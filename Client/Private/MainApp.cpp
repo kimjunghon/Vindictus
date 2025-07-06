@@ -1,0 +1,181 @@
+#include "MainApp.h"
+#include "GameInstance.h"
+#include "Level_Loading.h"
+#include "Level_GamePlay.h"
+#include "Level_Logo.h"
+#include "LoadingScreen.h"
+#include "ProgressBar.h"
+#include "ProgressBar_Back.h"
+
+CMainApp::CMainApp()
+	: m_pGameInstance { CGameInstance::GetInstance()}
+{
+	Safe_AddRef(m_pGameInstance);
+}
+
+HRESULT CMainApp::Initialize()
+{
+	ENGINE_DESC tEngineDesc{};
+
+	tEngineDesc.hInst = g_hInst;
+	tEngineDesc.hWnd = g_hWnd;
+	tEngineDesc.eWinMode = WINMODE::WIN;
+	tEngineDesc.iWinSizeX = g_iWinSizeX;
+	tEngineDesc.iWinSizeY = g_iWinSizeY;
+	tEngineDesc.iNumLevels = ENUM_CLASS(LEVEL::END);
+	
+	if (FAILED(m_pGameInstance->Initialize_Engine(tEngineDesc, &m_pDevice, &m_pDeviceContext)))
+		return E_FAIL;
+
+	if (FAILED(Ready_Prototype_ForStatic()))
+		return E_FAIL;
+
+	if (FAILED(Start_Level(LEVEL::LOGO)))
+		return E_FAIL;
+
+	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
+		this->Event_LevelChange(Event); });
+
+	return S_OK;
+}
+
+void CMainApp::Post_Update()
+{
+	if (m_bChange_Level)
+	{
+		if (FAILED(m_pGameInstance->Clear_Resources()))
+			MSG_BOX(TEXT("Failed Clear Resrouces"));
+		
+		if (FAILED(m_pGameInstance->Open_Level(m_iChange_Level, Create_NewLevel(m_iChange_Level))))
+			MSG_BOX(TEXT("Failed Open Level"));
+
+		m_bChange_Level = false;
+	}
+}
+
+void CMainApp::Update(_float fTimeDelta)
+{
+	m_pGameInstance->Update_Engine(fTimeDelta);
+}
+
+HRESULT CMainApp::Render()
+{
+	_float4		vClearColor = _float4(0.f, 0.f, 1.f, 1.f);
+
+	m_pGameInstance->Render_Begin(&vClearColor);
+	m_pGameInstance->Draw();
+	m_pGameInstance->Render_End();
+
+	return S_OK;
+}
+
+void CMainApp::Event_LevelChange(const EVENT_LEVEL_CHANGE& Event)
+{
+	m_bChange_Level = true;
+	m_iChange_Level = Event.iChange_Level;
+	m_bIsLoading = Event.bIsLoading;
+}
+
+CLevel* CMainApp::Create_NewLevel(_uint iChangeLevel)
+{
+	CLevel* pNewLevel = { nullptr };
+
+	if (m_bIsLoading)
+	{
+		switch (static_cast<LEVEL>(m_iChange_Level))
+		{
+		case LEVEL::LOGO:
+			pNewLevel = CLevel_Logo::Create(m_pDevice, m_pDeviceContext);
+			break;
+		case LEVEL::GAMEPLAY:
+			pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pDeviceContext);
+			break;
+		}
+	}
+	else
+		pNewLevel = CLevel_Loading::Create(m_pDevice, m_pDeviceContext, static_cast<LEVEL>(m_iChange_Level));
+
+	return pNewLevel;
+}
+
+HRESULT CMainApp::Ready_Prototype_ForStatic()
+{
+	D3D11_INPUT_ELEMENT_DESC Elements[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+
+	/* Ready_Prototype_Component_Shader */
+	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), Elements, 2))))
+		return E_FAIL;
+
+	/* Ready_Prototype_Component_VIBuffer*/
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
+		CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Ready_Prototype_GameObject_LoadingScreen */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"),
+		CLoadingScreen::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+	/* Ready_Prototype_GameObject_ProgressBar*/
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_ProgressBar"),
+		CProgressBar::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Ready_Prototype_GameObject_ProgressBar_Back */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_ProgressBar_Back"),
+		CProgressBar_Back::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+	
+	/* Ready_Prototype_Component_Texture_LoadingScreen */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Loading/LoadingScreen.png"), 1))))
+		return E_FAIL;
+
+	/* Ready_Prototype_Component_Texture_LoadingBar */
+	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Loading/LoadingBar.png"),1))))
+		return E_FAIL;
+
+	/* Ready_Prototype_Component_Texture_LoadingBar_Back */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Loading/LoadingBack.png"), 1))))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Start_Level(LEVEL eStartLevelID)
+{
+	return m_pGameInstance->Open_Level(ENUM_CLASS(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pDeviceContext, eStartLevelID));
+}
+
+CMainApp* CMainApp::Create()
+{
+	CMainApp* pInstance = new CMainApp();
+
+	if (FAILED(pInstance->Initialize()))
+	{
+		MSG_BOX(TEXT("Failed Created : CMainApp"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void CMainApp::Free()
+{
+	__super::Free();
+
+	Safe_Release(m_pDevice);
+	Safe_Release(m_pDeviceContext);
+
+	m_pGameInstance->Release_Engine();
+
+	Safe_Release(m_pGameInstance);
+}

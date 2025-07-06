@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="98.Defaults">
+      <UniqueIdentifier>{796a97b5-a9f9-4727-a380-abaf911b6011}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99.Defines">
+      <UniqueIdentifier>{87430cc9-bdb5-4921-a408-7ac82e1fdd91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00.MainApp">
+      <UniqueIdentifier>{6dc40b73-3221-4ce1-b4e7-e0142a2df85d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels">
+      <UniqueIdentifier>{47241e83-a0f6-4b8c-a78f-19fce34818f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\GamePlay">
+      <UniqueIdentifier>{9fcec439-8bb5-46e7-81bc-f401093c77a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Loading">
+      <UniqueIdentifier>{b4ff1bb4-8c5f-4c91-9074-7b5f0fd3068e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Loading\Loader">
+      <UniqueIdentifier>{aef88141-ab26-4dc9-a8fe-7010776d6d5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Logo">
+      <UniqueIdentifier>{8efafbf9-e876-47cc-88ba-ad25bc38c69e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject">
+      <UniqueIdentifier>{13d34374-d51a-4b83-9983-e1a08fc692f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player">
+      <UniqueIdentifier>{7fe11105-edce-441a-bb5e-93f9ed77907c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Loading">
+      <UniqueIdentifier>{fc7e9559-cc44-48d5-b0fb-55ccbd6ae479}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UI">
+      <UniqueIdentifier>{12c29669-e658-40c2-8dd9-2d7c6fd0cd9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UI\ProgressBar">
+      <UniqueIdentifier>{00c7a3ce-7dac-4fe9-94e7-7e66e5447cd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UI\Background">
+      <UniqueIdentifier>{894bcd7f-e626-4263-b8aa-5837632cb147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Loading\UI">
+      <UniqueIdentifier>{c2ac7ef4-fcd1-4917-972c-cdef907fc67d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Client.h">
+      <Filter>98.Defaults</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>98.Defaults</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>98.Defaults</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>98.Defaults</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MainApp.h">
+      <Filter>00.MainApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_GamePlay.h">
+      <Filter>01.Levels\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Loading.h">
+      <Filter>01.Levels\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Loader.h">
+      <Filter>01.Levels\Loading\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Logo.h">
+      <Filter>01.Levels\Logo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Client_Defines.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02.GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Background.h">
+      <Filter>02.GameObject\UI\Background</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ProgressBar_Back.h">
+      <Filter>02.GameObject\UI\ProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Event_Struct.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ProgressBar.h">
+      <Filter>02.GameObject\UI\ProgressBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadingScreen.h">
+      <Filter>02.GameObject\Loading\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Client_Enum.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Client.ico">
+      <Filter>98.Defaults</Filter>
+    </Image>
+    <Image Include="small.ico">
+      <Filter>98.Defaults</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Client.rc">
+      <Filter>98.Defaults</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Client.cpp">
+      <Filter>98.Defaults</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MainApp.cpp">
+      <Filter>00.MainApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_GamePlay.cpp">
+      <Filter>01.Levels\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Loading.cpp">
+      <Filter>01.Levels\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Loader.cpp">
+      <Filter>01.Levels\Loading\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Logo.cpp">
+      <Filter>01.Levels\Logo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Player.cpp">
+      <Filter>02.GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Background.cpp">
+      <Filter>02.GameObject\UI\Background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ProgressBar_Back.cpp">
+      <Filter>02.GameObject\UI\ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ProgressBar.cpp">
+      <Filter>02.GameObject\UI\ProgressBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingScreen.cpp">
+      <Filter>02.GameObject\Loading\UI</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
+      <Filter>98.Defaults</Filter>
+    </FxCompile>
+  </ItemGroup>
+</Project>
