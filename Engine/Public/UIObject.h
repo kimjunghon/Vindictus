@@ -11,7 +11,7 @@ public:
 		_float fY{}; 
 		_float fSizeX{}; 
 		_float fSizeY{};
-		_uint  iHeight{};
+		_uint  iDepth{};
 
 		_float fOffsetX = 0.f;
 		_float fOffsetY = 0.f;
@@ -38,7 +38,7 @@ protected:
 	_float4x4		m_ProjMatrix = {};
 	_float			m_fX = {};
 	_float			m_fY = {};
-	_uint			m_iHeight = {};
+	_uint			m_iDepth = {};
 
 	_float			m_fSizeX = {};
 	_float			m_fSizeY = {};
@@ -60,7 +60,7 @@ protected:
 	void			Children_Priority_Update(_float fTimeDelta);
 	void			Children_Update(_float fTimeDelta);
 	void			Children_Late_Update(_float fTimeDelta);
-	HRESULT			Children_Render();
+
 
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;

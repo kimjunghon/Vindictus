@@ -28,7 +28,7 @@ HRESULT CUIObject::Initialize(void* pArg)
 
 	m_fX = pDesc->fX;
 	m_fY = pDesc->fY;
-	m_iHeight = pDesc->iHeight;
+	m_iDepth = pDesc->iDepth;
 	m_fSizeX = pDesc->fSizeX;
 	m_fSizeY = pDesc->fSizeY;
 	m_fOffsetX = pDesc->fOffsetX;
@@ -71,7 +71,10 @@ HRESULT CUIObject::Render()
 
 _bool CUIObject::IsPick(HWND hWnd)
 {
-	RECT	rcRect = { m_fX - m_fSizeX * 0.5f, m_fY - m_fSizeY * 0.5f, m_fX + m_fSizeX * 0.5f, m_fY + m_fSizeY * 0.5f };
+	_float fX = m_fX - m_fOffsetX;
+	_float fY = m_fY + m_fOffsetY;
+
+	RECT	rcRect = { LONG(fX - (m_fSizeX * 0.5f)), LONG(fY - (m_fSizeY * 0.5f)), LONG(fX + (m_fSizeX * 0.5f)), LONG(fY + (m_fSizeY * 0.5f)) };
 
 	POINT	ptMouse = {};
 	GetCursorPos(&ptMouse);
@@ -114,7 +117,7 @@ HRESULT CUIObject::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _ws
 HRESULT CUIObject::Begin()
 {
 	m_pTransformCom->Scale(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX - m_fOffsetX - (m_iWinSizeX * 0.5f), -m_fY - m_fOffsetY + (m_iWinSizeY * 0.5f), (UI_FAR / (_float)m_iHeight), 1.f));
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX - m_fOffsetX - (m_iWinSizeX * 0.5f), -m_fY - m_fOffsetY + (m_iWinSizeY * 0.5f), (UI_FAR / (_float)m_iDepth), 1.f));
 
 	return S_OK;
 }
@@ -155,20 +158,6 @@ void CUIObject::Children_Late_Update(_float fTimeDelta)
 
 	for (auto Child : m_Children)
 		Child->Late_Update(fTimeDelta);
-}
-
-HRESULT CUIObject::Children_Render()
-{
-	if (m_Children.size() <= 0)
-		return E_FAIL;
-
-	for (auto Child : m_Children)
-	{
-		if (FAILED(Child->Render()))
-			return E_FAIL;
-	}
-
-	return S_OK;
 }
 
 void CUIObject::Free()

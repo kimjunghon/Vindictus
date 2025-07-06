@@ -150,6 +150,7 @@ call Copy.bat</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h" />
+    <ClInclude Include="..\public\ButtonObject.h" />
     <ClInclude Include="..\Public\CollisionObject.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\DynamicAABBTree.h" />
@@ -182,6 +183,7 @@ call Copy.bat</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp" />
+    <ClCompile Include="..\private\ButtonObject.cpp" />
     <ClCompile Include="..\Private\CollisionObject.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\DynamicAABBTree.cpp" />

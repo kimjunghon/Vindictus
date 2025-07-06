@@ -82,6 +82,9 @@
     <Filter Include="01.Utility\04.Component\Texture">
       <UniqueIdentifier>{f1623c8a-ed28-4790-8deb-772246b5ca32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.GameObject\UIObject\Button">
+      <UniqueIdentifier>{164f1e53-c3ad-4527-9c8d-015c66b65375}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -174,6 +177,9 @@
     <ClInclude Include="..\public\Texture.h">
       <Filter>01.Utility\04.Component\Texture</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ButtonObject.h">
+      <Filter>01.Utility\03.GameObject\UIObject\Button</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -244,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Texture.cpp">
       <Filter>01.Utility\04.Component\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ButtonObject.cpp">
+      <Filter>01.Utility\03.GameObject\UIObject\Button</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
