@@ -30,6 +30,7 @@ public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+
 protected:
 	vector<CUIObject*> m_Children;
 
@@ -52,6 +53,7 @@ protected:
 	HRESULT			Add_StaticTexture_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, UIOBJECT_DESC& UIChildDesc);
 	HRESULT			Add_DynamicTexture_Child(_uint iUIPrototypeLevelIndex, const _wstring& strUIPrototypeTag, _uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag, UIOBJECT_DESC& UIChildDesc);
 	virtual HRESULT Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag);
+	virtual _bool	IsPick(HWND hWnd);
 
 	HRESULT			Begin();
 	HRESULT			Update_ChildPosition(_float fX, _float fY);

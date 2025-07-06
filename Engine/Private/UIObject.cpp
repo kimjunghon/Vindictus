@@ -69,6 +69,17 @@ HRESULT CUIObject::Render()
 	return S_OK;
 }
 
+_bool CUIObject::IsPick(HWND hWnd)
+{
+	RECT	rcRect = { m_fX - m_fSizeX * 0.5f, m_fY - m_fSizeY * 0.5f, m_fX + m_fSizeX * 0.5f, m_fY + m_fSizeY * 0.5f };
+
+	POINT	ptMouse = {};
+	GetCursorPos(&ptMouse);
+	ScreenToClient(hWnd, &ptMouse);
+
+	return PtInRect(&rcRect, ptMouse);
+}
+
 
 HRESULT CUIObject::Add_StaticTexture_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, UIOBJECT_DESC& UIChildDesc)
 {

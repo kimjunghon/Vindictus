@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UIObject.h"
+#include "ButtonObject.h"
 #include "VIBuffer_Rect.h"
 #include "Transform.h"
 #include "Shader.h"
