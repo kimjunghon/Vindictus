@@ -1,22 +1,22 @@
-#include "ProgressBar_Back.h"
+#include "Panel.h"
 #include "GameInstance.h"
 
-CProgressBar_Back::CProgressBar_Back(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
+CPanel::CPanel(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CUIObject{ pDevice, pDeviceContext }
 {
 }
 
-CProgressBar_Back::CProgressBar_Back(const CProgressBar_Back& Prototype)
+CPanel::CPanel(const CPanel& Prototype)
 	: CUIObject{ Prototype }
 {
 }
 
-HRESULT CProgressBar_Back::Initialize_Prototype()
+HRESULT CPanel::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CProgressBar_Back::Initialize(void* pArg)
+HRESULT CPanel::Initialize(void* pArg)
 {
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
@@ -27,21 +27,21 @@ HRESULT CProgressBar_Back::Initialize(void* pArg)
     return S_OK;
 }
 
-void CProgressBar_Back::Priority_Update(_float fTimeDelta)
+void CPanel::Priority_Update(_float fTimeDelta)
 {
 }
 
-void CProgressBar_Back::Update(_float fTimeDelta)
+void CPanel::Update(_float fTimeDelta)
 {
 }
 
-void CProgressBar_Back::Late_Update(_float fTimeDelta)
+void CPanel::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
 		return;
 }
 
-HRESULT CProgressBar_Back::Render()
+HRESULT CPanel::Render()
 {
 	__super::Begin();
 
@@ -66,7 +66,7 @@ HRESULT CProgressBar_Back::Render()
 	return S_OK;
 }
 
-HRESULT CProgressBar_Back::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag)
+HRESULT CPanel::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag)
 {
 	if (FAILED(CGameObject::Add_Component(iTexturePrototypeLevelIndex, strTexturePrototypeTag,
 		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
@@ -75,7 +75,7 @@ HRESULT CProgressBar_Back::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, c
 	return S_OK;
 }
 
-HRESULT CProgressBar_Back::Ready_Components()
+HRESULT CPanel::Ready_Components()
 {
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
@@ -88,33 +88,33 @@ HRESULT CProgressBar_Back::Ready_Components()
 	return S_OK;
 }
 
-CProgressBar_Back* CProgressBar_Back::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
+CPanel* CPanel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 {
-	CProgressBar_Back* pInstance = new CProgressBar_Back(pDevice, pDeviceContext);
+	CPanel* pInstance = new CPanel(pDevice, pDeviceContext);
 
 	if (FAILED(pInstance->Initialize_Prototype()))
 	{
-		MSG_BOX(TEXT("Failed to Created : CProgressBar_Back"));
+		MSG_BOX(TEXT("Failed to Created : CPanel"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CGameObject* CProgressBar_Back::Clone(void* pArg)
+CGameObject* CPanel::Clone(void* pArg)
 {
-	CProgressBar_Back* pInstance = new CProgressBar_Back(*this);
+	CPanel* pInstance = new CPanel(*this);
 
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed to Cloned : CProgressBar_Back"));
+		MSG_BOX(TEXT("Failed to Cloned : CPanel"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CProgressBar_Back::Free()
+void CPanel::Free()
 {
 	__super::Free();
 

@@ -10,12 +10,12 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CProgressBar_Back final : public CUIObject
+class CPanel final : public CUIObject
 {
 private:
-	CProgressBar_Back(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CProgressBar_Back(const CProgressBar_Back& Prototype);
-	virtual ~CProgressBar_Back() = default;
+	CPanel(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CPanel(const CPanel& Prototype);
+	virtual ~CPanel() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -35,7 +35,7 @@ private:
 	HRESULT			Ready_Components();
 
 public:
-	static CProgressBar_Back*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	static CPanel*				Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*		Clone(void* pArg) override;
 	virtual void				Free() override;
 };

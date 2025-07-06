@@ -28,10 +28,7 @@ HRESULT CProgressBar::Initialize(void* pArg)
 		return E_FAIL;
 
 	m_fStartX = m_fX - m_fSizeX;
-	m_fRatio = 0.f;
-	m_fCurrentRatio = 0.f;
-	m_fFillSpeed = 0.5f;
-
+	
 	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
 		this->Event_ProgressBar(Event); });
 
@@ -44,18 +41,12 @@ void CProgressBar::Priority_Update(_float fTimeDelta)
 
 void CProgressBar::Update(_float fTimeDelta)
 {
-	if (m_fRatio > m_fCurrentRatio)
-	{
-		m_fCurrentRatio += (m_fFillSpeed * fTimeDelta);
-		if (m_fCurrentRatio > m_fRatio)
-			m_fCurrentRatio = m_fRatio;
-	}
+
 }
 
 void CProgressBar::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
-		return;
+
 }
 
 HRESULT CProgressBar::Render()
@@ -119,29 +110,6 @@ void CProgressBar::Event_ProgressBar(const EVENT_PROGRESSBAR& Event)
 	m_fRatio = Event.fRatio;
 }
 
-CProgressBar* CProgressBar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-{
-	CProgressBar* pInstance = new CProgressBar(pDevice, pDeviceContext);
-	if (FAILED(pInstance->Initialize_Prototype()))
-	{
-		MSG_BOX(TEXT("Failed Created : CProgressBar"));
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
-}
-
-CGameObject* CProgressBar::Clone(void* pArg)
-{
-	CProgressBar* pInstance = new CProgressBar(*this);
-	if (FAILED(pInstance->Initialize(pArg)))
-	{
-		MSG_BOX(TEXT("Failed Cloned : CProgressBar"));
-		Safe_Release(pInstance);
-	}
-
-	return pInstance;
-}
 
 void CProgressBar::Free()
 {

@@ -10,9 +10,9 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CProgressBar final : public CUIObject
+class CProgressBar abstract : public CUIObject
 {
-private:
+protected:
 	CProgressBar(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CProgressBar(const CProgressBar& Prototype);
 	virtual ~CProgressBar() = default;
@@ -25,7 +25,7 @@ public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
-private:
+protected:
 	CVIBuffer*		m_pVIBufferCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
 	CTexture*		m_pTextureCom = { nullptr };
@@ -34,6 +34,7 @@ private:
 	_float			m_fRatio = {};
 	_float			m_fCurrentRatio = {};
 	_float			m_fFillSpeed = {};
+	
 private:
 	virtual HRESULT	Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag) override;
 	HRESULT			Ready_Components();
@@ -41,8 +42,7 @@ private:
 
 
 public:
-	static CProgressBar*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	virtual CGameObject*	Clone(void* pArg) override;
+	virtual CGameObject*	Clone(void* pArg) PURE;
 	virtual void			Free() override;
 };
 
