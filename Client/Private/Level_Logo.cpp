@@ -36,6 +36,19 @@ HRESULT CLevel_Logo::Render()
 
 HRESULT CLevel_Logo::Ready_Layer(const _wstring& strLayerTag)
 {
+	CUIObject::UIOBJECT_DESC UI_Desc{};
+	UI_Desc.fX = g_iWinSizeX >> 1;
+	UI_Desc.fY = g_iWinSizeY >> 1;
+	UI_Desc.fSizeX = g_iWinSizeX;
+	UI_Desc.fSizeY = g_iWinSizeY;
+	UI_Desc.fOffsetX = 0;
+	UI_Desc.fOffsetY = 0;
+	UI_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_UIObject_LogoScreen"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_UI"), &UI_Desc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 

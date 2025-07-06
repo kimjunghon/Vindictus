@@ -1,7 +1,6 @@
 #include "LoadingScreen.h"
 #include "GameInstance.h"
 #include "ProgressBar.h"
-#include "ProgressBar_Back.h"
 
 CLoadingScreen::CLoadingScreen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CUIObject { pDevice, pDeviceContext }
@@ -75,8 +74,6 @@ HRESULT CLoadingScreen::Render()
 
 	m_pVIBufferCom->Render();
 
-	__super::Children_Render();
-
 	return S_OK;
 }
 
@@ -99,24 +96,26 @@ HRESULT CLoadingScreen::Ready_Component()
 
 HRESULT CLoadingScreen::Ready_Children()
 {
-	UIOBJECT_DESC Childer_Desc{};
-	Childer_Desc.fX = m_fX;
-	Childer_Desc.fY = m_fY;
-	Childer_Desc.fSizeX = m_fSizeX - 100.f;
-	Childer_Desc.fSizeY = 10.f;
-	Childer_Desc.fOffsetX = 0.f;
-	Childer_Desc.fOffsetY = 260.f;
-	Childer_Desc.iHeight = 4;
+	UIOBJECT_DESC Children_Desc{};
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_ProgressBar"), 
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar"), Childer_Desc)))
+	Children_Desc.fX = m_fX;
+	Children_Desc.fY = m_fY;
+	Children_Desc.fSizeX = m_fSizeX - 100.f;
+	Children_Desc.fSizeY = 10.f;
+	Children_Desc.fOffsetX = 0.f;
+	Children_Desc.fOffsetY = 260.f;
+	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
+
+	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"), 
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar"), Children_Desc)))
 		return E_FAIL;
 
-	Childer_Desc.iHeight = 3;
+	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_ProgressBar_Back"),
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"),Childer_Desc)))
+	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"), Children_Desc)))
 		return E_FAIL;
+
 
 	return S_OK;
 }

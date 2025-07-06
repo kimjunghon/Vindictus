@@ -31,20 +31,29 @@
     <Filter Include="02.GameObject\Player">
       <UniqueIdentifier>{7fe11105-edce-441a-bb5e-93f9ed77907c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Loading">
+    <Filter Include="02.GameObject\UIObject">
+      <UniqueIdentifier>{12c19376-a6c9-4db0-95ca-b116485a18bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\Logo">
+      <UniqueIdentifier>{663f6d98-11ba-438c-99b9-1406a1fe843d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\Loading">
       <UniqueIdentifier>{fc7e9559-cc44-48d5-b0fb-55ccbd6ae479}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\UI">
-      <UniqueIdentifier>{12c29669-e658-40c2-8dd9-2d7c6fd0cd9f}</UniqueIdentifier>
+    <Filter Include="02.GameObject\UIObject\Static">
+      <UniqueIdentifier>{9b5a3425-2493-4e94-a944-22b17a5c2c60}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\UI\ProgressBar">
-      <UniqueIdentifier>{00c7a3ce-7dac-4fe9-94e7-7e66e5447cd5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UI\Background">
+    <Filter Include="02.GameObject\UIObject\Static\Background">
       <UniqueIdentifier>{894bcd7f-e626-4263-b8aa-5837632cb147}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Loading\UI">
-      <UniqueIdentifier>{c2ac7ef4-fcd1-4917-972c-cdef907fc67d}</UniqueIdentifier>
+    <Filter Include="02.GameObject\UIObject\Static\ProgressBar">
+      <UniqueIdentifier>{00c7a3ce-7dac-4fe9-94e7-7e66e5447cd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\Static\Button">
+      <UniqueIdentifier>{3f709017-faa8-4a54-896b-0a8fa92454cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\Static\Panel">
+      <UniqueIdentifier>{75274f8e-fba3-4800-9d95-1645c708fcda}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -82,22 +91,31 @@
       <Filter>02.GameObject\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Background.h">
-      <Filter>02.GameObject\UI\Background</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\ProgressBar_Back.h">
-      <Filter>02.GameObject\UI\ProgressBar</Filter>
+      <Filter>02.GameObject\UIObject\Static\Background</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Event_Struct.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\ProgressBar.h">
-      <Filter>02.GameObject\UI\ProgressBar</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\LoadingScreen.h">
-      <Filter>02.GameObject\Loading\UI</Filter>
+      <Filter>02.GameObject\UIObject\Static\ProgressBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Client_Enum.h">
       <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadingScreen.h">
+      <Filter>02.GameObject\UIObject\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LogoScreen.h">
+      <Filter>02.GameObject\UIObject\Logo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Button.h">
+      <Filter>02.GameObject\UIObject\Static\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Panel.h">
+      <Filter>02.GameObject\UIObject\Static\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadingBar.h">
+      <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -136,16 +154,25 @@
       <Filter>02.GameObject\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Background.cpp">
-      <Filter>02.GameObject\UI\Background</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\ProgressBar_Back.cpp">
-      <Filter>02.GameObject\UI\ProgressBar</Filter>
+      <Filter>02.GameObject\UIObject\Static\Background</Filter>
     </ClCompile>
     <ClCompile Include="..\private\ProgressBar.cpp">
-      <Filter>02.GameObject\UI\ProgressBar</Filter>
+      <Filter>02.GameObject\UIObject\Static\ProgressBar</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LoadingScreen.cpp">
-      <Filter>02.GameObject\Loading\UI</Filter>
+      <Filter>02.GameObject\UIObject\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LogoScreen.cpp">
+      <Filter>02.GameObject\UIObject\Logo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Button.cpp">
+      <Filter>02.GameObject\UIObject\Static\Button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Panel.cpp">
+      <Filter>02.GameObject\UIObject\Static\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingBar.cpp">
+      <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

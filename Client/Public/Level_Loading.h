@@ -22,7 +22,7 @@ private:
 private:
 	HRESULT Ready_GameObjects();
 	HRESULT Ready_LoadingThread();
-
+	void	Event_LoadingComplete(const EVENT_LOADING_COMPLETE& Event);
 public:
 	static CLevel_Loading*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, LEVEL eNextLevelID);
 	virtual void			Free() override;

@@ -4,8 +4,9 @@
 #include "Level_GamePlay.h"
 #include "Level_Logo.h"
 #include "LoadingScreen.h"
-#include "ProgressBar.h"
-#include "ProgressBar_Back.h"
+#include "LoadingBar.h"
+#include "Panel.h"
+#include "Button.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
@@ -121,14 +122,15 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"),
 		CLoadingScreen::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
+
 	/* Ready_Prototype_GameObject_ProgressBar*/
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_ProgressBar"),
-		CProgressBar::Create(m_pDevice, m_pDeviceContext))))
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"),
+		CLoadingBar::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	/* Ready_Prototype_GameObject_ProgressBar_Back */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_ProgressBar_Back"),
-		CProgressBar_Back::Create(m_pDevice, m_pDeviceContext))))
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
+		CPanel::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 	
 	/* Ready_Prototype_Component_Texture_LoadingScreen */
@@ -146,6 +148,10 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Loading/LoadingBack.png"), 1))))
 		return E_FAIL;
 
+	/* Ready_Prototype_GameObject_Button */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_ButtonObject_Button"),
+		CButton::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 
 	return S_OK;
 }

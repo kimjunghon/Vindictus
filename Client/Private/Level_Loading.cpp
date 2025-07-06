@@ -11,6 +11,9 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;
 
+	m_pGameInstance->Subscribe<EVENT_LOADING_COMPLETE>(ENUM_CLASS(LEVEL::LOADING), [this](const EVENT_LOADING_COMPLETE& Event) {
+		this->Event_LoadingComplete(Event); });
+
 	if (FAILED(Ready_GameObjects()))
 		return E_FAIL;
 
@@ -22,15 +25,6 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 
 void CLevel_Loading::Update(_float fTimeDelta)
 {
-	if (m_pLoader->isFinished() &&
-		GetKeyState(VK_SPACE) & 0x8000)
-	{
-		EVENT_LEVEL_CHANGE Event;
-		Event.iChange_Level = ENUM_CLASS(m_eNextLevelID);
-		Event.bIsLoading = true;
-
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
-	}
 }
 
 HRESULT CLevel_Loading::Render()
@@ -49,7 +43,7 @@ HRESULT CLevel_Loading::Ready_GameObjects()
 	UI_Desc.fSizeY = g_iWinSizeY;
 	UI_Desc.fOffsetX = 0;
 	UI_Desc.fOffsetY = 0;
-	UI_Desc.iHeight = 2;
+	UI_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"),
 		ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_UI"), &UI_Desc)))
@@ -65,6 +59,15 @@ HRESULT CLevel_Loading::Ready_LoadingThread()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CLevel_Loading::Event_LoadingComplete(const EVENT_LOADING_COMPLETE& Event)
+{
+	EVENT_LEVEL_CHANGE Event_LevelChange;
+	Event_LevelChange.iChange_Level = ENUM_CLASS(m_eNextLevelID);
+	Event_LevelChange.bIsLoading = true;
+
+	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event_LevelChange);
 }
 
 CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, LEVEL eNextLevelID)

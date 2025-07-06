@@ -16,4 +16,7 @@ namespace Client
 		PROGRESS_TYPE	eType;
 		_float			fRatio;
 	}EVENT_PROGRESSBAR;
+
+	typedef struct tagEventLoadingComplete final : public CEvent
+	{}EVENT_LOADING_COMPLETE;
 }

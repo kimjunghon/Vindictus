@@ -2,7 +2,7 @@
 #include "Event_Struct.h"
 #include "GameInstance.h"
 
-#include "BackGround.h"
+#include "LogoScreen.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: m_pDevice { pDevice}
@@ -55,8 +55,6 @@ HRESULT CLoader::Loading()
 	if (FAILED(hr))
 		return E_FAIL;
 
-
-
 	LeaveCriticalSection(&m_CriticalSection);
 
 	return S_OK;
@@ -64,7 +62,61 @@ HRESULT CLoader::Loading()
 
 HRESULT CLoader::Loading_For_Logo_Level()
 {
+	EVENT_PROGRESSBAR Event;
+	Event.eType = PROGRESS_TYPE::LOADING;
+	Event.fRatio = m_fLoadingRatio;
 
+	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+
+	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_SkyBox"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Logo/Sky_Box.png"), 1))))
+		return E_FAIL;	
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_WaterMark"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Logo/Logo_Watermark.png"), 1))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Button"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Logo/Button.png"), 1))))
+		return E_FAIL;
+
+	Event.fRatio += 0.2f;
+
+	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+
+	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
+	Event.fRatio += 0.2f;
+
+	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+
+	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
+	Event.fRatio += 0.2f;
+
+	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+
+	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_UIObject_LogoScreen"),
+		CLogoScreen::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	Event.fRatio += 0.2f;
+
+	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+
+	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
+	Event.fRatio = 1.f;
+
+	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+
+	m_isFinished = true;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_GamePlay_Level()
+{
 	EVENT_PROGRESSBAR Event;
 	Event.eType = PROGRESS_TYPE::LOADING;
 	Event.fRatio = m_fLoadingRatio;
@@ -88,9 +140,6 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
 
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_BackGround"),
-		CBackground::Create(m_pDevice, m_pDeviceContext))))
-		return E_FAIL;
 
 	Event.fRatio += 0.2f;
 
@@ -103,22 +152,6 @@ HRESULT CLoader::Loading_For_Logo_Level()
 
 	m_isFinished = true;
 
-	return S_OK;
-}
-
-HRESULT CLoader::Loading_For_GamePlay_Level()
-{
-	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
-
-	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
-
-	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
-
-	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
-
-	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
-
-	m_isFinished = true;
 
 	return S_OK;
 }
