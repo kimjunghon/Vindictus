@@ -21,8 +21,8 @@ HRESULT CBackground::Initialize(void* pArg)
 	UIOBJECT_DESC               Desc{};
 	Desc.fX = g_iWinSizeX >> 1;
 	Desc.fY = g_iWinSizeY >> 1;
-	Desc.fSizeX = 200.0f;
-	Desc.fSizeY = 200.0f;
+	Desc.fSizeX = g_iWinSizeX;
+	Desc.fSizeY = g_iWinSizeY;
 	Desc.fOffsetX = 0.f;
 	Desc.fOffsetY = 0.f;
 

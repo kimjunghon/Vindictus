@@ -23,38 +23,70 @@ HRESULT CLoadingBar::Initialize(void* pArg)
 
 	m_fRatio = 0.f;
 	m_fCurrentRatio = 0.f;
-	m_fFillSpeed = 0.5f;
+	m_fFillSpeed = 0.f;
+	
+	m_eType = PROGRESS_TYPE::LOADING;
+
+	if (FAILED(Ready_Components()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Children()))
+		return E_FAIL;
 
 	return S_OK;
 }
 
-void CLoadingBar::Priority_Update(_float fTimeDelta)
-{
-}
-
 void CLoadingBar::Update(_float fTimeDelta)
 {
-	if (m_fCurrentRatio < m_fRatio)
+	m_fFillSpeed = (1.f - m_fCurrentRatio) * m_fRatio;
+	if (m_fFillSpeed <= 0.03f)
+		m_fFillSpeed = 0.03f;
+	
+	m_fCurrentRatio += m_fFillSpeed * fTimeDelta;
+
+	m_fPointX = m_fStartX + (m_fSizeX * m_fCurrentRatio);
+
+	__super::Update_ChildPosition(m_fPointX, m_fY);
+
+	if (m_fCurrentRatio >= 1.f)
 	{
-		m_fCurrentRatio += m_fFillSpeed * fTimeDelta;
-		if (m_fCurrentRatio > m_fRatio)
-		{
-			m_fCurrentRatio = m_fRatio;
-			EVENT_LOADING_COMPLETE Event;
-			m_pGameInstance->Publish(ENUM_CLASS(LEVEL::LOADING), Event);
-		}
+		EVENT_LOADING_COMPLETE Event;
+		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::LOADING), Event);
 	}
+
+	__super::Children_Update(fTimeDelta);
 }
 
-void CLoadingBar::Late_Update(_float fTimeDelta)
+HRESULT CLoadingBar::Ready_Components()
 {
-	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
-		return;
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
+		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
+		return E_FAIL;
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar"),
+		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+		return E_FAIL;
+
+	return S_OK;
 }
 
-HRESULT CLoadingBar::Render()
+HRESULT CLoadingBar::Ready_Children()
 {
-	CProgressBar::Render();
+	UIOBJECT_DESC Children_Desc{};
+	Children_Desc.fX = m_fX;
+	Children_Desc.fY = m_fY;
+	Children_Desc.fSizeX = 100.f;
+	Children_Desc.fSizeY = 100.f;
+	Children_Desc.fOffsetX = 0.f;
+	Children_Desc.fOffsetY = m_fOffsetY;
+	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
+
+	if (FAILED(CUIObject::Add_StaticTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingPoint"), &Children_Desc)))
+		return E_FAIL;
 
 	return S_OK;
 }

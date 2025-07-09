@@ -55,6 +55,12 @@
     <Filter Include="02.GameObject\UIObject\Static\Panel">
       <UniqueIdentifier>{75274f8e-fba3-4800-9d95-1645c708fcda}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\Camera">
+      <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\GamePlay">
+      <UniqueIdentifier>{e09314ea-c9cf-4170-9b10-fc01544610b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -117,6 +123,24 @@
     <ClInclude Include="..\public\LoadingBar.h">
       <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\LoadingPoint.h">
+      <Filter>02.GameObject\UIObject\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Camera_Target.h">
+      <Filter>02.GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\HUD.h">
+      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerStateBar_Lerp.h">
+      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerStateBar.h">
+      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StateBar.h">
+      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -173,6 +197,24 @@
     </ClCompile>
     <ClCompile Include="..\private\LoadingBar.cpp">
       <Filter>02.GameObject\UIObject\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingPoint.cpp">
+      <Filter>02.GameObject\UIObject\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_Target.cpp">
+      <Filter>02.GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerStateBar.cpp">
+      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\HUD.cpp">
+      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerStateBar_Lerp.cpp">
+      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StateBar.cpp">
+      <Filter>02.GameObject\UIObject\GamePlay</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

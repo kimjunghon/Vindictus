@@ -145,20 +145,26 @@
   <ItemGroup>
     <ClInclude Include="..\public\Background.h" />
     <ClInclude Include="..\public\Button.h" />
+    <ClInclude Include="..\public\Camera_Target.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Client_Enum.h" />
     <ClInclude Include="..\Public\Event_Struct.h" />
+    <ClInclude Include="..\public\HUD.h" />
     <ClInclude Include="..\public\Level_GamePlay.h" />
     <ClInclude Include="..\public\Level_Loading.h" />
     <ClInclude Include="..\public\Level_Logo.h" />
     <ClInclude Include="..\public\Loader.h" />
     <ClInclude Include="..\public\LoadingBar.h" />
+    <ClInclude Include="..\public\LoadingPoint.h" />
     <ClInclude Include="..\public\LoadingScreen.h" />
     <ClInclude Include="..\public\LogoScreen.h" />
+    <ClInclude Include="..\Public\PlayerStateBar.h" />
+    <ClInclude Include="..\public\PlayerStateBar_Lerp.h" />
     <ClInclude Include="..\public\ProgressBar.h" />
     <ClInclude Include="..\public\Panel.h" />
     <ClInclude Include="..\public\MainApp.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\StateBar.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -167,18 +173,24 @@
   <ItemGroup>
     <ClCompile Include="..\private\Background.cpp" />
     <ClCompile Include="..\private\Button.cpp" />
+    <ClCompile Include="..\private\Camera_Target.cpp" />
+    <ClCompile Include="..\private\HUD.cpp" />
     <ClCompile Include="..\private\Level_GamePlay.cpp" />
     <ClCompile Include="..\private\Level_Loading.cpp" />
     <ClCompile Include="..\private\Level_Logo.cpp" />
     <ClCompile Include="..\private\Loader.cpp" />
     <ClCompile Include="..\private\LoadingBar.cpp" />
+    <ClCompile Include="..\private\LoadingPoint.cpp" />
     <ClCompile Include="..\private\LoadingScreen.cpp" />
     <ClCompile Include="..\private\LogoScreen.cpp" />
+    <ClCompile Include="..\private\PlayerStateBar_Lerp.cpp" />
     <ClCompile Include="..\private\ProgressBar.cpp" />
     <ClCompile Include="..\private\Panel.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\Player.cpp" />
+    <ClCompile Include="..\Private\StateBar.cpp" />
     <ClCompile Include="Client.cpp" />
+    <ClCompile Include="PlayerStateBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc" />

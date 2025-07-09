@@ -1,6 +1,7 @@
 #include "Level_Loading.h"
 #include "Loader.h"
 #include "GameInstance.h"
+#include "LoadingScreen.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel { pDevice, pDeviceContext }
@@ -36,17 +37,19 @@ HRESULT CLevel_Loading::Render()
 
 HRESULT CLevel_Loading::Ready_GameObjects()
 {
-	CUIObject::UIOBJECT_DESC UI_Desc{};
-	UI_Desc.fX = g_iWinSizeX >> 1;
-	UI_Desc.fY = g_iWinSizeY >> 1;
-	UI_Desc.fSizeX = g_iWinSizeX;
-	UI_Desc.fSizeY = g_iWinSizeY;
-	UI_Desc.fOffsetX = 0;
-	UI_Desc.fOffsetY = 0;
-	UI_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
+	CLoadingScreen::LOADING_DESC Loading_Desc{};
+
+	Loading_Desc.fX = g_iWinSizeX >> 1;
+	Loading_Desc.fY = g_iWinSizeY >> 1;
+	Loading_Desc.fSizeX = g_iWinSizeX;
+	Loading_Desc.fSizeY = g_iWinSizeY;
+	Loading_Desc.fOffsetX = 0;
+	Loading_Desc.fOffsetY = 0;
+	Loading_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
+	Loading_Desc.iLoadingLevelID = ENUM_CLASS(m_eNextLevelID);
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_UI"), &UI_Desc)))
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_UI"), &Loading_Desc)))
 		return E_FAIL;
 
 	return S_OK;

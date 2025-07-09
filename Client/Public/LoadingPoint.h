@@ -1,6 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
-#include "UIOBject.h"
+#include "UIObject.h"
 
 NS_BEGIN(Engine)
 class CVIBuffer;
@@ -9,17 +9,13 @@ class CShader;
 NS_END
 
 NS_BEGIN(Client)
-class CLoadingScreen final : public CUIObject
-{
-public:
-	typedef struct tagLoadingDesc : public UIOBJECT_DESC {
-		_uint iLoadingLevelID;
-	}LOADING_DESC;
 
+class CLoadingPoint final : public CUIObject
+{
 private:
-	CLoadingScreen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
-	CLoadingScreen(const CLoadingScreen& Prototype);
-	virtual ~CLoadingScreen() = default;
+	CLoadingPoint(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CLoadingPoint(const CLoadingPoint& Prototype);
+	virtual ~CLoadingPoint() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -33,16 +29,14 @@ private:
 	CVIBuffer*	m_pVIBufferCom = { nullptr };
 	CShader*	m_pShaderCom = { nullptr };
 	CTexture*	m_pTextureCom = { nullptr };
-	_uint		m_iLoadingLevelID = {};
+
 private:
 	HRESULT Ready_Component();
-	HRESULT Ready_Children();
 
 public:
-	static CLoadingScreen*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	static CLoadingPoint*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
 };
-
 
 NS_END

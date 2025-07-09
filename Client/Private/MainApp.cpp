@@ -5,6 +5,7 @@
 #include "Level_Logo.h"
 #include "LoadingScreen.h"
 #include "LoadingBar.h"
+#include "LoadingPoint.h"
 #include "Panel.h"
 #include "Button.h"
 
@@ -16,22 +17,22 @@ CMainApp::CMainApp()
 
 HRESULT CMainApp::Initialize()
 {
-	ENGINE_DESC tEngineDesc{};
+	ENGINE_DESC EngineDesc{};
 
-	tEngineDesc.hInst = g_hInst;
-	tEngineDesc.hWnd = g_hWnd;
-	tEngineDesc.eWinMode = WINMODE::WIN;
-	tEngineDesc.iWinSizeX = g_iWinSizeX;
-	tEngineDesc.iWinSizeY = g_iWinSizeY;
-	tEngineDesc.iNumLevels = ENUM_CLASS(LEVEL::END);
+	EngineDesc.hInst = g_hInst;
+	EngineDesc.hWnd = g_hWnd;
+	EngineDesc.eWinMode = WINMODE::WIN;
+	EngineDesc.iWinSizeX = g_iWinSizeX;
+	EngineDesc.iWinSizeY = g_iWinSizeY;
+	EngineDesc.iNumLevels = ENUM_CLASS(LEVEL::END);
 	
-	if (FAILED(m_pGameInstance->Initialize_Engine(tEngineDesc, &m_pDevice, &m_pDeviceContext)))
+	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pDeviceContext)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::LOGO)))
+	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
@@ -107,45 +108,54 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-
-	/* Ready_Prototype_Component_Shader */
+	/* Prototype_Component_Shader_VtxPosTex */
 	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), Elements, 2))))
 		return E_FAIL;
 
-	/* Ready_Prototype_Component_VIBuffer*/
+	/* Prototype_Component_VIBuffer_Rect*/
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
 		CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Ready_Prototype_GameObject_LoadingScreen */
+	/* Prototype_UIObject_LoadingScreen */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"),
 		CLoadingScreen::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Ready_Prototype_GameObject_ProgressBar*/
+	/* Prototype_UIObject_LoadingBar*/
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"),
 		CLoadingBar::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Ready_Prototype_GameObject_ProgressBar_Back */
+	/* Prototype_UIObject_Panel */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
 		CPanel::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 	
+	/* Prototype_UIObject_LoadingPoint */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingPoint"),
+		CLoadingPoint::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 	/* Ready_Prototype_Component_Texture_LoadingScreen */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Loading/LoadingScreen.png"), 1))))
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingScreen%d.png"), 2))))
 		return E_FAIL;
 
 	/* Ready_Prototype_Component_Texture_LoadingBar */
 	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Loading/LoadingBar.png"),1))))
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingBar.png"),1))))
 		return E_FAIL;
 
 	/* Ready_Prototype_Component_Texture_LoadingBar_Back */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Loading/LoadingBack.png"), 1))))
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingBack.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_LoadingBar_Point */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Point"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/Point.png"), 1))))
 		return E_FAIL;
 
 	/* Ready_Prototype_GameObject_Button */

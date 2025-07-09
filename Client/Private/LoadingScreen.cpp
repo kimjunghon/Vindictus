@@ -25,6 +25,9 @@ HRESULT CLoadingScreen::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	LOADING_DESC* pDesc = static_cast<LOADING_DESC*>(pArg);
+	m_iLoadingLevelID = pDesc->iLoadingLevelID - 2;
+
 	if (FAILED(Ready_Component()))
 		return E_FAIL;
 
@@ -65,7 +68,7 @@ HRESULT CLoadingScreen::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", 0)))
+	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", m_iLoadingLevelID)))
 		return E_FAIL;
 
 	m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::DEFAULT));
@@ -80,11 +83,11 @@ HRESULT CLoadingScreen::Render()
 HRESULT CLoadingScreen::Ready_Component()
 {
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
+		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen"),
@@ -97,7 +100,6 @@ HRESULT CLoadingScreen::Ready_Component()
 HRESULT CLoadingScreen::Ready_Children()
 {
 	UIOBJECT_DESC Children_Desc{};
-
 	Children_Desc.fX = m_fX;
 	Children_Desc.fY = m_fY;
 	Children_Desc.fSizeX = m_fSizeX - 100.f;
@@ -106,16 +108,14 @@ HRESULT CLoadingScreen::Ready_Children()
 	Children_Desc.fOffsetY = 260.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"), 
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar"), Children_Desc)))
+	if (FAILED(CUIObject::Add_StaticTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"), &Children_Desc)))
 		return E_FAIL;
 
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
 
 	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"), Children_Desc)))
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"), &Children_Desc)))
 		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -128,7 +128,6 @@ CLoadingScreen* CLoadingScreen::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 		MSG_BOX(TEXT("Failed Created : CLoadingScreen"));
 		Safe_Release(pInstance);
 	}
-
 	return pInstance;
 }
 

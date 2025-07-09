@@ -82,11 +82,11 @@ HRESULT CLogoScreen::Render()
 HRESULT CLogoScreen::Ready_Component()
 {
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
+		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_SkyBox"),
@@ -101,14 +101,22 @@ HRESULT CLogoScreen::Ready_Children()
 	UIOBJECT_DESC Children_Desc{};
 	Children_Desc.fX = m_fX;
 	Children_Desc.fY = m_fY;
-	Children_Desc.fSizeX = 100.f;
-	Children_Desc.fSizeY = 100.f;
+	Children_Desc.fSizeX = 150.f;
+	Children_Desc.fSizeY = 150.f;
 	Children_Desc.fOffsetX = 0.f;
-	Children_Desc.fOffsetY = 0.f;
+	Children_Desc.fOffsetY = -150.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 
 	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_WaterMark"), Children_Desc)))
+		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Logo_WaterMark"), &Children_Desc)))
+		return E_FAIL;
+
+	Children_Desc.fSizeX = 300.f;
+	Children_Desc.fSizeY = 300.f;
+	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
+
+	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
+		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Logo_WaterMark_Back"), &Children_Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -119,9 +127,9 @@ HRESULT CLogoScreen::Ready_Button()
 	CButtonObject::BUTTONOBJECT_DESC Button_Desc{};
 	Button_Desc.fX = m_fX;
 	Button_Desc.fY = m_fY;
-	Button_Desc.fSizeX = 100.f;
-	Button_Desc.fSizeY = 100.f;
-	Button_Desc.fOffsetX = 250.f;
+	Button_Desc.fSizeX = 150.f;
+	Button_Desc.fSizeY = 70.f;
+	Button_Desc.fOffsetX = 0.f;
 	Button_Desc.fOffsetY = 100.f;
 	Button_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 	Button_Desc.Callback = [&]() {
@@ -132,17 +140,16 @@ HRESULT CLogoScreen::Ready_Button()
 		};
 
 	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_ButtonObject_Button"),
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Button"), Button_Desc)))
+		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Logo_Button"), &Button_Desc)))
 		return E_FAIL;
 
-	Button_Desc.fOffsetX = 250.f;
-	Button_Desc.fOffsetY = 250.f;
+	Button_Desc.fOffsetY = 200.f;
 	Button_Desc.Callback = []() {
 			DestroyWindow(g_hWnd);
 		};
 
 	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_ButtonObject_Button"),
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Button"), Button_Desc)))
+		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Logo_Button"), &Button_Desc)))
 		return E_FAIL;
 
 	return S_OK;

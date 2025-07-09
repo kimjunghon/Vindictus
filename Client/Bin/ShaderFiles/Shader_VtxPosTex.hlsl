@@ -1,6 +1,8 @@
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-float g_ProgressBarStartX, g_ProgressBarSizeX ,g_ProgressBarRatio;
+float g_fStartX, g_fSizeX, g_fProgressBarRatio;
+float g_fWinSizeX = 1280.f;
+float g_fWinSizeY = 720.f;
 
 texture2D g_Texture;
 
@@ -17,7 +19,7 @@ struct VS_IN
     float2 vTexcoord : TEXCOORD0;
 };
 
-// Default Pass Start
+// Default Pass Start ------------------------------------------------------------------------------------------
 
 struct VS_DEFAULT_OUT
 {
@@ -59,23 +61,45 @@ PS_OUT PS_MAIN(PS_DEFAULT_IN In)
     
     Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
     
+    if(Out.vColor.a <= 0.3f)
+        discard;
+    
     return Out;
 }
 
-// Default Pass End
+// Default Pass End ------------------------------------------------------------------------------------------------
 
-// ProgressBar Pass Start
+// ProgressBar Pass Start ------------------------------------------------------------------------------------------
 
-struct VS_PROGRESS_OUT
+PS_OUT PS_PROGRESSBAR(PS_DEFAULT_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    if (In.vPosition.x <= g_fStartX + (g_fSizeX * g_fProgressBarRatio))
+        Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
+    else
+        discard;
+    
+    if (Out.vColor.a <= 0.3f)
+        discard;
+
+    return Out;
+}
+// ProgressBar Pass End -------------------------------------------------------------------------------------------
+
+// LoadingPoint Pass Start ----------------------------------------------------------------------------------------
+
+struct VS_LOADINGPOINT_OUT
 {
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
-    float4 vWorldPos : TEXCOORD1;
+    float3 vLocalPos : TEXCOORD1;
 };
 
-VS_PROGRESS_OUT VS_PROGRESSBAR(VS_IN In)
+
+VS_LOADINGPOINT_OUT VS_LOADINGPOINT(VS_IN In)
 {
-    VS_PROGRESS_OUT Out = (VS_PROGRESS_OUT) 0;
+    VS_LOADINGPOINT_OUT Out = (VS_LOADINGPOINT_OUT) 0;
 
     float4x4 matWV, matWVP;
     
@@ -84,30 +108,44 @@ VS_PROGRESS_OUT VS_PROGRESSBAR(VS_IN In)
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
     Out.vTexcoord = In.vTexcoord;
-    Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vLocalPos = In.vPosition;
     
     return Out;
 }
 
-struct P_PROGRESS_IN
+struct PS_LOADINGPOINT_IN
 {
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
-    float3 vWorldPos : TEXCOORD1;
+    float3 vLocalPos : TEXCOORD1;
 };
 
-PS_OUT PS_PROGRESSBAR(P_PROGRESS_IN In)
+
+PS_OUT PS_LOADINGPOINT(PS_LOADINGPOINT_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
+    float2 vPosition = { In.vLocalPos.x, In.vLocalPos.y };
+    float2 vCenter = 0.f;
+    float2 vLength = length(vPosition - vCenter);
+    float Length = vLength;
     
-    if (In.vWorldPos.x <= g_ProgressBarStartX + (g_ProgressBarSizeX * g_ProgressBarRatio))
-        Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
+    Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (abs(In.vLocalPos.x) <= 0.05f)
+    {
+        if (abs(In.vLocalPos.y) >= 0.3f)    
+            Out.vColor.a = (0.5f - Length);
+    }
     else
+        Out.vColor.a = (0.5f - Length);
+    
+    if(Out.vColor.a <= 0.3f)
         discard;
     
     return Out;
 }
-// ProgressBar Pass End
+
+// LoadingPoint Pass End ---------------------------------------------------------------------------
 
 technique11 DefaultTechnique
 {
@@ -119,7 +157,13 @@ technique11 DefaultTechnique
 
     pass ProgressBarPass
     {
-        VertexShader = compile vs_5_0 VS_PROGRESSBAR();
+        VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_PROGRESSBAR();
+    }
+
+    pass LoadingPointPass
+    {
+        VertexShader = compile vs_5_0 VS_LOADINGPOINT();
+        PixelShader = compile ps_5_0 PS_LOADINGPOINT();
     }
 }

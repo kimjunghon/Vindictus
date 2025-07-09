@@ -24,10 +24,7 @@ HRESULT CProgressBar::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Components()))
-		return E_FAIL;
-
-	m_fStartX = m_fX - m_fSizeX;
+	m_fStartX = g_iWinSizeX - (m_fX + m_fOffsetX + (m_fSizeX * 0.5f));
 	
 	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
 		this->Event_ProgressBar(Event); });
@@ -37,6 +34,7 @@ HRESULT CProgressBar::Initialize(void* pArg)
 
 void CProgressBar::Priority_Update(_float fTimeDelta)
 {
+	__super::Children_Priority_Update(fTimeDelta);
 }
 
 void CProgressBar::Update(_float fTimeDelta)
@@ -46,7 +44,10 @@ void CProgressBar::Update(_float fTimeDelta)
 
 void CProgressBar::Late_Update(_float fTimeDelta)
 {
+	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
+		return;
 
+	__super::Children_Late_Update(fTimeDelta);
 }
 
 HRESULT CProgressBar::Render()
@@ -62,13 +63,14 @@ HRESULT CProgressBar::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Float("g_ProgressBarStartX", m_fStartX)))
+
+	if (FAILED(m_pShaderCom->Bind_Float("g_fStartX", m_fStartX)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Float("g_ProgressBarSizeX", m_fSizeX)))
+	if (FAILED(m_pShaderCom->Bind_Float("g_fSizeX", m_fSizeX)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Float("g_ProgressBarRatio", m_fCurrentRatio)))
+	if (FAILED(m_pShaderCom->Bind_Float("g_fProgressBarRatio", m_fCurrentRatio)))
 		return E_FAIL;
 
 	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", 0)))
@@ -83,31 +85,11 @@ HRESULT CProgressBar::Render()
 	return S_OK;
 }
 
-HRESULT CProgressBar::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag)
-{
-	if (FAILED(CGameObject::Add_Component(iTexturePrototypeLevelIndex, strTexturePrototypeTag,
-		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CProgressBar::Ready_Components()
-{
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
-		return E_FAIL;
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
-		return E_FAIL;
-
-	return S_OK;
-}
 
 void CProgressBar::Event_ProgressBar(const EVENT_PROGRESSBAR& Event)
 {
-	m_fRatio = Event.fRatio;
+	if(Event.eType == m_eType)
+		m_fRatio = Event.fRatio;
 }
 
 
