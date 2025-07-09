@@ -5,7 +5,7 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL CCollisionObject abstract : public CGameObject
 {
-private:
+protected:
 	CCollisionObject(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CCollisionObject(const CCollisionObject& Prototype);
 	virtual ~CCollisionObject() = default;
@@ -21,10 +21,10 @@ public:
 public:
 	const BoundingBox& Get_BoundingBox() { return m_BoundingBox; }
 
-private:
+protected:
 	BoundingBox				m_BoundingBox;
 
-private:
+protected:
 	BoundingBox	Compute_BoundingVolume() const;
 
 public:

@@ -53,7 +53,7 @@ void CGameObject_Manager::Priority_Update(_float fTimeDelta)
 {
 	for (_uint i = 0; i < ENUM_CLASS(LAYERTYPE::END); i++)
 	{
-		for (auto Pair : m_pLayers[i])
+		for (auto& Pair : m_pLayers[i])
 		{
 			if(nullptr != Pair.second)
 				Pair.second->Priority_Update(fTimeDelta);
@@ -65,7 +65,7 @@ void CGameObject_Manager::Update(_float fTimeDelta)
 {
 	for (_uint i = 0; i < ENUM_CLASS(LAYERTYPE::END); i++)
 	{
-		for (auto Pair : m_pLayers[i])
+		for (auto& Pair : m_pLayers[i])
 		{
 			if (nullptr != Pair.second)
 				Pair.second->Update(fTimeDelta);
@@ -77,7 +77,7 @@ void CGameObject_Manager::Late_Update(_float fTimeDelta)
 {
 	for (_uint i = 0; i < ENUM_CLASS(LAYERTYPE::END); i++)
 	{
-		for (auto Pair : m_pLayers[i])
+		for (auto& Pair : m_pLayers[i])
 		{
 			if (nullptr != Pair.second)
 				Pair.second->Late_Update(fTimeDelta);
@@ -87,7 +87,7 @@ void CGameObject_Manager::Late_Update(_float fTimeDelta)
 
 void CGameObject_Manager::Clear()
 {
-	for (auto Pair : m_pLayers[ENUM_CLASS(LAYERTYPE::NONSTATIC)])
+	for (auto& Pair : m_pLayers[ENUM_CLASS(LAYERTYPE::NONSTATIC)])
 		Safe_Release(Pair.second);
 
 	m_pLayers[ENUM_CLASS(LAYERTYPE::NONSTATIC)].clear();

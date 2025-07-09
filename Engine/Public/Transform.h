@@ -31,6 +31,14 @@ public:
 						XMVectorGetX(XMVector3Length(Get_State(STATE::LOOK))));
 	}
 
+	_matrix	Get_WorldMatrix() {
+		return XMLoadFloat4x4(&m_WorldMatrix);
+	}
+
+	_matrix Get_WorldMatrix_Inverse() {
+		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
+	}
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

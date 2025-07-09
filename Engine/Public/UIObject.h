@@ -47,20 +47,19 @@ protected:
 	_float			m_iWinSizeX = {};
 	_float			m_iWinSizeY = {};
 
-	_bool			m_bMove = {};
-
 protected:	
-	HRESULT			Add_StaticTexture_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, UIOBJECT_DESC& UIChildDesc);
-	HRESULT			Add_DynamicTexture_Child(_uint iUIPrototypeLevelIndex, const _wstring& strUIPrototypeTag, _uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag, UIOBJECT_DESC& UIChildDesc);
+	HRESULT			Add_StaticTexture_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, UIOBJECT_DESC* UIChildDesc = nullptr);
+	HRESULT			Add_DynamicTexture_Child(_uint iUIPrototypeLevelIndex, const _wstring& strUIPrototypeTag, 
+		_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag, UIOBJECT_DESC* UIChildDesc = nullptr);
 	virtual HRESULT Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag);
 	virtual _bool	IsPick(HWND hWnd);
 
 	HRESULT			Begin();
 	HRESULT			Update_ChildPosition(_float fX, _float fY);
+	void			Set_ChildPosition(_float fX, _float fY);
 	void			Children_Priority_Update(_float fTimeDelta);
 	void			Children_Update(_float fTimeDelta);
 	void			Children_Late_Update(_float fTimeDelta);
-
 
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;

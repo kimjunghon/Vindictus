@@ -119,7 +119,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>d3d11.lib;dxguid.lib;Effects11d.lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxguid.lib;dinput8.lib;Effects11d.lib;DirectXTKd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../ThirdPartyLib/</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -144,13 +144,14 @@ call Copy.bat</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>d3d11.lib;dxguid.lib;Effects11.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxguid.lib;dinput8.lib;Effects11.lib;DirectXTK.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../ThirdPartyLib/</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h" />
     <ClInclude Include="..\public\ButtonObject.h" />
+    <ClInclude Include="..\public\Camera.h" />
     <ClInclude Include="..\Public\CollisionObject.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\public\DynamicAABBTree.h" />
@@ -166,10 +167,12 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\GameObject_Manager.h" />
     <ClInclude Include="..\public\Graphic_Device.h" />
+    <ClInclude Include="..\public\Input_Device.h" />
     <ClInclude Include="..\public\Layer.h" />
     <ClInclude Include="..\public\Level.h" />
     <ClInclude Include="..\public\Level_Manager.h" />
     <ClInclude Include="..\public\Octree.h" />
+    <ClInclude Include="..\public\PipeLine.h" />
     <ClInclude Include="..\public\Prototype_Manager.h" />
     <ClInclude Include="..\public\Renderer.h" />
     <ClInclude Include="..\public\Shader.h" />
@@ -180,10 +183,12 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\UIObject.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
     <ClInclude Include="..\public\VIBuffer_Rect.h" />
+    <ClInclude Include="..\public\VIBuffer_Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp" />
     <ClCompile Include="..\private\ButtonObject.cpp" />
+    <ClCompile Include="..\private\Camera.cpp" />
     <ClCompile Include="..\Private\CollisionObject.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\DynamicAABBTree.cpp" />
@@ -192,10 +197,12 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\GameObject.cpp" />
     <ClCompile Include="..\private\GameObject_Manager.cpp" />
     <ClCompile Include="..\private\Graphic_Device.cpp" />
+    <ClCompile Include="..\private\Input_Device.cpp" />
     <ClCompile Include="..\private\Layer.cpp" />
     <ClCompile Include="..\private\Level.cpp" />
     <ClCompile Include="..\private\Level_Manager.cpp" />
     <ClCompile Include="..\private\Octree.cpp" />
+    <ClCompile Include="..\private\PipeLine.cpp" />
     <ClCompile Include="..\private\Prototype_Manager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
@@ -206,6 +213,7 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\UIObject.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
     <ClCompile Include="..\private\VIBuffer_Rect.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Terrain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

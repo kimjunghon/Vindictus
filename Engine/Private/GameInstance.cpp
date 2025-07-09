@@ -1,6 +1,7 @@
 #include "GameInstance.h"
 
 #include "Graphic_Device.h"
+#include "Input_Device.h"
 
 /* Manager */
 #include "Timer_Manager.h"
@@ -12,7 +13,8 @@
 #include "DynamicAABBTree.h"
 #include "Octree.h"
 #include "EventBus.h"
-
+#include "PipeLine.h"
+#include "Camera.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -24,6 +26,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 {
     m_pGraphic_Device = CGraphic_Device::Create(EngineDesc.hWnd, EngineDesc.eWinMode, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY, ppDevice, ppDeviceContext);
     if (nullptr == m_pGraphic_Device)
+        return E_FAIL;
+
+    m_pInput_Device = CInput_Device::Create(EngineDesc.hInst, EngineDesc.hWnd);
+    if (nullptr == m_pInput_Device)
         return E_FAIL;
 
     m_pTimer_Manager = CTimer_Manager::Create();
@@ -50,15 +56,24 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pEventBus)
         return E_FAIL;
 
+    m_pPipeLine = CPipeLine::Create();
+    if (nullptr == m_pPipeLine)
+        return E_FAIL;
+
     return S_OK;
 }
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+    m_pInput_Device->Update();
+
     m_pObject_Manager->Priority_Update(fTimeDelta);
 
     m_pObject_Manager->Update(fTimeDelta);
     m_pObject_Manager->Late_Update(fTimeDelta);
+
+    if (m_pCurrentCamera)
+        m_pCurrentCamera->Update_PipeLines();
 
     m_pLevel_Manager->Update(fTimeDelta);
 }
@@ -110,6 +125,36 @@ _float CGameInstance::Rand(_float fMin, _float fMax)
 {
     return fMin + Rand_Normal() * (fMax - fMin);
 }
+
+
+#pragma region INPUT_DEVICE
+_bool CGameInstance::Get_KeyDown(_ubyte byKeyID)
+{
+    return m_pInput_Device->Get_KeyDown(byKeyID);
+}
+
+_bool CGameInstance::Get_KeyUp(_ubyte byKeyID)
+{
+    return m_pInput_Device->Get_KeyUp(byKeyID);
+}
+
+_bool CGameInstance::Get_KeyPressing(_ubyte byKeyID)
+{
+    return m_pInput_Device->Get_KeyPressing(byKeyID);
+}
+
+_byte CGameInstance::Get_MouseState(MOUSEKEYSTATE eMouse)
+{
+    return m_pInput_Device->Get_DIMouseState(eMouse);
+}
+
+_long CGameInstance::Get_MouseMove(MOUSEMOVESTATE eState)
+{
+    return m_pInput_Device->Get_DIMouseMove(eState);
+}
+
+#pragma endregion
+
 
 #pragma region TIMER_MANAGER
 _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
@@ -197,17 +242,65 @@ void CGameInstance::Publish(_uint iEventLevelIndex, const CEvent& Event)
 }
 #pragma endregion
 
+#pragma region PIPELINE
+
+const _float4x4* CGameInstance::Get_Transform_Float4x4(D3DTS eTransformState) const
+{
+    return m_pPipeLine->Get_Transform_Float4x4(eTransformState);
+}
+_matrix CGameInstance::Get_Transform_Matrix(D3DTS eTransformState) const
+{
+    return m_pPipeLine->Get_Transform_Matrix(eTransformState);
+}
+const _float4x4* CGameInstance::Get_Transform_Float4x4_Inverse(D3DTS eTransformState) const
+{
+    return m_pPipeLine->Get_Transform_Float4x4_Inverse(eTransformState);
+}
+_matrix CGameInstance::Get_Transform_Matrix_Inverse(D3DTS eTransformState) const
+{
+    return m_pPipeLine->Get_Transform_Matrix_Inverse(eTransformState);
+}
+const _float4* CGameInstance::Get_CamPoisiton() const
+{
+    return m_pPipeLine->Get_CamPoisiton();
+}
+void CGameInstance::Set_Transform(D3DTS eTransformState, _fmatrix Matrix)
+{
+    m_pPipeLine->Set_Transform(eTransformState, Matrix);
+}
+void CGameInstance::Set_Transform(D3DTS eTransformState, const _float4x4& Matrix)
+{
+    m_pPipeLine->Set_Transform(eTransformState, Matrix);
+}
+HRESULT CGameInstance::Set_Camera(CCamera* pNewCamera)
+{
+    if (nullptr == pNewCamera)
+        return E_FAIL;
+
+    if (nullptr != m_pCurrentCamera)
+        Safe_Release(m_pCurrentCamera);
+
+    m_pCurrentCamera = pNewCamera;
+
+    Safe_AddRef(m_pCurrentCamera);
+
+    return S_OK;
+}
+#pragma endregion
 void CGameInstance::Release_Engine()
 {
     Release();
 
     Safe_Release(m_pGraphic_Device);
+    Safe_Release(m_pInput_Device);
     Safe_Release(m_pTimer_Manager);
     Safe_Release(m_pLevel_Manager);
     Safe_Release(m_pPrototype_Manager);
     Safe_Release(m_pRenderer);
     Safe_Release(m_pObject_Manager);
     Safe_Release(m_pEventBus);
+    Safe_Release(m_pPipeLine);
+    Safe_Release(m_pCurrentCamera);
 }
 
 void CGameInstance::Free()
