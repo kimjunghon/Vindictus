@@ -32,13 +32,9 @@ public:
 
 #pragma region INPUT_DEVICE
 	_bool	Get_KeyDown(_ubyte byKeyID);
-
 	_bool	Get_KeyUp(_ubyte byKeyID);
-
 	_bool	Get_KeyPressing(_ubyte byKeyID);
-
 	_byte	Get_MouseState(MOUSEKEYSTATE eMouse);
-
 	_long	Get_MouseMove(MOUSEMOVESTATE eState);
 #pragma endregion
 
@@ -84,6 +80,13 @@ public:
 	void Publish(_uint iEventLevelIndex, const CEvent& Event);
 #pragma endregion
 
+
+#pragma region CAMERA_MANAGER
+	HRESULT Add_CameraToManager(_uint iPrototypeIndex, const _wstring& strPrototypeTag, const _wstring& strCameraTag, class CCamera** ppOut = nullptr, void* pArg = nullptr);
+	HRESULT Change_Camera(const _wstring& strCameraTag);
+	HRESULT Change_Camera(class CCamera* pNewCamera);
+#pragma endregion
+
 #pragma region PIPELINE
 	const _float4x4*	Get_Transform_Float4x4(D3DTS eTransformState) const;
 	_matrix				Get_Transform_Matrix(D3DTS eTransformState) const;
@@ -94,8 +97,12 @@ public:
 	void				Set_Transform(D3DTS eTransformState, const _float4x4& Matrix);
 #pragma endregion
 
-#pragma region CAMERA
-	HRESULT Set_Camera(class CCamera* pNewCamera);
+
+#pragma region CONTROLLER
+	HRESULT				Add_Controller_ToManager(const _wstring& strControllerTag, class CController* pController);
+	HRESULT				Change_Controller(_uint iChannelIndex, const _wstring& strControllerTag);
+	HRESULT				Change_Controller(_uint iChannelIndex, class CController* pNewController);
+
 #pragma endregion
 
 private:
@@ -110,7 +117,9 @@ private:
 	class CDynamicAABBTree*		m_pDynamicAABBTree = { nullptr };
 	CEventBus*					m_pEventBus = { nullptr };
 	class CPipeLine*			m_pPipeLine = { nullptr };
-	class CCamera*				m_pCurrentCamera = { nullptr };
+	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
+	class CController_Manager*	m_pController_Manager = { nullptr };
+
 public:
 	void Release_Engine();
 	virtual void Free() override;

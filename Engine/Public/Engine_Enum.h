@@ -16,6 +16,7 @@ namespace Engine
 	enum class MOUSEKEYSTATE { LB, RB, MB, END	};
 	enum class MOUSEMOVESTATE {	X, Y, WHEEL, END	};
 
+	enum class CONTROLLER_CHANNEL { MAIN, SUB, END};
 	enum class UI_DEPTH { FIRST = 2, SECOND, THIRD, FORTH, FIFTH};
 
 	enum class SHADER_VTXPOSTEX { DEFAULT, PROGRESSBAR, LOADINGPOINT};

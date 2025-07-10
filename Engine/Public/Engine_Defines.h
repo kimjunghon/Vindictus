@@ -35,6 +35,17 @@ using namespace std;
 
 #define UI_FAR 1.f
 
+#define MOVE_LEFT		1
+#define MOVE_RIGHT		1<<1
+#define MOVE_FRONT		1<<2
+#define MOVE_BACK		1<<3
+
+#define ACTION_ATTACK	1
+#define ACTION_SMASH	1<<1
+#define ACTION_GUARD	1<<2
+#define ACTION_DASH		1<<3
+#define ACTION_SPRINT	1<<4
+
 #ifdef _DEBUG
 
 #define _CRTDBG_MAP_ALLOC

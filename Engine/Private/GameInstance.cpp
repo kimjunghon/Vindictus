@@ -14,7 +14,8 @@
 #include "Octree.h"
 #include "EventBus.h"
 #include "PipeLine.h"
-#include "Camera.h"
+#include "Camera_Manager.h"
+#include "Controller_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -56,8 +57,16 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pEventBus)
         return E_FAIL;
 
+    m_pCamera_Manager = CCamera_Manager::Create();
+    if (nullptr == m_pCamera_Manager)
+        return E_FAIL;
+
     m_pPipeLine = CPipeLine::Create();
     if (nullptr == m_pPipeLine)
+        return E_FAIL;
+
+    m_pController_Manager = CController_Manager::Create();
+    if (nullptr == m_pController_Manager)
         return E_FAIL;
 
     return S_OK;
@@ -66,15 +75,14 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
     m_pInput_Device->Update();
+    m_pController_Manager->Update();
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
-
     m_pObject_Manager->Update(fTimeDelta);
     m_pObject_Manager->Late_Update(fTimeDelta);
 
-    if (m_pCurrentCamera)
-        m_pCurrentCamera->Update_PipeLines();
-
+    m_pCamera_Manager->Update(fTimeDelta);
+    
     m_pLevel_Manager->Update(fTimeDelta);
 }
 
@@ -83,6 +91,8 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
     m_pPrototype_Manager->Clear(iClearLevelID);
     m_pEventBus->Clear(iClearLevelID);
     m_pObject_Manager->Clear();
+    m_pCamera_Manager->Clear();
+    m_pController_Manager->Clear();
 
     return S_OK;
 }
@@ -155,7 +165,6 @@ _long CGameInstance::Get_MouseMove(MOUSEMOVESTATE eState)
 
 #pragma endregion
 
-
 #pragma region TIMER_MANAGER
 _float CGameInstance::Get_TimeDelta(const _wstring& strTimerTag)
 {
@@ -194,7 +203,6 @@ CBase* CGameInstance::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototpyeLeve
     return m_pPrototype_Manager->Clone_Prototype(ePrototype, iPrototpyeLevelIndex, strPrototypeTag, pArg);
 }
 #pragma endregion
-
 
 #pragma region OBJECT_MANAGER
 HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, _uint iLayerIndex, const _wstring& strLayerTag, void* pArg)
@@ -242,8 +250,23 @@ void CGameInstance::Publish(_uint iEventLevelIndex, const CEvent& Event)
 }
 #pragma endregion
 
-#pragma region PIPELINE
+#pragma region CAMERA_MANAGER
+HRESULT CGameInstance::Add_CameraToManager(_uint iPrototypeIndex, const _wstring& strPrototypeTag, const _wstring& strCameraTag, CCamera** ppOut, void* pArg)
+{
+    return m_pCamera_Manager->Add_CameraToManager(iPrototypeIndex, strPrototypeTag, strCameraTag, ppOut, pArg);
+}
 
+HRESULT CGameInstance::Change_Camera(const _wstring& strCameraTag)
+{
+    return m_pCamera_Manager->Change_Camera(strCameraTag);
+}
+HRESULT CGameInstance::Change_Camera(CCamera* pNewCamera)
+{
+    return m_pCamera_Manager->Change_Camera(pNewCamera);
+}
+#pragma endregion
+
+#pragma region PIPELINE
 const _float4x4* CGameInstance::Get_Transform_Float4x4(D3DTS eTransformState) const
 {
     return m_pPipeLine->Get_Transform_Float4x4(eTransformState);
@@ -272,21 +295,23 @@ void CGameInstance::Set_Transform(D3DTS eTransformState, const _float4x4& Matrix
 {
     m_pPipeLine->Set_Transform(eTransformState, Matrix);
 }
-HRESULT CGameInstance::Set_Camera(CCamera* pNewCamera)
+#pragma endregion
+
+#pragma region CONTROLLER_MANAGER
+HRESULT CGameInstance::Add_Controller_ToManager(const _wstring& strControllerTag, CController* pController)
 {
-    if (nullptr == pNewCamera)
-        return E_FAIL;
-
-    if (nullptr != m_pCurrentCamera)
-        Safe_Release(m_pCurrentCamera);
-
-    m_pCurrentCamera = pNewCamera;
-
-    Safe_AddRef(m_pCurrentCamera);
-
-    return S_OK;
+    return m_pController_Manager->Add_Controller_ToManager(strControllerTag, pController);
+}
+HRESULT CGameInstance::Change_Controller(_uint iChannelIndex, const _wstring& strControllerTag)
+{
+    return m_pController_Manager->Change_Controller(iChannelIndex, strControllerTag);
+}
+HRESULT CGameInstance::Change_Controller(_uint iChannelIndex, CController* pNewController)
+{
+    return m_pController_Manager->Change_Controller(iChannelIndex, pNewController);
 }
 #pragma endregion
+
 void CGameInstance::Release_Engine()
 {
     Release();
@@ -300,7 +325,8 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pObject_Manager);
     Safe_Release(m_pEventBus);
     Safe_Release(m_pPipeLine);
-    Safe_Release(m_pCurrentCamera);
+    Safe_Release(m_pCamera_Manager);
+    Safe_Release(m_pController_Manager);
 }
 
 void CGameInstance::Free()

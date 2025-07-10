@@ -82,9 +82,6 @@
     <Filter Include="01.Utility\04.Component\Texture">
       <UniqueIdentifier>{f1623c8a-ed28-4790-8deb-772246b5ca32}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\03.GameObject\UIObject\Button">
-      <UniqueIdentifier>{164f1e53-c3ad-4527-9c8d-015c66b65375}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\04.Component\VIBuffer\Terrain">
       <UniqueIdentifier>{8a7611c4-51fa-4651-9c79-ff817c5bdb28}</UniqueIdentifier>
     </Filter>
@@ -99,6 +96,15 @@
     </Filter>
     <Filter Include="01.Utility\97.PipeLine">
       <UniqueIdentifier>{2ee5b079-1bb7-4ff9-80d2-aca5255727ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.GameObject\Camera\Manager">
+      <UniqueIdentifier>{acc62295-2ba8-44a3-b1a6-885809dc5695}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\06.Controller">
+      <UniqueIdentifier>{7221a967-0416-45a6-97a5-6e4e48f496bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\06.Controller\Manager">
+      <UniqueIdentifier>{f9b7356f-1232-49cc-9b7b-c9959af81618}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -189,9 +195,6 @@
     <ClInclude Include="..\public\Texture.h">
       <Filter>01.Utility\04.Component\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\ButtonObject.h">
-      <Filter>01.Utility\03.GameObject\UIObject\Button</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\VIBuffer_Terrain.h">
       <Filter>01.Utility\04.Component\VIBuffer\Terrain</Filter>
     </ClInclude>
@@ -206,6 +209,18 @@
     </ClInclude>
     <ClInclude Include="..\public\Camera.h">
       <Filter>01.Utility\03.GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Manager.h">
+      <Filter>01.Utility\03.GameObject\Camera\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Controller.h">
+      <Filter>01.Utility\06.Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Controller_KeyBoard.h">
+      <Filter>01.Utility\06.Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Controller_Manager.h">
+      <Filter>01.Utility\06.Controller\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -275,9 +290,6 @@
     <ClCompile Include="..\private\Texture.cpp">
       <Filter>01.Utility\04.Component\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\ButtonObject.cpp">
-      <Filter>01.Utility\03.GameObject\UIObject\Button</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\VIBuffer_Terrain.cpp">
       <Filter>01.Utility\04.Component\VIBuffer\Terrain</Filter>
     </ClCompile>
@@ -292,6 +304,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera.cpp">
       <Filter>01.Utility\03.GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Manager.cpp">
+      <Filter>01.Utility\03.GameObject\Camera\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Vindictusback\Vindictus\Engine\Private\Controller.cpp">
+      <Filter>01.Utility\06.Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Vindictusback\Vindictus\Engine\Private\Controller_KeyBoard.cpp">
+      <Filter>01.Utility\06.Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Vindictusback\Vindictus\Engine\Private\Controller_Manager.cpp">
+      <Filter>01.Utility\06.Controller\Manager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

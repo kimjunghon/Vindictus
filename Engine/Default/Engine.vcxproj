@@ -150,10 +150,13 @@ call Copy.bat</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\Base.h" />
-    <ClInclude Include="..\public\ButtonObject.h" />
     <ClInclude Include="..\public\Camera.h" />
+    <ClInclude Include="..\Public\Camera_Manager.h" />
     <ClInclude Include="..\Public\CollisionObject.h" />
     <ClInclude Include="..\public\Component.h" />
+    <ClInclude Include="..\Public\Controller.h" />
+    <ClInclude Include="..\Public\Controller_KeyBoard.h" />
+    <ClInclude Include="..\Public\Controller_Manager.h" />
     <ClInclude Include="..\public\DynamicAABBTree.h" />
     <ClInclude Include="..\Public\Engine_Defines.h" />
     <ClInclude Include="..\Public\Engine_Enum.h" />
@@ -186,9 +189,12 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\VIBuffer_Terrain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Vindictusback\Vindictus\Engine\Private\Controller.cpp" />
+    <ClCompile Include="..\..\..\Vindictusback\Vindictus\Engine\Private\Controller_KeyBoard.cpp" />
+    <ClCompile Include="..\..\..\Vindictusback\Vindictus\Engine\Private\Controller_Manager.cpp" />
     <ClCompile Include="..\private\Base.cpp" />
-    <ClCompile Include="..\private\ButtonObject.cpp" />
     <ClCompile Include="..\private\Camera.cpp" />
+    <ClCompile Include="..\Private\Camera_Manager.cpp" />
     <ClCompile Include="..\Private\CollisionObject.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\private\DynamicAABBTree.cpp" />
