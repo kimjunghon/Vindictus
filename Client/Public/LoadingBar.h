@@ -18,7 +18,6 @@ public:
 
 private:
 	_float					m_fPointX = {};
-
 private:
 	virtual HRESULT	Ready_Components() override;
 	HRESULT			Ready_Children();

@@ -31,17 +31,17 @@ HRESULT CHUD::Initialize(void* pArg)
 
 void CHUD::Priority_Update(_float fTimeDelta)
 {
-	__super::Children_Priority_Update(fTimeDelta);
+	__super::Priority_Update(fTimeDelta);
 }
 
 void CHUD::Update(_float fTimeDelta)
 {
-	__super::Children_Update(fTimeDelta);
+	__super::Update(fTimeDelta);
 }
 
 void CHUD::Late_Update(_float fTimeDelta)
 {
-	__super::Children_Late_Update(fTimeDelta);
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CHUD::Render()
@@ -73,13 +73,13 @@ HRESULT CHUD::Ready_PlayerHPBar()
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
 	Children_Desc.eType = PROGRESS_TYPE::HP;
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_PlayerStateBar"),
+	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_StateBar"),
 		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_GamePlay_PlayerHPBar"), &Children_Desc)))
 		return E_FAIL;
 
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_PlayerStateBar_Lerp"),
+	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_StateBar_Lerp"),
 		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_GamePlay_PlayerHPBar_Lerp"), &Children_Desc)))
 		return E_FAIL;
 
@@ -107,13 +107,13 @@ HRESULT CHUD::Ready_PlayerStaminaBar()
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
 	Children_Desc.eType = PROGRESS_TYPE::STAMINA;
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_PlayerStateBar"),
+	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_StateBar"),
 		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_GamePlay_PlayerStaminaBar"), &Children_Desc)))
 		return E_FAIL;
 
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_PlayerStateBar_Lerp"),
+	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_StateBar_Lerp"),
 		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_GamePlay_PlayerStaminaBar_Lerp"), &Children_Desc)))
 		return E_FAIL;
 

@@ -132,10 +132,7 @@
     <ClInclude Include="..\public\HUD.h">
       <Filter>02.GameObject\UIObject\GamePlay</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\PlayerStateBar_Lerp.h">
-      <Filter>02.GameObject\UIObject\GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\PlayerStateBar.h">
+    <ClInclude Include="..\public\StateBar_Lerp.h">
       <Filter>02.GameObject\UIObject\GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StateBar.h">
@@ -204,13 +201,10 @@
     <ClCompile Include="..\private\Camera_Target.cpp">
       <Filter>02.GameObject\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerStateBar.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\HUD.cpp">
       <Filter>02.GameObject\UIObject\GamePlay</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\PlayerStateBar_Lerp.cpp">
+    <ClCompile Include="..\private\StateBar_Lerp.cpp">
       <Filter>02.GameObject\UIObject\GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StateBar.cpp">

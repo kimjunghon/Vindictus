@@ -44,9 +44,9 @@ void CLoadingBar::Update(_float fTimeDelta)
 	
 	m_fCurrentRatio += m_fFillSpeed * fTimeDelta;
 
-	m_fPointX = m_fStartX + (m_fSizeX * m_fCurrentRatio);
-
-	__super::Update_ChildPosition(m_fPointX, m_fY);
+	m_fPointX = m_fSizeX * 0.5f - (m_fSizeX * m_fCurrentRatio);
+	
+	CUIObject::Update_ChildOffset(m_fPointX, 0.f);
 
 	if (m_fCurrentRatio >= 1.f)
 	{
@@ -54,7 +54,7 @@ void CLoadingBar::Update(_float fTimeDelta)
 		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::LOADING), Event);
 	}
 
-	__super::Children_Update(fTimeDelta);
+	__super::Update(fTimeDelta);
 }
 
 HRESULT CLoadingBar::Ready_Components()
@@ -81,9 +81,9 @@ HRESULT CLoadingBar::Ready_Children()
 	Children_Desc.fY = m_fY;
 	Children_Desc.fSizeX = 100.f;
 	Children_Desc.fSizeY = 100.f;
-	Children_Desc.fOffsetX = 0.f;
-	Children_Desc.fOffsetY = m_fOffsetY;
-	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
+	Children_Desc.fOffsetX = m_fSizeX * 0.5f;
+	Children_Desc.fOffsetY = 0.f;
+	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
 
 	if (FAILED(CUIObject::Add_StaticTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingPoint"), &Children_Desc)))
 		return E_FAIL;

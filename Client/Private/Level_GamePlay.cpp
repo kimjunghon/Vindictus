@@ -1,5 +1,6 @@
 #include "Level_GamePlay.h"
 #include "GameInstance.h"
+#include "UIObject.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
     : CLevel { pDevice, pDeviceContext }

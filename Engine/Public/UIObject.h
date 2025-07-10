@@ -56,7 +56,9 @@ protected:
 
 	HRESULT			Begin();
 	HRESULT			Update_ChildPosition(_float fX, _float fY);
-	void			Set_ChildPosition(_float fX, _float fY);
+	HRESULT			Update_ChildOffset(_float fOffsetX, _float fOffsetY);
+	void			Set_Position(_float fX, _float fY);
+	void			Set_Offset(_float fOffsetX, _float fOffsetY);
 	void			Children_Priority_Update(_float fTimeDelta);
 	void			Children_Update(_float fTimeDelta);
 	void			Children_Late_Update(_float fTimeDelta);

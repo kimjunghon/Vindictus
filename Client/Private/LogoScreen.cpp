@@ -1,5 +1,6 @@
 #include "LogoScreen.h"
 #include "GameInstance.h"
+#include "Button.h"
 
 CLogoScreen::CLogoScreen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CUIObject{ pDevice, pDeviceContext }
@@ -124,7 +125,7 @@ HRESULT CLogoScreen::Ready_Children()
 
 HRESULT CLogoScreen::Ready_Button()
 {
-	CButtonObject::BUTTONOBJECT_DESC Button_Desc{};
+	CButton::BUTTON_DESC Button_Desc{};
 	Button_Desc.fX = m_fX;
 	Button_Desc.fY = m_fY;
 	Button_Desc.fSizeX = 150.f;

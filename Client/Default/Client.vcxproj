@@ -158,8 +158,7 @@
     <ClInclude Include="..\public\LoadingPoint.h" />
     <ClInclude Include="..\public\LoadingScreen.h" />
     <ClInclude Include="..\public\LogoScreen.h" />
-    <ClInclude Include="..\Public\PlayerStateBar.h" />
-    <ClInclude Include="..\public\PlayerStateBar_Lerp.h" />
+    <ClInclude Include="..\public\StateBar_Lerp.h" />
     <ClInclude Include="..\public\ProgressBar.h" />
     <ClInclude Include="..\public\Panel.h" />
     <ClInclude Include="..\public\MainApp.h" />
@@ -183,14 +182,13 @@
     <ClCompile Include="..\private\LoadingPoint.cpp" />
     <ClCompile Include="..\private\LoadingScreen.cpp" />
     <ClCompile Include="..\private\LogoScreen.cpp" />
-    <ClCompile Include="..\private\PlayerStateBar_Lerp.cpp" />
+    <ClCompile Include="..\private\StateBar_Lerp.cpp" />
     <ClCompile Include="..\private\ProgressBar.cpp" />
     <ClCompile Include="..\private\Panel.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
     <ClCompile Include="..\private\Player.cpp" />
     <ClCompile Include="..\Private\StateBar.cpp" />
     <ClCompile Include="Client.cpp" />
-    <ClCompile Include="PlayerStateBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Client.rc" />

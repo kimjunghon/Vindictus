@@ -39,12 +39,12 @@ HRESULT CLoadingScreen::Initialize(void* pArg)
 
 void CLoadingScreen::Priority_Update(_float fTimeDelta)
 {
-	__super::Children_Priority_Update(fTimeDelta);
+	__super::Priority_Update(fTimeDelta);
 }
 
 void CLoadingScreen::Update(_float fTimeDelta)
 {
-	__super::Children_Update(fTimeDelta);
+	__super::Update(fTimeDelta);
 }
 
 void CLoadingScreen::Late_Update(_float fTimeDelta)
@@ -52,7 +52,7 @@ void CLoadingScreen::Late_Update(_float fTimeDelta)
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
 		return;
 
-	__super::Children_Late_Update(fTimeDelta);
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CLoadingScreen::Render()
@@ -106,16 +106,18 @@ HRESULT CLoadingScreen::Ready_Children()
 	Children_Desc.fSizeY = 10.f;
 	Children_Desc.fOffsetX = 0.f;
 	Children_Desc.fOffsetY = 260.f;
-	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
-
-	if (FAILED(CUIObject::Add_StaticTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"), &Children_Desc)))
-		return E_FAIL;
-
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
 
 	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"), &Children_Desc)))
 		return E_FAIL;
+
+	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
+
+	if (FAILED(CUIObject::Add_StaticTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"), &Children_Desc)))
+		return E_FAIL;
+
+
 
 	return S_OK;
 }

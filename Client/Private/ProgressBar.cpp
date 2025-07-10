@@ -24,7 +24,7 @@ HRESULT CProgressBar::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_fStartX = g_iWinSizeX - (m_fX + m_fOffsetX + (m_fSizeX * 0.5f));
+	m_fStartX = (m_fX - (m_fSizeX * 0.5f));
 	
 	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
 		this->Event_ProgressBar(Event); });
@@ -34,12 +34,12 @@ HRESULT CProgressBar::Initialize(void* pArg)
 
 void CProgressBar::Priority_Update(_float fTimeDelta)
 {
-	__super::Children_Priority_Update(fTimeDelta);
+	__super::Priority_Update(fTimeDelta);
 }
 
 void CProgressBar::Update(_float fTimeDelta)
 {
-
+	__super::Update(fTimeDelta);
 }
 
 void CProgressBar::Late_Update(_float fTimeDelta)
@@ -47,7 +47,7 @@ void CProgressBar::Late_Update(_float fTimeDelta)
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
 		return;
 
-	__super::Children_Late_Update(fTimeDelta);
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CProgressBar::Render()
@@ -84,7 +84,6 @@ HRESULT CProgressBar::Render()
 
 	return S_OK;
 }
-
 
 void CProgressBar::Event_ProgressBar(const EVENT_PROGRESSBAR& Event)
 {

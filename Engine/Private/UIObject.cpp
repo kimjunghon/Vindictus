@@ -26,8 +26,8 @@ HRESULT CUIObject::Initialize(void* pArg)
 
 	UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);
 
-	m_fX = pDesc->fX;
-	m_fY = pDesc->fY;
+	m_fX = pDesc->fX - pDesc->fOffsetX;
+	m_fY = pDesc->fY + pDesc->fOffsetY;
 	m_iDepth = pDesc->iDepth;
 	m_fSizeX = pDesc->fSizeX;
 	m_fSizeY = pDesc->fSizeY;
@@ -53,14 +53,17 @@ HRESULT CUIObject::Initialize(void* pArg)
 
 void CUIObject::Priority_Update(_float fTimeDelta)
 {
+	Children_Priority_Update(fTimeDelta);
 }
 
 void CUIObject::Update(_float fTimeDelta)
 {
+	Children_Update(fTimeDelta);
 }
 
 void CUIObject::Late_Update(_float fTimeDelta)
 {
+	Children_Late_Update(fTimeDelta);
 }
 
 HRESULT CUIObject::Render()
@@ -70,8 +73,8 @@ HRESULT CUIObject::Render()
 
 _bool CUIObject::IsPick(HWND hWnd)
 {
-	_float fX = m_fX - m_fOffsetX;
-	_float fY = m_fY + m_fOffsetY;
+	_float fX = m_fX;
+	_float fY = m_fY;
 
 	RECT	rcRect = { LONG(fX - (m_fSizeX * 0.5f)), LONG(fY - (m_fSizeY * 0.5f)), LONG(fX + (m_fSizeX * 0.5f)), LONG(fY + (m_fSizeY * 0.5f)) };
 
@@ -118,7 +121,7 @@ HRESULT CUIObject::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _ws
 HRESULT CUIObject::Begin()
 {
 	m_pTransformCom->Scale(_float3(m_fSizeX, m_fSizeY, 1.f));
-	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX - m_fOffsetX - (m_iWinSizeX * 0.5f), -m_fY - m_fOffsetY + (m_iWinSizeY * 0.5f), (UI_FAR / (_float)m_iDepth), 1.f));
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX - (m_iWinSizeX * 0.5f), -m_fY + (m_iWinSizeY * 0.5f), (UI_FAR / (_float)m_iDepth), 1.f));
 
 	return S_OK;
 }
@@ -130,17 +133,35 @@ HRESULT CUIObject::Update_ChildPosition(_float fX, _float fY)
 
 	for (auto& Child: m_Children)
 	{
-		Child->Set_ChildPosition(fX, fY);
-		Child->Update_ChildPosition(fX, fY);
+		Child->Set_Position(fX, fY);
 	}
 
 	return S_OK;
 }
 
-void CUIObject::Set_ChildPosition(_float fX, _float fY)
+HRESULT CUIObject::Update_ChildOffset(_float fOffsetX, _float fOffsetY)
 {
-	m_fX = fX;
-	m_fY = fY;
+	if (m_Children.size() <= 0)
+		return S_OK;
+
+	for (auto& Child : m_Children)
+	{
+		Child->Set_Offset(fOffsetX, fOffsetY);
+	}
+
+	return S_OK;
+}
+
+void CUIObject::Set_Position(_float fX, _float fY)
+{
+	m_fX = fX - m_fOffsetX;
+	m_fY = fY + m_fOffsetY;
+}
+
+void CUIObject::Set_Offset(_float fOffsetX, _float fOffsetY)
+{
+	m_fOffsetX = fOffsetX;
+	m_fOffsetY = fOffsetY;
 }
 
 void CUIObject::Children_Priority_Update(_float fTimeDelta)
@@ -167,7 +188,11 @@ void CUIObject::Children_Late_Update(_float fTimeDelta)
 		return;
 
 	for (auto& Child : m_Children)
+	{
 		Child->Late_Update(fTimeDelta);
+		Update_ChildPosition(m_fX, m_fY);
+	}
+
 }
 
 void CUIObject::Free()

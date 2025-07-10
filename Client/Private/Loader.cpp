@@ -4,8 +4,8 @@
 
 #include "LogoScreen.h"
 #include "HUD.h"
-#include "PlayerStateBar.h"
-#include "PlayerStateBar_Lerp.h"
+#include "StateBar.h"
+#include "StateBar_Lerp.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: m_pDevice { pDevice}
@@ -174,12 +174,12 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		CHUD::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_PlayerStateBar"),
-		CPlayerStateBar::Create(m_pDevice, m_pDeviceContext))))
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_StateBar"),
+		CStateBar::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_PlayerStateBar_Lerp"),
-		CPlayerStateBar_Lerp::Create(m_pDevice, m_pDeviceContext))))
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_StateBar_Lerp"),
+		CStateBar_Lerp::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	Event.fRatio += 0.2f;

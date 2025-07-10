@@ -37,16 +37,19 @@ HRESULT CBackground::Initialize(void* pArg)
 
 void CBackground::Priority_Update(_float fTimeDelta)
 {
+	__super::Priority_Update(fTimeDelta);
 }
 
 void CBackground::Update(_float fTimeDelta)
 {
+	__super::Update(fTimeDelta);
 }
 
 void CBackground::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
 		return;
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CBackground::Render()

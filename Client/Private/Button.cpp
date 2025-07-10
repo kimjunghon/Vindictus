@@ -2,12 +2,12 @@
 #include "GameInstance.h"
 
 CButton::CButton(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)   
-    : CButtonObject {pDevice, pDeviceContext }
+    : CUIObject{pDevice, pDeviceContext }
 {
 }
 
 CButton::CButton(const CButton& Prototype)
-    : CButtonObject { Prototype }
+    : CUIObject{ Prototype }
 {
 }
 
@@ -27,11 +27,15 @@ HRESULT CButton::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    BUTTON_DESC* pDesc = static_cast<BUTTON_DESC*>(pArg);
+    m_Callback = pDesc->Callback;
+
     return S_OK;
 }
 
 void CButton::Priority_Update(_float fTimeDelta)
 {
+    __super::Priority_Update(fTimeDelta);
 }
 
 void CButton::Update(_float fTimeDelta)
@@ -41,12 +45,14 @@ void CButton::Update(_float fTimeDelta)
         if(m_Callback)
             m_Callback();
     }
+    __super::Update(fTimeDelta);
 }
 
 void CButton::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
+    __super::Late_Update(fTimeDelta);
 }
 
 HRESULT CButton::Render()

@@ -3,7 +3,7 @@
 
 NS_BEGIN(Client)
 
-class CStateBar abstract : public CProgressBar
+class CStateBar : public CProgressBar
 {
 public:
 	typedef struct tagProgressDesc : public UIOBJECT_DESC {
@@ -26,7 +26,8 @@ protected:
 	virtual HRESULT	Ready_Components() override;
 
 public:
-	virtual CGameObject*	Clone(void* pArg) PURE;
+	static CStateBar*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
 }; 
 

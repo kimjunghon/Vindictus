@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Client_Defines.h"
-#include "ButtonObject.h"
+#include "UIObject.h"
 
 
 NS_BEGIN(Engine)
@@ -12,8 +12,13 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CButton final : public CButtonObject
+class CButton final : public CUIObject
 {
+public:
+	typedef struct tagButtonObjectDesc : public CUIObject::UIOBJECT_DESC {
+		function<void()> Callback;
+	}BUTTON_DESC;
+
 private:
 	CButton(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CButton(const CButton& Prototype);
@@ -28,9 +33,10 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CVIBuffer*	m_pVIBufferCom = { nullptr };
-	CShader*	m_pShaderCom = { nullptr };
-	CTexture*	m_pTextureCom = { nullptr };
+	CVIBuffer*			m_pVIBufferCom = { nullptr };
+	CShader*			m_pShaderCom = { nullptr };
+	CTexture*			m_pTextureCom = { nullptr };
+	function<void()>	m_Callback;
 
 private:
 	virtual HRESULT	Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag) override;

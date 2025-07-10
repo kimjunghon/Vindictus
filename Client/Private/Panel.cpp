@@ -29,16 +29,20 @@ HRESULT CPanel::Initialize(void* pArg)
 
 void CPanel::Priority_Update(_float fTimeDelta)
 {
+	__super::Priority_Update(fTimeDelta);
 }
 
 void CPanel::Update(_float fTimeDelta)
 {
+	__super::Update(fTimeDelta);
 }
 
 void CPanel::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
 		return;
+
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CPanel::Render()
