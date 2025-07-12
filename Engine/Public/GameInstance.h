@@ -102,7 +102,9 @@ public:
 	HRESULT				Add_Controller_ToManager(const _wstring& strControllerTag, class CController* pController);
 	HRESULT				Change_Controller(_uint iChannelIndex, const _wstring& strControllerTag);
 	HRESULT				Change_Controller(_uint iChannelIndex, class CController* pNewController);
-
+	HRESULT				MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut);
+	HRESULT				ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut);
+	HRESULT				CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut);
 #pragma endregion
 
 private:
@@ -112,11 +114,13 @@ private:
 	class CLevel_Manager*		m_pLevel_Manager = { nullptr };
 	class CPrototype_Manager*	m_pPrototype_Manager = { nullptr };
 	class CRenderer*			m_pRenderer = { nullptr };
-	class CGameObject_Manager* m_pObject_Manager = { nullptr };
+	class CGameObject_Manager*	m_pObject_Manager = { nullptr };
+	class CPipeLine*			m_pPipeLine = { nullptr };
+	class CLight_Manager*		m_pLight_Manager = { nullptr };
+
 	class COctree*				m_pOctree = { nullptr };
 	class CDynamicAABBTree*		m_pDynamicAABBTree = { nullptr };
 	CEventBus*					m_pEventBus = { nullptr };
-	class CPipeLine*			m_pPipeLine = { nullptr };
 	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
 	class CController_Manager*	m_pController_Manager = { nullptr };
 

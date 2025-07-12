@@ -10,68 +10,87 @@ HRESULT CController_KeyBoard::Initialize()
     return S_OK;
 }
 
-void CController_KeyBoard::MoveInput()
+HRESULT CController_KeyBoard::MoveInput(INPUT_MOVE_DESC* pOut)
 {
-    m_byMoveInputData = 0;
-    
+    if (nullptr == pOut)
+        return E_FAIL;
+
+    _float4 vTempDir = {};
+    _bool   bTempMove = false;
+
     if (m_pGameInstance->Get_KeyDown(DIK_LEFT))
-        m_byMoveInputData |= MOVE_LEFT;
+        vTempDir.x -= 1.f;
 
     if (m_pGameInstance->Get_KeyDown(DIK_RIGHT))
-    {
-        if (m_byMoveInputData & MOVE_LEFT)
-            m_byMoveInputData ^= MOVE_LEFT;
-        else
-            m_byMoveInputData |= MOVE_RIGHT;
-    }
+        vTempDir.x += 1.f;
 
     if (m_pGameInstance->Get_KeyDown(DIK_UP))
-        m_byMoveInputData |= MOVE_FRONT;
+        vTempDir.z += 1.f;
 
     if (m_pGameInstance->Get_KeyDown(DIK_DOWN))
+        vTempDir.z -= 1.f;
+
+    if (XMVectorGetX((XMVector4Length(XMLoadFloat4(&vTempDir)))) > 0.f)
     {
-        if (m_byMoveInputData & MOVE_FRONT)
-            m_byMoveInputData ^= MOVE_FRONT;
-        else
-            m_byMoveInputData |= MOVE_BACK;
+        bTempMove = true;
+        XMVector4Normalize(XMLoadFloat4(&vTempDir));
     }
+
+    pOut->vDir = XMLoadFloat4(&vTempDir);
+    pOut->bMove = bTempMove;
+
+    return S_OK;
 }
 
-void CController_KeyBoard::ActionInput()
+HRESULT CController_KeyBoard::ActionInput(INPUT_ACTION_DESC* pOut)
 {
-    m_iActionInputData = 0;
+    if (nullptr == pOut)
+        return E_FAIL;
+
+    INPUT_ACTION_DESC ActionDesc = {};
 
     if (m_pGameInstance->Get_KeyDown(DIK_A) || m_pGameInstance->Get_KeyPressing(DIK_A))
-        m_iActionInputData |= ACTION_GUARD;
+        ActionDesc.bGuard = true;
 
     if (m_pGameInstance->Get_KeyDown(DIK_S))
-        m_iActionInputData |= ACTION_ATTACK;
+        ActionDesc.bAttack = true;
 
     if (m_pGameInstance->Get_KeyDown(DIK_D))
-        m_iActionInputData |= ACTION_SMASH;
+        ActionDesc.bSmash = true;
 
     if (m_pGameInstance->Get_KeyDown(DIK_SPACE))
-        m_iActionInputData |= ACTION_DASH;
+        ActionDesc.bDash = true;
 
     if (m_pGameInstance->Get_KeyDown(DIK_LSHIFT) || m_pGameInstance->Get_KeyPressing(DIK_LSHIFT))
-        m_iActionInputData |= ACTION_SPRINT;
+        ActionDesc.bSprint= true;
+
+    *pOut = ActionDesc;
+
+    return S_OK;
 }
 
-void CController_KeyBoard::CameraInput()
+HRESULT CController_KeyBoard::CameraInput(INPUT_CAMERA_DESC* pOut)
 {
-    m_vCameraInputData = { 0.f, 0.f, 0.f };
+    if (nullptr == pOut)
+        return E_FAIL;
+
+    INPUT_CAMERA_DESC CameraDesc = {};
 
     if (m_pGameInstance->Get_KeyDown(DIK_Q) || m_pGameInstance->Get_KeyPressing(DIK_Q))
-        m_vCameraInputData.x -= m_fSensor;
+        CameraDesc.vCameraRotate.x -= m_fSensor;
 
     if (m_pGameInstance->Get_KeyDown(DIK_E) || m_pGameInstance->Get_KeyPressing(DIK_E))
-        m_vCameraInputData.x += m_fSensor;
+        CameraDesc.vCameraRotate.x += m_fSensor;
 
     if (m_pGameInstance->Get_KeyDown(DIK_R) || m_pGameInstance->Get_KeyPressing(DIK_R))
-        m_vCameraInputData.y += m_fSensor;
+        CameraDesc.vCameraRotate.y += m_fSensor;
 
     if (m_pGameInstance->Get_KeyDown(DIK_F) || m_pGameInstance->Get_KeyPressing(DIK_F))
-        m_vCameraInputData.y -= m_fSensor;
+        CameraDesc.vCameraRotate.y -= m_fSensor;
+
+    *pOut = CameraDesc;
+
+    return S_OK;
 }
 
 CController_KeyBoard* CController_KeyBoard::Create()

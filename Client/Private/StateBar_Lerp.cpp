@@ -43,7 +43,7 @@ void CStateBar_Lerp::Update(_float fTimeDelta)
 			m_fCurrentRatio = m_fRatio;
 	}
 
-	__super::Update(fTimeDelta);
+	CProgressBar::Update(fTimeDelta);
 }
 
 CStateBar_Lerp* CStateBar_Lerp::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

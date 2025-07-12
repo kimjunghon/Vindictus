@@ -11,12 +11,9 @@ private:
 
 public:
 	virtual HRESULT Initialize() override;
-	virtual void	MoveInput() override;
-	virtual void	ActionInput() override;
-	virtual void	CameraInput() override;
-
-private:
-	_float		m_fSensor = {};
+	virtual HRESULT	MoveInput(INPUT_MOVE_DESC* pOut) override;
+	virtual HRESULT	ActionInput(INPUT_ACTION_DESC* pOut) override;
+	virtual HRESULT	CameraInput(INPUT_CAMERA_DESC* pOut) override;
 
 public:
 	static CController_KeyBoard* Create();

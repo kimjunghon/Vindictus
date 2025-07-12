@@ -13,6 +13,7 @@
 #include "DynamicAABBTree.h"
 #include "Octree.h"
 #include "EventBus.h"
+#include "Light_Manager.h"
 #include "PipeLine.h"
 #include "Camera_Manager.h"
 #include "Controller_Manager.h"
@@ -57,12 +58,16 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pEventBus)
         return E_FAIL;
 
-    m_pCamera_Manager = CCamera_Manager::Create();
-    if (nullptr == m_pCamera_Manager)
+    m_pLight_Manager = CLight_Manager::Create();
+    if (nullptr == m_pLight_Manager)
         return E_FAIL;
 
     m_pPipeLine = CPipeLine::Create();
     if (nullptr == m_pPipeLine)
+        return E_FAIL;
+
+    m_pCamera_Manager = CCamera_Manager::Create();
+    if (nullptr == m_pCamera_Manager)
         return E_FAIL;
 
     m_pController_Manager = CController_Manager::Create();
@@ -75,7 +80,6 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
     m_pInput_Device->Update();
-    m_pController_Manager->Update();
 
     m_pObject_Manager->Priority_Update(fTimeDelta);
     m_pObject_Manager->Update(fTimeDelta);
@@ -310,6 +314,18 @@ HRESULT CGameInstance::Change_Controller(_uint iChannelIndex, CController* pNewC
 {
     return m_pController_Manager->Change_Controller(iChannelIndex, pNewController);
 }
+HRESULT CGameInstance::MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut)
+{
+    return m_pController_Manager->MoveInput(iChannelIndex, pOut);
+}
+HRESULT CGameInstance::ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut)
+{
+    return m_pController_Manager->ActionInput(iChannelIndex, pOut);
+}
+HRESULT CGameInstance::CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut)
+{
+    return m_pController_Manager->CameraInput(iChannelIndex, pOut);
+}
 #pragma endregion
 
 void CGameInstance::Release_Engine()
@@ -325,6 +341,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pObject_Manager);
     Safe_Release(m_pEventBus);
     Safe_Release(m_pPipeLine);
+    Safe_Release(m_pLight_Manager);
     Safe_Release(m_pCamera_Manager);
     Safe_Release(m_pController_Manager);
 }

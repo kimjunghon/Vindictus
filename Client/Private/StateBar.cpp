@@ -49,7 +49,7 @@ void CStateBar::Update(_float fTimeDelta)
 			m_fCurrentRatio = m_fRatio;
 	}
 
-	__super::Update(fTimeDelta);
+	CProgressBar::Update(fTimeDelta);
 }
 
 HRESULT CStateBar::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag)
