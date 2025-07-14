@@ -1,5 +1,5 @@
+#include "ClientPch.h"
 #include "Background.h"
-#include "GameInstance.h"
 
 CBackground::CBackground(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CUIObject { pDevice, pDeviceContext}

@@ -1,15 +1,10 @@
 #pragma once
 #include "Client_Defines.h"
-#include "UIObject.h"
-NS_BEGIN(Engine)
-class CVIBuffer;
-class CTexture;
-class CShader;
-NS_END
+#include "UI_Panel.h"
 
 NS_BEGIN(Client)
 
-class CLogoScreen final : public CUIObject
+class CLogoScreen final : public CUI_Panel
 {
 private:
 	CLogoScreen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
@@ -25,12 +20,6 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CVIBuffer* m_pVIBufferCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-
-private:
-	HRESULT Ready_Component();
 	HRESULT Ready_Children();
 	HRESULT Ready_Button();
 

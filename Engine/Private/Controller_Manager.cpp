@@ -1,3 +1,4 @@
+#include "EnginePch.h"
 #include "Controller_Manager.h"
 #include "Controller.h"
 
@@ -5,33 +6,14 @@ CController_Manager::CController_Manager()
 {
 }
 
-HRESULT CController_Manager::MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut)
+void CController_Manager::Update(_float fTimeDelta)
 {
-	if (iChannelIndex >= ENUM_CLASS(CONTROLLER_CHANNEL::END) ||
-		nullptr != m_pCurrentController[iChannelIndex])
-		return E_FAIL;
-
-	return m_pCurrentController[iChannelIndex]->MoveInput(pOut);
+	for (_uint i = 0; i < ENUM_CLASS(CONTROLLER_CHANNEL::END); i++)
+	{
+		if(m_pCurrentController[i])
+			m_pCurrentController[i]->Update(fTimeDelta);
+	}
 }
-
-HRESULT CController_Manager::ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut)
-{
-	if (iChannelIndex >= ENUM_CLASS(CONTROLLER_CHANNEL::END) ||
-		nullptr != m_pCurrentController[iChannelIndex])
-		return E_FAIL;
-
-	return m_pCurrentController[iChannelIndex]->ActionInput(pOut);
-}
-
-HRESULT CController_Manager::CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut)
-{
-	if (iChannelIndex >= ENUM_CLASS(CONTROLLER_CHANNEL::END) ||
-		nullptr != m_pCurrentController[iChannelIndex])
-		return E_FAIL;
-
-	return m_pCurrentController[iChannelIndex]->CameraInput(pOut);
-}
-
 
 HRESULT CController_Manager::Add_Controller_ToManager(const _wstring& strControllerTag, CController* pController)
 {

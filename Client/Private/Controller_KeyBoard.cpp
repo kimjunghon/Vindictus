@@ -1,5 +1,5 @@
+#include "ClientPch.h"
 #include "Controller_KeyBoard.h"
-#include "GameInstance.h"
 
 CController_KeyBoard::CController_KeyBoard()
 {
@@ -8,6 +8,10 @@ CController_KeyBoard::CController_KeyBoard()
 HRESULT CController_KeyBoard::Initialize()
 {
     return S_OK;
+}
+
+void CController_KeyBoard::Update(_float fTimeDelta)
+{
 }
 
 HRESULT CController_KeyBoard::MoveInput(INPUT_MOVE_DESC* pOut)

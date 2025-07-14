@@ -1,13 +1,13 @@
+#include "ClientPch.h"
 #include "LoadingPoint.h"
-#include "GameInstance.h"
 
 CLoadingPoint::CLoadingPoint(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CUIObject{ pDevice, pDeviceContext }
+	: CTextureUI { pDevice, pDeviceContext }
 {
 }
 
 CLoadingPoint::CLoadingPoint(const CLoadingPoint& Prototype)
-	: CUIObject{ Prototype }
+	: CTextureUI { Prototype }
 {
 }
 
@@ -79,10 +79,6 @@ HRESULT CLoadingPoint::Ready_Component()
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Point"),
-		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -114,6 +110,5 @@ void CLoadingPoint::Free()
 	__super::Free();
 
 	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pTextureCom);
 	Safe_Release(m_pShaderCom);
 }

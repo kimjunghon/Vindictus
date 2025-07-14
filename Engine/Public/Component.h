@@ -15,6 +15,7 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
+	_bool			NeedCloned() { return m_bNeedCloned; }
 
 protected:
 	ID3D11Device*				m_pDevice = { nullptr };
@@ -22,6 +23,7 @@ protected:
 	class CGameInstance*		m_pGameInstance = { nullptr };
 
 	_bool						m_IsCloned = { false };
+	_bool						m_bNeedCloned = { true };
 
 public:
 	virtual CComponent* Clone(void* pArg) PURE;

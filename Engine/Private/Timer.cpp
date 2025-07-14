@@ -1,3 +1,4 @@
+#include "EnginePch.h"
 #include "Timer.h"
 
 CTimer::CTimer()

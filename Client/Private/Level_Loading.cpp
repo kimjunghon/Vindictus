@@ -1,6 +1,6 @@
+#include "ClientPch.h"
 #include "Level_Loading.h"
 #include "Loader.h"
-#include "GameInstance.h"
 #include "LoadingScreen.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

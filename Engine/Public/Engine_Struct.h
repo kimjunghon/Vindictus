@@ -29,6 +29,10 @@ namespace Engine
 		XMFLOAT2	vCameraRotate;
 	}INPUT_CAMERA_DESC;
 
+	typedef struct tagInputUIDesc {
+		bool		bESC;
+	}INPUT_UI_DESC;
+
 	typedef struct tagLightDesc
 	{
 		enum TYPE { DIRECTIONAL, POINT, END};

@@ -1,6 +1,7 @@
+#include "ClientPch.h"
 #include "Level_Logo.h"
 #include "Level_Loading.h"
-#include "GameInstance.h"
+
 #include "UIObject.h"
 
 CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

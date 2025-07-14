@@ -1,13 +1,16 @@
+#include "ClientPch.h"
+
 #include "MainApp.h"
-#include "GameInstance.h"
+#include "Panel.h"
+#include "Button.h"
+#include "Bar.h"
 #include "Level_Loading.h"
 #include "Level_GamePlay.h"
 #include "Level_Logo.h"
 #include "LoadingScreen.h"
 #include "LoadingBar.h"
 #include "LoadingPoint.h"
-#include "Panel.h"
-#include "Button.h"
+
 
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
@@ -32,7 +35,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
@@ -48,7 +51,9 @@ void CMainApp::Post_Update()
 		if (FAILED(m_pGameInstance->Clear_Resources()))
 			MSG_BOX(TEXT("Failed Clear Resrouces"));
 		
-		if (FAILED(m_pGameInstance->Open_Level(m_iChange_Level, Create_NewLevel(m_iChange_Level))))
+		CLevel* pNextLevel = Create_NewLevel(m_iChange_Level);
+
+		if (FAILED(m_pGameInstance->Open_Level(m_iChange_Level, pNextLevel)))
 			MSG_BOX(TEXT("Failed Open Level"));
 
 		m_bChange_Level = false;
@@ -95,7 +100,10 @@ CLevel* CMainApp::Create_NewLevel(_uint iChangeLevel)
 		}
 	}
 	else
+	{
 		pNewLevel = CLevel_Loading::Create(m_pDevice, m_pDeviceContext, static_cast<LEVEL>(m_iChange_Level));
+		m_iChange_Level = ENUM_CLASS(LEVEL::LOADING);
+	}
 
 	return pNewLevel;
 }
@@ -159,8 +167,13 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 
 	/* Ready_Prototype_GameObject_Button */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_ButtonObject_Button"),
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"),
 		CButton::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Ready_Prototype_GameObject_Button */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"),
+		CBar::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	return S_OK;

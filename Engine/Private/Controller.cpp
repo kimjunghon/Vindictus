@@ -1,3 +1,4 @@
+#include "EnginePch.h"
 #include "Controller.h"
 #include "GameInstance.h"
 
@@ -10,6 +11,10 @@ CController::CController()
 HRESULT CController::Initialize()
 {
     return S_OK;
+}
+
+void CController::Update(_float fTimeDelta)
+{
 }
 
 void CController::Free()

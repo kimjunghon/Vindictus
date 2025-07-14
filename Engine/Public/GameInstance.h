@@ -102,9 +102,6 @@ public:
 	HRESULT				Add_Controller_ToManager(const _wstring& strControllerTag, class CController* pController);
 	HRESULT				Change_Controller(_uint iChannelIndex, const _wstring& strControllerTag);
 	HRESULT				Change_Controller(_uint iChannelIndex, class CController* pNewController);
-	HRESULT				MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut);
-	HRESULT				ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut);
-	HRESULT				CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut);
 #pragma endregion
 
 private:

@@ -1,3 +1,4 @@
+#include "EnginePch.h"
 #include "GameInstance.h"
 
 #include "Graphic_Device.h"
@@ -80,7 +81,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
     m_pInput_Device->Update();
-
+    m_pController_Manager->Update(fTimeDelta);
     m_pObject_Manager->Priority_Update(fTimeDelta);
     m_pObject_Manager->Update(fTimeDelta);
     m_pObject_Manager->Late_Update(fTimeDelta);
@@ -313,18 +314,6 @@ HRESULT CGameInstance::Change_Controller(_uint iChannelIndex, const _wstring& st
 HRESULT CGameInstance::Change_Controller(_uint iChannelIndex, CController* pNewController)
 {
     return m_pController_Manager->Change_Controller(iChannelIndex, pNewController);
-}
-HRESULT CGameInstance::MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut)
-{
-    return m_pController_Manager->MoveInput(iChannelIndex, pOut);
-}
-HRESULT CGameInstance::ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut)
-{
-    return m_pController_Manager->ActionInput(iChannelIndex, pOut);
-}
-HRESULT CGameInstance::CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut)
-{
-    return m_pController_Manager->CameraInput(iChannelIndex, pOut);
 }
 #pragma endregion
 

@@ -1,11 +1,10 @@
 ﻿// Client.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
 
+#include "ClientPch.h"
 #include "framework.h"
 #include "Client.h"
-
 #include "MainApp.h"
-#include "GameInstance.h"
 
 #define MAX_LOADSTRING 100
 
@@ -39,13 +38,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_CLIENT, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
-
+    
     // 애플리케이션 초기화를 수행합니다:
     if (!InitInstance (hInstance, nCmdShow))
     {
         return FALSE;
     }
-
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_CLIENT));
 
     MSG msg;
@@ -149,20 +147,23 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
     RECT rcWindow = { 0, 0, g_iWinSizeX, g_iWinSizeY };
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+    AdjustWindowRect(&rcWindow, WS_OVERLAPPEDWINDOW, false);
+
+    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top, nullptr, nullptr, hInstance, nullptr);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   g_hWnd = hWnd;
-
-   return TRUE;
+    if (!hWnd)
+    {
+       return FALSE;
+    }
+    
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
+    
+    g_hWnd = hWnd;
+    
+    return TRUE;
 }
 
 //

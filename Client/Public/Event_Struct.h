@@ -19,4 +19,9 @@ namespace Client
 
 	typedef struct tagEventLoadingComplete final : public CEvent
 	{}EVENT_LOADING_COMPLETE;
+
+	typedef struct tagEventOptionSelect final : public CEvent
+	{
+		_byte byVisibleType;
+	}EVENT_UI_CHANGE;
 }

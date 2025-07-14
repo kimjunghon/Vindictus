@@ -1,14 +1,14 @@
+#include "ClientPch.h"
 #include "LogoScreen.h"
-#include "GameInstance.h"
 #include "Button.h"
 
 CLogoScreen::CLogoScreen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CUIObject{ pDevice, pDeviceContext }
+	: CUI_Panel{ pDevice, pDeviceContext }
 {
 }
 
 CLogoScreen::CLogoScreen(const CLogoScreen& Prototype)
-	: CUIObject{ Prototype }
+	: CUI_Panel{ Prototype }
 {
 }
 
@@ -23,9 +23,6 @@ HRESULT CLogoScreen::Initialize(void* pArg)
 		return E_FAIL;
 
 	if (FAILED(__super::Initialize(pArg)))
-		return E_FAIL;
-
-	if (FAILED(Ready_Component()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Children()))
@@ -49,75 +46,47 @@ void CLogoScreen::Update(_float fTimeDelta)
 
 void CLogoScreen::Late_Update(_float fTimeDelta)
 {
-	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
-		return;
-
 	__super::Children_Late_Update(fTimeDelta);
 }
 
 HRESULT CLogoScreen::Render()
 {
-	__super::Begin();
-
-	if (FAILED(m_pTransformCom->Bind_Shader_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-		return E_FAIL;
-
-	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", 0)))
-		return E_FAIL;
-
-	m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::DEFAULT));
-
-	m_pVIBufferCom->Bind_Resources();
-
-	m_pVIBufferCom->Render();
-
-	return S_OK;
-}
-
-HRESULT CLogoScreen::Ready_Component()
-{
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
-		return E_FAIL;
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
-		return E_FAIL;
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_SkyBox"),
-		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-		return E_FAIL;
 
 	return S_OK;
 }
 
 HRESULT CLogoScreen::Ready_Children()
 {
-	UIOBJECT_DESC Children_Desc{};
+	CTextureUI::TEXTURE_UI_DESC Children_Desc = {};
 	Children_Desc.fX = m_fX;
 	Children_Desc.fY = m_fY;
+	Children_Desc.fSizeX = m_fSizeX;
+	Children_Desc.fSizeY = m_fSizeY;
+	Children_Desc.fOffsetX = 0.f;
+	Children_Desc.fOffsetY = 0.f;
+	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
+	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::LOGO);
+	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_SkyBox");
+
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
+		return E_FAIL;
+
 	Children_Desc.fSizeX = 150.f;
 	Children_Desc.fSizeY = 150.f;
 	Children_Desc.fOffsetX = 0.f;
 	Children_Desc.fOffsetY = -150.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
+	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_Logo_WaterMark");
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Logo_WaterMark"), &Children_Desc)))
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
 		return E_FAIL;
 
 	Children_Desc.fSizeX = 300.f;
 	Children_Desc.fSizeY = 300.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
+	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_Logo_WaterMark_Back");
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Logo_WaterMark_Back"), &Children_Desc)))
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -133,6 +102,9 @@ HRESULT CLogoScreen::Ready_Button()
 	Button_Desc.fOffsetX = 0.f;
 	Button_Desc.fOffsetY = 100.f;
 	Button_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
+	Button_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::LOGO);
+	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_Logo_Button");
+
 	Button_Desc.Callback = [&]() {
 		EVENT_LEVEL_CHANGE Event;
 		Event.iChange_Level = ENUM_CLASS(LEVEL::GAMEPLAY);
@@ -140,8 +112,7 @@ HRESULT CLogoScreen::Ready_Button()
 		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
 		};
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_ButtonObject_Button"),
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Logo_Button"), &Button_Desc)))
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 
 	Button_Desc.fOffsetY = 200.f;
@@ -149,8 +120,7 @@ HRESULT CLogoScreen::Ready_Button()
 			DestroyWindow(g_hWnd);
 		};
 
-	if (FAILED(CUIObject::Add_DynamicTexture_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_ButtonObject_Button"),
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Logo_Button"), &Button_Desc)))
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -183,8 +153,4 @@ CGameObject* CLogoScreen::Clone(void* pArg)
 void CLogoScreen::Free()
 {
 	__super::Free();
-
-	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pShaderCom);
 }

@@ -1,13 +1,13 @@
+#include "ClientPch.h"
 #include "Button.h"
-#include "GameInstance.h"
 
 CButton::CButton(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)   
-    : CUIObject{pDevice, pDeviceContext }
+    : CTextureUI{pDevice, pDeviceContext }
 {
 }
 
 CButton::CButton(const CButton& Prototype)
-    : CUIObject{ Prototype }
+    : CTextureUI{ Prototype }
 {
 }
 
@@ -40,7 +40,7 @@ void CButton::Priority_Update(_float fTimeDelta)
 
 void CButton::Update(_float fTimeDelta)
 {
-    if (GetKeyState(VK_LBUTTON) & 0x8000 && true == CUIObject::IsPick(g_hWnd))
+    if (GetKeyState(VK_LBUTTON) & 0x8000 && CUIObject::IsPick(g_hWnd))
     {
         if(m_Callback)
             m_Callback();
@@ -76,15 +76,6 @@ HRESULT CButton::Render()
     m_pVIBufferCom->Bind_Resources();
 
     m_pVIBufferCom->Render();
-
-    return S_OK;
-}
-
-HRESULT CButton::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag)
-{
-    if (FAILED(CGameObject::Add_Component(iTexturePrototypeLevelIndex, strTexturePrototypeTag,
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-        return E_FAIL;
 
     return S_OK;
 }

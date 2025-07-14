@@ -1,3 +1,4 @@
+#include "EnginePch.h"
 #include "UIObject.h"
 #include "GameInstance.h"
 
@@ -26,7 +27,7 @@ HRESULT CUIObject::Initialize(void* pArg)
 
 	UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);
 
-	m_fX = pDesc->fX - pDesc->fOffsetX;
+	m_fX = pDesc->fX + pDesc->fOffsetX;
 	m_fY = pDesc->fY + pDesc->fOffsetY;
 	m_iDepth = pDesc->iDepth;
 	m_fSizeX = pDesc->fSizeX;
@@ -48,22 +49,20 @@ HRESULT CUIObject::Initialize(void* pArg)
 	m_iWinSizeX = Viewport.Width;
 	m_iWinSizeY = Viewport.Height;
 
+
 	return S_OK;
 }
 
 void CUIObject::Priority_Update(_float fTimeDelta)
 {
-	Children_Priority_Update(fTimeDelta);
 }
 
 void CUIObject::Update(_float fTimeDelta)
 {
-	Children_Update(fTimeDelta);
 }
 
 void CUIObject::Late_Update(_float fTimeDelta)
 {
-	Children_Late_Update(fTimeDelta);
 }
 
 HRESULT CUIObject::Render()
@@ -86,36 +85,9 @@ _bool CUIObject::IsPick(HWND hWnd)
 }
 
 
-HRESULT CUIObject::Add_StaticTexture_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, UIOBJECT_DESC* UIChildDesc)
+void CUIObject::Change_Visible()
 {
-	CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, 
-		iPrototypeLevelIndex, strPrototypeTag, UIChildDesc));;
-	if (nullptr == pUIObject)
-		return E_FAIL;
-
-	m_Children.push_back(pUIObject);
-
-	return S_OK;
-}
-
-HRESULT CUIObject::Add_DynamicTexture_Child(_uint iUIPrototypeLevelIndex, const _wstring& strUIPrototypeTag, _uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag, UIOBJECT_DESC* UIChildDesc)
-{
-	CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, 
-		iUIPrototypeLevelIndex, strUIPrototypeTag, UIChildDesc));;
-	if (nullptr == pUIObject)
-		return E_FAIL;
-
-	if (FAILED(pUIObject->Ready_TextureCom(iTexturePrototypeLevelIndex, strTexturePrototypeTag)))
-		return E_FAIL;
-
-	m_Children.push_back(pUIObject);
-
-	return S_OK;
-}
-
-HRESULT CUIObject::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag)
-{
-	return S_OK;
+	m_bVisible = !m_bVisible;
 }
 
 HRESULT CUIObject::Begin()
@@ -126,35 +98,10 @@ HRESULT CUIObject::Begin()
 	return S_OK;
 }
 
-HRESULT CUIObject::Update_ChildPosition(_float fX, _float fY)
-{
-	if (m_Children.size() <= 0)
-		return S_OK;
-
-	for (auto& Child: m_Children)
-	{
-		Child->Set_Position(fX, fY);
-	}
-
-	return S_OK;
-}
-
-HRESULT CUIObject::Update_ChildOffset(_float fOffsetX, _float fOffsetY)
-{
-	if (m_Children.size() <= 0)
-		return S_OK;
-
-	for (auto& Child : m_Children)
-	{
-		Child->Set_Offset(fOffsetX, fOffsetY);
-	}
-
-	return S_OK;
-}
 
 void CUIObject::Set_Position(_float fX, _float fY)
 {
-	m_fX = fX - m_fOffsetX;
+	m_fX = fX + m_fOffsetX;
 	m_fY = fY + m_fOffsetY;
 }
 
@@ -164,43 +111,8 @@ void CUIObject::Set_Offset(_float fOffsetX, _float fOffsetY)
 	m_fOffsetY = fOffsetY;
 }
 
-void CUIObject::Children_Priority_Update(_float fTimeDelta)
-{
-	if (m_Children.size() <= 0)
-		return;
-
-	for (auto& Child : m_Children)
-		Child->Priority_Update(fTimeDelta);
-}
-
-void CUIObject::Children_Update(_float fTimeDelta)
-{
-	if (m_Children.size() <= 0)
-		return;
-
-	for (auto& Child : m_Children)
-		Child->Update(fTimeDelta);
-}
-
-void CUIObject::Children_Late_Update(_float fTimeDelta)
-{
-	if (m_Children.size() <= 0)
-		return;
-
-	for (auto& Child : m_Children)
-	{
-		Child->Late_Update(fTimeDelta);
-		Update_ChildPosition(m_fX, m_fY);
-	}
-
-}
-
 void CUIObject::Free()
 {
 	__super::Free();
 
-	for (auto& Child : m_Children)
-		Safe_Release(Child);
-
-	m_Children.clear();
 }

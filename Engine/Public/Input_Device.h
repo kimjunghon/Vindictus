@@ -33,7 +33,7 @@ public:
 	}
 
 	_bool	Get_KeyDown(_ubyte byKeyID) {
-		return (m_byKeyState[byKeyID] & 0x80) && (~m_byOldKeyState[byKeyID] & 0x80);
+		return  (m_byKeyState[byKeyID] & 0x80) && (~m_byOldKeyState[byKeyID] & 0x80);
 	}
 
 	_bool	Get_KeyUp(_ubyte byKeyID) {

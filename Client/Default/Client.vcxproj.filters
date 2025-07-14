@@ -40,14 +40,29 @@
     <Filter Include="02.GameObject\UIObject\Loading">
       <UniqueIdentifier>{fc7e9559-cc44-48d5-b0fb-55ccbd6ae479}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\Camera">
+      <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\GamePlay">
+      <UniqueIdentifier>{e09314ea-c9cf-4170-9b10-fc01544610b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\GamePlay\HUD">
+      <UniqueIdentifier>{1cff8f92-4619-46e0-8494-51c719def440}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\GamePlay\Option">
+      <UniqueIdentifier>{3c7af0dd-663d-4b6f-bfab-39c72a7e68b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\UIObject\GamePlay\OptionController">
+      <UniqueIdentifier>{166339c0-8123-4505-957b-e8cbbd01a34d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.Controller">
+      <UniqueIdentifier>{99dc2a59-58e4-4f27-b4b2-83c785ce242e}</UniqueIdentifier>
+    </Filter>
     <Filter Include="02.GameObject\UIObject\Static">
       <UniqueIdentifier>{9b5a3425-2493-4e94-a944-22b17a5c2c60}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObject\UIObject\Static\Background">
       <UniqueIdentifier>{894bcd7f-e626-4263-b8aa-5837632cb147}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\Static\ProgressBar">
-      <UniqueIdentifier>{00c7a3ce-7dac-4fe9-94e7-7e66e5447cd5}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObject\UIObject\Static\Button">
       <UniqueIdentifier>{3f709017-faa8-4a54-896b-0a8fa92454cc}</UniqueIdentifier>
@@ -55,11 +70,8 @@
     <Filter Include="02.GameObject\UIObject\Static\Panel">
       <UniqueIdentifier>{75274f8e-fba3-4800-9d95-1645c708fcda}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Camera">
-      <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\GamePlay">
-      <UniqueIdentifier>{e09314ea-c9cf-4170-9b10-fc01544610b5}</UniqueIdentifier>
+    <Filter Include="02.GameObject\UIObject\Static\Bar">
+      <UniqueIdentifier>{ac98ff6d-3684-43f3-891f-9f78d974127a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -96,14 +108,8 @@
     <ClInclude Include="..\Public\Player.h">
       <Filter>02.GameObject\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Background.h">
-      <Filter>02.GameObject\UIObject\Static\Background</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Event_Struct.h">
       <Filter>99.Defines</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\ProgressBar.h">
-      <Filter>02.GameObject\UIObject\Static\ProgressBar</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Client_Enum.h">
       <Filter>99.Defines</Filter>
@@ -113,12 +119,6 @@
     </ClInclude>
     <ClInclude Include="..\public\LogoScreen.h">
       <Filter>02.GameObject\UIObject\Logo</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Button.h">
-      <Filter>02.GameObject\UIObject\Static\Button</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Panel.h">
-      <Filter>02.GameObject\UIObject\Static\Panel</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LoadingBar.h">
       <Filter>02.GameObject\UIObject\Loading</Filter>
@@ -130,13 +130,40 @@
       <Filter>02.GameObject\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\public\HUD.h">
-      <Filter>02.GameObject\UIObject\GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\StateBar_Lerp.h">
-      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+      <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StateBar.h">
-      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+      <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\OptionMain.h">
+      <Filter>02.GameObject\UIObject\GamePlay\Option</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ClientPch.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\OptionController.h">
+      <Filter>02.GameObject\UIObject\GamePlay\OptionController</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Controller_UI.h">
+      <Filter>03.Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Controller_KeyBoard.h">
+      <Filter>03.Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Background.h">
+      <Filter>02.GameObject\UIObject\Static\Background</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Button.h">
+      <Filter>02.GameObject\UIObject\Static\Button</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Panel.h">
+      <Filter>02.GameObject\UIObject\Static\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bar.h">
+      <Filter>02.GameObject\UIObject\Static\Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\LoadingBack.h">
+      <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -174,23 +201,11 @@
     <ClCompile Include="..\private\Player.cpp">
       <Filter>02.GameObject\Player</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Background.cpp">
-      <Filter>02.GameObject\UIObject\Static\Background</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\ProgressBar.cpp">
-      <Filter>02.GameObject\UIObject\Static\ProgressBar</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\LoadingScreen.cpp">
       <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LogoScreen.cpp">
       <Filter>02.GameObject\UIObject\Logo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Button.cpp">
-      <Filter>02.GameObject\UIObject\Static\Button</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Panel.cpp">
-      <Filter>02.GameObject\UIObject\Static\Panel</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LoadingBar.cpp">
       <Filter>02.GameObject\UIObject\Loading</Filter>
@@ -202,13 +217,40 @@
       <Filter>02.GameObject\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\private\HUD.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\StateBar_Lerp.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+      <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StateBar.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay</Filter>
+      <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\public\OptionMain.cpp">
+      <Filter>02.GameObject\UIObject\GamePlay\Option</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ClientPch.cpp">
+      <Filter>99.Defines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\OptionController.cpp">
+      <Filter>02.GameObject\UIObject\GamePlay\OptionController</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Controller_UI.cpp">
+      <Filter>03.Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Controller_KeyBoard.cpp">
+      <Filter>03.Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Background.cpp">
+      <Filter>02.GameObject\UIObject\Static\Background</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Button.cpp">
+      <Filter>02.GameObject\UIObject\Static\Button</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Panel.cpp">
+      <Filter>02.GameObject\UIObject\Static\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bar.cpp">
+      <Filter>02.GameObject\UIObject\Static\Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\LoadingBack.cpp">
+      <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

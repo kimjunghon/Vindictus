@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "Shader.h"
 #include "Texture.h"
+#include "TextureUI.h"
 
 NS_BEGIN(Engine)
 

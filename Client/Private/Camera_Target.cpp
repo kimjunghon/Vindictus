@@ -1,5 +1,5 @@
+#include "ClientPch.h"
 #include "Camera_Target.h"
-#include "GameInstance.h"
 
 CCamera_Target::CCamera_Target(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CCamera { pDevice, pDeviceContext }

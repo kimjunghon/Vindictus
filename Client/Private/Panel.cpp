@@ -1,13 +1,13 @@
+#include "ClientPch.h"
 #include "Panel.h"
-#include "GameInstance.h"
 
 CPanel::CPanel(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CUIObject{ pDevice, pDeviceContext }
+	: CTextureUI{ pDevice, pDeviceContext }
 {
 }
 
 CPanel::CPanel(const CPanel& Prototype)
-	: CUIObject{ Prototype }
+	: CTextureUI{ Prototype }
 {
 }
 
@@ -66,15 +66,6 @@ HRESULT CPanel::Render()
 	m_pVIBufferCom->Bind_Resources();
 
 	m_pVIBufferCom->Render();
-
-	return S_OK;
-}
-
-HRESULT CPanel::Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag)
-{
-	if (FAILED(CGameObject::Add_Component(iTexturePrototypeLevelIndex, strTexturePrototypeTag,
-		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-		return E_FAIL;
 
 	return S_OK;
 }

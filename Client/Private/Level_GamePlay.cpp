@@ -1,5 +1,6 @@
+#include "ClientPch.h"
+
 #include "Level_GamePlay.h"
-#include "GameInstance.h"
 #include "UIObject.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
@@ -49,7 +50,12 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
 	}
 
-
+	if (m_pGameInstance->Get_KeyDown(DIK_ESCAPE))
+	{
+		EVENT_UI_CHANGE Event;
+		Event.byVisibleType = ENUM_CLASS(GAMEPLAY_UI::DEFAULT) + ENUM_CLASS(GAMEPLAY_UI::OPTION);
+		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::GAMEPLAY), Event);
+	}
 }
 
 HRESULT CLevel_GamePlay::Render()
@@ -66,13 +72,23 @@ HRESULT CLevel_GamePlay::Ready_Layer(const _wstring& strLayerTag)
 	UI_Desc.fY = g_iWinSizeY >> 1;
 	UI_Desc.fSizeX = g_iWinSizeX;
 	UI_Desc.fSizeY = g_iWinSizeY;
-	UI_Desc.fOffsetX = 0;
-	UI_Desc.fOffsetY = 0;
+	UI_Desc.fOffsetX = 0.f;
+	UI_Desc.fOffsetY = 0.f;
 	UI_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_HUD"),
 		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &UI_Desc)))
 		return E_FAIL;
+
+	UI_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_Option"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &UI_Desc)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_UIObject_OptionController"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &UI_Desc)))
+		return E_FAIL;
+
 
     return S_OK;
 }

@@ -13,10 +13,7 @@ private:
 	virtual ~CController_Manager() = default;
 
 public:
-	HRESULT MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut);
-	HRESULT ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut);
-	HRESULT CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut);
-
+	void				Update(_float fTimeDelta);
 public:
 	HRESULT				Add_Controller_ToManager(const _wstring& strControllerTag, class CController* pController);
 	HRESULT				Change_Controller(_uint iChannelIndex, const _wstring& strControllerTag);

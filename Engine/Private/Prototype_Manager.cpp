@@ -1,3 +1,4 @@
+#include "EnginePch.h"
 #include "Prototype_Manager.h"
 #include "GameObject.h"
 #include "Component.h"
@@ -40,14 +41,24 @@ CBase* CPrototype_Manager::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototyp
 
 	switch (ePrototype)
 	{
-	case PROTOTYPE::GAMEOBJECT:
-		pClone = dynamic_cast<CGameObject*>(pPrototype)->Clone(pArg);
-		break;
-	case PROTOTYPE::COMPONENT:
-		pClone = dynamic_cast<CComponent*>(pPrototype)->Clone(pArg);
-		break;
-	}
+		case PROTOTYPE::GAMEOBJECT:
+			pClone = dynamic_cast<CGameObject*>(pPrototype)->Clone(pArg);
+			break;
+		case PROTOTYPE::COMPONENT:
+		{
+			pClone = dynamic_cast<CComponent*>(pPrototype)->Clone(pArg);
+			//CComponent* pComponent = dynamic_cast<CComponent*>(pPrototype);
+			//if (pComponent->NeedCloned())
+			//	pClone = pComponent->Clone(pArg);
+			//else
+			//{
+			//	pClone = pComponent;
+			//	Safe_AddRef(pClone);
+			//}
 
+			break;
+		}
+	}
 	if (nullptr == pClone)
 		return nullptr;
 

@@ -1,3 +1,4 @@
+#include "ClientPch.h"
 #include "Player.h"
 
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

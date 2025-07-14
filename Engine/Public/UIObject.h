@@ -6,7 +6,8 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CUIObject abstract : public CGameObject
 {
 public:
-	typedef struct tagUIObjectDesc : public CTransform::TRANSFORM_DESC {
+	typedef struct tagUIObjectDesc : public CTransform::TRANSFORM_DESC 
+	{
 		_float fX{}; 
 		_float fY{}; 
 		_float fSizeX{}; 
@@ -30,9 +31,11 @@ public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	virtual void	Set_Position(_float fX, _float fY);
+	virtual void	Set_Offset(_float fOffsetX, _float fOffsetY);
 
 protected:
-	vector<CUIObject*> m_Children;
+	_bool			m_bVisible = {};
 
 	_float4x4		m_ViewMatrix = {};
 	_float4x4		m_ProjMatrix = {};
@@ -48,21 +51,13 @@ protected:
 	_float			m_iWinSizeY = {};
 
 protected:	
-	HRESULT			Add_StaticTexture_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, UIOBJECT_DESC* UIChildDesc = nullptr);
-	HRESULT			Add_DynamicTexture_Child(_uint iUIPrototypeLevelIndex, const _wstring& strUIPrototypeTag, 
-		_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag, UIOBJECT_DESC* UIChildDesc = nullptr);
-	virtual HRESULT Ready_TextureCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag);
-	virtual _bool	IsPick(HWND hWnd);
-
 	HRESULT			Begin();
-	HRESULT			Update_ChildPosition(_float fX, _float fY);
-	HRESULT			Update_ChildOffset(_float fOffsetX, _float fOffsetY);
-	void			Set_Position(_float fX, _float fY);
-	void			Set_Offset(_float fOffsetX, _float fOffsetY);
-	void			Children_Priority_Update(_float fTimeDelta);
-	void			Children_Update(_float fTimeDelta);
-	void			Children_Late_Update(_float fTimeDelta);
 
+	void			Change_Visible();
+	virtual _bool	IsPick(HWND hWnd);
+	
+
+	
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;
 	virtual void			Free() override;

@@ -1,16 +1,15 @@
 #pragma once
 #include "Client_Defines.h"
-#include "UIObject.h"
+#include "TextureUI.h"
 
 NS_BEGIN(Engine)
 class CVIBuffer;
-class CTexture;
 class CShader;
 NS_END
 
 NS_BEGIN(Client)
 
-class CLoadingPoint final : public CUIObject
+class CLoadingPoint final : public CTextureUI
 {
 private:
 	CLoadingPoint(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
@@ -28,7 +27,6 @@ public:
 private:
 	CVIBuffer*	m_pVIBufferCom = { nullptr };
 	CShader*	m_pShaderCom = { nullptr };
-	CTexture*	m_pTextureCom = { nullptr };
 
 private:
 	HRESULT Ready_Component();

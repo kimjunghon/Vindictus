@@ -112,6 +112,15 @@
     <Filter Include="96.Light\Manager">
       <UniqueIdentifier>{1a5ee149-8706-4d7a-b339-76cc60f403c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.GameObject\UIObject\Panel">
+      <UniqueIdentifier>{a85c082a-7f90-4b6f-a634-272cdcb8491d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.GameObject\UIObject\UI_Slot">
+      <UniqueIdentifier>{c1633203-19cb-4eeb-9a0d-e5f6f411ffb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.GameObject\UIObject\TextureUI">
+      <UniqueIdentifier>{cdad5909-ca5b-4bd4-8eaf-dac2f148ab2a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -222,9 +231,6 @@
     <ClInclude Include="..\Public\Controller.h">
       <Filter>01.Utility\06.Controller</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Controller_KeyBoard.h">
-      <Filter>01.Utility\06.Controller</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Controller_Manager.h">
       <Filter>01.Utility\06.Controller\Manager</Filter>
     </ClInclude>
@@ -233,6 +239,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\VindictusBack\Vindictus\Engine\Public\Light_Manager.h">
       <Filter>96.Light\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EnginePch.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_Panel.h">
+      <Filter>01.Utility\03.GameObject\UIObject\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_Slot.h">
+      <Filter>01.Utility\03.GameObject\UIObject\UI_Slot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\TextureUI.h">
+      <Filter>01.Utility\03.GameObject\UIObject\TextureUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -323,9 +341,6 @@
     <ClCompile Include="..\Private\Controller_Manager.cpp">
       <Filter>01.Utility\06.Controller\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Controller_KeyBoard.cpp">
-      <Filter>01.Utility\06.Controller</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Controller.cpp">
       <Filter>01.Utility\06.Controller</Filter>
     </ClCompile>
@@ -334,6 +349,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\VindictusBack\Vindictus\Engine\Private\Light_Manager.cpp">
       <Filter>96.Light\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EnginePch.cpp">
+      <Filter>99.Defines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_Panel.cpp">
+      <Filter>01.Utility\03.GameObject\UIObject\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_Slot.cpp">
+      <Filter>01.Utility\03.GameObject\UIObject\UI_Slot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TextureUI.cpp">
+      <Filter>01.Utility\03.GameObject\UIObject\TextureUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

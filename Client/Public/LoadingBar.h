@@ -1,10 +1,13 @@
 #pragma once
-#include "ProgressBar.h"
+#include "UI_Slot.h"
 
 NS_BEGIN(Client)
 
-class CLoadingBar final : public CProgressBar
+class CLoadingBar final : public CUI_Slot
 {
+private:
+	enum class LOADING_SLOT { BACKGROUND, BAR, POINT, END};
+
 private:
 	CLoadingBar(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CLoadingBar(const CLoadingBar& Prototype);
@@ -13,14 +16,26 @@ private:
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
-
+	virtual void	Priority_Update(_float fTimeDelta) override;
 	virtual void	Update(_float fTimeDelta) override;
+	virtual void	Late_Update(_float fTimeDelta) override;
+	virtual HRESULT Render() override;
 
 private:
-	_float					m_fPointX = {};
+	PROGRESS_TYPE	m_eType = {};
+
+	_float			m_fRatio = {};
+	_float			m_fBarRatio = {};
+	_float			m_fFillSpeed = {};
+	_float			m_fPointX = {};
+
+	class CBar*		m_pBar = { nullptr };
+
 private:
-	virtual HRESULT	Ready_Components() override;
 	HRESULT			Ready_Children();
+	void			Event_ProgressBar(const EVENT_PROGRESSBAR& Event);
+	void			Update_BarRatio(_float fTimeDelta);
+	void			Update_PointOffset(_float fTimeDelta);
 
 public:
 	static CLoadingBar*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
