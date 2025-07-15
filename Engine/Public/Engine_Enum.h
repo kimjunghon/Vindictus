@@ -20,6 +20,8 @@ namespace Engine
 	enum class UI_DEPTH { FIRST = 2, SECOND, THIRD, FORTH, FIFTH};
 
 	enum class SHADER_VTXPOSTEX { DEFAULT, PROGRESSBAR, LOADINGPOINT};
+
+	enum class MODELTYPE { ANIM, NONANIM};
 }
 
 #endif // Engine_Enum_h__

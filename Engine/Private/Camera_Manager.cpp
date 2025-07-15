@@ -33,7 +33,7 @@ HRESULT CCamera_Manager::Add_CameraToManager(_uint iPrototypeIndex, const _wstri
 	m_Cameras.emplace(strCameraTag, pCamera);
 	Safe_AddRef(pCamera);
 
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 HRESULT CCamera_Manager::Change_Camera(const _wstring& strCameraTag)

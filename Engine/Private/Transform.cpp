@@ -116,12 +116,9 @@ void CTransform::LookAt(_fvector vAt)
 
 	_float3 vScaled = Get_Scaled();
 	
-	
-
-	Set_State(STATE::RIGHT, XMVectorScale(vRight, vScaled.x));
-	Set_State(STATE::UP, XMVectorScale(vUp, vScaled.y));
-	Set_State(STATE::LOOK, XMVectorScale(vLook, vScaled.z));
-	
+	Set_State(STATE::RIGHT,XMVectorScale(XMVector3Normalize(vRight), vScaled.x));
+	Set_State(STATE::UP, XMVectorScale(XMVector3Normalize(vUp), vScaled.y));
+	Set_State(STATE::LOOK, XMVectorScale(XMVector3Normalize(vLook), vScaled.z));
 }
 
 void CTransform::Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit)

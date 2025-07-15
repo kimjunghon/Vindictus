@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "TextureUI.h"
+#include "Model.h"
 
 NS_BEGIN(Engine)
 

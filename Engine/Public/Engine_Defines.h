@@ -13,7 +13,10 @@
 #include "Fx11/d3dx11effect.h"
 #include "DirectXTK/DDSTextureLoader.h"
 #include "DirectXTK/WICTextureLoader.h"
-
+#include "Assimp/scene.h"
+#include "Assimp/postprocess.h"
+#include "Assimp/Importer.hpp"
+#include "Json/json.hpp"
 using namespace DirectX;
 
 #include <vector>
