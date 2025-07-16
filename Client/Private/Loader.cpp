@@ -8,6 +8,8 @@
 #include "OptionMain.h"
 #include "OptionController.h"
 #include "StateBar.h"
+#include "Player.h"
+#include "Camera_Target.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: m_pDevice { pDevice}
@@ -184,6 +186,13 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 	Event.fRatio += 0.2f;
 
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Player"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::NONANIM, "../Bin/Resoruces/Model/Test.json", PreTransformMatrix))))
+		return E_FAIL;
+
 	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
 
 	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
@@ -208,6 +217,13 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		COptionController::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player"),
+		CPlayer::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Target"),
+		CCamera_Target::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 
 	Event.fRatio += 0.2f;
 

@@ -25,11 +25,12 @@ public:
 
 
 private:
-
+	CShader*	m_pShaderCom = { nullptr };
+	CModel*		m_pModelCom = { nullptr };
 
 private:
-	HRESULT Ready_Component();
-	
+	HRESULT	Ready_Camera();
+	HRESULT Ready_Components();
 
 public:
 	static CPlayer*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

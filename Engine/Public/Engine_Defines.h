@@ -17,6 +17,8 @@
 #include "Assimp/postprocess.h"
 #include "Assimp/Importer.hpp"
 #include "Json/json.hpp"
+using Json = nlohmann::json;
+
 using namespace DirectX;
 
 #include <vector>
@@ -27,7 +29,7 @@ using namespace DirectX;
 #include <string>
 #include <unordered_map>
 #include <ctime>
-
+#include <fstream>
 using namespace std;
 
 #include "Engine_Enum.h"

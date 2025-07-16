@@ -17,8 +17,10 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	HRESULT Ready_UI(const _wstring& strLayerTag);
 	HRESULT Ready_Layer(const _wstring& strLayerTag);
-
+	HRESULT Ready_Camera(const _wstring& strLayerTag);
+	HRESULT Ready_GameObject(const _wstring& strLayerTag);
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual void			Free() override;

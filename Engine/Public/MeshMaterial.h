@@ -11,6 +11,7 @@ private:
 
 public:
 	HRESULT Initialize(const _char* pModelFilePath, const aiMaterial* pAIMaterial);
+	HRESULT Initialize(const _char* pModelFilePath, Json& Data);
 
 	void	Bind_Material(class CShader* pShader, const _char* pConstantName, _uint iSRVIndex, _uint iTextureType);
 
@@ -21,6 +22,8 @@ private:
 
 public:
 	static CMeshMaterial*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial);
+	static CMeshMaterial*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _char* pModelFilePath, Json& Data);
+
 	virtual void			Free() override;
 };
 

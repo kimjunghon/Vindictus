@@ -3,6 +3,10 @@
 #include "Client_Defines.h"
 #include "Camera.h"
 
+NS_BEGIN(Engine)
+class CTransform;
+NS_END
+
 NS_BEGIN(Client)
 
 class CCamera_Target final : public CCamera
@@ -10,6 +14,7 @@ class CCamera_Target final : public CCamera
 public:
 	typedef struct tagCamera_Target_Dest : public CAMERA_DESC {
 		_float		fDistance;
+		CTransform* pTarget_TransformCom;
 	}CAMERA_TARGET_DESC;
 
 private:
@@ -29,9 +34,11 @@ public:
 	void Update_CameraPosition(_fvector vTargetPosition);
 
 private:
+	CTransform*		m_pTarget_TransformCom = { nullptr };
 	_float			m_fDistance = {};
 	_float			m_fRotateRadianX = {};
 	_float			m_fRotateRadianY = {};
+
 
 public:
 	static CCamera_Target*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

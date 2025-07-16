@@ -65,7 +65,7 @@ HRESULT CLevel_GamePlay::Render()
     return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer(const _wstring& strLayerTag)
+HRESULT CLevel_GamePlay::Ready_UI(const _wstring& strLayerTag)
 {
 	CUIObject::UIOBJECT_DESC UI_Desc{};
 	UI_Desc.fX = g_iWinSizeX >> 1;
@@ -89,8 +89,31 @@ HRESULT CLevel_GamePlay::Ready_Layer(const _wstring& strLayerTag)
 		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &UI_Desc)))
 		return E_FAIL;
 
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer(const _wstring& strLayerTag)
+{
+
+
+
+	
 
     return S_OK;
+}
+
+
+HRESULT CLevel_GamePlay::Ready_GameObject(const _wstring& strLayerTag)
+{
+	CTransform::TRANSFORM_DESC TransformDesc{};
+	TransformDesc.fRotationPerSec = 90.f;
+	TransformDesc.fSpeedPerSec = 10.f;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &TransformDesc)))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
