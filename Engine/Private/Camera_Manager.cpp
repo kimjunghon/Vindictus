@@ -28,11 +28,13 @@ HRESULT CCamera_Manager::Add_CameraToManager(_uint iPrototypeIndex, const _wstri
 		return E_FAIL;
 
 	if(nullptr !=ppOut)
+	{
 		*ppOut = pCamera;
+		Safe_AddRef(pCamera);
+	}
 
 	m_Cameras.emplace(strCameraTag, pCamera);
-	Safe_AddRef(pCamera);
-
+	
 	return S_OK;
 }
 

@@ -187,10 +187,11 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	Event.fRatio += 0.2f;
 
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	
+	PreTransformMatrix = XMMatrixScaling(0.001f, 0.001f, 0.001f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Player"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::NONANIM, "../Bin/Resoruces/Model/Test.json", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Anim.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);

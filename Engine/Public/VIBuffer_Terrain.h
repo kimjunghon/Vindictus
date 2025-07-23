@@ -15,6 +15,7 @@ public:
 	virtual HRESULT Initialize(void* pArg) override;
 
 private:
+	vector<VTXNORTEX>	m_Vertices;
 	_uint				m_iNumVerticesX = { };
 	_uint				m_iNumVerticesZ = { };
 

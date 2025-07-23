@@ -65,7 +65,12 @@ HRESULT CLoadingScreen::Ready_Children()
 	Children_Desc.fOffsetY = 0.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
 	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
-	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_LoadingScreen");
+
+	_tchar szFullPath[MAX_PATH] = TEXT("Prototype_Component_Texture_LoadingScreen%d");
+
+	wsprintf(szFullPath, szFullPath, m_iLoadingLevelID);
+
+	Children_Desc.strTexturePrototypeTag = szFullPath;
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
 		return E_FAIL;

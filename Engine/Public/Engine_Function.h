@@ -51,7 +51,6 @@ namespace Engine
 			dwRefCnt = pInstance->AddRef();
 		return dwRefCnt;
 	}
-
 }
 
 #endif // Engine_Function_h__

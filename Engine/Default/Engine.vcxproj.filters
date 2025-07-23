@@ -115,20 +115,32 @@
     <Filter Include="01.Utility\04.Component\Transform">
       <UniqueIdentifier>{fa0e191e-5496-4e30-b3dc-c381b564e86f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\04.Component\Modle">
-      <UniqueIdentifier>{4dbf24dc-4062-4bf4-8437-29c3cb7d5fa9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\04.Component\Modle\Mesh">
-      <UniqueIdentifier>{80b9c40f-300c-444a-9581-3e20d1ca0f90}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\04.Component\Modle\Material">
-      <UniqueIdentifier>{ebc2d2e3-7977-4421-ae4c-a9faff374810}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\96.Light">
       <UniqueIdentifier>{b29298b0-3e51-4cd3-b72f-407f96bcefef}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Utility\96.Light\Manager">
       <UniqueIdentifier>{1a5ee149-8706-4d7a-b339-76cc60f403c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\95.RenderState">
+      <UniqueIdentifier>{22729498-d04a-4011-88b8-f9cc8da3f65b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Model">
+      <UniqueIdentifier>{4dbf24dc-4062-4bf4-8437-29c3cb7d5fa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Model\Mesh">
+      <UniqueIdentifier>{80b9c40f-300c-444a-9581-3e20d1ca0f90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Model\Material">
+      <UniqueIdentifier>{ebc2d2e3-7977-4421-ae4c-a9faff374810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Model\Bone">
+      <UniqueIdentifier>{7fa83ec5-6533-4030-b502-af8b50576f48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Model\Animation">
+      <UniqueIdentifier>{acc0f1d3-4a14-4093-948f-3d2b9052361a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Model\Animation\Channel">
+      <UniqueIdentifier>{900a0d21-5ecc-4372-98cf-bef9b073f4f9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -219,9 +231,6 @@
     <ClInclude Include="..\..\..\VindictusBack\Vindictus\Engine\Public\Light.h">
       <Filter>01.Utility\96.Light</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\VindictusBack\Vindictus\Engine\Public\Light_Manager.h">
-      <Filter>01.Utility\96.Light\Manager</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\EnginePch.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
@@ -262,13 +271,31 @@
       <Filter>01.Utility\04.Component</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Model.h">
-      <Filter>01.Utility\04.Component\Modle</Filter>
+      <Filter>01.Utility\04.Component\Model</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Mesh.h">
-      <Filter>01.Utility\04.Component\Modle\Mesh</Filter>
+      <Filter>01.Utility\04.Component\Model\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MeshMaterial.h">
-      <Filter>01.Utility\04.Component\Modle\Material</Filter>
+      <Filter>01.Utility\04.Component\Model\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RenderState.h">
+      <Filter>01.Utility\95.RenderState</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Binary_Struct.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bone.h">
+      <Filter>01.Utility\04.Component\Model\Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light_Manager.h">
+      <Filter>01.Utility\96.Light\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Animation.h">
+      <Filter>01.Utility\04.Component\Model\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Channel.h">
+      <Filter>01.Utility\04.Component\Model\Animation\Channel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -341,9 +368,6 @@
     <ClCompile Include="..\..\..\VindictusBack\Vindictus\Engine\Private\Light.cpp">
       <Filter>01.Utility\96.Light</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\VindictusBack\Vindictus\Engine\Private\Light_Manager.cpp">
-      <Filter>01.Utility\96.Light\Manager</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\EnginePch.cpp">
       <Filter>99.Defines</Filter>
     </ClCompile>
@@ -381,13 +405,28 @@
       <Filter>01.Utility\04.Component</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Model.cpp">
-      <Filter>01.Utility\04.Component\Modle</Filter>
+      <Filter>01.Utility\04.Component\Model</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Mesh.cpp">
-      <Filter>01.Utility\04.Component\Modle\Mesh</Filter>
+      <Filter>01.Utility\04.Component\Model\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MeshMaterial.cpp">
-      <Filter>01.Utility\04.Component\Modle\Material</Filter>
+      <Filter>01.Utility\04.Component\Model\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RenderState.cpp">
+      <Filter>01.Utility\95.RenderState</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bone.cpp">
+      <Filter>01.Utility\04.Component\Model\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light_Manager.cpp">
+      <Filter>01.Utility\96.Light\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Animation.cpp">
+      <Filter>01.Utility\04.Component\Model\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Channel.cpp">
+      <Filter>01.Utility\04.Component\Model\Animation\Channel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

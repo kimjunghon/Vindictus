@@ -3,7 +3,7 @@
 
 #include "Graphic_Device.h"
 #include "Input_Device.h"
-
+#include "RenderState.h"
 /* Manager */
 #include "Timer_Manager.h"
 #include "Level_Manager.h"
@@ -37,6 +37,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
     m_pTimer_Manager = CTimer_Manager::Create();
     if (nullptr == m_pTimer_Manager)
+        return E_FAIL;
+
+    m_pRenderState = CRenderState::Create(*ppDevice, *ppDeviceContext);
+    if (nullptr == m_pRenderState)
         return E_FAIL;
 
     m_pLevel_Manager = CLevel_Manager::Create();
@@ -101,6 +105,7 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
     m_pObject_Manager->Clear();
     m_pCamera_Manager->Clear();
     m_pController_Manager->Clear();
+    m_pLight_Manager->Clear();
 
     return S_OK;
 }
@@ -190,6 +195,37 @@ void CGameInstance::Compute_TimeDelta(const _wstring& strTimerTag)
 }
 #pragma endregion
 
+#pragma region RENDER_STATE
+HRESULT CGameInstance::RSSetState(_uint iRSIndex)
+{
+    return m_pRenderState->RSSetState(iRSIndex);
+}
+HRESULT CGameInstance::RSSetState(const _wstring& strRSTag)
+{
+    return m_pRenderState->RSSetState(strRSTag);
+}
+HRESULT CGameInstance::BSSetState(_uint iBSIndex)
+{
+    return m_pRenderState->BSSetState(iBSIndex);
+}
+HRESULT CGameInstance::BSSetState(const _wstring& strBSTag)
+{
+    return m_pRenderState->BSSetState(strBSTag);
+}
+HRESULT CGameInstance::DSSSetState(_uint iDSSIndex)
+{
+    return m_pRenderState->DSSSetState(iDSSIndex);
+}
+HRESULT CGameInstance::Add_CustomRS(const _wstring& strRSTag, const D3D11_RASTERIZER_DESC& RS_DESC)
+{
+    return m_pRenderState->Add_CustomRS(strRSTag, RS_DESC);
+}
+HRESULT CGameInstance::Add_CustomBS(const _wstring& strBSTag, const D3D11_BLEND_DESC& BS_DESC)
+{
+    return m_pRenderState->Add_CustomBS(strBSTag, BS_DESC);
+}
+#pragma endregion
+
 #pragma region LEVEL_MANAGER
 HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pOpenLevel)
 {
@@ -248,7 +284,18 @@ HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pR
 {
     return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);
 }
+#pragma endregion
 
+#pragma region LIGHT_MANAGER
+const LIGHT_DESC* CGameInstance::Get_LightDesc(const _wstring& strLightTag)
+{
+    return m_pLight_Manager->Get_LightDesc(strLightTag);
+}
+
+HRESULT CGameInstance::Add_Light(const _wstring& strLightTag, const LIGHT_DESC& LightDesc)
+{
+    return m_pLight_Manager->Add_Light(strLightTag, LightDesc);
+}
 #pragma endregion
 
 #pragma region EVENTBUS
@@ -291,9 +338,9 @@ _matrix CGameInstance::Get_Transform_Matrix_Inverse(D3DTS eTransformState) const
 {
     return m_pPipeLine->Get_Transform_Matrix_Inverse(eTransformState);
 }
-const _float4* CGameInstance::Get_CamPoisiton() const
+const _float4* CGameInstance::Get_CamPosition() const
 {
-    return m_pPipeLine->Get_CamPoisiton();
+    return m_pPipeLine->Get_CamPosition();
 }
 void CGameInstance::Set_Transform(D3DTS eTransformState, _fmatrix Matrix)
 {
@@ -318,6 +365,22 @@ HRESULT CGameInstance::Change_Controller(_uint iChannelIndex, CController* pNewC
 {
     return m_pController_Manager->Change_Controller(iChannelIndex, pNewController);
 }
+HRESULT CGameInstance::MoveInput(INPUT_MOVE_DESC* pOut)
+{
+    return E_NOTIMPL;
+}
+HRESULT CGameInstance::ActionInput(INPUT_ACTION_DESC* pOut)
+{
+    return E_NOTIMPL;
+}
+HRESULT CGameInstance::CameraInput(INPUT_CAMERA_DESC* pOut)
+{
+    return E_NOTIMPL;
+}
+HRESULT CGameInstance::UI_Input(INPUT_UI_DESC* pOut)
+{
+    return E_NOTIMPL;
+}
 #pragma endregion
 
 void CGameInstance::Release_Engine()
@@ -327,6 +390,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pGraphic_Device);
     Safe_Release(m_pInput_Device);
     Safe_Release(m_pTimer_Manager);
+    Safe_Release(m_pRenderState);
     Safe_Release(m_pLevel_Manager);
     Safe_Release(m_pPrototype_Manager);
     Safe_Release(m_pRenderer);

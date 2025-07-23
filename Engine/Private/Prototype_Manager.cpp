@@ -32,6 +32,7 @@ HRESULT CPrototype_Manager::Add_Prototype(_uint iPrototypeLevelIndex, const _wst
 
 CBase* CPrototype_Manager::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
 {
+
 	CBase* pPrototype = Find_Prototype(iPrototypeLevelIndex, strPrototypeTag);
 
 	if (nullptr == pPrototype)

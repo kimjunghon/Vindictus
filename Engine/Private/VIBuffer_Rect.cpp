@@ -30,7 +30,6 @@ HRESULT CVIBuffer_Rect::Initialize_Prototype()
 	VBDesc.MiscFlags = 0;
 	VBDesc.StructureByteStride = m_iVertexStride;
 
-
 	VTXPOSTEX* pVertices = new VTXPOSTEX[m_iNumVertices];
 
 	pVertices[0].vPosition = { -0.5f, 0.5f, 0.f };

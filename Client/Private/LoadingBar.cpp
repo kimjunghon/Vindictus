@@ -93,8 +93,8 @@ HRESULT CLoadingBar::Ready_Children()
 	if (FAILED(CUI_Slot::Add_Child(ENUM_CLASS(LOADING_SLOT::BAR), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"), &Children_Desc)))
 		return E_FAIL;
 
-	Children_Desc.fSizeX = 100.f;
-	Children_Desc.fSizeY = 100.f;
+	Children_Desc.fSizeX = 30.f;
+	Children_Desc.fSizeY = 30.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_LoadingBar_Point");
 

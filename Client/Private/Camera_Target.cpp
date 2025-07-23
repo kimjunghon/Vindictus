@@ -27,6 +27,8 @@ HRESULT CCamera_Target::Initialize(void* pArg)
 	CAMERA_TARGET_DESC* pDesc = static_cast<CAMERA_TARGET_DESC*>(pArg);
 
 	m_fDistance = pDesc->fDistance;
+	m_pTarget_TransformCom = pDesc->pTarget_TransformCom;
+	Safe_AddRef(m_pTarget_TransformCom);
 
 	return S_OK;
 }
@@ -41,6 +43,7 @@ void CCamera_Target::Update(_float fTimeDelta)
 
 void CCamera_Target::Late_Update(_float fTimeDelta)
 {
+	Update_CameraPosition(m_pTarget_TransformCom->Get_State(STATE::POSITION));
 }
 
 HRESULT CCamera_Target::Render()
@@ -52,7 +55,7 @@ void CCamera_Target::Update_CameraPosition(_fvector vTargetPosition)
 {
 	_vector vDir = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
 	_vector vDistance = XMVectorScale(vDir, m_fDistance);
-	_vector vPosition = XMVectorSubtract(m_pTransformCom->Get_State(STATE::POSITION), vDistance);
+	_vector vPosition = XMVectorSubtract(vTargetPosition, vDistance);
 	
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 }
@@ -82,4 +85,6 @@ CGameObject* CCamera_Target::Clone(void* pArg)
 void CCamera_Target::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pTarget_TransformCom);
 }

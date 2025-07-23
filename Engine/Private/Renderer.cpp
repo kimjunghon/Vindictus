@@ -1,6 +1,6 @@
 #include "EnginePch.h"
 #include "Renderer.h"
-#include "GameObject.h"
+#include "UIObject.h"
 
 CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: m_pDevice {pDevice}
@@ -87,6 +87,11 @@ HRESULT CRenderer::Render_Blend()
 
 HRESULT CRenderer::Render_UI()
 {
+
+	sort(m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)].begin(), m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)].end(), [&](CGameObject* pSour, CGameObject* pDest) {
+		return static_cast<CUIObject*>(pSour)->Get_Depth() < static_cast<CUIObject*>(pDest)->Get_Depth();
+		});
+	
 	for (auto& Object : m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)])
 	{
 		if (nullptr != Object)

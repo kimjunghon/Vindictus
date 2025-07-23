@@ -10,11 +10,10 @@ CMeshMaterial::CMeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContext* pDevice
 	Safe_AddRef(m_pDeviceContext);
 }
 
-HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial* pAIMaterial)
+HRESULT CMeshMaterial::Initialize_Assimp(const _char* pModelFilePath, const aiMaterial* pAIMaterial)
 {
 	for (_uint i = 1; i < AI_TEXTURE_TYPE_MAX; i++)
 	{
-		
 		_uint iNumTextures = pAIMaterial->GetTextureCount(static_cast<aiTextureType>(i));
 
 		for (_uint j = 0; j < iNumTextures; j++)
@@ -36,11 +35,11 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 			
 
 			_char szFullPath[MAX_PATH] = {};
-			sprintf_s(szFullPath, "%s%s%s%s", szDrive, szDir, szFileName, szExt);
+			sprintf_s(szFullPath, "%s%s%s%s%s", szDrive, szDir, "Textures/", szFileName, szExt);
 			
 			_tchar szTemp[MAX_PATH] = {};
 
-			MultiByteToWideChar(CP_UTF8, 0, szFullPath, -1, szTemp, MAX_PATH);
+			MultiByteToWideChar(CP_UTF8, 0, szFullPath, static_cast<_int>(strlen(szFullPath)), szTemp, MAX_PATH);
 
 			ID3D11ShaderResourceView* pSRV = { nullptr };
 
@@ -67,9 +66,8 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 	return S_OK;
 }
 
-HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, Json& Data)
+HRESULT CMeshMaterial::Initialize_Json(const _char* pModelFilePath, Json& Data)
 {
-	//for (_uint i = 1; i < AI_TEXTURE_TYPE_MAX; i++)
 	_uint iIndex = {1};
 	for(auto& TextureType : Data)
 	{
@@ -91,7 +89,6 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, Json& Data)
 			_char szExt[MAX_PATH] = {};
 			_splitpath_s(szFileName, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
 
-
 			_char szFullDrivePath[MAX_PATH] = {};
 			
 			strcpy_s(szFullDrivePath, pModelFilePath);
@@ -102,7 +99,7 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, Json& Data)
 
 			_char szFullFilePath[MAX_PATH] = {};
 			
-			sprintf_s(szFullFilePath, "%s%s%s", szDrive, szDir,szFileName);
+			sprintf_s(szFullFilePath, "%s%s%s%s", szDrive, szDir, "Textures/", szFileName);
 
 			_tchar szWideFullFilePath[MAX_PATH] = {};
 
@@ -134,9 +131,85 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, Json& Data)
 	return S_OK;
 }
 
+HRESULT CMeshMaterial::Initialize_Binary(const _char* pModelFilePath, ifstream& File)
+{
+	for (_uint i = 1; i < AI_TEXTURE_TYPE_MAX; i++)
+	{
+		_uint iNumTextures = {};
+		File.read(reinterpret_cast<_char*>(&iNumTextures), sizeof(_uint));
+
+		for (_uint j = 0; j < iNumTextures; j++)
+		{
+			size_t iFileNameLength = {};
+			File.read(reinterpret_cast<_char*>(&iFileNameLength), sizeof(size_t));
+
+			_char TextureFileName[MAX_PATH] = {};
+			File.read(TextureFileName, sizeof(_char) * iFileNameLength);
+
+			_char szExt[MAX_PATH] = {};
+			_splitpath_s(TextureFileName, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
+
+			const _char* pCutPoint = strstr(pModelFilePath, "Models");
+			size_t PostLength = strlen(pModelFilePath)- strlen(pCutPoint);
+
+			_char szDrivePath[MAX_PATH] = {};
+
+			strncpy_s(szDrivePath, pModelFilePath, PostLength);
+
+			_char szFullFilePath[MAX_PATH] = {};
+
+			sprintf_s(szFullFilePath, "%s%s%s", szDrivePath, "Models/Textures/", TextureFileName);
+			
+			//_char szFullDrivePath[MAX_PATH] = {};
+			//
+			//strcpy_s(szFullDrivePath, pModelFilePath);
+			//
+			//_char szDrive[MAX_PATH] = {};
+			//_char szDir[MAX_PATH] = {};
+			//_splitpath_s(szFullDrivePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
+			//
+			//_char szFullFilePath[MAX_PATH] = {};
+			//
+			//
+			//sprintf_s(szFullFilePath, "%s%s%s%s", szDrive, szDir, "Textures/", TextureFileName);
+
+			_tchar szWideFullFilePath[MAX_PATH] = {};
+
+			MultiByteToWideChar(CP_UTF8, 0, szFullFilePath, -1, szWideFullFilePath, MAX_PATH);
+
+			ID3D11ShaderResourceView* pSRV = { nullptr };
+
+			HRESULT     hr = {};
+
+			if (false == strcmp(szExt, ".dds"))
+			{
+				hr = CreateDDSTextureFromFile(m_pDevice, szWideFullFilePath, nullptr, &pSRV);
+			}
+			else if (false == strcmp(szExt, ".tga"))
+				return E_FAIL;
+			else
+			{
+				hr = CreateWICTextureFromFile(m_pDevice, szWideFullFilePath, nullptr, &pSRV);
+			}
+
+			if (FAILED(hr))
+				continue;
+
+			m_SRVs[i].push_back(pSRV);
+		}
+	}
+
+	return S_OK;
+}
+
 
 void CMeshMaterial::Bind_Material(CShader* pShader, const _char* pConstantName, _uint iSRVIndex, _uint iTextureType)
 {
+	if (m_SRVs[iSRVIndex].size() <= 0)
+	{
+		return;
+	}
+
 	pShader->Bind_SPV(pConstantName, m_SRVs[iSRVIndex][iTextureType]);
 }
 
@@ -144,7 +217,7 @@ CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 {
 	CMeshMaterial* pInstance = new CMeshMaterial(pDevice, pDeviceContext);
 
-	if (FAILED(pInstance->Initialize(pModelFilePath, pAIMaterial)))
+	if (FAILED(pInstance->Initialize_Assimp(pModelFilePath, pAIMaterial)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CMeshMaterial"));
 		Safe_Release(pInstance);
@@ -157,7 +230,20 @@ CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 {
 	CMeshMaterial* pInstance = new CMeshMaterial(pDevice, pDeviceContext);
 
-	if (FAILED(pInstance->Initialize(pModelFilePath, Data)))
+	if (FAILED(pInstance->Initialize_Json(pModelFilePath, Data)))
+	{
+		MSG_BOX(TEXT("Failed to Created : CMeshMaterial"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _char* pModelFilePath, ifstream& File)
+{
+	CMeshMaterial* pInstance = new CMeshMaterial(pDevice, pDeviceContext);
+
+	if (FAILED(pInstance->Initialize_Binary(pModelFilePath, File)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CMeshMaterial"));
 		Safe_Release(pInstance);

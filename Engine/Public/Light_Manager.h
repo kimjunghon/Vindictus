@@ -16,7 +16,7 @@ public:
 	const LIGHT_DESC*	Get_LightDesc(const _wstring& strLightTag);
 	HRESULT				Add_Light(const _wstring& strLightTag, const LIGHT_DESC& LightDesc);
 	class CLight*		Find_Light(const _wstring& strLightTag);
-
+	void				Clear();
 private:
 	LIGHTS		m_Lights;
 

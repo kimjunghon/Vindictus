@@ -119,6 +119,7 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
         return E_FAIL;
 
     Safe_Delete_Array(pVertices);
+
     D3D11_BUFFER_DESC		IBDesc{};
     IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
     IBDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -138,8 +139,10 @@ HRESULT CVIBuffer_Terrain::Initialize_Prototype(const _tchar* pHeightMapFilePath
     return S_OK;
 }
 
+
 HRESULT CVIBuffer_Terrain::Initialize(void* pArg)
 {
+    
     return S_OK;
 }
 

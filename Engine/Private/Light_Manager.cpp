@@ -1,3 +1,4 @@
+#include "EnginePch.h"
 #include "Light_Manager.h"
 #include "Light.h"
 
@@ -25,7 +26,7 @@ HRESULT CLight_Manager::Add_Light(const _wstring& strLightTag, const LIGHT_DESC&
 
 	m_Lights.emplace(strLightTag, pLight);
 
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 CLight* CLight_Manager::Find_Light(const _wstring& strLightTag)
@@ -35,6 +36,14 @@ CLight* CLight_Manager::Find_Light(const _wstring& strLightTag)
 		return nullptr;
 
 	return Pair->second;
+}
+
+void CLight_Manager::Clear()
+{
+	for (auto& Pair : m_Lights)
+		Safe_Release(Pair.second);
+
+	m_Lights.clear();
 }
 
 CLight_Manager* CLight_Manager::Create()

@@ -1,5 +1,8 @@
 #include "EnginePch.h"
+#include "Shader.h"
 #include "Mesh.h"
+#include "Bone.h"
+
 
 CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CVIBuffer { pDevice, pDeviceContext }
@@ -12,50 +15,23 @@ CMesh::CMesh(const CMesh& Prototype)
 {
 }
 
-HRESULT CMesh::Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
+	strcpy_s(m_szName, pAIMesh->mName.data);
+
 	m_iMaterialIndex = pAIMesh->mMaterialIndex;
 	m_iNumVertices = pAIMesh->mNumVertices;
-	m_iVertexStride = sizeof(VTXMESH);
 	m_iNumIndices = pAIMesh->mNumFaces * 3;
 	m_iIndexStride = 4;
 	m_iNumVertexBuffers = 1;
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-
-	D3D11_BUFFER_DESC VBDesc{};
-
-	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
-	VBDesc.Usage = D3D11_USAGE_DEFAULT;
-	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;;
-	VBDesc.CPUAccessFlags = 0;
-	VBDesc.MiscFlags = 0;
-	VBDesc.StructureByteStride = m_iVertexStride;
-
-	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
 	
-	for (_uint i = 0; i < m_iNumVertices; i++)
-	{
-		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
-		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PreTransformMatrix));
+	HRESULT hr = MODELTYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Assimp(pAIMesh, PreTransformMatrix) : Ready_Vertices_For_Anim_Assimp(pAIMesh, Bones);
 
-		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
-		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
-
-		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
-		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
-		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
-	}
-
-	D3D11_SUBRESOURCE_DATA VBInitialData{};
-	VBInitialData.pSysMem = pVertices;
-
-	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
+	if (FAILED(hr))
 		return E_FAIL;
 
-	Safe_Delete_Array(pVertices);
-	
 	D3D11_BUFFER_DESC	IBDesc{};
 	IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
 	IBDesc.Usage = D3D11_USAGE_DEFAULT;
@@ -88,50 +64,27 @@ HRESULT CMesh::Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PreTransform
 	return S_OK;
 }
 
-HRESULT CMesh::Initialize_Prototype(Json& Data,_fmatrix PreTransformMatrix)
+HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
-	m_iMaterialIndex = Data["MaterialIndex"];
-	m_iNumVertices = Data["NumVertices"];
-	m_iVertexStride = sizeof(VTXMESH);
-	m_iNumIndices = (Data["NumFaces"] * 3);
+	MESH_INFO tMeshInfo = {};
+	size_t iMeshNameLenghth = {};
+
+	File.read(reinterpret_cast<_char*>(&tMeshInfo), sizeof(MESH_INFO));
+	File.read(reinterpret_cast<_char*>(&iMeshNameLenghth), sizeof(size_t));
+	File.read(m_szName, sizeof(_char) * iMeshNameLenghth);
+
+	m_iMaterialIndex = tMeshInfo.iMaterialIndex;
+	m_iNumVertices = tMeshInfo.iNumVertices;
+	m_iNumIndices = tMeshInfo.iNumFaces * 3;
 	m_iIndexStride = 4;
 	m_iNumVertexBuffers = 1;
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	D3D11_BUFFER_DESC VBDesc{};
+	HRESULT hr = MODELTYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Binary(File, PreTransformMatrix) : Ready_Vertices_For_Anim_Binary(File, Bones);
 
-	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
-	VBDesc.Usage = D3D11_USAGE_DEFAULT;
-	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;;
-	VBDesc.CPUAccessFlags = 0;
-	VBDesc.MiscFlags = 0;
-	VBDesc.StructureByteStride = m_iVertexStride;
-
-	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
-
-	_uint iVertexIndex = {};
-
-	for(auto& Vertex : Data["Vertices"])
-	{
-		pVertices[iVertexIndex].vPosition = _float3(Vertex["Position"][0], Vertex["Position"][1], Vertex["Position"][2]);
-		XMStoreFloat3(&pVertices[iVertexIndex].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[iVertexIndex].vPosition), PreTransformMatrix));
-	
-		pVertices[iVertexIndex].vNormal = _float3(Vertex["Normal"][0], Vertex["Normal"][1], Vertex["Normal"][2]);
-		XMStoreFloat3(&pVertices[iVertexIndex].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[iVertexIndex].vNormal), PreTransformMatrix));
-		pVertices[iVertexIndex].vTangent = _float3(Vertex["Tangent"][0], Vertex["Tangent"][1], Vertex["Tangent"][2]);
-		pVertices[iVertexIndex].vBinormal = _float3(Vertex["Binormal"][0], Vertex["Binormal"][1], Vertex["Binormal"][2]);
-		pVertices[iVertexIndex++].vTexcoord = _float2(Vertex["Texcoord"][0], Vertex["Texcoord"][1]);
-	}
-		
-
-	D3D11_SUBRESOURCE_DATA VBInitialData{};
-	VBInitialData.pSysMem = pVertices;
-
-	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
+	if (FAILED(hr))
 		return E_FAIL;
-
-	Safe_Delete_Array(pVertices);
 
 	D3D11_BUFFER_DESC	IBDesc{};
 	IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
@@ -145,13 +98,12 @@ HRESULT CMesh::Initialize_Prototype(Json& Data,_fmatrix PreTransformMatrix)
 
 	_uint iIndex = {};
 
-	for (auto& NumIndex : Data["Indices"])
+	for (_uint i = 0; i < tMeshInfo.iNumFaces; i++)
 	{
-		pIndices[iIndex++] = NumIndex["Index"][0];
-		pIndices[iIndex++] = NumIndex["Index"][1];
-		pIndices[iIndex++] = NumIndex["Index"][2];
+		File.read(reinterpret_cast<_char*>(&pIndices[iIndex++]), sizeof(_uint));
+		File.read(reinterpret_cast<_char*>(&pIndices[iIndex++]), sizeof(_uint));
+		File.read(reinterpret_cast<_char*>(&pIndices[iIndex++]), sizeof(_uint));
 	}
-	
 
 	D3D11_SUBRESOURCE_DATA IBInitialData{};
 	IBInitialData.pSysMem = pIndices;
@@ -170,10 +122,287 @@ HRESULT CMesh::Initialize(void* pArg)
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones)
+{
+	for (_uint i = 0; i < m_iNumBones; i++)
+	{
+		if (!strcmp("SWORD", m_szName))
+			int a = 10;
+		XMStoreFloat4x4(&m_BoneMatrices[i], XMMatrixMultiply(XMLoadFloat4x4(&m_OffsetMatrices[i]), Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrix()));
+
+	}
+
+	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
+}
+
+HRESULT CMesh::Ready_Vertices_For_NonAnim_Assimp(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
+{
+	m_iVertexStride = sizeof(VTXMESH);
+
+	D3D11_BUFFER_DESC VBDesc{};
+
+	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
+	VBDesc.Usage = D3D11_USAGE_DEFAULT;
+	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;;
+	VBDesc.CPUAccessFlags = 0;
+	VBDesc.MiscFlags = 0;
+	VBDesc.StructureByteStride = m_iVertexStride;
+
+	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
+
+	for (_uint i = 0; i < m_iNumVertices; i++)
+	{
+		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PreTransformMatrix));
+
+		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
+		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
+
+		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
+		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+	}
+
+	D3D11_SUBRESOURCE_DATA VBInitialData{};
+	VBInitialData.pSysMem = pVertices;
+
+	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+
+	return S_OK;
+}
+
+HRESULT CMesh::Ready_Vertices_For_Anim_Assimp(const aiMesh* pAIMesh, const vector<CBone*>& Bones)
+{
+	m_iVertexStride = sizeof(VTXANIMMESH);
+
+	D3D11_BUFFER_DESC VBDesc{};
+	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
+	VBDesc.Usage = D3D11_USAGE_DEFAULT;
+	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	VBDesc.CPUAccessFlags = 0;
+	VBDesc.MiscFlags = 0;
+	VBDesc.StructureByteStride = m_iVertexStride;
+
+	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXANIMMESH) * pAIMesh->mNumVertices);
+
+	for (_uint i = 0; i < m_iNumVertices; i++)
+	{
+		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
+		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
+		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+	}
+
+	m_iNumBones = pAIMesh->mNumBones;
+
+	for (_uint i = 0; i < m_iNumBones; i++)
+	{
+		aiBone* pAIBone = pAIMesh->mBones[i];
+		_float4x4 OffsetMatrix;
+
+		memcpy(&OffsetMatrix, &pAIBone->mOffsetMatrix, sizeof(_float4x4));
+
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixTranspose(XMLoadFloat4x4(&OffsetMatrix)));
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
+
+		_uint iBoneIndex = {0};
+
+		auto Bone = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool {
+			if (pBone->Compare_Name(pAIBone->mName.data))
+				return true;
+			iBoneIndex++;
+
+			return false;
+			});
+
+		m_BoneIndices.push_back(iBoneIndex);
+
+		for (_uint j = 0; j < pAIBone->mNumWeights; j++)
+		{
+			aiVertexWeight AIVertexWeight = pAIBone->mWeights[j];
+
+			if (0.f == pVertices[AIVertexWeight.mVertexId].vBlendWeight.x)
+			{
+				pVertices[AIVertexWeight.mVertexId].vBlendIndex.x = i;
+				pVertices[AIVertexWeight.mVertexId].vBlendWeight.x = AIVertexWeight.mWeight;
+			}
+			else if (0.f == pVertices[AIVertexWeight.mVertexId].vBlendWeight.y)
+			{
+				pVertices[AIVertexWeight.mVertexId].vBlendIndex.y = i;
+				pVertices[AIVertexWeight.mVertexId].vBlendWeight.y = AIVertexWeight.mWeight;
+			}
+			else if (0.f == pVertices[AIVertexWeight.mVertexId].vBlendWeight.z)
+			{
+				pVertices[AIVertexWeight.mVertexId].vBlendIndex.z = i;
+				pVertices[AIVertexWeight.mVertexId].vBlendWeight.z = AIVertexWeight.mWeight;
+			}
+			else
+			{
+				pVertices[AIVertexWeight.mVertexId].vBlendIndex.w = i;
+				pVertices[AIVertexWeight.mVertexId].vBlendWeight.w = AIVertexWeight.mWeight;
+			}
+		}
+	}
+
+	if (0 == m_iNumBones)
+	{
+		m_iNumBones = 1;
+
+		_uint iBoneIndex = { 0 };
+
+		auto iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool {
+			if (true == pBone->Compare_Name(m_szName))
+				return true;
+
+			iBoneIndex++;
+
+			return false;
+			});
+
+		m_BoneIndices.push_back(iBoneIndex);
+
+		_float4x4 OffsetMatrix;
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
+	}
+
+	D3D11_SUBRESOURCE_DATA	VBInitialData{};
+	VBInitialData.pSysMem = pVertices;
+
+	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+
+	return S_OK;
+}
+
+HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTransformMatrix)
+{
+	m_iVertexStride = sizeof(VTXMESH);
+
+	D3D11_BUFFER_DESC VBDesc{};
+
+	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
+	VBDesc.Usage = D3D11_USAGE_DEFAULT;
+	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;;
+	VBDesc.CPUAccessFlags = 0;
+	VBDesc.MiscFlags = 0;
+	VBDesc.StructureByteStride = m_iVertexStride;
+
+	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
+
+	for (_uint i = 0; i < m_iNumVertices; i++)
+	{
+		File.read(reinterpret_cast<_char*>(&pVertices[i]), sizeof(VTXMESH));
+		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PreTransformMatrix));
+		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
+
+	}
+
+	D3D11_SUBRESOURCE_DATA VBInitialData{};
+	VBInitialData.pSysMem = pVertices;
+
+	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+
+	return S_OK;
+}
+
+HRESULT CMesh::Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone*>& Bones)
+{
+	File.read(reinterpret_cast<_char*>(&m_iNumBones), sizeof(_uint));
+
+	for (_uint i = 0; i < m_iNumBones; i++)
+	{
+		_float4x4 OffsetMatrix;
+		size_t iBoneNameLength;
+		_char	szBoneName[MAX_PATH] = {};
+
+		File.read(reinterpret_cast<_char*>(&OffsetMatrix), sizeof(_float4x4));
+		File.read(reinterpret_cast<_char*>(&iBoneNameLength), sizeof(size_t));
+		File.read(szBoneName, sizeof(_char) * iBoneNameLength);
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
+
+		_uint iBoneIndex = {};
+
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
+			{
+				if (true == pBone->Compare_Name(szBoneName))
+					return true;
+
+				iBoneIndex++;
+
+				return false;
+			});
+
+		m_BoneIndices.push_back(iBoneIndex);
+	}
+
+	if (0 == m_iNumBones)
+	{
+		m_iNumBones = 1;
+
+		_uint	iBoneIndex = { 0 };
+
+		auto	iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool
+			{
+				if (true == pBone->Compare_Name(m_szName))
+					return true;
+
+				iBoneIndex++;
+
+				return false;
+			});
+
+		m_BoneIndices.push_back(iBoneIndex);
+
+		_float4x4		OffsetMatrix;
+		XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
+
+		m_OffsetMatrices.push_back(OffsetMatrix);
+	}
+
+	m_iVertexStride = sizeof(VTXANIMMESH);
+	
+	D3D11_BUFFER_DESC VBDesc{};
+
+	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
+	VBDesc.Usage = D3D11_USAGE_DEFAULT;
+	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;;
+	VBDesc.CPUAccessFlags = 0;
+	VBDesc.MiscFlags = 0;
+	VBDesc.StructureByteStride = m_iVertexStride;
+
+	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
+	
+	File.read(reinterpret_cast<_char*>(pVertices), sizeof(VTXANIMMESH) * m_iNumVertices);
+
+	D3D11_SUBRESOURCE_DATA VBInitialData{};
+	VBInitialData.pSysMem = pVertices;
+
+	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
+		return E_FAIL;
+
+	Safe_Delete_Array(pVertices);
+
+	return S_OK;
+}
+
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
 	CMesh* pInstance = new CMesh(pDevice, pDeviceContext);
-	if (FAILED(pInstance->Initialize_Prototype(pAIMesh, PreTransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype_Assimp(eType, pAIMesh, Bones, PreTransformMatrix)))
 	{
 		MSG_BOX(TEXT("Failed Created : CMesh"));
 		Safe_Release(pInstance);
@@ -181,10 +410,11 @@ CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,
 	return pInstance;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, Json& Data, _fmatrix PreTransformMatrix)
+
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
 	CMesh* pInstance = new CMesh(pDevice, pDeviceContext);
-	if (FAILED(pInstance->Initialize_Prototype(Data, PreTransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype_Binary(eType, File, Bones, PreTransformMatrix)))
 	{
 		MSG_BOX(TEXT("Failed Created : CMesh"));
 		Safe_Release(pInstance);

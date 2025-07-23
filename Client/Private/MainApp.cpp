@@ -110,15 +110,21 @@ CLevel* CMainApp::Create_NewLevel(_uint iChangeLevel)
 
 HRESULT CMainApp::Ready_Prototype_ForStatic()
 {
-	D3D11_INPUT_ELEMENT_DESC Elements[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
 	/* Prototype_Component_Shader_VtxPosTex */
 	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), Elements, 2))))
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxNorTex"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 
 	/* Prototype_Component_VIBuffer_Rect*/
@@ -147,8 +153,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 
 	/* Ready_Prototype_Component_Texture_LoadingScreen */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingScreen%d.png"), 2))))
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen0"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingScreen0.png"), 1))))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen1"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingScreen1.png"), 1))))
 		return E_FAIL;
 
 	/* Ready_Prototype_Component_Texture_LoadingBar */

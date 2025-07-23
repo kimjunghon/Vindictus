@@ -1,3 +1,4 @@
+#include "Controller.h"
 #include "ClientPch.h"
 #include "Controller_KeyBoard.h"
 
@@ -94,6 +95,11 @@ HRESULT CController_KeyBoard::CameraInput(INPUT_CAMERA_DESC* pOut)
 
     *pOut = CameraDesc;
 
+    return S_OK;
+}
+
+HRESULT CController_KeyBoard::UI_Input(INPUT_UI_DESC* pOut)
+{
     return S_OK;
 }
 

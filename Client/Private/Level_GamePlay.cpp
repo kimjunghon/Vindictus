@@ -13,6 +13,12 @@ HRESULT CLevel_GamePlay::Initialize()
     if (FAILED(Ready_Layer(TEXT("Layer"))))
         return E_FAIL;
 
+	if(FAILED(Ready_GameObject(TEXT("Layer_GameObject"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
+
     return S_OK;
 }
 
@@ -108,7 +114,7 @@ HRESULT CLevel_GamePlay::Ready_GameObject(const _wstring& strLayerTag)
 	CTransform::TRANSFORM_DESC TransformDesc{};
 	TransformDesc.fRotationPerSec = 90.f;
 	TransformDesc.fSpeedPerSec = 10.f;
-
+	
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player"),
 		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &TransformDesc)))
 		return E_FAIL;

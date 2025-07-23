@@ -3,6 +3,8 @@
 #include "Mesh.h"
 #include "MeshMaterial.h"
 #include "Shader.h"
+#include "Bone.h"
+#include "Animation.h"
 
 CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CComponent{ pDevice ,pDeviceContext }
@@ -17,7 +19,11 @@ CModel::CModel(const CModel& Prototype)
     , m_Materials { Prototype.m_Materials }
     , m_pAIScene { Prototype.m_pAIScene }
     , m_PreTransformMatrix { Prototype.m_PreTransformMatrix}
+    , m_Bones { Prototype.m_Bones}
 {
+    for (auto& pBone : m_Bones)
+        Safe_AddRef(pBone);
+
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
 
@@ -28,8 +34,6 @@ CModel::CModel(const CModel& Prototype)
 
 HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
-    m_eModelType = eModelType;
-
     XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
 
     _char szExt[MAX_PATH] = {};
@@ -37,6 +41,8 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
 
     if (false == strcmp(szExt, ".fbx"))
     {
+        m_eModelType = eModelType;
+
         _uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
         if (MODELTYPE::NONANIM == m_eModelType)
@@ -46,34 +52,53 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
         if (nullptr == m_pAIScene)
             return E_FAIL;
 
-        if (FAILED(Ready_Meshes(PreTransformMatrix)))
+        if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
+            return E_FAIL;
+
+        if (FAILED(Ready_Meshes()))
             return E_FAIL;
 
         if (FAILED(Ready_Materials(pModelFilePath)))
             return E_FAIL;
+        
+        if (FAILED(Ready_Animation()))
+            return E_FAIL;
+
 
     }
-    else if (false == strcmp(szExt, ".json"))
+    else if (false == strcmp(szExt, ".dat"))
     {
-        ifstream File(pModelFilePath);
+        ifstream File(pModelFilePath, ios::binary);
         if (!File)
         {
             MSG_BOX(TEXT("Failed File Open"));
             return E_FAIL;
         }
 
-        Json Data;
-        File >> Data;
+        MODEL_INFO tModelInfo = {};
 
-        if (FAILED(Ready_Meshes(Data, PreTransformMatrix)))
+        File.read(reinterpret_cast<_char*>(&tModelInfo), sizeof(MODEL_INFO));
+
+        m_eModelType = static_cast<MODELTYPE>(tModelInfo.iModelType);
+        m_iNumMeshes = tModelInfo.iNumMeshes;
+        m_iNumMaterials = tModelInfo.iNumMaterials;
+
+        
+        if (FAILED(Ready_Bones(File, -1)))
             return E_FAIL;
 
-        if (FAILED(Ready_Materials(Data, pModelFilePath)))
+        if (FAILED(Ready_Meshes(File)))
+            return E_FAIL;
+
+        if (FAILED(Ready_Materials(File, pModelFilePath)))
+            return E_FAIL;
+
+        if (FAILED(Ready_Animation(File)))
             return E_FAIL;
 
         File.close();
     }
-    else 
+    else
         return E_FAIL;
 
 	return S_OK;
@@ -84,147 +109,258 @@ HRESULT CModel::Initialize(void* pArg)
 	return S_OK;
 }
 
-HRESULT CModel::Render(class CShader* pShader)
+HRESULT CModel::Render(_uint iMeshIndex)
 {
-    for (auto& pMesh : m_Meshes)
-    {
-        Bind_Shader_Material(pShader, "g_Texture", pMesh->Get_MaterialIndex(), aiTextureType_DIFFUSE, 0);
-        pShader->Begin(0);
-        pMesh->Bind_Resources();
-        pMesh->Render();
-    }
+    if (FAILED(m_Meshes[iMeshIndex]->Bind_Resources()))
+        return E_FAIL;
+
+    if (FAILED(m_Meshes[iMeshIndex]->Render()))
+        return E_FAIL;
 
     return S_OK;
 }
 
-void CModel::Bind_Shader_Material(CShader* pShader, const _char* pConstantName, _uint iMaterialIndex, _uint iSRVIndex, _uint iTextureType)
+HRESULT CModel::Bind_Shader_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iSRVIndex, _uint iTextureType)
 {
+    if (iMeshIndex >= m_iNumMeshes)
+        return E_FAIL;
+    
+    _uint iMaterialIndex = m_Meshes[iMeshIndex]->Get_MaterialIndex();
+
     if (iMaterialIndex >= m_iNumMaterials)
-        return;
+        return E_FAIL;
 
     m_Materials[iMaterialIndex]->Bind_Material(pShader, pConstantName, iSRVIndex, iTextureType);
+
+    return S_OK;
 }
 
-HRESULT CModel::Save_Json(const _wstring& strJsonPath)
+HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex)
 {
-    std::ofstream File(strJsonPath);
+    if (iMeshIndex >= m_iNumMeshes)
+        return E_FAIL;
+
+    return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
+}
+
+HRESULT CModel::Set_Animation(const string& strAnimationTag)
+{
+    CAnimation* pAnimation = Find_Animation(strAnimationTag);
+    if (nullptr == pAnimation)
+        return E_FAIL;
+
+    m_pCurrentAnimation = pAnimation;
+
+    return S_OK;
+}
+
+_bool CModel::Play_Animation(_float fTimeDelta)
+{
+    if(m_pCurrentAnimation)
+        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, fTimeDelta);
+
+    for (auto& pBone : m_Bones)
+    {
+        pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+    }
+
+    return true;
+}
+
+HRESULT CModel::Save_Binary(const _wstring& strSaveFilePath)
+{
+    std::ofstream File(strSaveFilePath, ios::binary);
     if (!File.is_open())
     {
         MSG_BOX(TEXT("Failed File Open"));
         return E_FAIL;
     }
 
-    Json Array;
-    Array["Model"]["Meshes"] = Json::array();
-    Array["Model"]["Materials"] = Json::array();
-
     m_iNumMeshes = m_pAIScene->mNumMeshes;
-    Array["Model"]["NumMeshes"] = m_iNumMeshes;
-    if (FAILED(MeshesToJson(File, Array["Model"]["Meshes"])))
-        return E_FAIL;
-
     m_iNumMaterials = m_pAIScene->mNumMaterials;
-    Array["Model"]["NumMaterials"] = m_iNumMaterials;
-    if (FAILED(MaterialToJson(File, Array["Model"]["Materials"])))
+    
+    File.write(reinterpret_cast<_char*>(&m_eModelType), sizeof(_uint));
+    File.write(reinterpret_cast<_char*>(&m_iNumMeshes), sizeof(_uint));
+    File.write(reinterpret_cast<_char*>(&m_iNumMaterials), sizeof(_uint));
+
+    if (FAILED(BonesToBinary(File, m_pAIScene->mRootNode)))
         return E_FAIL;
 
-    std::string jsonStr = Array.dump(4);
-
-    if (jsonStr.empty())
-    {
-        MSG_BOX(TEXT("JSON string is empty, nothing to write."));
+    if (FAILED(MeshesToBinary(File)))
         return E_FAIL;
-    }
 
-    if(File.fail())
-    {
-        MSG_BOX(TEXT("File Wrong"));
+    if (FAILED(MaterialToBinary(File)))
         return E_FAIL;
-    }
-    File << Array.dump(4);
+
+    if (FAILED(AnimationToBinary(File)))
+        return E_FAIL;
 
     File.close();
 
     return S_OK;
 }
 
-HRESULT CModel::MeshesToJson(ofstream& File, Json& Array)
+HRESULT CModel::BonesToBinary(ofstream& File, const aiNode* pAINode)
 {
-    Json Meshes;
+    size_t iLength = strlen(pAINode->mName.data);
+    _uint iNumChildren = pAINode->mNumChildren;
+    
+    _float4x4 TransformationMatrix = {  };
 
+    memcpy(&TransformationMatrix, &pAINode->mTransformation, sizeof(_float4x4));
+    XMStoreFloat4x4(&TransformationMatrix, XMMatrixTranspose(XMLoadFloat4x4(&TransformationMatrix)));
+
+    File.write(reinterpret_cast<_char*>(&iLength), sizeof(size_t));
+    File.write(pAINode->mName.data, sizeof(_char) * iLength);
+    File.write(reinterpret_cast<_char*>(&TransformationMatrix), sizeof(_float4x4));
+    File.write(reinterpret_cast<_char*>(&iNumChildren), sizeof(_uint));
+
+    for (_uint i = 0; i < iNumChildren; i++)
+        BonesToBinary(File, pAINode->mChildren[i]);
+
+    return S_OK;
+}
+
+HRESULT CModel::MeshesToBinary(ofstream& File)
+{
     for (_uint i = 0; i < m_iNumMeshes; i++)
     {
         aiMesh* pAIMesh = m_pAIScene->mMeshes[i];
         if (nullptr == pAIMesh)
             return E_FAIL;
 
-        Json MeshInfo;
+        size_t  iMeshNameLength = strlen(pAIMesh->mName.data);
 
-        MeshInfo["MaterialIndex"] = pAIMesh->mMaterialIndex;
-        MeshInfo["NumVertices"] = pAIMesh->mNumVertices;
-        MeshInfo["NumFaces"] = pAIMesh->mNumFaces;
+        File.write(reinterpret_cast<_char*>(&pAIMesh->mMaterialIndex), sizeof(_uint));
+        File.write(reinterpret_cast<_char*>(&pAIMesh->mNumVertices), sizeof(_uint));
+        File.write(reinterpret_cast<_char*>(&pAIMesh->mNumFaces), sizeof(_uint));
 
-        Json Vertices = Json::array();
+        File.write(reinterpret_cast<_char*>(&iMeshNameLength), sizeof(size_t));
+        File.write(pAIMesh->mName.data, sizeof(_char) * iMeshNameLength);
 
-        for (_uint i = 0; i < pAIMesh->mNumVertices; i++)
+        if(m_eModelType == MODELTYPE::NONANIM)
         {
-            Json Vertex = Json{
-            {"Position",    {pAIMesh->mVertices[i].x, pAIMesh->mVertices[i].y, pAIMesh->mVertices[i].z}},
-            {"Normal",      {pAIMesh->mNormals[i].x, pAIMesh->mNormals[i].y, pAIMesh->mNormals[i].z}},
-            {"Tangent",     {pAIMesh->mTangents[i].x, pAIMesh->mTangents[i].y, pAIMesh->mTangents[i].z}},
-            {"Binormal",    {pAIMesh->mBitangents[i].x, pAIMesh->mBitangents[i].y, pAIMesh->mBitangents[i].z}},
-            {"Texcoord",    {pAIMesh->mTextureCoords[0][i].x, pAIMesh->mTextureCoords[0][i].y}}
-            };
+            VTXMESH* pVertices = new VTXMESH[pAIMesh->mNumVertices];
 
-            Vertices.push_back(Vertex);
+            for (_uint i = 0; i < pAIMesh->mNumVertices; i++)
+            {
+                memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+                memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
+                memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+                memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
+                memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+            }
+
+//            for (_uint i = 0; i < pAIMesh->mNumVertices; i++)
+//                File.write(reinterpret_cast<_char*>(&pVertices[i]), sizeof(VTXMESH));
+
+            File.write(reinterpret_cast<_char*>(pVertices), sizeof(VTXMESH) * pAIMesh->mNumVertices);
+
+            Safe_Delete_Array(pVertices);
         }
+        else if(m_eModelType == MODELTYPE::ANIM)
+        {   
+            VTXANIMMESH* pVertices = new VTXANIMMESH[pAIMesh->mNumVertices];
+            ZeroMemory(pVertices, sizeof(VTXANIMMESH) * pAIMesh->mNumVertices);
 
-        MeshInfo["Vertices"] = Vertices;
 
-        Json Indices = Json::array();
+            for (_uint i = 0; i < pAIMesh->mNumVertices; i++)
+            {
+                memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+                memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
+                memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+                memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
+                memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+            }
+            
+            File.write(reinterpret_cast<_char*>(&pAIMesh->mNumBones), sizeof(_uint));
+            
+            for (_uint i = 0; i < pAIMesh->mNumBones; i++)
+            {
+                aiBone* pAIBone = pAIMesh->mBones[i];
+            
+                for (size_t j = 0; j < pAIBone->mNumWeights; j++)
+                {
+                    aiVertexWeight	AIVertexWeight = pAIBone->mWeights[j];
+            
+                    /* i번째 뼈가 영향을 주는 j번째 정점의 정점버퍼상의 인덱스 */
+                    if (0.f == pVertices[AIVertexWeight.mVertexId].vBlendWeight.x)
+                    {
+                        pVertices[AIVertexWeight.mVertexId].vBlendIndex.x = i;
+                        pVertices[AIVertexWeight.mVertexId].vBlendWeight.x = AIVertexWeight.mWeight;
+                    }
+            
+                    else if (0.f == pVertices[AIVertexWeight.mVertexId].vBlendWeight.y)
+                    {
+                        pVertices[AIVertexWeight.mVertexId].vBlendIndex.y = i;
+                        pVertices[AIVertexWeight.mVertexId].vBlendWeight.y = AIVertexWeight.mWeight;
+                    }
+                    else if (0.f == pVertices[AIVertexWeight.mVertexId].vBlendWeight.z)
+                    {
+                        pVertices[AIVertexWeight.mVertexId].vBlendIndex.z = i;
+                        pVertices[AIVertexWeight.mVertexId].vBlendWeight.z = AIVertexWeight.mWeight;
+                    }
+            
+                    else
+                    {
+                        pVertices[AIVertexWeight.mVertexId].vBlendIndex.w = i;
+                        pVertices[AIVertexWeight.mVertexId].vBlendWeight.w = AIVertexWeight.mWeight;
+                    }
+                }
+            
+                _float4x4 OffsetMatrix;
+            
+                memcpy(&OffsetMatrix, &pAIBone->mOffsetMatrix, sizeof(_float4x4));
+                XMStoreFloat4x4(&OffsetMatrix, XMMatrixTranspose(XMLoadFloat4x4(&OffsetMatrix)));
+
+                size_t  iBoneNameLength = strlen(pAIBone->mName.data);
+            
+                File.write(reinterpret_cast<_char*>(&OffsetMatrix), sizeof(_float4x4));
+                File.write(reinterpret_cast<_char*>(&iBoneNameLength), sizeof(size_t));
+                File.write(pAIBone->mName.data, sizeof(_char) * iBoneNameLength);
+            }
+
+            if (0 == pAIMesh->mNumBones)
+            {
+                _float4x4 OffsetMatrix;
+                XMStoreFloat4x4(&OffsetMatrix, XMMatrixIdentity());
+
+                File.write(reinterpret_cast<_char*>(&OffsetMatrix), sizeof(_float4x4));
+            }
+            
+
+            File.write(reinterpret_cast<_char*>(pVertices), sizeof(VTXANIMMESH) * pAIMesh->mNumVertices);
+
+            Safe_Delete_Array(pVertices);
+        }
 
         for (_uint i = 0; i < pAIMesh->mNumFaces; i++)
         {
             aiFace AIFace = pAIMesh->mFaces[i];
 
-            Json Index;
-            Index["Index"] = Json{ AIFace.mIndices[0], AIFace.mIndices[1], AIFace.mIndices[2] };
-
-            Indices.push_back(Index);
+            File.write(reinterpret_cast<_char*>(&AIFace.mIndices[0]), sizeof(_uint));
+            File.write(reinterpret_cast<_char*>(&AIFace.mIndices[1]), sizeof(_uint));
+            File.write(reinterpret_cast<_char*>(&AIFace.mIndices[2]), sizeof(_uint));
         }
-
-        MeshInfo["Indices"] = Indices;
-
-        Meshes.push_back(MeshInfo);
     }
-
-    Array = Meshes;
 
     return S_OK;
 }
 
-HRESULT CModel::MaterialToJson(ofstream& File, Json& Array)
+HRESULT CModel::MaterialToBinary(ofstream& File)
 {
-    Json Materials;
-
     for (_uint i = 0; i < m_iNumMaterials; i++)
     {
         aiMaterial* pAIMaterial = m_pAIScene->mMaterials[i];
         if (nullptr == pAIMaterial)
             return E_FAIL;
 
-        Json MaterialArray = Json::array();
-
         for (_uint j = 1; j < AI_TEXTURE_TYPE_MAX; j++)
-        {   
+        {
             _uint iNumTextures = pAIMaterial->GetTextureCount(static_cast<aiTextureType>(j));
 
-            Json TextureInfo;
-
-            TextureInfo["NumTextures"] = iNumTextures;
+            File.write(reinterpret_cast<_char*>(&iNumTextures), sizeof(_uint));
             
-            Json Textures = Json::array();
-
             for (_uint k = 0; k < iNumTextures; k++)
             {
                 aiString strTexturePath;
@@ -238,35 +374,133 @@ HRESULT CModel::MaterialToJson(ofstream& File, Json& Array)
                 _splitpath_s(strTexturePath.data, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
                 strcat_s(szFileName, MAX_PATH, szExt);
                 string strFileFullName = szFileName;
+                
+                size_t iNameLength = strlen(strFileFullName.c_str());
 
-                Json Texture;
-
-                Texture["FilePath"] = strFileFullName;
-
-                Textures.push_back(Texture);
-
+                File.write(reinterpret_cast<_char*>(&iNameLength), sizeof(size_t));
+                File.write(strFileFullName.c_str(), sizeof(_char) * iNameLength);
             }
-
-            TextureInfo["Textures"] = Textures;
-
-            MaterialArray.push_back(TextureInfo);
         }
-
-        Materials.push_back(MaterialArray);
     }
-
-    Array = Materials;
 
     return S_OK;
 }
 
-HRESULT CModel::Ready_Meshes(_fmatrix PreTransformMatrix)
+HRESULT CModel::AnimationToBinary(ofstream& File)
 {
-    m_iNumMeshes = m_pAIScene->mNumMeshes;
+    _uint iNumAnimations = m_pAIScene->mNumAnimations;
 
+    File.write(reinterpret_cast<_char*>(&iNumAnimations), sizeof(_uint));
+
+    for (_uint i = 0; i < iNumAnimations; i++)
+    {
+        aiAnimation* pAIAnimation = m_pAIScene->mAnimations[i];
+        
+        size_t iAnimNameLength = {};
+        _char szAnimName[MAX_PATH] = {};
+
+        const _char* pFullName = pAIAnimation->mName.data;
+        const _char* pCutPoint = strchr(pFullName, '|');
+
+        strcpy_s(szAnimName, pCutPoint + 1);
+        iAnimNameLength = strlen(szAnimName);
+
+        _uint iNumChannels = pAIAnimation->mNumChannels;
+
+        _float fDuration = static_cast<_float>(pAIAnimation->mDuration);
+        _float fTickPerSecond = static_cast<_float>(pAIAnimation->mTicksPerSecond);
+
+        File.write(reinterpret_cast<_char*>(&iAnimNameLength), sizeof(size_t));
+        File.write(szAnimName, sizeof(_char) * iAnimNameLength);
+
+        File.write(reinterpret_cast<_char*>(&fDuration), sizeof(_float));
+        File.write(reinterpret_cast<_char*>(&fTickPerSecond), sizeof(_float));
+
+        File.write(reinterpret_cast<_char*>(&iNumChannels), sizeof(_uint));
+
+        for (_uint j = 0; j < iNumChannels; j++)
+        {
+            aiNodeAnim* pAIChannel = pAIAnimation->mChannels[j];
+
+            _char szName[MAX_PATH] = {};
+            size_t iNameLength = {};
+            
+            strcpy_s(szName, pAIChannel->mNodeName.data);
+            iNameLength = strlen(szName);
+
+            File.write(reinterpret_cast<_char*>(&iNameLength), sizeof(size_t));
+            File.write(szName, sizeof(_char) * iNameLength);
+
+            _uint iNumKeyFrames = max(max(pAIChannel->mNumScalingKeys, pAIChannel->mNumRotationKeys), pAIChannel->mNumPositionKeys);
+
+            File.write(reinterpret_cast<_char*>(&iNumKeyFrames), sizeof(_uint));
+
+            _float3     vScale{};
+            _float4     vRotation{};
+            _float3     vTranslation{};
+
+            for (size_t k = 0; k < iNumKeyFrames; k++)
+            {
+                KEYFRAME            KeyFrame{};
+
+                if (k < pAIChannel->mNumScalingKeys)
+                {
+                    memcpy(&vScale, &pAIChannel->mScalingKeys[k].mValue, sizeof(_float3));
+                    KeyFrame.fTrackPosition = static_cast<_float>(pAIChannel->mScalingKeys[k].mTime);
+                }
+
+                if (k < pAIChannel->mNumRotationKeys)
+                {
+                    vRotation.x = pAIChannel->mRotationKeys[k].mValue.x;
+                    vRotation.y = pAIChannel->mRotationKeys[k].mValue.y;
+                    vRotation.z = pAIChannel->mRotationKeys[k].mValue.z;
+                    vRotation.w = pAIChannel->mRotationKeys[k].mValue.w;
+
+                    KeyFrame.fTrackPosition = static_cast<_float>(pAIChannel->mRotationKeys[k].mTime);
+                }
+
+                if (k < pAIChannel->mNumPositionKeys)
+                {
+                    memcpy(&vTranslation, &pAIChannel->mPositionKeys[k].mValue, sizeof(_float3));
+                    KeyFrame.fTrackPosition = static_cast<_float>(pAIChannel->mPositionKeys[k].mTime);
+                }
+
+                KeyFrame.vScale = vScale;
+                KeyFrame.vRotation = vRotation;
+                KeyFrame.vPosition = vTranslation;
+
+                File.write(reinterpret_cast<_char*>(&KeyFrame), sizeof(KEYFRAME));
+            }
+        }
+    }
+
+    return S_OK;
+}
+
+HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
+{
+    CBone* pBone = CBone::Create(File, iParentIndex);
+    if (nullptr == pBone)
+        return E_FAIL;
+
+    m_Bones.push_back(pBone);
+
+    _uint iIndex = static_cast<_uint>(m_Bones.size()) - 1;
+
+    _uint iNumChildren = {};
+    File.read(reinterpret_cast<_char*>(&iNumChildren), sizeof(_uint));
+    
+    for (_uint i = 0; i < iNumChildren; i++)
+        Ready_Bones(File, iIndex);
+    
+    return S_OK;
+}
+
+HRESULT CModel::Ready_Meshes(ifstream& File)
+{
     for (_uint i = 0; i < m_iNumMeshes; i++)
     {
-        CMesh* pMesh = CMesh::Create(m_pDevice, m_pDeviceContext, m_pAIScene->mMeshes[i], PreTransformMatrix);
+        CMesh* pMesh = CMesh::Create(m_pDevice, m_pDeviceContext, m_eModelType ,File, m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
         if (nullptr == pMesh)
             return E_FAIL;
 
@@ -276,13 +510,59 @@ HRESULT CModel::Ready_Meshes(_fmatrix PreTransformMatrix)
     return S_OK;
 }
 
-HRESULT CModel::Ready_Meshes(Json& Data, _fmatrix PreTransformMatrix)
+HRESULT CModel::Ready_Materials(ifstream& File, const _char* pModelFilePath)
 {
-    m_iNumMeshes = Data["Model"]["NumMeshes"].get<_uint>();
-
-    for (auto& MeshData : Data["Model"]["Meshes"])
+    for (_uint i = 0; i < m_iNumMaterials; i++)
     {
-        CMesh* pMesh = CMesh::Create(m_pDevice, m_pDeviceContext, MeshData, PreTransformMatrix);
+        CMeshMaterial* pMeshMaterial = CMeshMaterial::Create(m_pDevice, m_pDeviceContext, pModelFilePath, File);
+        if (nullptr == pMeshMaterial)
+            return E_FAIL;
+
+        m_Materials.push_back(pMeshMaterial);
+    }
+
+    return S_OK;
+}
+
+HRESULT CModel::Ready_Animation(ifstream& File)
+{
+    File.read(reinterpret_cast<_char*>(&m_iNumAnimation), sizeof(_uint));
+
+    
+    for (_uint i = 0; i < m_iNumAnimation; i++)
+    {
+        size_t iAnimNameLength;
+        _char szAnimName[MAX_PATH] = {};
+
+        File.read(reinterpret_cast<_char*>(&iAnimNameLength), sizeof(size_t));
+        File.read(szAnimName, sizeof(_char) * iAnimNameLength);
+
+        CAnimation* pAnimation = CAnimation::Create(File, m_Bones);
+        if (nullptr == pAnimation)
+            return E_FAIL;
+
+        m_Animations.emplace(szAnimName, pAnimation);
+    }
+    return S_OK;
+}
+
+CAnimation* CModel::Find_Animation(const string& strAnimationTag)
+{
+    auto Pair = m_Animations.find(strAnimationTag);
+
+    if (Pair == m_Animations.end())
+        return nullptr;
+
+    return Pair->second;
+}
+
+HRESULT CModel::Ready_Meshes()
+{
+    m_iNumMeshes = m_pAIScene->mNumMeshes;
+
+    for (_uint i = 0; i < m_iNumMeshes; i++)
+    {
+        CMesh* pMesh = CMesh::Create(m_pDevice, m_pDeviceContext, m_eModelType, m_pAIScene->mMeshes[i], m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
         if (nullptr == pMesh)
             return E_FAIL;
 
@@ -307,18 +587,35 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
     return S_OK;
 }
 
-HRESULT CModel::Ready_Materials(Json& Data, const _char* pModelFilePath)
+HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
 {
-    m_iNumMaterials = Data["Model"]["NumMaterials"].get<_uint>();
-    
-    for (auto& MaterialData : Data["Model"]["Materials"])
+    CBone* pBone = CBone::Create(pAINode, iParentIndex);
+    if (nullptr == pBone)
+        return E_FAIL;
+
+    m_Bones.push_back(pBone);
+
+    _int iIndex = static_cast<_int>(m_Bones.size()) - 1;
+
+    for (_uint i = 0; i < pAINode->mNumChildren; i++)
+        Ready_Bones(pAINode->mChildren[i], iIndex);
+
+    return S_OK;
+}
+
+HRESULT CModel::Ready_Animation()
+{
+    m_iNumAnimation = m_pAIScene->mNumAnimations;
+
+    for (size_t i = 0; i < m_iNumAnimation; i++)
     {
-        CMeshMaterial* pMeshMaterial = CMeshMaterial::Create(m_pDevice, m_pDeviceContext, pModelFilePath, MaterialData);
-        if (nullptr == pMeshMaterial)
+        CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i], m_Bones);
+        if (nullptr == pAnimation)
             return E_FAIL;
 
-        m_Materials.push_back(pMeshMaterial);
+        m_Animations.emplace(m_pAIScene->mAnimations[i]->mName.data, pAnimation);
     }
+
     return S_OK;
 }
 
@@ -352,6 +649,10 @@ void CModel::Free()
 {
     __super::Free();
 
+    for (auto& pBone : m_Bones)
+        Safe_Release(pBone);
+    m_Bones.clear();
+
     for (auto& pMesh : m_Meshes)
         Safe_Release(pMesh);
     m_Meshes.clear();
@@ -359,6 +660,10 @@ void CModel::Free()
     for (auto& pMaterials : m_Materials)
         Safe_Release(pMaterials);
     m_Materials.clear();
+
+    for (auto& Pair : m_Animations)
+        Safe_Release(Pair.second);
+    m_Animations.clear();
 
     m_Importer.FreeScene();
 }

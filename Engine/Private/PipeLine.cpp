@@ -25,7 +25,7 @@ _matrix CPipeLine::Get_Transform_Matrix_Inverse(D3DTS eTransformState) const
 	return XMLoadFloat4x4(&m_TransformMatricesInverse[ENUM_CLASS(eTransformState)]);
 }
 
-const _float4* CPipeLine::Get_CamPoisiton() const
+const _float4* CPipeLine::Get_CamPosition() const
 {
 	return &m_vCamPosition;
 }

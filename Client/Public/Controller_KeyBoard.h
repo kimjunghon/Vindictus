@@ -15,12 +15,13 @@ public:
 	virtual void	Update(_float fTimeDelta) override;
 
 public:
-	virtual HRESULT	MoveInput(INPUT_MOVE_DESC* pOut);
-	virtual HRESULT	ActionInput(INPUT_ACTION_DESC* pOut);
-	virtual HRESULT	CameraInput(INPUT_CAMERA_DESC* pOut);
+	virtual HRESULT	MoveInput(INPUT_MOVE_DESC* pOut) override;
+	virtual HRESULT	ActionInput(INPUT_ACTION_DESC* pOut) override;
+	virtual HRESULT	CameraInput(INPUT_CAMERA_DESC* pOut) override;
+	virtual HRESULT UI_Input(INPUT_UI_DESC* pOut) override;
 
 private:
-	_float		m_fSensor;
+	_float		m_fSensor = {};
 
 public:
 	static CController_KeyBoard* Create();

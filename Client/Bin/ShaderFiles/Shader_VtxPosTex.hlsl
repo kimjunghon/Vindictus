@@ -24,7 +24,8 @@ struct VS_IN
 struct VS_DEFAULT_OUT
 {
     float4 vPosition : SV_POSITION;
-    float2 vTexcoord : TEXCOORD0;
+    float4 vLocalPos : TEXCOORD0;
+    float2 vTexcoord : TEXCOORD1;
 };
 
 
@@ -39,6 +40,7 @@ VS_DEFAULT_OUT VS_MAIN(VS_IN In)
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
     Out.vTexcoord = In.vTexcoord;
+    Out.vLocalPos = float4(In.vPosition, 1.f);
     
     return Out;
 }
@@ -46,7 +48,8 @@ VS_DEFAULT_OUT VS_MAIN(VS_IN In)
 struct PS_DEFAULT_IN
 {
     float4 vPosition : SV_POSITION;
-    float2 vTexcoord : TEXCOORD0;
+    float4 vLocalPos : TEXCOORD0;
+    float2 vTexcoord : TEXCOORD1;
 };
 
 struct PS_OUT
@@ -127,19 +130,24 @@ PS_OUT PS_LOADINGPOINT(PS_LOADINGPOINT_IN In)
     float2 vPosition = { In.vLocalPos.x, In.vLocalPos.y };
     float2 vCenter = 0.f;
     float2 vLength = length(vPosition - vCenter);
-    float Length = vLength;
+    float Length = length(vPosition);
     
     Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
     
-    if (abs(In.vLocalPos.x) <= 0.05f)
-    {
-        if (abs(In.vLocalPos.y) >= 0.3f)    
-            Out.vColor.a = (0.5f - Length);
-    }
-    else
-        Out.vColor.a = (0.5f - Length);
+    float MaxLength = length(float2(0.5, 0.5f));
     
-    if(Out.vColor.a <= 0.3f)
+    Out.vColor.a = (1.f - (Length / MaxLength)) * 0.8f;
+    
+    
+    //if (abs(In.vLocalPos.x) <= 0.05f)
+    //{
+    //    if (abs(In.vLocalPos.y) >= 0.3f)    
+    //        Out.vColor.a = Length;
+    //}
+    //else
+    //    Out.vColor.a = Length;
+    
+    if (Out.vColor.a <= 0.35f)
         discard;
     
     return Out;

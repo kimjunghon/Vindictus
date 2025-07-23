@@ -12,12 +12,14 @@ namespace Engine
 		unsigned int	iNumLevels;
 	}ENGINE_DESC;	
 
-	typedef struct tagInputMoveDesc {
+	typedef struct tagInputMoveDesc 
+	{
 		XMVECTOR	vDir;
 		bool		bMove;
 	}INPUT_MOVE_DESC;
 
-	typedef struct tagInputActionDesc {
+	typedef struct tagInputActionDesc 
+	{
 		bool		bAttack;
 		bool		bSmash;
 		bool		bGuard;
@@ -25,11 +27,13 @@ namespace Engine
 		bool		bSprint;
 	}INPUT_ACTION_DESC;
 
-	typedef struct tagInputCameraDesc {
+	typedef struct tagInputCameraDesc
+	{
 		XMFLOAT2	vCameraRotate;
 	}INPUT_CAMERA_DESC;
 
-	typedef struct tagInputUIDesc {
+	typedef struct tagInputUIDesc 
+	{
 		bool		bESC;
 	}INPUT_UI_DESC;
 
@@ -46,6 +50,14 @@ namespace Engine
 		XMFLOAT4	vDirection;
 		float		fRange;
 	}LIGHT_DESC;
+
+	typedef struct tagKeyFrame
+	{
+		XMFLOAT3	vScale;
+		XMFLOAT4	vRotation;
+		XMFLOAT3	vPosition;
+		float		fTrackPosition;
+	}KEYFRAME;
 
 	typedef struct tagVertexPositionTexcoord
 	{
@@ -73,6 +85,20 @@ namespace Engine
 		};
 	}VTXNORTEX;
 
+	typedef struct tagVertexPositionColor
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vNormal;
+		XMFLOAT3		vColor;
+
+		static const unsigned int iNumElements = { 3 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[iNumElements] = {
+			{ "POSITION" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "NORMAL" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "COLOR" , 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+	}VTXNORCOL;
+
 	typedef struct tagVertexMesh
 	{
 		XMFLOAT3		vPosition;
@@ -90,6 +116,28 @@ namespace Engine
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0}
 		};
 	}VTXMESH;
+
+	typedef struct tagVertexAnimMesh
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT3		vNormal;
+		XMFLOAT3		vTangent;
+		XMFLOAT3		vBinormal;
+		XMUINT4			vBlendIndex;
+		XMFLOAT4		vBlendWeight;
+		XMFLOAT2		vTexcoord;
+
+		static const unsigned int iNumElements = { 7 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "BLENDINDEX", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 64, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 80, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		};
+	}VTXANIMMESH;
 }
 
 

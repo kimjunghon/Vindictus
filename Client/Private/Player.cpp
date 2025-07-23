@@ -56,7 +56,20 @@ HRESULT CPlayer::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
-	m_pModelCom->Render(m_pShaderCom);
+	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		m_pShaderCom->Begin(0);
+
+		m_pModelCom->Render(i);
+	}
 
 	return S_OK;
 }
@@ -71,7 +84,7 @@ HRESULT CPlayer::Ready_Camera()
 	CameraDesc.fFar = 500.f;
 	CameraDesc.fSpeedPerSec = 5.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	CameraDesc.fDistance = 100.f;
+	CameraDesc.fDistance = 10.f;
 	CameraDesc.pTarget_TransformCom = m_pTransformCom;
 
 	if (FAILED(m_pGameInstance->Add_CameraToManager(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Target"), TEXT("Camera_Target"), nullptr, &CameraDesc)))
@@ -84,10 +97,10 @@ HRESULT CPlayer::Ready_Camera()
 
 HRESULT CPlayer::Ready_Components()
 {
-	if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Player"), TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Player"), TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
+	
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 

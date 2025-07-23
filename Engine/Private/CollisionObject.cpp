@@ -66,4 +66,5 @@ BoundingBox CCollisionObject::Compute_BoundingVolume() const
 
 void CCollisionObject::Free()
 {
+	__super::Free();
 }

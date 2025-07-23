@@ -73,6 +73,9 @@
     <Filter Include="02.GameObject\UIObject\Static\Bar">
       <UniqueIdentifier>{ac98ff6d-3684-43f3-891f-9f78d974127a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97.ShaderFiles">
+      <UniqueIdentifier>{5191c7ce-16b1-4664-9c92-827c72f29e2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -255,13 +258,16 @@
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
-      <Filter>98.Defaults</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
-      <Filter>98.Defaults</Filter>
+      <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
-      <Filter>98.Defaults</Filter>
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl">
+      <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -3,6 +3,9 @@
 
 namespace Engine
 {
+	enum class D3DRS { DEFAULT, CCW, NONCULL, WIRE, END};
+	enum class D3DBS { DEFAULT, ALPHABLEND, END };
+	enum class D3DDSS { DEFAULT, ZDISABLE, END};
 	enum class D3DTS { VIEW, PROJ, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
@@ -21,7 +24,7 @@ namespace Engine
 
 	enum class SHADER_VTXPOSTEX { DEFAULT, PROGRESSBAR, LOADINGPOINT};
 
-	enum class MODELTYPE { ANIM, NONANIM};
+	enum class MODELTYPE { ANIM, NONANIM, INFILE };
 }
 
 #endif // Engine_Enum_h__

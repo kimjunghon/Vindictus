@@ -39,6 +39,10 @@ public:
 		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
 	}
 
+	void Set_WorldMatrix(_float4x4 WorldMatrix) {
+		m_WorldMatrix = WorldMatrix;
+	}
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;

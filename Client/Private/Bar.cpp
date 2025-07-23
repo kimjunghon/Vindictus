@@ -59,13 +59,13 @@ HRESULT CBar::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Float("g_fStartX", m_fStartX)))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fStartX", &m_fStartX, sizeof(_float))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Float("g_fSizeX", m_fSizeX)))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fSizeX", &m_fSizeX, sizeof(_float))))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Float("g_fProgressBarRatio", m_fRatio)))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fProgressBarRatio", &m_fRatio, sizeof(_float))))
 		return E_FAIL;
 
 	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", 0)))

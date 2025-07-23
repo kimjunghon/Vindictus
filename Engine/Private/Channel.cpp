@@ -1,0 +1,155 @@
+#include "EnginePch.h"
+#include "Channel.h"
+#include "Bone.h"
+
+CChannel::CChannel()
+{
+}
+
+HRESULT CChannel::Initialize(const aiNodeAnim* pAIChannel, const vector<CBone*>& Bones)
+{
+	strcpy_s(m_szName, pAIChannel->mNodeName.data);
+
+	auto iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool {
+		if (true == pBone->Compare_Name(m_szName))
+			return true;
+		m_iBoneIndex++;
+		return false;
+		});
+
+	m_iNumKeyFrame = max(max(pAIChannel->mNumPositionKeys, pAIChannel->mNumRotationKeys), pAIChannel->mNumScalingKeys);
+
+	_float3 vScale = {};
+	_float4 vRotation = {};
+	_float3 vPosition = {};
+
+	for (_uint i = 0; i < m_iNumKeyFrame; i++)
+	{
+		KEYFRAME KeyFrame = {};
+
+		if (i < pAIChannel->mNumScalingKeys)
+		{
+			memcpy(&vScale, &pAIChannel->mScalingKeys[i].mValue, sizeof(_float3));
+			KeyFrame.fTrackPosition = static_cast<_float>(pAIChannel->mScalingKeys[i].mTime);
+		}
+
+		if (i < pAIChannel->mNumRotationKeys)
+		{
+			vRotation.x = pAIChannel->mRotationKeys[i].mValue.x;
+			vRotation.y = pAIChannel->mRotationKeys[i].mValue.y;
+			vRotation.z = pAIChannel->mRotationKeys[i].mValue.z;
+			vRotation.w = pAIChannel->mRotationKeys[i].mValue.w;
+			KeyFrame.fTrackPosition = static_cast<_float>(pAIChannel->mScalingKeys[i].mTime);
+		}
+
+		if (i < pAIChannel->mNumPositionKeys)
+		{
+			memcpy(&vPosition, &pAIChannel->mPositionKeys[i].mValue, sizeof(_float3));
+			KeyFrame.fTrackPosition = static_cast<_float>(pAIChannel->mPositionKeys[i].mTime);
+		}
+
+		KeyFrame.vScale = vScale;
+		KeyFrame.vRotation = vRotation;
+		KeyFrame.vPosition = vPosition;
+
+		m_KeyFrames.push_back(KeyFrame);
+	}
+
+	return S_OK;
+}
+
+HRESULT CChannel::Initialize(ifstream& File, const vector<CBone*>& Bones)
+{
+	size_t iNameLength = {};
+	File.read(reinterpret_cast<_char*>(&iNameLength), sizeof(size_t));
+	File.read(m_szName, sizeof(_char) * iNameLength);
+
+	auto iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool {
+		if (true == pBone->Compare_Name(m_szName))
+			return true;
+		m_iBoneIndex++;
+		return false;
+		});
+
+	File.read(reinterpret_cast<_char*>(&m_iNumKeyFrame), sizeof(_uint));
+
+	for (_uint i = 0; i < m_iNumKeyFrame; i++)
+	{
+		KEYFRAME KeyFrame = {};
+		File.read(reinterpret_cast<_char*>(&KeyFrame), sizeof(KEYFRAME));
+		m_KeyFrames.push_back(KeyFrame);
+	}
+
+	return S_OK;
+}
+
+void CChannel::Update_TransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition)
+{
+	_vector vScale, vRotation, vPosition;
+
+	if (fCurrentTrackPosition == 0.f)
+		m_iKeyFrameIndex = 0;
+
+	if (fCurrentTrackPosition >= m_KeyFrames.back().fTrackPosition)
+	{
+		vScale = XMLoadFloat3(&m_KeyFrames.back().vScale);
+		vRotation = XMLoadFloat4(&m_KeyFrames.back().vRotation);
+		vPosition = XMVectorSetW(XMLoadFloat3(&m_KeyFrames.back().vPosition), 1.f);
+
+		m_iKeyFrameIndex = m_iNumKeyFrame - 1;
+	}
+	else
+	{
+		while (fCurrentTrackPosition >= m_KeyFrames[m_iKeyFrameIndex + 1].fTrackPosition)
+			m_iKeyFrameIndex++;
+
+		_float fRatio = (fCurrentTrackPosition - m_KeyFrames[m_iKeyFrameIndex].fTrackPosition) / (m_KeyFrames[m_iKeyFrameIndex + 1].fTrackPosition - m_KeyFrames[m_iKeyFrameIndex].fTrackPosition);
+
+		_vector vLeftScale, vRightScale;
+		_vector vLeftRotation, vRightRotation;
+		_vector vLeftPosition, vRightPosition;
+
+		vLeftScale = XMLoadFloat3(&m_KeyFrames[m_iKeyFrameIndex].vScale);
+		vLeftRotation = XMLoadFloat4(&m_KeyFrames[m_iKeyFrameIndex].vRotation);
+		vLeftPosition = XMLoadFloat3(&m_KeyFrames[m_iKeyFrameIndex].vPosition);
+
+		vRightScale = XMLoadFloat3(&m_KeyFrames[m_iKeyFrameIndex+1].vScale);
+		vRightRotation = XMLoadFloat4(&m_KeyFrames[m_iKeyFrameIndex+1].vRotation);
+		vRightPosition = XMLoadFloat3(&m_KeyFrames[m_iKeyFrameIndex+1].vPosition);
+
+		vScale = XMVectorLerp(vLeftScale, vRightScale, fRatio);
+		vRotation = XMQuaternionSlerp(vLeftRotation, vRightRotation, fRatio);
+		vPosition = XMVectorSetW(XMVectorLerp(vLeftPosition, vRightPosition, fRatio), 1.f);
+	}
+
+	_matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
+
+	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
+}
+
+CChannel* CChannel::Create(const aiNodeAnim* pAIChannel, const vector<CBone*>& Bones)
+{
+	CChannel* pInstance = new CChannel();
+	if (FAILED(pInstance->Initialize(pAIChannel, Bones)))
+	{
+		MSG_BOX(TEXT("Failed Created : CChannel"));
+		Safe_Release(pInstance);
+	}
+	return pInstance;
+}
+
+CChannel* CChannel::Create(ifstream& File, const vector<CBone*>& Bones)
+{
+	CChannel* pInstance = new CChannel();
+	if (FAILED(pInstance->Initialize(File, Bones)))
+	{
+		MSG_BOX(TEXT("Failed Created : CChannel"));
+		Safe_Release(pInstance);
+	}
+	return pInstance;
+}
+
+void CChannel::Free()
+{
+	__super::Free();
+}
