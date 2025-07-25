@@ -2,6 +2,9 @@
 
 #include "Level_GamePlay.h"
 #include "UIObject.h"
+#include "MapObject.h"
+#include "Pawn.h"
+#include "Controller_KeyBoard.h"
 
 CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
     : CLevel { pDevice, pDeviceContext }
@@ -10,13 +13,19 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pDe
 
 HRESULT CLevel_GamePlay::Initialize()
 {
-    if (FAILED(Ready_Layer(TEXT("Layer"))))
+	if (FAILED(Ready_Right()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Player(TEXT("Layer_Player"))))
         return E_FAIL;
 
 	if(FAILED(Ready_GameObject(TEXT("Layer_GameObject"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_UI(TEXT("Layer_UI"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
     return S_OK;
@@ -71,6 +80,22 @@ HRESULT CLevel_GamePlay::Render()
     return S_OK;
 }
 
+HRESULT CLevel_GamePlay::Ready_Right()
+{
+	LIGHT_DESC			LightDesc{};
+
+	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(0.6f, 0.6f, 0.6f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+
+	if (FAILED(m_pGameInstance->Add_Light(TEXT("DIRECTONAL"), LightDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CLevel_GamePlay::Ready_UI(const _wstring& strLayerTag)
 {
 	CUIObject::UIOBJECT_DESC UI_Desc{};
@@ -98,26 +123,80 @@ HRESULT CLevel_GamePlay::Ready_UI(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer(const _wstring& strLayerTag)
+HRESULT CLevel_GamePlay::Ready_Player(const _wstring& strLayerTag)
 {
+	CGameObject::GAMEOBJECT_DESC GameObjectDesc = {};
+	GameObjectDesc.fSpeedPerSec = 10.f;
+	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.f);
 
-
-
-	
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_PlayerPawn"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+		return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Controller()
+{
+	if(FAILED(m_pGameInstance->Add_Controller_ToManager(TEXT("Controller_KeyBoard"), CController_KeyBoard::Create())))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Change_Controller(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), TEXT("Controller_KeyBoard"))))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 
 HRESULT CLevel_GamePlay::Ready_GameObject(const _wstring& strLayerTag)
 {
-	CTransform::TRANSFORM_DESC TransformDesc{};
-	TransformDesc.fRotationPerSec = 90.f;
-	TransformDesc.fSpeedPerSec = 10.f;
-	
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &TransformDesc)))
+	if (FAILED(Ready_MapObject(TEXT("Layer_MapObject"))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_MapObject(const _wstring& strLayerTag)
+{
+	ifstream File("../Bin/Resources/BossMap1.dat", ios::binary);
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed File Open BossMap1"));
+		return E_FAIL;
+	}
+
+	size_t iNumObjects = {};
+	File.read(reinterpret_cast<_char*>(&iNumObjects), sizeof(size_t));
+
+	for (size_t i = 0; i < iNumObjects; i++)
+	{
+		size_t iNameLength = {};
+		_char szName[MAX_PATH] = {};
+		_float4x4 WorldMatrx = {};
+
+		File.read(reinterpret_cast<_char*>(&iNameLength), sizeof(size_t));
+		File.read(szName, sizeof(_char) * iNameLength);
+		File.read(reinterpret_cast<_char*>(&WorldMatrx), sizeof(_float4x4));
+
+		_char szPrototype[MAX_PATH] = "Prototype_GameObject_Map_";
+		_char szPrototypeTag[MAX_PATH] = {};
+		strcpy_s(szPrototypeTag, szPrototype);
+		strcat_s(szPrototypeTag, szName);
+
+		_tchar szWidePrototypeTag[MAX_PATH] = {};
+
+		MultiByteToWideChar(CP_UTF8, 0, szPrototypeTag, static_cast<_int>(strlen(szPrototypeTag)), szWidePrototypeTag, MAX_PATH);
+
+		CMapObject::MAP_OBJECT_DESC MapObjectDesc = {};
+		MapObjectDesc.iModelLevel = ENUM_CLASS(LEVEL::GAMEPLAY);
+		MapObjectDesc.strModelTag = szWidePrototypeTag;
+		MapObjectDesc.WorldMatrix = WorldMatrx;
+
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_MapObject"), 
+			ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &MapObjectDesc)))
+			return E_FAIL;
+	}
+
 
 	return S_OK;
 }

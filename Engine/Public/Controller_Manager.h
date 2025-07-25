@@ -21,6 +21,12 @@ public:
 	class CController*	Find_Controller(const _wstring& strControllerTag);
 	void				Clear();
 
+public:
+	HRESULT	MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut);
+	HRESULT	ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut);
+	HRESULT	CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut);
+	HRESULT UI_Input(_uint iChannelIndex, INPUT_UI_DESC* pOut);
+
 private:
 	CONTROLLERS					m_Controllers;
 	class CController*			m_pCurrentController[ENUM_CLASS(CONTROLLER_CHANNEL::END)] = { nullptr };

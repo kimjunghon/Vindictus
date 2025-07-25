@@ -12,6 +12,7 @@ private:
 public:
 	_matrix			Get_CombinedTransformationMatrix() { return XMLoadFloat4x4(&m_CombinedTransformationMatrix); }
 	void			Set_TransformationMatrix(_fmatrix Matrix) { XMStoreFloat4x4(&m_TransformationMatrix, Matrix); }
+	_matrix			Get_TransformationMatrix() { return XMLoadFloat4x4(&m_TransformationMatrix); }
 	_bool			Compare_Name(const _char* pName) { return !strcmp(pName, m_szName); }
 
 public:
@@ -28,6 +29,7 @@ private:
 public:
 	static CBone*	Create(const aiNode* pAINode, _int iParentBoneIndex);
 	static CBone*	Create(ifstream& File, _int iParentBoneIndex);
+	CBone*			Clone();
 	virtual void	Free() override;
 };
 

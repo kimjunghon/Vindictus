@@ -22,7 +22,6 @@ HRESULT CController_Manager::Add_Controller_ToManager(const _wstring& strControl
 		return E_FAIL;
 
 	m_Controllers.emplace(strControllerTag, pController);
-	Safe_AddRef(pController);
 
 	return S_OK;
 }
@@ -63,6 +62,26 @@ void CController_Manager::Clear()
 		Safe_Release(Pair.second);
 
 	m_Controllers.clear();
+}
+
+HRESULT CController_Manager::MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut)
+{
+	return m_pCurrentController[iChannelIndex]->MoveInput(pOut);
+}
+
+HRESULT CController_Manager::ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut)
+{
+	return m_pCurrentController[iChannelIndex]->ActionInput(pOut);
+}
+
+HRESULT CController_Manager::CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut)
+{
+	return m_pCurrentController[iChannelIndex]->CameraInput(pOut);
+}
+
+HRESULT CController_Manager::UI_Input(_uint iChannelIndex, INPUT_UI_DESC* pOut)
+{
+	return m_pCurrentController[iChannelIndex]->UI_Input(pOut);
 }
 
 CController_Manager* CController_Manager::Create()

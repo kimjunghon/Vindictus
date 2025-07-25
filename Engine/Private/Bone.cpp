@@ -64,6 +64,11 @@ CBone* CBone::Create(ifstream& File, _int iParentBoneIndex)
 	return pInstance;
 }
 
+CBone* CBone::Clone()
+{
+	return new CBone(*this);
+}
+
 void CBone::Free()
 {
 	__super::Free();

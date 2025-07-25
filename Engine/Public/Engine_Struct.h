@@ -16,15 +16,13 @@ namespace Engine
 	{
 		XMVECTOR	vDir;
 		bool		bMove;
+		bool		bSprint;
 	}INPUT_MOVE_DESC;
 
 	typedef struct tagInputActionDesc 
 	{
-		bool		bAttack;
-		bool		bSmash;
-		bool		bGuard;
-		bool		bDash;
-		bool		bSprint;
+		bool		bAction;
+		byte		byAction;
 	}INPUT_ACTION_DESC;
 
 	typedef struct tagInputCameraDesc
@@ -138,6 +136,14 @@ namespace Engine
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 80, D3D11_INPUT_PER_VERTEX_DATA, 0}
 		};
 	}VTXANIMMESH;
+
+	typedef struct tagAnimData
+	{
+		string		strAnimKey;
+		bool		IsLoop;
+		XMFLOAT2	vRange;
+	}ANIM_DATA;
+
 }
 
 

@@ -188,6 +188,8 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\MeshMaterial.h" />
     <ClInclude Include="..\public\Model.h" />
     <ClInclude Include="..\public\Octree.h" />
+    <ClInclude Include="..\public\Pawn.h" />
+    <ClInclude Include="..\public\PawnObject.h" />
     <ClInclude Include="..\public\PipeLine.h" />
     <ClInclude Include="..\public\Prototype_Manager.h" />
     <ClInclude Include="..\public\Renderer.h" />
@@ -238,6 +240,8 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\MeshMaterial.cpp" />
     <ClCompile Include="..\private\Model.cpp" />
     <ClCompile Include="..\private\Octree.cpp" />
+    <ClCompile Include="..\private\Pawn.cpp" />
+    <ClCompile Include="..\private\PawnObject.cpp" />
     <ClCompile Include="..\private\PipeLine.cpp" />
     <ClCompile Include="..\private\Prototype_Manager.cpp" />
     <ClCompile Include="..\private\Renderer.cpp" />

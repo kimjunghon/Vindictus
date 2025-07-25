@@ -83,44 +83,54 @@ HRESULT CChannel::Initialize(ifstream& File, const vector<CBone*>& Bones)
 	return S_OK;
 }
 
-void CChannel::Update_TransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition)
+void CChannel::Update_TransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex)
 {
 	_vector vScale, vRotation, vPosition;
 
 	if (fCurrentTrackPosition == 0.f)
-		m_iKeyFrameIndex = 0;
+		*pCurrentKeyFrameIndex = 0;
 
-	if (fCurrentTrackPosition >= m_KeyFrames.back().fTrackPosition)
+	KEYFRAME        LastKeyFrame = m_KeyFrames.back();
+
+	if (fCurrentTrackPosition >= LastKeyFrame.fTrackPosition)
 	{
-		vScale = XMLoadFloat3(&m_KeyFrames.back().vScale);
-		vRotation = XMLoadFloat4(&m_KeyFrames.back().vRotation);
-		vPosition = XMVectorSetW(XMLoadFloat3(&m_KeyFrames.back().vPosition), 1.f);
-
-		m_iKeyFrameIndex = m_iNumKeyFrame - 1;
+		vScale = XMLoadFloat3(&LastKeyFrame.vScale);
+		vRotation = XMLoadFloat4(&LastKeyFrame.vRotation);
+		vPosition = XMVectorSetW(XMLoadFloat3(&LastKeyFrame.vPosition), 1.f);
 	}
 	else
 	{
-		while (fCurrentTrackPosition >= m_KeyFrames[m_iKeyFrameIndex + 1].fTrackPosition)
-			m_iKeyFrameIndex++;
+		while (fCurrentTrackPosition >= m_KeyFrames[*pCurrentKeyFrameIndex + 1].fTrackPosition)
+			(*pCurrentKeyFrameIndex)++;
 
-		_float fRatio = (fCurrentTrackPosition - m_KeyFrames[m_iKeyFrameIndex].fTrackPosition) / (m_KeyFrames[m_iKeyFrameIndex + 1].fTrackPosition - m_KeyFrames[m_iKeyFrameIndex].fTrackPosition);
+		_float fRatio = (fCurrentTrackPosition - m_KeyFrames[*pCurrentKeyFrameIndex].fTrackPosition) /
+			(m_KeyFrames[*pCurrentKeyFrameIndex + 1].fTrackPosition - m_KeyFrames[*pCurrentKeyFrameIndex].fTrackPosition);
 
-		_vector vLeftScale, vRightScale;
-		_vector vLeftRotation, vRightRotation;
-		_vector vLeftPosition, vRightPosition;
-
-		vLeftScale = XMLoadFloat3(&m_KeyFrames[m_iKeyFrameIndex].vScale);
-		vLeftRotation = XMLoadFloat4(&m_KeyFrames[m_iKeyFrameIndex].vRotation);
-		vLeftPosition = XMLoadFloat3(&m_KeyFrames[m_iKeyFrameIndex].vPosition);
-
-		vRightScale = XMLoadFloat3(&m_KeyFrames[m_iKeyFrameIndex+1].vScale);
-		vRightRotation = XMLoadFloat4(&m_KeyFrames[m_iKeyFrameIndex+1].vRotation);
-		vRightPosition = XMLoadFloat3(&m_KeyFrames[m_iKeyFrameIndex+1].vPosition);
-
-		vScale = XMVectorLerp(vLeftScale, vRightScale, fRatio);
-		vRotation = XMQuaternionSlerp(vLeftRotation, vRightRotation, fRatio);
-		vPosition = XMVectorSetW(XMVectorLerp(vLeftPosition, vRightPosition, fRatio), 1.f);
+		vScale = XMVectorLerp(XMLoadFloat3(&m_KeyFrames[*pCurrentKeyFrameIndex].vScale), XMLoadFloat3(&m_KeyFrames[*pCurrentKeyFrameIndex + 1].vScale), fRatio);
+		vRotation = XMQuaternionSlerp(XMLoadFloat4(&m_KeyFrames[*pCurrentKeyFrameIndex].vRotation), XMLoadFloat4(&m_KeyFrames[*pCurrentKeyFrameIndex + 1].vRotation), fRatio);
+		vPosition = XMVectorSetW(XMVectorLerp(XMLoadFloat3(&m_KeyFrames[*pCurrentKeyFrameIndex].vPosition), XMLoadFloat3(&m_KeyFrames[*pCurrentKeyFrameIndex + 1].vPosition), fRatio), 1.f);
 	}
+
+	_matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
+
+	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
+}
+
+void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition)
+{
+	_vector vScale, vRotation, vPosition;
+
+	_matrix PrevTransformationMatrix = Bones[m_iBoneIndex]->Get_TransformationMatrix();
+
+	_vector vPrevScale, vPrevRotation, vPrevPosition;
+
+	DirectX::XMMatrixDecompose(&vPrevScale, &vPrevRotation, &vPrevPosition, PrevTransformationMatrix);
+
+	_float fRatio = fCurrentTrackPosition / 2.f;
+
+	vScale = XMVectorLerp(vPrevScale, XMLoadFloat3(&m_KeyFrames[0].vScale), fRatio);
+	vRotation = XMQuaternionSlerp(vPrevRotation, XMLoadFloat4(&m_KeyFrames[0].vRotation), fRatio);
+	vPosition = XMVectorSetW(XMVectorLerp(vPrevPosition, XMLoadFloat3(&m_KeyFrames[0].vPosition), fRatio), 1.f);
 
 	_matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 

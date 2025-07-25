@@ -39,8 +39,10 @@ private:
 	_float							m_fLoadingRatio = {0.f};
 private:
 	HRESULT Loading_For_Logo_Level();
-	HRESULT Loading_For_GamePlay_Level();
 
+	HRESULT Loading_For_GamePlay_Level();
+	HRESULT Loading_For_GamePlay_MapModel();
+	
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, LEVEL eNextLevelID);
 	virtual void	Free() override;

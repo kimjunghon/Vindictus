@@ -14,16 +14,15 @@ private:
 public:
 	HRESULT Initialize(const aiNodeAnim* pAIChannel, const vector<CBone*>& Bones);
 	HRESULT Initialize(ifstream& File, const vector<CBone*>& Bones);
-	void	Update_TransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition);
-
+	void	Update_TransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex);
+	void	Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition);
 private:
 	_char				m_szName[MAX_PATH] = {};
 	_uint				m_iBoneIndex = {};
 	_uint				m_iNumKeyFrame = {};
 
-	_uint				m_iKeyFrameIndex = {};
 	vector<KEYFRAME>	m_KeyFrames;
-
+	
 public:
 	static CChannel*	Create(const aiNodeAnim* pAIChannel, const vector<CBone*>& Bones);
 	static CChannel*	Create(ifstream& File, const vector<CBone*>& Bones);

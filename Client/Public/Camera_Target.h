@@ -13,8 +13,9 @@ class CCamera_Target final : public CCamera
 {   
 public:
 	typedef struct tagCamera_Target_Dest : public CAMERA_DESC {
-		_float		fDistance;
-		CTransform* pTarget_TransformCom;
+		const _float4x4*	TargetMatrix;
+		_float				fDistance;
+		_float				fHeight;
 	}CAMERA_TARGET_DESC;
 
 private:
@@ -31,13 +32,13 @@ public:
 	virtual HRESULT Render() override;
 	
 public:
-	void Update_CameraPosition(_fvector vTargetPosition);
 
 private:
-	CTransform*		m_pTarget_TransformCom = { nullptr };
-	_float			m_fDistance = {};
-	_float			m_fRotateRadianX = {};
-	_float			m_fRotateRadianY = {};
+	const _float4x4*	m_TargetMatrix = {};
+	_float				m_fDistance = {};
+	_float				m_fHeight = {};
+	_float				m_fRotateRadianX = {};
+	_float				m_fRotateRadianY = {};
 
 
 public:

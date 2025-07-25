@@ -4,6 +4,8 @@
 #include <process.h>
 
 #include "Event_Struct.h"
+#include "../Default/AnimTable.h"
+
 
 namespace Client
 {

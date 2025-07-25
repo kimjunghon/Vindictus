@@ -1,0 +1,87 @@
+#include "ClientPch.h"
+#include "State_Smash3.h"
+#include "PlayerPawn.h"
+#include "StateFactory.h"
+
+CState_Smash3::CState_Smash3()
+{
+}
+
+HRESULT CState_Smash3::Initialize()
+{
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SMASH);
+	m_iActionFlag = ENUM_CLASS(SMASH_FLAG::SMASH3_0);
+	m_iMaxComboCount = 2;
+
+	return S_OK;
+}
+
+void CState_Smash3::Enter(CPlayerPawn* pPlayerPawn)
+{
+	ChangeActionFlag(ENUM_CLASS(SMASH_FLAG::SMASH3_0));
+
+	m_iComboCount = 0;
+}
+
+void CState_Smash3::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput)
+{
+	if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::SMASH) && false == pPlayerPawn->AnimIsFinished() && pPlayerPawn->AnimCanChange())
+	{
+		m_iComboCount++;
+		if (m_iComboCount >= m_iMaxComboCount)
+			m_iComboCount = m_iMaxComboCount;
+
+		ChangeActionFlag(m_iActionFlag << m_iComboCount);
+	}
+	else if (~ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::SMASH) && pPlayerPawn->AnimCanChange())
+	{
+		if (ActionInput.bAction && pPlayerPawn->AnimCanChange())
+		{
+			Find_ActionState(pPlayerPawn, ActionInput.byAction);
+		}
+		else if (MoveInput.bMove && pPlayerPawn->AnimCanChange())
+		{
+			pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::MOVE));
+		}
+	}
+	else if (pPlayerPawn->AnimIsFinished())
+	{
+		Change_OtherState(pPlayerPawn, MoveInput, ActionInput);
+	}
+}
+
+void CState_Smash3::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
+{
+}
+
+void CState_Smash3::Exit(CPlayerPawn* pPlayerPawn)
+{
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SMASH);
+	pPlayerPawn->Reset_ComboCount();
+}
+
+CState_Smash3* CState_Smash3::Create()
+{
+	CState_Smash3* pInstance = new CState_Smash3();
+	if (FAILED(pInstance->Initialize()))
+	{
+		MSG_BOX(TEXT("Failed Created : CState_Smash3"));
+		Safe_Release(pInstance);
+	}
+	return pInstance;
+}
+
+void CState_Smash3::Free()
+{
+	__super::Free();
+}
+
+namespace {
+	struct StateSmash2Register {
+		StateSmash2Register() {
+			CStateFactory::GetInstance()->Register(ENUM_CLASS(PLAYER_STATE::SMASH3), []()->CPlayerState* { return CState_Smash3::Create(); });
+		};
+
+	};
+	static StateSmash2Register RegisterIdle;
+}

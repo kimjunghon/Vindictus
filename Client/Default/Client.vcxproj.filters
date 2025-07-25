@@ -28,9 +28,6 @@
     <Filter Include="02.GameObject">
       <UniqueIdentifier>{13d34374-d51a-4b83-9983-e1a08fc692f0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Player">
-      <UniqueIdentifier>{7fe11105-edce-441a-bb5e-93f9ed77907c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObject\UIObject">
       <UniqueIdentifier>{12c19376-a6c9-4db0-95ca-b116485a18bb}</UniqueIdentifier>
     </Filter>
@@ -39,9 +36,6 @@
     </Filter>
     <Filter Include="02.GameObject\UIObject\Loading">
       <UniqueIdentifier>{fc7e9559-cc44-48d5-b0fb-55ccbd6ae479}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Camera">
-      <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
     </Filter>
     <Filter Include="02.GameObject\UIObject\GamePlay">
       <UniqueIdentifier>{e09314ea-c9cf-4170-9b10-fc01544610b5}</UniqueIdentifier>
@@ -76,6 +70,66 @@
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{5191c7ce-16b1-4664-9c92-827c72f29e2e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\MapObject">
+      <UniqueIdentifier>{639bf950-2ac8-4e65-bfca-1855b29a1905}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player">
+      <UniqueIdentifier>{e76ae3c2-b617-455a-9f85-87db20d7fe33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\Camera">
+      <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState">
+      <UniqueIdentifier>{9c5ababc-c939-4237-8bf0-78ed58b5efe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Idle">
+      <UniqueIdentifier>{4ada9e0c-e083-4662-831d-2b5c6f7df67c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Move">
+      <UniqueIdentifier>{7f0d4b68-c147-4e32-9aad-93d86d133fe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action">
+      <UniqueIdentifier>{074df14b-8afe-4ba1-a37c-75b49080f444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Attack">
+      <UniqueIdentifier>{8d39bad7-709e-4384-ba4f-6ea63b1f5f12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Smash">
+      <UniqueIdentifier>{5148baf3-bed3-4bca-aff5-ef973cb04bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Roll">
+      <UniqueIdentifier>{2765dfee-9bfc-4383-ab17-1b42a6701ce1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Guard">
+      <UniqueIdentifier>{b49bc489-9688-46f2-9bb8-aa5fdcfb07ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\AnimMachine">
+      <UniqueIdentifier>{225f42ad-e275-4cbd-aab0-9e91f7b06c3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerBody">
+      <UniqueIdentifier>{5325e74b-3782-48d9-a55e-3ddd265ebfdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\Factory">
+      <UniqueIdentifier>{335beab5-b4db-450a-90f7-61654d3a5d04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Smash\Smash0">
+      <UniqueIdentifier>{10e44a59-e3bf-43c5-98af-f38950efcf03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Smash\Smash1">
+      <UniqueIdentifier>{900ea364-329a-4dcf-9d5e-519d02914d18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Smash\Smash2">
+      <UniqueIdentifier>{70693b5b-b082-4c1d-ae48-74d11c02e8b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Smash\Smash3">
+      <UniqueIdentifier>{217a5d9e-29e0-4de5-b03d-753042d9a9db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\Smash\Smash4">
+      <UniqueIdentifier>{fbcf3960-2f16-49bb-921f-6d8abcfd8c79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerState\State_Action\HeavyStand">
+      <UniqueIdentifier>{eee2bfe9-de81-43da-ba21-65cdea455db1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -108,9 +162,6 @@
     <ClInclude Include="..\Public\Client_Defines.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Player.h">
-      <Filter>02.GameObject\Player</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Event_Struct.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
@@ -130,7 +181,7 @@
       <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Target.h">
-      <Filter>02.GameObject\Camera</Filter>
+      <Filter>02.GameObject\Player\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\public\HUD.h">
       <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
@@ -168,6 +219,57 @@
     <ClInclude Include="..\public\LoadingBack.h">
       <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\MapObject.h">
+      <Filter>02.GameObject\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerState.h">
+      <Filter>02.GameObject\Player\PlayerState</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Idle.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Move.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Attack.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Guard.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Guard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Roll.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Roll</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerPawn.h">
+      <Filter>02.GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerBody.h">
+      <Filter>02.GameObject\Player\PlayerBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StateFactory.h">
+      <Filter>02.GameObject\Player\PlayerState\Factory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerAnimMachine.h">
+      <Filter>02.GameObject\Player\AnimMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimTable.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Smash0.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash0</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Smash2.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Smash1.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash1</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Smash4.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash4</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Smash3.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -201,9 +303,6 @@
     <ClCompile Include="..\private\Level_Logo.cpp">
       <Filter>01.Levels\Logo</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Player.cpp">
-      <Filter>02.GameObject\Player</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\LoadingScreen.cpp">
       <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClCompile>
@@ -217,16 +316,13 @@
       <Filter>02.GameObject\UIObject\Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Target.cpp">
-      <Filter>02.GameObject\Camera</Filter>
+      <Filter>02.GameObject\Player\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\private\HUD.cpp">
       <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StateBar.cpp">
       <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="..\public\OptionMain.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay\Option</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ClientPch.cpp">
       <Filter>99.Defines</Filter>
@@ -254,6 +350,57 @@
     </ClCompile>
     <ClCompile Include="..\private\LoadingBack.cpp">
       <Filter>02.GameObject\UIObject\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MapObject.cpp">
+      <Filter>02.GameObject\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerState.cpp">
+      <Filter>02.GameObject\Player\PlayerState</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Idle.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Move.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Attack.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Guard.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Guard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Roll.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Roll</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerPawn.cpp">
+      <Filter>02.GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerBody.cpp">
+      <Filter>02.GameObject\Player\PlayerBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StateFactory.cpp">
+      <Filter>02.GameObject\Player\PlayerState\Factory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerAnimMachine.cpp">
+      <Filter>02.GameObject\Player\AnimMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\OptionMain.cpp">
+      <Filter>02.GameObject\UIObject\GamePlay\Option</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Smash0.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash0</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Smash2.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Smash1.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash1</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Smash4.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Smash3.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

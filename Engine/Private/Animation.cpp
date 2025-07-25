@@ -6,9 +6,27 @@ CAnimation::CAnimation()
 {
 }
 
+CAnimation::CAnimation(const CAnimation& Prototype)
+	: m_fDuration { Prototype.m_fDuration }
+	, m_fTickPerSecond{ Prototype.m_fTickPerSecond }
+	, m_fCurrentTrackPosition{ Prototype.m_fCurrentTrackPosition }
+	, m_iNumChannels{ Prototype.m_iNumChannels }
+	, m_fAnimChangeDelay{ Prototype.m_fAnimChangeDelay }
+	, m_Channels{ Prototype.m_Channels }
+	, m_CurrentKeyFrameIndices{ Prototype.m_CurrentKeyFrameIndices }
+{
+	for (auto& pChannel : m_Channels)
+		Safe_AddRef(pChannel);
+}
+
 HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones)
 {
+	m_fDuration = pAIAnimation->mDuration;
+	m_fTickPerSecond = pAIAnimation->mTicksPerSecond;
+
 	m_iNumChannels = pAIAnimation->mNumChannels;
+
+	m_CurrentKeyFrameIndices.resize(m_iNumChannels);
 
 	for (_uint i = 0; i < m_iNumChannels; i++)
 	{
@@ -29,6 +47,8 @@ HRESULT CAnimation::Initialize(ifstream& File, const vector<class CBone*>& Bones
 
 	File.read(reinterpret_cast<_char*>(&m_iNumChannels), sizeof(_uint));
 
+	m_CurrentKeyFrameIndices.resize(m_iNumChannels);
+
 	for (_uint i = 0; i < m_iNumChannels; i++)
 	{
 		CChannel* pChannel = CChannel::Create(File, Bones);
@@ -38,20 +58,62 @@ HRESULT CAnimation::Initialize(ifstream& File, const vector<class CBone*>& Bones
 		m_Channels.push_back(pChannel);
 	}
 
+	m_fAnimChangeDelay = 2.f;
+
 	return S_OK;
 }
 
-_bool CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _float fTimeDelta)
+void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta)
 {
+
 	m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
 
-	if (m_fCurrentTrackPosition >= m_fDuration)
-		m_fCurrentTrackPosition = 0.f;
+	if (m_bAnimChange)
+	{
+		if(m_fCurrentTrackPosition >= m_fAnimChangeDelay)
+		{
+			m_fCurrentTrackPosition = 0.f;
+			m_bAnimChange = false;
+		}
+		else
+		{
+			for (auto& pChannel : m_Channels)
+				pChannel->Update_AnimChangeTransformationMatrix(Bones, m_fCurrentTrackPosition);
+		}
+	}
+	else
+	{
+		if (m_fCurrentTrackPosition >= m_fDuration)
+		{
+			if (false == IsLoop)
+			{
+				*pFinished = true;
+				m_fCurrentTrackPosition = 0.f;
+				return;
+			}
+			else
+				m_fCurrentTrackPosition = 0.f;
+		}
 
-	for (auto& pChannel : m_Channels)
-		pChannel->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition);
+		for (_uint i =0; i< m_iNumChannels; i++)
+			m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i]);
 
-	return true;
+	}
+
+}
+
+_bool CAnimation::CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio)
+{
+	return (m_fCurrentTrackPosition / m_fDuration) >= fBeginRatio && (m_fCurrentTrackPosition / m_fDuration) <= fEndRatio;
+}
+
+void CAnimation::Enter()
+{
+	m_fCurrentTrackPosition = 0.f;
+	
+	fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);
+
+	m_bAnimChange = true;
 }
 
 CAnimation* CAnimation::Create(const aiAnimation* pAIAnimation, const vector<CBone*>& Bones)
@@ -76,11 +138,17 @@ CAnimation* CAnimation::Create(ifstream& File, const vector<CBone*>& Bones)
 	return pInstance;
 }
 
+CAnimation* CAnimation::Clone()
+{
+	return new CAnimation(*this);
+}
+
 void CAnimation::Free()
 {
 	__super::Free();
 
 	for (auto pChannel : m_Channels)
 		Safe_Release(pChannel);
+
 	m_Channels.clear();
 }

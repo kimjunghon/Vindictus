@@ -146,6 +146,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\PlayerAnimMachine.h" />
+    <ClInclude Include="..\public\PlayerBody.h" />
+    <ClInclude Include="..\public\PlayerPawn.h" />
+    <ClInclude Include="..\public\PlayerState.h" />
     <ClInclude Include="..\public\Background.h" />
     <ClInclude Include="..\public\Bar.h" />
     <ClInclude Include="..\public\Button.h" />
@@ -166,18 +170,35 @@
     <ClInclude Include="..\public\LoadingPoint.h" />
     <ClInclude Include="..\public\LoadingScreen.h" />
     <ClInclude Include="..\public\LogoScreen.h" />
+    <ClInclude Include="..\public\MapObject.h" />
     <ClInclude Include="..\public\OptionController.h" />
     <ClInclude Include="..\public\OptionMain.h" />
     <ClInclude Include="..\public\Panel.h" />
     <ClInclude Include="..\public\MainApp.h" />
-    <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\StateBar.h" />
+    <ClInclude Include="..\Public\StateFactory.h" />
+    <ClInclude Include="..\public\State_Attack.h" />
+    <ClInclude Include="..\public\State_Guard.h" />
+    <ClInclude Include="..\public\State_Idle.h" />
+    <ClInclude Include="..\public\State_Move.h" />
+    <ClInclude Include="..\public\State_Roll.h" />
+    <ClInclude Include="..\public\State_Smash0.h" />
+    <ClInclude Include="..\public\State_Smash1.h" />
+    <ClInclude Include="..\public\State_Smash2.h" />
+    <ClInclude Include="..\public\State_Smash3.h" />
+    <ClInclude Include="..\public\State_Smash4.h" />
+    <ClInclude Include="AnimTable.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\OptionMain.cpp" />
+    <ClCompile Include="..\private\PlayerAnimMachine.cpp" />
+    <ClCompile Include="..\private\PlayerBody.cpp" />
+    <ClCompile Include="..\private\PlayerPawn.cpp" />
+    <ClCompile Include="..\private\PlayerState.cpp" />
     <ClCompile Include="..\private\Background.cpp" />
     <ClCompile Include="..\private\Bar.cpp" />
     <ClCompile Include="..\private\Button.cpp" />
@@ -198,12 +219,22 @@
     <ClCompile Include="..\private\LoadingPoint.cpp" />
     <ClCompile Include="..\private\LoadingScreen.cpp" />
     <ClCompile Include="..\private\LogoScreen.cpp" />
+    <ClCompile Include="..\private\MapObject.cpp" />
     <ClCompile Include="..\private\OptionController.cpp" />
     <ClCompile Include="..\private\Panel.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
-    <ClCompile Include="..\private\Player.cpp" />
     <ClCompile Include="..\Private\StateBar.cpp" />
-    <ClCompile Include="..\public\OptionMain.cpp" />
+    <ClCompile Include="..\Private\StateFactory.cpp" />
+    <ClCompile Include="..\private\State_Attack.cpp" />
+    <ClCompile Include="..\private\State_Guard.cpp" />
+    <ClCompile Include="..\private\State_Idle.cpp" />
+    <ClCompile Include="..\private\State_Move.cpp" />
+    <ClCompile Include="..\private\State_Roll.cpp" />
+    <ClCompile Include="..\private\State_Smash0.cpp" />
+    <ClCompile Include="..\private\State_Smash1.cpp" />
+    <ClCompile Include="..\private\State_Smash2.cpp" />
+    <ClCompile Include="..\private\State_Smash3.cpp" />
+    <ClCompile Include="..\private\State_Smash4.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>

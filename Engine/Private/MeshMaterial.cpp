@@ -159,23 +159,10 @@ HRESULT CMeshMaterial::Initialize_Binary(const _char* pModelFilePath, ifstream& 
 			_char szFullFilePath[MAX_PATH] = {};
 
 			sprintf_s(szFullFilePath, "%s%s%s", szDrivePath, "Models/Textures/", TextureFileName);
-			
-			//_char szFullDrivePath[MAX_PATH] = {};
-			//
-			//strcpy_s(szFullDrivePath, pModelFilePath);
-			//
-			//_char szDrive[MAX_PATH] = {};
-			//_char szDir[MAX_PATH] = {};
-			//_splitpath_s(szFullDrivePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
-			//
-			//_char szFullFilePath[MAX_PATH] = {};
-			//
-			//
-			//sprintf_s(szFullFilePath, "%s%s%s%s", szDrive, szDir, "Textures/", TextureFileName);
 
 			_tchar szWideFullFilePath[MAX_PATH] = {};
 
-			MultiByteToWideChar(CP_UTF8, 0, szFullFilePath, -1, szWideFullFilePath, MAX_PATH);
+			MultiByteToWideChar(CP_UTF8, 0, szFullFilePath, static_cast<_int>(strlen(szFullFilePath)), szWideFullFilePath, MAX_PATH);
 
 			ID3D11ShaderResourceView* pSRV = { nullptr };
 
@@ -203,14 +190,16 @@ HRESULT CMeshMaterial::Initialize_Binary(const _char* pModelFilePath, ifstream& 
 }
 
 
-void CMeshMaterial::Bind_Material(CShader* pShader, const _char* pConstantName, _uint iSRVIndex, _uint iTextureType)
+_bool CMeshMaterial::Bind_Material(CShader* pShader, const _char* pConstantName, _uint iSRVIndex, _uint iTextureType)
 {
 	if (m_SRVs[iSRVIndex].size() <= 0)
 	{
-		return;
+		return false;
 	}
 
 	pShader->Bind_SPV(pConstantName, m_SRVs[iSRVIndex][iTextureType]);
+	
+	return true;
 }
 
 CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial)

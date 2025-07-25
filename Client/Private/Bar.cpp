@@ -77,6 +77,7 @@ HRESULT CBar::Render()
 
 	m_pVIBufferCom->Render();
 
+	return S_OK;
 }
 
 void CBar::Set_Ratio(_float fRatio)

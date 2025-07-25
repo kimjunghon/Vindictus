@@ -365,21 +365,21 @@ HRESULT CGameInstance::Change_Controller(_uint iChannelIndex, CController* pNewC
 {
     return m_pController_Manager->Change_Controller(iChannelIndex, pNewController);
 }
-HRESULT CGameInstance::MoveInput(INPUT_MOVE_DESC* pOut)
+HRESULT CGameInstance::MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut)
 {
-    return E_NOTIMPL;
+    return m_pController_Manager->MoveInput(iChannelIndex, pOut);
 }
-HRESULT CGameInstance::ActionInput(INPUT_ACTION_DESC* pOut)
+HRESULT CGameInstance::ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut)
 {
-    return E_NOTIMPL;
+    return m_pController_Manager->ActionInput(iChannelIndex, pOut);
 }
-HRESULT CGameInstance::CameraInput(INPUT_CAMERA_DESC* pOut)
+HRESULT CGameInstance::CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut)
 {
-    return E_NOTIMPL;
+    return m_pController_Manager->CameraInput(iChannelIndex, pOut);
 }
-HRESULT CGameInstance::UI_Input(INPUT_UI_DESC* pOut)
+HRESULT CGameInstance::UI_Input(_uint iChannelIndex, INPUT_UI_DESC* pOut)
 {
-    return E_NOTIMPL;
+    return m_pController_Manager->UI_Input(iChannelIndex, pOut);
 }
 #pragma endregion
 

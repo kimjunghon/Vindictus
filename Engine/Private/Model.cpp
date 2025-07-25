@@ -19,16 +19,20 @@ CModel::CModel(const CModel& Prototype)
     , m_Materials { Prototype.m_Materials }
     , m_pAIScene { Prototype.m_pAIScene }
     , m_PreTransformMatrix { Prototype.m_PreTransformMatrix}
-    , m_Bones { Prototype.m_Bones}
+    , m_iNumAnimation { Prototype.m_iNumAnimation }
+    , m_iRootBoneIndex{ Prototype.m_iRootBoneIndex }
 {
-    for (auto& pBone : m_Bones)
-        Safe_AddRef(pBone);
+    for (auto& pPrototypeBone : Prototype.m_Bones)
+        m_Bones.push_back(pPrototypeBone->Clone());
 
     for (auto& pMesh : m_Meshes)
         Safe_AddRef(pMesh);
 
     for (auto& pMaterials : m_Materials)
         Safe_AddRef(pMaterials);
+
+    for (auto& Pair : Prototype.m_Animations)
+        m_Animations.emplace(Pair.first, Pair.second->Clone());
 }
 
 
@@ -120,7 +124,7 @@ HRESULT CModel::Render(_uint iMeshIndex)
     return S_OK;
 }
 
-HRESULT CModel::Bind_Shader_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iSRVIndex, _uint iTextureType)
+HRESULT CModel::Bind_Shader_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iSRVIndex, _uint iTextureType, _bool* hasSPV)
 {
     if (iMeshIndex >= m_iNumMeshes)
         return E_FAIL;
@@ -130,7 +134,10 @@ HRESULT CModel::Bind_Shader_Material(class CShader* pShader, const _char* pConst
     if (iMaterialIndex >= m_iNumMaterials)
         return E_FAIL;
 
-    m_Materials[iMaterialIndex]->Bind_Material(pShader, pConstantName, iSRVIndex, iTextureType);
+    if(hasSPV)
+        *hasSPV = m_Materials[iMaterialIndex]->Bind_Material(pShader, pConstantName, iSRVIndex, iTextureType);
+    else
+        m_Materials[iMaterialIndex]->Bind_Material(pShader, pConstantName, iSRVIndex, iTextureType);
 
     return S_OK;
 }
@@ -143,13 +150,20 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
     return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
 }
 
-HRESULT CModel::Set_Animation(const string& strAnimationTag)
+HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 {
-    CAnimation* pAnimation = Find_Animation(strAnimationTag);
+    if (m_CurrentAnimData.strAnimKey == AnimData.strAnimKey)
+        return S_OK;
+
+    CAnimation* pAnimation = Find_Animation(AnimData.strAnimKey);
     if (nullptr == pAnimation)
         return E_FAIL;
 
     m_pCurrentAnimation = pAnimation;
+
+    m_pCurrentAnimation->Enter();
+
+    m_CurrentAnimData = AnimData;
 
     return S_OK;
 }
@@ -157,14 +171,31 @@ HRESULT CModel::Set_Animation(const string& strAnimationTag)
 _bool CModel::Play_Animation(_float fTimeDelta)
 {
     if(m_pCurrentAnimation)
-        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, fTimeDelta);
+    {
+        m_IsFinished = false;
+
+        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta);
+    }
+
+//    _vector vScale = {};
+//    _vector vRotation = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+//    _vector vPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+//    
+//    DirectX::XMMatrixDecompose(&vScale, &vRotation, &vPosition, m_Bones[m_iRootBoneIndex]->Get_TransformationMatrix());
+    
+//    vRotation = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+//    vPosition = XMVectorSet(vPosition., 0.f, 0.f, 1.f);
+
+//    _matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
+//
+//    m_Bones[m_iRootBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 
     for (auto& pBone : m_Bones)
     {
         pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
     }
 
-    return true;
+    return m_IsFinished;
 }
 
 HRESULT CModel::Save_Binary(const _wstring& strSaveFilePath)
@@ -477,6 +508,14 @@ HRESULT CModel::AnimationToBinary(ofstream& File)
     return S_OK;
 }
 
+_bool CModel::CanChangeAnimation()
+{
+    if (nullptr == m_pCurrentAnimation)
+        return true;
+
+    return m_pCurrentAnimation->CurrentAnim_InRangeOfRatio(m_CurrentAnimData.vRange.x, m_CurrentAnimData.vRange.y);
+}
+
 HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
 {
     CBone* pBone = CBone::Create(File, iParentIndex);
@@ -484,6 +523,12 @@ HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
         return E_FAIL;
 
     m_Bones.push_back(pBone);
+    
+    if(m_iRootBoneIndex == -1)
+    {
+        if (pBone->Compare_Name("ValveBiped.Bip01"))
+            m_iRootBoneIndex = static_cast<_uint>(m_Bones.size() - 1);
+    }
 
     _uint iIndex = static_cast<_uint>(m_Bones.size()) - 1;
 
