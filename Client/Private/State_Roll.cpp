@@ -25,25 +25,20 @@ void CState_Roll::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput,
 {
 	if (pPlayerPawn->AnimCanChange())
 		Change_OtherState(pPlayerPawn, MoveInput, ActionInput);
-
-	if (pPlayerPawn->AnimIsFinished())
-		pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::IDLE));
 }
 
 void CState_Roll::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 {
 //	if (m_eAnimPhase != ANIM_PHASE::END && pPlayerPawn->AnimIsFinished())
 //	{
-//		if (m_eAnimPhase == ANIM_PHASE::BEGIN)
+//		if(m_eAnimPhase == ANIM_PHASE::BEGIN)
 //		{
 //			m_eAnimPhase = ANIM_PHASE::DURING;
-//			ChangeActionFlag(ENUM_CLASS(ROLL_FLAG::ROLL_DURING));
-//		}
-//		else
-//		{
-//			m_eAnimPhase = ANIM_PHASE::END;
 //			ChangeActionFlag(ENUM_CLASS(ROLL_FLAG::ROLL_END));
 //		}
+//		else
+//			m_eAnimPhase = ANIM_PHASE::END;
+//
 //	}
 }
 

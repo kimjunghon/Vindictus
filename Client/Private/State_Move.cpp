@@ -18,6 +18,8 @@ void CState_Move::Enter(CPlayerPawn* pPlayerPawn)
 {
 	ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::DEFAULT));
 
+	pPlayerPawn->Run();
+
 	m_bStop = false;
 }
 
@@ -34,13 +36,18 @@ void CState_Move::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput,
 
 		m_bStop = true;
 	}
-	else if(MoveInput.bSprint)
+	else 
 	{
-		ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::SPRINT));
-	}
-	else
-	{
-		ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::DEFAULT));
+		if (MoveInput.bSprint)
+		{
+			pPlayerPawn->Sprint();
+			ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::SPRINT));
+		}
+		else
+		{
+			pPlayerPawn->Run();
+			ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::DEFAULT));
+		}
 	}
 }
 

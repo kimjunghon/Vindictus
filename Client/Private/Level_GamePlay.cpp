@@ -131,6 +131,7 @@ HRESULT CLevel_GamePlay::Ready_Player(const _wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_PlayerPawn"),
 		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+
 		return E_FAIL;
 
     return S_OK;

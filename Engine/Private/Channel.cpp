@@ -116,21 +116,24 @@ void CChannel::Update_TransformationMatrix(const vector<CBone*>& Bones, _float f
 	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }
 
-void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition)
+void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones, _float fRatio, _bool* pFirstCall)
 {
 	_vector vScale, vRotation, vPosition;
 
-	_matrix PrevTransformationMatrix = Bones[m_iBoneIndex]->Get_TransformationMatrix();
+	if(*pFirstCall)
+	{
+		if (m_iBoneIndex == 5)
+			int a = 10;
 
-	_vector vPrevScale, vPrevRotation, vPrevPosition;
+		_matrix PrevTransformationMatrix = Bones[m_iBoneIndex]->Get_TransformationMatrix();
+		
+		DirectX::XMMatrixDecompose(&m_vChangePrevScale, &m_vChangePrevRotation, &m_vChangePrevPosition, PrevTransformationMatrix);
+	}
 
-	DirectX::XMMatrixDecompose(&vPrevScale, &vPrevRotation, &vPrevPosition, PrevTransformationMatrix);
 
-	_float fRatio = fCurrentTrackPosition / 2.f;
-
-	vScale = XMVectorLerp(vPrevScale, XMLoadFloat3(&m_KeyFrames[0].vScale), fRatio);
-	vRotation = XMQuaternionSlerp(vPrevRotation, XMLoadFloat4(&m_KeyFrames[0].vRotation), fRatio);
-	vPosition = XMVectorSetW(XMVectorLerp(vPrevPosition, XMLoadFloat3(&m_KeyFrames[0].vPosition), fRatio), 1.f);
+	vScale = XMVectorLerp(m_vChangePrevScale, XMLoadFloat3(&m_KeyFrames[0].vScale), fRatio);
+	vRotation = XMQuaternionSlerp(m_vChangePrevRotation, XMLoadFloat4(&m_KeyFrames[0].vRotation), fRatio);
+	vPosition = XMVectorSetW(XMVectorLerp(m_vChangePrevPosition, XMLoadFloat3(&m_KeyFrames[0].vPosition), fRatio), 1.f);
 
 	_matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 

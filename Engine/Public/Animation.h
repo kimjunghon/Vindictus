@@ -30,6 +30,7 @@ private:
 	_uint				m_iNumChannels = {};
 
 	_bool				m_bAnimChange = {};
+	_bool				m_bAnimChangeFirstCall = {};
 	_float				m_fAnimChangeDelay = {};
 
 	vector<CChannel*>	m_Channels;

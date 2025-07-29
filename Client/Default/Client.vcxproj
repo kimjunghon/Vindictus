@@ -71,10 +71,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>../Bin/</OutDir>
+    <OutDir>../Bin/Debug/</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>../Bin/</OutDir>
+    <OutDir>../Bin/Release/</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -117,7 +117,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../EngineSDK/Lib/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/Debug/</AdditionalLibraryDirectories>
       <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile />
@@ -134,7 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>../Public/; ../../EngineSDK/Inc/</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../public/; ../../EngineSDK/Inc/</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ClientPch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -143,9 +143,20 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>../../EngineSDK/Lib/Release/</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\Armor.h" />
+    <ClInclude Include="..\public\BastardSword.h" />
+    <ClInclude Include="..\Public\Client_Struct.h" />
     <ClInclude Include="..\public\PlayerAnimMachine.h" />
     <ClInclude Include="..\public\PlayerBody.h" />
     <ClInclude Include="..\public\PlayerPawn.h" />
@@ -175,10 +186,12 @@
     <ClInclude Include="..\public\OptionMain.h" />
     <ClInclude Include="..\public\Panel.h" />
     <ClInclude Include="..\public\MainApp.h" />
+    <ClInclude Include="..\public\RoundShield.h" />
     <ClInclude Include="..\Public\StateBar.h" />
     <ClInclude Include="..\Public\StateFactory.h" />
     <ClInclude Include="..\public\State_Attack.h" />
     <ClInclude Include="..\public\State_Guard.h" />
+    <ClInclude Include="..\public\State_HeavyStand.h" />
     <ClInclude Include="..\public\State_Idle.h" />
     <ClInclude Include="..\public\State_Move.h" />
     <ClInclude Include="..\public\State_Roll.h" />
@@ -194,6 +207,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\Armor.cpp" />
+    <ClCompile Include="..\private\BastardSword.cpp" />
     <ClCompile Include="..\Private\OptionMain.cpp" />
     <ClCompile Include="..\private\PlayerAnimMachine.cpp" />
     <ClCompile Include="..\private\PlayerBody.cpp" />
@@ -223,10 +238,12 @@
     <ClCompile Include="..\private\OptionController.cpp" />
     <ClCompile Include="..\private\Panel.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
+    <ClCompile Include="..\private\RoundShield.cpp" />
     <ClCompile Include="..\Private\StateBar.cpp" />
     <ClCompile Include="..\Private\StateFactory.cpp" />
     <ClCompile Include="..\private\State_Attack.cpp" />
     <ClCompile Include="..\private\State_Guard.cpp" />
+    <ClCompile Include="..\private\State_HeavyStand.cpp" />
     <ClCompile Include="..\private\State_Idle.cpp" />
     <ClCompile Include="..\private\State_Move.cpp" />
     <ClCompile Include="..\private\State_Roll.cpp" />

@@ -29,16 +29,23 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 {
     m_pGraphic_Device = CGraphic_Device::Create(EngineDesc.hWnd, EngineDesc.eWinMode, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY, ppDevice, ppDeviceContext);
     if (nullptr == m_pGraphic_Device)
+    {
+        MSG_BOX(TEXT("GRAPIC"));
         return E_FAIL;
+    }
 
     m_pInput_Device = CInput_Device::Create(EngineDesc.hInst, EngineDesc.hWnd);
     if (nullptr == m_pInput_Device)
+    {
+        MSG_BOX(TEXT("INPUT"));
         return E_FAIL;
-
+    }
     m_pTimer_Manager = CTimer_Manager::Create();
     if (nullptr == m_pTimer_Manager)
+    {
+        MSG_BOX(TEXT("TIMER"));
         return E_FAIL;
-
+    }
     m_pRenderState = CRenderState::Create(*ppDevice, *ppDeviceContext);
     if (nullptr == m_pRenderState)
         return E_FAIL;

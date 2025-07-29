@@ -58,7 +58,7 @@ HRESULT CAnimation::Initialize(ifstream& File, const vector<class CBone*>& Bones
 		m_Channels.push_back(pChannel);
 	}
 
-	m_fAnimChangeDelay = 2.f;
+	m_fAnimChangeDelay = 0.2f;
 
 	return S_OK;
 }
@@ -66,30 +66,37 @@ HRESULT CAnimation::Initialize(ifstream& File, const vector<class CBone*>& Bones
 void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta)
 {
 
-	m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
-
 	if (m_bAnimChange)
 	{
+		m_fCurrentTrackPosition += fTimeDelta;
+
+		_float fRatio = m_fCurrentTrackPosition / m_fAnimChangeDelay;
+
 		if(m_fCurrentTrackPosition >= m_fAnimChangeDelay)
 		{
 			m_fCurrentTrackPosition = 0.f;
+
+			fRatio = 1.f;
+
 			m_bAnimChange = false;
 		}
-		else
-		{
-			for (auto& pChannel : m_Channels)
-				pChannel->Update_AnimChangeTransformationMatrix(Bones, m_fCurrentTrackPosition);
-		}
+
+		for (auto& pChannel : m_Channels)
+			pChannel->Update_AnimChangeTransformationMatrix(Bones, fRatio, &m_bAnimChangeFirstCall);
+
+		if (m_bAnimChangeFirstCall)
+			m_bAnimChangeFirstCall = false;
 	}
 	else
 	{
+		m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+
 		if (m_fCurrentTrackPosition >= m_fDuration)
 		{
 			if (false == IsLoop)
 			{
 				*pFinished = true;
-				m_fCurrentTrackPosition = 0.f;
-				return;
+				m_fCurrentTrackPosition = m_fDuration;
 			}
 			else
 				m_fCurrentTrackPosition = 0.f;
@@ -109,11 +116,12 @@ _bool CAnimation::CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRati
 
 void CAnimation::Enter()
 {
-	m_fCurrentTrackPosition = 0.f;
-	
 	fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);
 
+	m_fCurrentTrackPosition = 0.f;
+
 	m_bAnimChange = true;
+	m_bAnimChangeFirstCall = true;
 }
 
 CAnimation* CAnimation::Create(const aiAnimation* pAIAnimation, const vector<CBone*>& Bones)

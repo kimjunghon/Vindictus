@@ -47,6 +47,10 @@ public:
 		m_WorldMatrix = WorldMatrix;
 	}
 
+	void Set_WorldMatrix(_fmatrix WorldMatrix) {
+		XMStoreFloat4x4(&m_WorldMatrix, WorldMatrix);
+	}
+
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -62,6 +66,7 @@ public:
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);
 	void Rotation(_fvector vAxis, _float fRadian);
+	void RotateQuaternion(_fvector Quaternion);
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void LookAt(_fvector vAt);
 	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);

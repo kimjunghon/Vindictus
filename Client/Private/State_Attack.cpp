@@ -11,6 +11,8 @@ HRESULT CState_Attack::Initialize()
 {
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
+	m_fKeepTime = 1.f;
+
 	return S_OK;
 }
 
@@ -20,45 +22,79 @@ void CState_Attack::Enter(CPlayerPawn* pPlayerPawn)
 
 	pPlayerPawn->Increase_ComboCount();
 
+	m_bSmash = false;
+
 	ChangeActionFlag(ENUM_CLASS(ATTACK_FLAG::COMBO1));
 }
 
 void CState_Attack::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput)
 {
-	if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::ATTACK) && pPlayerPawn->AnimCanChange())
+	if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::ATTACK) || m_bAttack)
 	{
-		_uint iComboCount = pPlayerPawn->Get_ComboCount();
+		if(pPlayerPawn->AnimCanChange())
+		{
+			m_bAttack = false;
 
-		if (iComboCount >= 4)
-			return;
+			if (MoveInput.bMove)
+				pPlayerPawn->Compute_PlayerMoveDir();
 
-		pPlayerPawn->Increase_ComboCount();
-		iComboCount++;
+			_uint iComboCount = pPlayerPawn->Get_ComboCount();
 
-		_uint iFlag = ENUM_CLASS(ATTACK_FLAG::COMBO1) << (iComboCount - 1);
+			if (iComboCount >= 4)
+				return;
 
-		ChangeActionFlag(iFlag);
+			pPlayerPawn->Increase_ComboCount();
+			iComboCount++;
 
+			_uint iFlag = ENUM_CLASS(ATTACK_FLAG::COMBO1) << (iComboCount - 1);
+
+			ChangeActionFlag(iFlag);
+		}
+		else
+		{
+			if (false == m_bAttack)
+			{
+				m_bAttack = true;
+				m_fCurrentKeepTime = 0.f;
+			}
+		}
 	}
-	else if (ActionInput.bAction && pPlayerPawn->AnimCanChange())
+	else 
 	{
-		Find_ActionState(pPlayerPawn, ActionInput.byAction);
+		if (ActionInput.bAction && pPlayerPawn->AnimCanChange())
+		{
+			if (MoveInput.bMove)
+				pPlayerPawn->Compute_PlayerMoveDir();
+
+			Find_ActionState(pPlayerPawn, ActionInput.byAction);
+		}
+		else if (MoveInput.bMove && pPlayerPawn->AnimIsFinished() && false == ActionInput.bAction)
+		{
+			pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::MOVE));
+		}
+
+		else if (pPlayerPawn->AnimIsFinished())
+			pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::IDLE));
 	}
-	else if (MoveInput.bMove && pPlayerPawn->AnimCanChange())
-	{
-		pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::MOVE));
-	}
-	else if(pPlayerPawn->AnimIsFinished())
-		pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::IDLE));
 }
 
 void CState_Attack::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 {
+	if (m_bAttack)
+	{
+		m_fCurrentKeepTime += fTimeDelta;
+		if (m_fCurrentKeepTime >= m_fKeepTime)
+			m_bAttack = false;
+	}
 }
 
 void CState_Attack::Exit(CPlayerPawn* pPlayerPawn)
 {
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+
+	pPlayerPawn->Reset_ComboCount();
+
+	m_bSmash = false;
 }
 
 CState_Attack* CState_Attack::Create()

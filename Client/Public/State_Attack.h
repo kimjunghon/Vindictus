@@ -17,8 +17,11 @@ public:
 	virtual void	Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta);
 	virtual void	Exit(CPlayerPawn* pPlayerPawn) override;
 
-
-
+private:
+	_bool			m_bAttack = {};
+	_bool			m_bSmash = {};
+	_float			m_fKeepTime = {};
+	_float			m_fCurrentKeepTime = {};
 public:
 	static CState_Attack*	Create();
 	virtual void			Free() override;

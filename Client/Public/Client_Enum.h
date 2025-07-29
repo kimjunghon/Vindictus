@@ -9,4 +9,6 @@ namespace Client
 
 	enum class ACTION_INPUT { ATTACK = 1<<0, SMASH = 1<<1, GUARD = 1<<2, ROLL = 1<<3, HEAVYSTAND = 1<<4};
 	enum class ANIM_PHASE { BEGIN, DURING, END};
+	enum class ARMOR_TYPE { HEAD, UPPER, LOWER, HAND, FOOT, END};
+	enum class ARMOR_STATE { DEFAULT, BROKEN, END };
 }

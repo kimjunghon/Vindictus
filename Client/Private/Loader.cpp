@@ -13,6 +13,9 @@
 #include "Camera_Target.h"
 #include "PlayerPawn.h"
 #include "PlayerBody.h"
+#include "BastardSword.h"
+#include "RoundShield.h"
+#include "Armor.h"
 
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: m_pDevice { pDevice}
@@ -247,6 +250,22 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Piona.dat", PreTransformMatrix))))
 		return E_FAIL;
 
+	/* Prototype_Component_Model_BastardSword */
+	PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BastardSword"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Sword_Bastard.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_RoundShield */
+	PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_RoundShield"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/RoundShield.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(Loading_For_GamePlay_ArmorModel()))
+		return E_FAIL;
 
 	if (FAILED(Loading_For_GamePlay_MapModel()))
 		return E_FAIL;
@@ -294,25 +313,40 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 		return E_FAIL;
 #pragma endregion
 
-	/* Prototype_Component_Model_Player */
+	/* Prototype_GameObject_Camera_Target */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Target"),
 		CCamera_Target::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Prototype_Component_Model_Player */
+	/* Prototype_GameObject_MapObject */
 	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_MapObject"),
 		CMapObject::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_PawnObject_Player_Body"),
+	/* Prototype_GameObject_Player_Body */
+	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player_Body"),
 		CPlayerBody::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Prototype_Component_Model_Player */
+	/* Prototype_GameObject_PlayerPawn */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_PlayerPawn"),
 		CPlayerPawn::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_GameObject_BastardSword */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_BastardSword"),
+		CBastardSword::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_RoundShield */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_RoundShield"),
+		CRoundShield::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Armor */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"),
+		CArmor::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 #pragma endregion
 
 
@@ -383,6 +417,58 @@ HRESULT CLoader::Loading_For_GamePlay_MapModel()
 			return E_FAIL;
 	}
 
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_GamePlay_ArmorModel()
+{
+	/* Prototype_Component_Model_LightMale_Foot */
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Foot"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Foot.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_LightMale_Foot_Broken */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Foot_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Foot_Broken.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_LightMale_Hand */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Hand"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Hand.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_LightMale_Hand_Broken */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Hand_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Hand_Broken.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_LightMale_Head */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Head"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Head.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_LightMale_Lower */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Lower"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Lower.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_LightMale_Lower_Broken */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Lower_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Lower_Broken.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_LightMale_Upper */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Upper"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_LightMale_Upper_Broken */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Upper_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper_Broken.dat", PreTransformMatrix))))
+		return E_FAIL;
 
 	return S_OK;
 }

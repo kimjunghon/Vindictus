@@ -94,6 +94,13 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 	Set_State(STATE::LOOK, XMVector4Transform(vLook, RotationMatrix));
 }
 
+void CTransform::RotateQuaternion(_fvector Quaternion)
+{
+	_matrix Rotation = XMMatrixRotationQuaternion(Quaternion);
+
+	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixMultiply(Rotation, XMLoadFloat4x4(&m_WorldMatrix)));
+}
+
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)
 {
 	_vector vRight = Get_State(STATE::RIGHT);

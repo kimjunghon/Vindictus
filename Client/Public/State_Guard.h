@@ -15,6 +15,10 @@ public:
 	virtual void	InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput) override;
 	virtual void	Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta);
 	virtual void	Exit(CPlayerPawn* pPlayerPawn) override;
+
+private:
+	_bool			m_bGuardEnd = {};
+	_bool			m_bGuardBegin = {};
 public:
 	static CState_Guard*	Create();
 	virtual void			Free() override;

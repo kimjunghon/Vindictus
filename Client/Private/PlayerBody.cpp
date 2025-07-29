@@ -26,8 +26,16 @@ HRESULT CPlayerBody::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	BODY_DESC* pDesc = static_cast<BODY_DESC*>(pArg);
+	m_pStateFlag = pDesc->pStateFlag;
+
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
+
+	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
+
+	m_pGameInstance->Subscribe<EVENT_BROKEN_HEAD>(ENUM_CLASS(LEVEL::GAMEPLAY), [&](const EVENT_BROKEN_HEAD& Event) {
+		this->UnEquipHead(); });
 
 	return S_OK;
 }
@@ -38,13 +46,14 @@ void CPlayerBody::Priority_Update(_float fTimeDelta)
 
 void CPlayerBody::Update(_float fTimeDelta)
 {
-	m_pAnimMachine->Set_Animation(m_pModelCom, m_iStateFlag);
+	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
 
 	m_pModelCom->Play_Animation(fTimeDelta);
 }
 
 void CPlayerBody::Late_Update(_float fTimeDelta)
 {
+
 	if(FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
 }
@@ -58,6 +67,10 @@ HRESULT CPlayerBody::Render()
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
+		if (m_IsEquipHead && i == 5)
+			continue;
+
+
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
 
@@ -66,15 +79,11 @@ HRESULT CPlayerBody::Render()
 
 		m_pShaderCom->Begin(0);
 
+
 		m_pModelCom->Render(i);
 	}
 
 	return S_OK;
-}
-
-void CPlayerBody::Bind_PawnData(void* pData)
-{
-	m_iStateFlag = *(static_cast<_uint*>(pData));
 }
 
 HRESULT CPlayerBody::Ready_Components()
@@ -96,7 +105,7 @@ HRESULT CPlayerBody::Ready_Components()
 
 HRESULT CPlayerBody::Bind_ShaderResources()
 {
-	if (FAILED(m_pTransformCom->Bind_Shader_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pPawnMatrix)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))

@@ -42,6 +42,7 @@ private:
 
 	HRESULT Loading_For_GamePlay_Level();
 	HRESULT Loading_For_GamePlay_MapModel();
+	HRESULT Loading_For_GamePlay_ArmorModel();
 	
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, LEVEL eNextLevelID);

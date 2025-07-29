@@ -48,15 +48,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    CMainApp* pMain = CMainApp::Create();
-    if (nullptr == pMain)
-        return FALSE;
 
     CGameInstance* pGameInstance = CGameInstance::GetInstance();
     if (nullptr == pGameInstance)
         return FALSE;
 
     Safe_AddRef(pGameInstance);
+
+    CMainApp* pMain = CMainApp::Create();
+    if (nullptr == pMain)
+        return FALSE;
+
 
     if (FAILED(pGameInstance->Add_Timer(TEXT("Timer_Default"))))
         return E_FAIL;

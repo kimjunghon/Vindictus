@@ -1,11 +1,12 @@
 #include "ClientPch.h"
 #include "PlayerPawn.h"
-#include "PawnObject.h"
+#include "SocketObject.h"
 #include "Camera_Target.h"
 #include "GameInstance.h"
 #include "PlayerState.h"
 #include "StateFactory.h"
 #include "PlayerBody.h"
+#include "Armor.h"
 
 CPlayerPawn::CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CPawn { pDevice, pDeviceContext }
@@ -42,12 +43,18 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	if (FAILED(Ready_States()))
 		return E_FAIL;
 
+	m_vPlayerMoveDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+
+	m_fSpeed = 10.f;
+
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::DEFAULT);
+
 	return S_OK;
 }
 
 void CPlayerPawn::Priority_Update(_float fTimeDelta)
 {
-	Bind_InputData();
+	Bind_InputData(fTimeDelta);
 
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Priority_Update(fTimeDelta);
@@ -63,8 +70,11 @@ void CPlayerPawn::Update(_float fTimeDelta)
 
 void CPlayerPawn::Late_Update(_float fTimeDelta)
 {
+	Compute_WorldMatrix();
+
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
+
 }
 
 HRESULT CPlayerPawn::Render()
@@ -90,18 +100,56 @@ void CPlayerPawn::Change_State(_uint iStateIndex)
 
 _bool CPlayerPawn::AnimIsFinished()
 {
-	CPlayerBody* pPlayerBody = static_cast<CPlayerBody*>(Find_PawnObject(TEXT("Player_Body")));
-	if (nullptr == pPlayerBody)
-		return false;
-	return pPlayerBody->AnimIsFinished();
+	return m_pPlayerBody->AnimIsFinished();
 }
 
 _bool CPlayerPawn::AnimCanChange()
 {
-	CPlayerBody* pPlayerBody = static_cast<CPlayerBody*>(Find_PawnObject(TEXT("Player_Body")));
-	if (nullptr == pPlayerBody)
-		return false;
-	return pPlayerBody->AnimCanChange();
+	return m_pPlayerBody->AnimCanChange();
+}
+
+void CPlayerPawn::Compute_PlayerMoveDir()
+{ 
+	m_vPlayerMoveDir = m_pCamera->Compute_PlayerMoveDir(m_MoveInput.vDir);
+}
+
+HRESULT CPlayerPawn::EquipArmor(const _wstring& strArmorTag, CArmor* pArmor, ARMOR_TYPE eArmorType)
+{
+	if (nullptr == pArmor || eArmorType == ARMOR_TYPE::END)
+		return E_FAIL;
+
+	if (eArmorType == ARMOR_TYPE::HEAD)
+		m_pPlayerBody->EquipHead();
+
+	if (m_strEquipArmors[ENUM_CLASS(eArmorType)].size() > 0)
+		UnEquipArmor(eArmorType);
+
+	m_strEquipArmors[ENUM_CLASS(eArmorType)] = strArmorTag;
+	
+	pArmor->Equip(m_pPlayerBody->Get_ParentModelPtr());
+
+	Add_PawnObject(strArmorTag, pArmor);
+
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::UnEquipArmor(ARMOR_TYPE eArmorType)
+{
+	if (FAILED(Remove_PawnObject(m_strEquipArmors[ENUM_CLASS(eArmorType)])))
+		return E_FAIL;
+
+	m_strEquipArmors[ENUM_CLASS(eArmorType)].clear();
+
+	return S_OK;
+}
+
+void CPlayerPawn::Move(_float fTimeDelta)
+{
+	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+
+	vPosition = XMVectorAdd(vPosition, XMVectorScale(m_vPlayerMoveDir, m_fSpeed * m_fSpeedRatio * fTimeDelta));
+
+	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 }
 
 HRESULT CPlayerPawn::Ready_Components()
@@ -121,10 +169,9 @@ HRESULT CPlayerPawn::Ready_Camera()
 	CameraDesc.fSpeedPerSec = 0.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 100.f;
+	CameraDesc.fDistance = 50.f;
 	CameraDesc.fHeight = 30.f;
 	CameraDesc.TargetMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-
 
 	CCamera* pCamera = { nullptr };
 
@@ -144,11 +191,98 @@ HRESULT CPlayerPawn::Ready_Camera()
 
 HRESULT CPlayerPawn::Ready_PawnObjects()
 {
-	CPawnObject::PAWNOBJECT_DESC PawnObjectDesc = {};
-	PawnObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-
-	if(FAILED(__super::Add_PawnObject(TEXT("Player_Body"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_PawnObject_Player_Body"), &PawnObjectDesc)))
+	if (FAILED(Ready_PlayerBody()))
 		return E_FAIL;
+
+	if (FAILED(Ready_Weapons()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Armors()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::Ready_PlayerBody()
+{
+	CPlayerBody::BODY_DESC PlayerBodyDesc = {};
+	PlayerBodyDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	PlayerBodyDesc.pStateFlag = &m_iStateFlag;
+
+	if (FAILED(__super::Add_PawnObject(TEXT("Player_Body"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player_Body"), &PlayerBodyDesc)))
+		return E_FAIL;
+
+	m_pPlayerBody = static_cast<CPlayerBody*>(Find_PawnObject(TEXT("Player_Body")));
+	if (nullptr == m_pPlayerBody)
+		return E_FAIL;
+
+	m_pAnimMovement = m_pPlayerBody->Get_AnimMovementPtr();
+	if (nullptr == m_pAnimMovement)
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::Ready_Weapons()
+{
+	CSocketObject::SOCKETOBJECT_DESC SocketObjectDesc = {};
+	SocketObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	SocketObjectDesc.pSocketMatrix = m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH");
+
+	if (FAILED(__super::Add_PawnObject(TEXT("Bastard_Sword"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_BastardSword"), &SocketObjectDesc)))
+		return E_FAIL;
+
+	SocketObjectDesc.pSocketMatrix = m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_LF");
+
+	if (FAILED(__super::Add_PawnObject(TEXT("Round_Shield"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_RoundShield"), &SocketObjectDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::Ready_Armors()
+{
+	CArmor::ARMOR_DESC ArmorDesc = {};
+	ArmorDesc.eArmorType = ARMOR_TYPE::UPPER;
+	ArmorDesc.iArmorModelPrototypeLevelIndex = ENUM_CLASS(LEVEL::GAMEPLAY);
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Upper");
+	ArmorDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	ArmorDesc.tArmorInfo = { 10.f, 5.f, 30.f };
+
+	CArmor* pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+	if (nullptr == pArmor)
+		return E_FAIL;
+
+	EquipArmor(TEXT("LightMale_Upper"), pArmor, ARMOR_TYPE::UPPER);
+
+
+	ArmorDesc.eArmorType = ARMOR_TYPE::LOWER;
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Lower");
+	pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+
+	EquipArmor(TEXT("LightMale_Lower"), pArmor, ARMOR_TYPE::LOWER);
+
+
+	ArmorDesc.eArmorType = ARMOR_TYPE::HAND;
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Hand");
+	pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+
+	EquipArmor(TEXT("LightMale_Hand"), pArmor, ARMOR_TYPE::HAND);
+
+
+	ArmorDesc.eArmorType = ARMOR_TYPE::HEAD;
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Head");
+	pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+
+	EquipArmor(TEXT("LightMale_Head"), pArmor, ARMOR_TYPE::HEAD);
+
+
+	ArmorDesc.eArmorType = ARMOR_TYPE::FOOT;
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Foot");
+	pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+
+	EquipArmor(TEXT("LightMale_Foot"), pArmor, ARMOR_TYPE::FOOT);
+
 
 	return S_OK;
 }
@@ -167,6 +301,8 @@ HRESULT CPlayerPawn::Ready_States()
 	m_States[ENUM_CLASS(PLAYER_STATE::SMASH2)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::SMASH2));
 	m_States[ENUM_CLASS(PLAYER_STATE::SMASH3)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::SMASH3));
 	m_States[ENUM_CLASS(PLAYER_STATE::SMASH4)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::SMASH4));
+	m_States[ENUM_CLASS(PLAYER_STATE::GUARD)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::GUARD));
+	m_States[ENUM_CLASS(PLAYER_STATE::HEAVYSTAND)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::HEAVYSTAND));
 	m_States[ENUM_CLASS(PLAYER_STATE::ROLL)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::ROLL));
 
 	Safe_Release(pStateFactory);
@@ -176,23 +312,55 @@ HRESULT CPlayerPawn::Ready_States()
 	return S_OK;
 }
 
-void CPlayerPawn::Bind_InputData()
+void CPlayerPawn::Compute_WorldMatrix()
+{
+	_float3 vScale = m_pTransformCom->Get_Scaled();
+	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vAnimPosition = *m_pAnimMovement;
+	
+	vAnimPosition = XMVectorSwizzle(vAnimPosition, XM_SWIZZLE_X, XM_SWIZZLE_Z, XM_SWIZZLE_Y, XM_SWIZZLE_W);
+
+	_vector vAnimPosScale = XMVectorSet(0.3f, 0.f, -0.3f, 1.f);
+
+	_float fAngle = atan2f(XMVectorGetX(m_vPlayerMoveDir), XMVectorGetZ(m_vPlayerMoveDir));
+	_matrix RotationMatrix = XMMatrixRotationY(fAngle);
+
+	vAnimPosition = XMVectorMultiply(vAnimPosition, vAnimPosScale);
+
+	vAnimPosition = XMVector3Transform(vAnimPosition, RotationMatrix);
+
+	vPosition = XMVectorAdd(vPosition, vAnimPosition);
+
+	_matrix ScaleMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&vScale));
+	_matrix PositionMatrix = XMMatrixTranslationFromVector(vPosition);
+
+	_matrix WorldMatrix = XMMatrixMultiply(XMMatrixMultiply(ScaleMatrix, RotationMatrix), PositionMatrix);
+
+	m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+}
+
+void CPlayerPawn::Bind_InputData(_float fTimeDelta)
 {
 	m_pGameInstance->MoveInput(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), &m_MoveInput);
 	m_pGameInstance->ActionInput(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), &m_ActionInput);
 	m_pGameInstance->CameraInput(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), &m_CameraInput);
+
 
 	if (m_pCurrentState)
 	{
 		m_pCurrentState->InputData(this, m_MoveInput, m_ActionInput);
 
 		m_pCurrentState->Bind_StateFlag(m_iStateFlag);
-
-		for (auto& Pair : m_PawnObjects)
-		{
-			Pair.second->Bind_PawnData(&m_iStateFlag);
-		}
 	}
+
+	m_pCamera->Bind_InputData(m_CameraInput);
+	
+	if(m_MoveInput.bMove && m_pCurrentState->CanMove())
+	{
+		Compute_PlayerMoveDir();
+		Move(fTimeDelta);
+	}
+
 }
 
 CPlayerPawn* CPlayerPawn::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

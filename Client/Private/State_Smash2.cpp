@@ -28,24 +28,16 @@ void CState_Smash2::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInpu
 
 	if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::SMASH) && false == pPlayerPawn->AnimIsFinished() && pPlayerPawn->AnimCanChange())
 	{
+		if (MoveInput.bMove)
+			pPlayerPawn->Compute_PlayerMoveDir();
+
 		m_iComboCount++;
 		if (m_iComboCount >= m_iMaxComboCount)
 			m_iComboCount = m_iMaxComboCount;
 
 		ChangeActionFlag(m_iActionFlag << m_iComboCount);
 	}
-	else if(~ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::SMASH)  && pPlayerPawn->AnimCanChange())
-	{
-		if (ActionInput.bAction && pPlayerPawn->AnimCanChange())
-		{
-			Find_ActionState(pPlayerPawn, ActionInput.byAction);
-		}
-		else if (MoveInput.bMove && pPlayerPawn->AnimCanChange())
-		{
-			pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::MOVE));
-		}
-	}
-	else if (pPlayerPawn->AnimIsFinished())
+	else
 	{
 		Change_OtherState(pPlayerPawn, MoveInput, ActionInput);
 	}

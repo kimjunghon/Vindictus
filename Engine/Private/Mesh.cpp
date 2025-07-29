@@ -31,8 +31,8 @@ HRESULT CMesh::Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMes
 
 	if (FAILED(hr))
 		return E_FAIL;
-
 	D3D11_BUFFER_DESC	IBDesc{};
+
 	IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
 	IBDesc.Usage = D3D11_USAGE_DEFAULT;
 	IBDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -126,10 +126,7 @@ HRESULT CMesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, c
 {
 	for (_uint i = 0; i < m_iNumBones; i++)
 	{
-		if (!strcmp("SWORD", m_szName))
-			int a = 10;
 		XMStoreFloat4x4(&m_BoneMatrices[i], XMMatrixMultiply(XMLoadFloat4x4(&m_OffsetMatrices[i]), Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrix()));
-
 	}
 
 	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);

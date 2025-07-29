@@ -124,29 +124,38 @@
     <Filter Include="01.Utility\95.RenderState">
       <UniqueIdentifier>{22729498-d04a-4011-88b8-f9cc8da3f65b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\04.Component\Model">
-      <UniqueIdentifier>{4dbf24dc-4062-4bf4-8437-29c3cb7d5fa9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\04.Component\Model\Mesh">
-      <UniqueIdentifier>{80b9c40f-300c-444a-9581-3e20d1ca0f90}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\04.Component\Model\Material">
-      <UniqueIdentifier>{ebc2d2e3-7977-4421-ae4c-a9faff374810}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\04.Component\Model\Bone">
-      <UniqueIdentifier>{7fa83ec5-6533-4030-b502-af8b50576f48}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\04.Component\Model\Animation">
-      <UniqueIdentifier>{acc0f1d3-4a14-4093-948f-3d2b9052361a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Utility\04.Component\Model\Animation\Channel">
-      <UniqueIdentifier>{900a0d21-5ecc-4372-98cf-bef9b073f4f9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\03.GameObject\Pawn">
       <UniqueIdentifier>{bee2f6bf-0702-43e3-bd5d-6b306ee92b78}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Utility\03.GameObject\Pawn\PawnObject">
       <UniqueIdentifier>{4bf7e90b-c36f-4b86-9221-c77b2741745a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.GameObject\Pawn\PawnObject\SocketObject">
+      <UniqueIdentifier>{6e4599ab-8519-4730-b994-bb773c8495a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Models">
+      <UniqueIdentifier>{4dbf24dc-4062-4bf4-8437-29c3cb7d5fa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Models\Mesh">
+      <UniqueIdentifier>{80b9c40f-300c-444a-9581-3e20d1ca0f90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Models\Material">
+      <UniqueIdentifier>{ebc2d2e3-7977-4421-ae4c-a9faff374810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Models\Bone">
+      <UniqueIdentifier>{7fa83ec5-6533-4030-b502-af8b50576f48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Models\Animation">
+      <UniqueIdentifier>{acc0f1d3-4a14-4093-948f-3d2b9052361a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Models\Animation\Channel">
+      <UniqueIdentifier>{900a0d21-5ecc-4372-98cf-bef9b073f4f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Models\EquipModel">
+      <UniqueIdentifier>{61e4c4ed-a9e9-44c0-9f48-eb3698ef317a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Models\Model">
+      <UniqueIdentifier>{2a0f8936-b037-4542-9f45-9e1713569a31}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -277,10 +286,10 @@
       <Filter>01.Utility\04.Component</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Mesh.h">
-      <Filter>01.Utility\04.Component\Model\Mesh</Filter>
+      <Filter>01.Utility\04.Component\Models\Mesh</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MeshMaterial.h">
-      <Filter>01.Utility\04.Component\Model\Material</Filter>
+      <Filter>01.Utility\04.Component\Models\Material</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RenderState.h">
       <Filter>01.Utility\95.RenderState</Filter>
@@ -289,25 +298,28 @@
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Bone.h">
-      <Filter>01.Utility\04.Component\Model\Bone</Filter>
+      <Filter>01.Utility\04.Component\Models\Bone</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Light_Manager.h">
       <Filter>01.Utility\96.Light\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Animation.h">
-      <Filter>01.Utility\04.Component\Model\Animation</Filter>
+      <Filter>01.Utility\04.Component\Models\Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Channel.h">
-      <Filter>01.Utility\04.Component\Model\Animation\Channel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Model.h">
-      <Filter>01.Utility\04.Component\Model</Filter>
+      <Filter>01.Utility\04.Component\Models\Animation\Channel</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Pawn.h">
       <Filter>01.Utility\03.GameObject\Pawn</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PawnObject.h">
       <Filter>01.Utility\03.GameObject\Pawn\PawnObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SocketObject.h">
+      <Filter>01.Utility\03.GameObject\Pawn\PawnObject\SocketObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Model.h">
+      <Filter>01.Utility\04.Component\Models\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -416,35 +428,38 @@
     <ClCompile Include="..\private\Component.cpp">
       <Filter>01.Utility\04.Component</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Model.cpp">
-      <Filter>01.Utility\04.Component\Model</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Mesh.cpp">
-      <Filter>01.Utility\04.Component\Model\Mesh</Filter>
+      <Filter>01.Utility\04.Component\Models\Mesh</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MeshMaterial.cpp">
-      <Filter>01.Utility\04.Component\Model\Material</Filter>
+      <Filter>01.Utility\04.Component\Models\Material</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RenderState.cpp">
       <Filter>01.Utility\95.RenderState</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Bone.cpp">
-      <Filter>01.Utility\04.Component\Model\Bone</Filter>
+      <Filter>01.Utility\04.Component\Models\Bone</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Light_Manager.cpp">
       <Filter>01.Utility\96.Light\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Animation.cpp">
-      <Filter>01.Utility\04.Component\Model\Animation</Filter>
+      <Filter>01.Utility\04.Component\Models\Animation</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Channel.cpp">
-      <Filter>01.Utility\04.Component\Model\Animation\Channel</Filter>
+      <Filter>01.Utility\04.Component\Models\Animation\Channel</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pawn.cpp">
       <Filter>01.Utility\03.GameObject\Pawn</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PawnObject.cpp">
       <Filter>01.Utility\03.GameObject\Pawn\PawnObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SocketObject.cpp">
+      <Filter>01.Utility\03.GameObject\Pawn\PawnObject\SocketObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Model.cpp">
+      <Filter>01.Utility\04.Component\Models\Model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

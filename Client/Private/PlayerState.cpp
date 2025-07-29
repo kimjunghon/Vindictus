@@ -6,6 +6,15 @@ CPlayerState::CPlayerState()
 {
 }
 
+_bool CPlayerState::CanMove()
+{
+	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::IDLE) ||
+		m_iStateFlag & ENUM_CLASS(STATE_FLAG::MOVE))
+		return true;
+
+	return false;
+}
+
 HRESULT CPlayerState::Initialize()
 {
 	return S_OK;
@@ -31,12 +40,16 @@ void CPlayerState::Change_OtherState(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC M
 {
 	if (ActionInput.bAction && pPlayerPawn->AnimCanChange())
 	{
+		if (MoveInput.bMove)
+			pPlayerPawn->Compute_PlayerMoveDir();
+
 		Find_ActionState(pPlayerPawn, ActionInput.byAction);
 	}
-	else if (MoveInput.bMove && pPlayerPawn->AnimCanChange())
+	else if (MoveInput.bMove && pPlayerPawn->AnimCanChange() && false == ActionInput.bAction)
 	{
 		pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::MOVE));
 	}
+
 	else if (pPlayerPawn->AnimIsFinished())
 		pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::IDLE));
 }

@@ -31,6 +31,7 @@ void CState_Smash1::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 void CState_Smash1::Exit(CPlayerPawn* pPlayerPawn)
 {
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SMASH);
+	pPlayerPawn->Reset_ComboCount();
 }
 
 CState_Smash1* CState_Smash1::Create()

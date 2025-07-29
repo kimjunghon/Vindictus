@@ -24,4 +24,8 @@ namespace Client
 	{
 		_byte byVisibleType;
 	}EVENT_UI_CHANGE;
+
+	typedef struct tagEventBrokenHead final : public CEvent
+	{}EVENT_BROKEN_HEAD;
+
 }

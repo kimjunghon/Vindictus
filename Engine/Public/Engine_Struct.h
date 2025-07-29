@@ -27,7 +27,9 @@ namespace Engine
 
 	typedef struct tagInputCameraDesc
 	{
+		bool		bRotate;
 		XMFLOAT2	vCameraRotate;
+		float		fDistance;
 	}INPUT_CAMERA_DESC;
 
 	typedef struct tagInputUIDesc 
@@ -142,6 +144,7 @@ namespace Engine
 		string		strAnimKey;
 		bool		IsLoop;
 		XMFLOAT2	vRange;
+		float		fAnimSpeed;
 	}ANIM_DATA;
 
 }

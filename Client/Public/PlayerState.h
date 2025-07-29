@@ -14,7 +14,8 @@ protected:
 	virtual ~CPlayerState() = default;
 
 public:
-	void Bind_StateFlag(_uint& iStateFlag) { iStateFlag = m_iStateFlag; }
+	void			Bind_StateFlag(_uint& iStateFlag) { iStateFlag = m_iStateFlag; }
+	_bool			CanMove();
 public:
 	virtual HRESULT Initialize();
 	virtual void	Enter(CPlayerPawn* pPlayerPawn);

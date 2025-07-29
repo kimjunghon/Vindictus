@@ -8,6 +8,8 @@ CController_KeyBoard::CController_KeyBoard()
 
 HRESULT CController_KeyBoard::Initialize()
 {
+    m_fSensor = 1.f;
+
     return S_OK;
 }
 
@@ -89,18 +91,25 @@ HRESULT CController_KeyBoard::CameraInput(INPUT_CAMERA_DESC* pOut)
         return E_FAIL;
 
     INPUT_CAMERA_DESC CameraDesc = {};
+    CameraDesc.bRotate = false;
 
     if (m_pGameInstance->Get_KeyDown(DIK_Q) || m_pGameInstance->Get_KeyPressing(DIK_Q))
-        CameraDesc.vCameraRotate.x -= m_fSensor;
+        CameraDesc.vCameraRotate.x += m_fSensor;
 
     if (m_pGameInstance->Get_KeyDown(DIK_E) || m_pGameInstance->Get_KeyPressing(DIK_E))
-        CameraDesc.vCameraRotate.x += m_fSensor;
+        CameraDesc.vCameraRotate.x -= m_fSensor;
 
     if (m_pGameInstance->Get_KeyDown(DIK_R) || m_pGameInstance->Get_KeyPressing(DIK_R))
         CameraDesc.vCameraRotate.y += m_fSensor;
 
     if (m_pGameInstance->Get_KeyDown(DIK_F) || m_pGameInstance->Get_KeyPressing(DIK_F))
         CameraDesc.vCameraRotate.y -= m_fSensor;
+
+    if (XMVectorGetX(XMVector2Length(XMLoadFloat2(&CameraDesc.vCameraRotate))) > 0.f)
+        CameraDesc.bRotate = true;
+
+    CameraDesc.fDistance = static_cast<_float>(m_pGameInstance->Get_MouseMove(MOUSEMOVESTATE::WHEEL));
+
 
     *pOut = CameraDesc;
 
@@ -114,7 +123,13 @@ HRESULT CController_KeyBoard::UI_Input(INPUT_UI_DESC* pOut)
 
 CController_KeyBoard* CController_KeyBoard::Create()
 {
-    return new CController_KeyBoard();
+    CController_KeyBoard* pInstance = new CController_KeyBoard();
+    if (FAILED(pInstance->Initialize()))
+    {
+        MSG_BOX(TEXT("Failed Created : CController_KeyBoard"));
+        Safe_Release(pInstance);
+    }
+    return pInstance;
 }
 
 void CController_KeyBoard::Free()

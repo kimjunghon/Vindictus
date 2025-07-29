@@ -23,6 +23,7 @@
 #include <RapidJson/stringbuffer.h>
 #include <RapidJson//istreamwrapper.h>
 #include "Json/json.hpp"
+
 using Json = nlohmann::json;
 using namespace rapidjson;
 using namespace DirectX;

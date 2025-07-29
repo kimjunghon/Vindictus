@@ -110,6 +110,7 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
 
 HRESULT CModel::Initialize(void* pArg)
 {
+    
 	return S_OK;
 }
 
@@ -150,6 +151,14 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
     return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
 }
 
+HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, vector<CBone*>& Bones)
+{
+    if (iMeshIndex >= m_iNumMeshes)
+        return E_FAIL;
+
+    return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, Bones);
+}
+
 HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 {
     if (m_CurrentAnimData.strAnimKey == AnimData.strAnimKey)
@@ -165,6 +174,8 @@ HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 
     m_CurrentAnimData = AnimData;
 
+    m_vPrevRootPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+
     return S_OK;
 }
 
@@ -174,21 +185,11 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     {
         m_IsFinished = false;
 
-        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta);
+        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed);
     }
 
-//    _vector vScale = {};
-//    _vector vRotation = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-//    _vector vPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-//    
-//    DirectX::XMMatrixDecompose(&vScale, &vRotation, &vPosition, m_Bones[m_iRootBoneIndex]->Get_TransformationMatrix());
-    
-//    vRotation = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-//    vPosition = XMVectorSet(vPosition., 0.f, 0.f, 1.f);
-
-//    _matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
-//
-//    m_Bones[m_iRootBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
+    if (m_iRootBoneIndex != -1)
+        Compute_RootBoneMovement();
 
     for (auto& pBone : m_Bones)
     {
@@ -196,6 +197,15 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     }
 
     return m_IsFinished;
+}
+
+void CModel::Bind_ParentBone(vector<CBone*>& ParentBones)
+{
+    for (auto& pBone : m_Bones)
+    {
+        pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, ParentBones);
+    }
+
 }
 
 HRESULT CModel::Save_Binary(const _wstring& strSaveFilePath)
@@ -516,6 +526,40 @@ _bool CModel::CanChangeAnimation()
     return m_pCurrentAnimation->CurrentAnim_InRangeOfRatio(m_CurrentAnimData.vRange.x, m_CurrentAnimData.vRange.y);
 }
 
+void CModel::Compute_RootBoneMovement()
+{
+    _vector vScale = {};
+    _vector vRotation = {};
+    _vector vPosition = {};
+
+    XMMatrixDecompose(&vScale, &vRotation, &vPosition, m_Bones[m_iRootBoneIndex]->Get_TransformationMatrix());
+
+    m_vAnimMovement = XMVectorSubtract(vPosition, m_vPrevRootPosition);
+    
+    m_vPrevRootPosition = vPosition;
+
+    vPosition = XMVectorSetX(vPosition, 0.f);
+    vPosition = XMVectorSetY(vPosition, 0.f);
+
+    _matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
+
+    m_Bones[m_iRootBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
+}
+
+const _float4x4* CModel::Find_SocketBoneCombinedMatrix(const string& strSocketBoneName)
+{
+    auto iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CBone* pBone) {
+        if (true == pBone->Compare_Name(strSocketBoneName.c_str()))
+            return true;
+        return false;
+        });
+
+    if(iter == m_Bones.end())
+        return nullptr;
+
+    return (*iter)->Get_CombinedTransformationMatrixPtr();
+}
+
 HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
 {
     CBone* pBone = CBone::Create(File, iParentIndex);
@@ -639,6 +683,12 @@ HRESULT CModel::Ready_Bones(const aiNode* pAINode, _int iParentIndex)
         return E_FAIL;
 
     m_Bones.push_back(pBone);
+
+    if (m_iRootBoneIndex == -1)
+    {
+        if (pBone->Compare_Name("ValveBiped.Bip01"))
+            m_iRootBoneIndex = static_cast<_uint>(m_Bones.size() - 1);
+    }
 
     _int iIndex = static_cast<_int>(m_Bones.size()) - 1;
 

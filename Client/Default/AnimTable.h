@@ -76,7 +76,8 @@ namespace Client
 	enum class ROLL_FLAG {
 		ROLL_BEGIN	= 1 << 8,
 		ROLL_DURING	= 1 << 9,
-		ROLL_END	= 1 << 10
+		ROLL_END	= 1 << 10,
+		ROLL_RUN	= 1 << 11
 	};
 
 //////////////HIT//////////////

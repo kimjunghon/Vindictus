@@ -21,10 +21,13 @@ public:
 	virtual HRESULT Render() override;
 
 protected:
-	map<const _wstring, CPawnObject*>		m_PawnObjects;
+	unordered_map<_wstring, CPawnObject*>		m_PawnObjects;
 
 protected:
 	HRESULT			Add_PawnObject(const _wstring& strPawnObjectTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	HRESULT			Add_PawnObject(const _wstring& strPawnObjectTag, CPawnObject* pPawnObject);
+	HRESULT			Remove_PawnObject(const _wstring& strPawnObjectTag);
+
 	CPawnObject*	Find_PawnObject(const _wstring& strPawnObjectTag);
 
 public:

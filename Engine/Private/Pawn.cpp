@@ -6,6 +6,7 @@
 CPawn::CPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CGameObject { pDevice, pDeviceContext }
 {
+	
 }
 
 CPawn::CPawn(const CPawn& Prototype)
@@ -50,14 +51,32 @@ HRESULT CPawn::Add_PawnObject(const _wstring& strPawnObjectTag, _uint iPrototype
 {
 	if (nullptr != Find_PawnObject(strPawnObjectTag))
 		return E_FAIL;
-	
-	
 
 	CPawnObject* pPawnObject = dynamic_cast<CPawnObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strPrototypeTag, pArg));
 	if (nullptr == pPawnObject)
 		return E_FAIL;
 
 	m_PawnObjects.emplace(strPawnObjectTag, pPawnObject);
+	
+	return S_OK;
+}
+
+HRESULT CPawn::Add_PawnObject(const _wstring& strPawnObjectTag, CPawnObject* pPawnObject)
+{
+	if (nullptr == pPawnObject)
+		return E_FAIL;
+
+	m_PawnObjects.emplace(strPawnObjectTag, pPawnObject);
+
+	return S_OK;
+}
+
+HRESULT CPawn::Remove_PawnObject(const _wstring& strPawnObjectTag)
+{
+	if (nullptr == Find_PawnObject(strPawnObjectTag))
+		return E_FAIL;
+
+	m_PawnObjects.erase(strPawnObjectTag);
 
 	return S_OK;
 }

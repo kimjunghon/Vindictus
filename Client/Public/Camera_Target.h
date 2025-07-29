@@ -32,13 +32,22 @@ public:
 	virtual HRESULT Render() override;
 	
 public:
+	void			Bind_InputData(const INPUT_CAMERA_DESC& CameraInput);
+	_vector			Compute_PlayerMoveDir(_vector vInputDir);
 
 private:
 	const _float4x4*	m_TargetMatrix = {};
 	_float				m_fDistance = {};
+	_float				m_fMinDistance = {};
+	_float				m_fMaxDistance = {};
+	
+	_float				m_fCurrentRotateY = {};
 	_float				m_fHeight = {};
-	_float				m_fRotateRadianX = {};
-	_float				m_fRotateRadianY = {};
+
+	_vector				m_vLook = {};
+	_vector				m_vPosition = {};
+	_float				m_fPitch = {};
+	_float				m_fYaw = {};
 
 
 public:

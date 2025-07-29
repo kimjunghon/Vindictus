@@ -30,14 +30,20 @@ HRESULT CMainApp::Initialize()
 	EngineDesc.iNumLevels = ENUM_CLASS(LEVEL::END);
 	
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pDeviceContext)))
+	{
+		MSG_BOX(TEXT("ENGINE"));
 		return E_FAIL;
-
+	}
 	if (FAILED(Ready_Prototype_ForStatic()))
+	{
+		MSG_BOX(TEXT("STATIC"));
 		return E_FAIL;
-
+	}
 	if (FAILED(Start_Level(LEVEL::LOGO)))
+	{
+		MSG_BOX(TEXT("LOGO"));
 		return E_FAIL;
-
+	}
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 

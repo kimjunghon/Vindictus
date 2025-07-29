@@ -71,7 +71,7 @@ HRESULT CMapObject::Render()
 
 		m_pModelCom->Render(i);
 
-		m_pShaderCom->Bind_SPV("g_Texture", nullptr);
+		m_pShaderCom->Bind_SPV("g_DiffuseTexture", nullptr);
 	}
 
 	return S_OK;

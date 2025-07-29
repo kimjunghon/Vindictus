@@ -103,9 +103,6 @@
     <Filter Include="02.GameObject\Player\PlayerState\State_Action\Guard">
       <UniqueIdentifier>{b49bc489-9688-46f2-9bb8-aa5fdcfb07ee}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Player\AnimMachine">
-      <UniqueIdentifier>{225f42ad-e275-4cbd-aab0-9e91f7b06c3e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.GameObject\Player\PlayerBody">
       <UniqueIdentifier>{5325e74b-3782-48d9-a55e-3ddd265ebfdc}</UniqueIdentifier>
     </Filter>
@@ -129,6 +126,24 @@
     </Filter>
     <Filter Include="02.GameObject\Player\PlayerState\State_Action\HeavyStand">
       <UniqueIdentifier>{eee2bfe9-de81-43da-ba21-65cdea455db1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\Sword">
+      <UniqueIdentifier>{bb5b346c-11b1-41ae-bd18-cd2d7523df64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\Sword\BastardSword">
+      <UniqueIdentifier>{29d67f86-ad4b-482e-b7f3-994660d2360d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\Shield">
+      <UniqueIdentifier>{a64da96d-c1a5-4d30-87b3-0e5b06c7c906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\Shield\RoundShield">
+      <UniqueIdentifier>{15fe760a-64dc-436a-9670-8ada20414c0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\PlayerBody\AnimMachine">
+      <UniqueIdentifier>{225f42ad-e275-4cbd-aab0-9e91f7b06c3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.GameObject\Player\Armor">
+      <UniqueIdentifier>{09e49895-4a60-4d26-9390-7e100e3dc131}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -250,7 +265,7 @@
       <Filter>02.GameObject\Player\PlayerState\Factory</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerAnimMachine.h">
-      <Filter>02.GameObject\Player\AnimMachine</Filter>
+      <Filter>02.GameObject\Player\PlayerBody\AnimMachine</Filter>
     </ClInclude>
     <ClInclude Include="AnimTable.h">
       <Filter>99.Defines</Filter>
@@ -269,6 +284,21 @@
     </ClInclude>
     <ClInclude Include="..\public\State_Smash3.h">
       <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash3</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_HeavyStand.h">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\HeavyStand</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BastardSword.h">
+      <Filter>02.GameObject\Player\Sword\BastardSword</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RoundShield.h">
+      <Filter>02.GameObject\Player\Shield\RoundShield</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Armor.h">
+      <Filter>02.GameObject\Player\Armor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Client_Struct.h">
+      <Filter>99.Defines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -382,7 +412,7 @@
       <Filter>02.GameObject\Player\PlayerState\Factory</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerAnimMachine.cpp">
-      <Filter>02.GameObject\Player\AnimMachine</Filter>
+      <Filter>02.GameObject\Player\PlayerBody\AnimMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\OptionMain.cpp">
       <Filter>02.GameObject\UIObject\GamePlay\Option</Filter>
@@ -401,6 +431,18 @@
     </ClCompile>
     <ClCompile Include="..\private\State_Smash3.cpp">
       <Filter>02.GameObject\Player\PlayerState\State_Action\Smash\Smash3</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_HeavyStand.cpp">
+      <Filter>02.GameObject\Player\PlayerState\State_Action\HeavyStand</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BastardSword.cpp">
+      <Filter>02.GameObject\Player\Sword\BastardSword</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RoundShield.cpp">
+      <Filter>02.GameObject\Player\Shield\RoundShield</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Armor.cpp">
+      <Filter>02.GameObject\Player\Armor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

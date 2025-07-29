@@ -16,31 +16,39 @@ private:
 	virtual ~CModel() = default;
 
 public:
-	_uint			Get_NumMeshes() const { return m_iNumMeshes; }
+	_uint				Get_NumMeshes() const { return m_iNumMeshes; }
 
-	_float4x4		Get_PreTransformMatrix() const { return m_PreTransformMatrix; }
-	void			Set_PreTransformMatrix(_fmatrix PreTransformMatrix) { XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix); }
-
-public:
-	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
-	virtual HRESULT Initialize(void* pArg);
-	HRESULT			Render(_uint iMeshIndex);
-
-	HRESULT			Bind_Shader_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iSRVIndex, _uint iTextureType, _bool* hasSPV = nullptr);
-	HRESULT			Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
-
-	HRESULT			Set_Animation(const ANIM_DATA& AnimData);
-	_bool			Play_Animation(_float fTimeDelta);
-
-	HRESULT			Save_Binary(const _wstring& strSaveFilePath);
-	HRESULT			BonesToBinary(ofstream& File, const aiNode* pAINode);
-	HRESULT			MeshesToBinary(ofstream& File);
-	HRESULT			MaterialToBinary(ofstream& File);
-	HRESULT			AnimationToBinary(ofstream& File);
+	_float4x4			Get_PreTransformMatrix() const { return m_PreTransformMatrix; }
+	void				Set_PreTransformMatrix(_fmatrix PreTransformMatrix) { XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix); }
 
 public:
-	_bool			CanChangeAnimation();
-	_bool			CurrentAnim_Finished() { return m_IsFinished; }
+	virtual HRESULT		Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
+	virtual HRESULT		Initialize(void* pArg);
+	HRESULT				Render(_uint iMeshIndex);
+
+	HRESULT				Bind_Shader_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iSRVIndex, _uint iTextureType, _bool* hasSPV = nullptr);
+	HRESULT				Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
+	HRESULT				Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, vector<CBone*>& Bones);
+	HRESULT				Set_Animation(const ANIM_DATA& AnimData);
+	_bool				Play_Animation(_float fTimeDelta);
+	void				Bind_ParentBone(vector<CBone*>& ParentBones);
+
+	HRESULT				Save_Binary(const _wstring& strSaveFilePath);
+	HRESULT				BonesToBinary(ofstream& File, const aiNode* pAINode);
+	HRESULT				MeshesToBinary(ofstream& File);
+	HRESULT				MaterialToBinary(ofstream& File);
+	HRESULT				AnimationToBinary(ofstream& File);
+
+public:
+	_bool				CanChangeAnimation();
+	_bool				CurrentAnim_Finished() { return m_IsFinished; }
+
+	void				Compute_RootBoneMovement();
+
+	const _float4x4*	Find_SocketBoneCombinedMatrix(const string& strSocketBoneName);
+	const _vector*		Get_AnimMovementPtr() { return &m_vAnimMovement; }
+
+	vector<CBone*>&		Get_Bones() { return m_Bones; }
 
 private:
 	const aiScene*				m_pAIScene = { nullptr };
@@ -58,7 +66,7 @@ private:
 
 private:
 	vector<CBone*>				m_Bones;
-	_int						m_iRootBoneIndex = { -1};
+	_int						m_iRootBoneIndex = { -1 };
 
 private:
 	CAnimation*					m_pCurrentAnimation = { nullptr };
@@ -70,7 +78,8 @@ private:
 	_bool						m_bAnimChange = {};	
 	_bool						m_IsFinished = {};
 
-	
+	_vector						m_vPrevRootPosition = {};
+	_vector						m_vAnimMovement = {};
 private:
 	CAnimation* Find_Animation(const string& strAnimationTag);
 #pragma region FBX
