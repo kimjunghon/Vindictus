@@ -1,35 +1,26 @@
 #pragma once
-#include "Client_Defines.h"
-#include "Base.h"
+#include "AnimMachine.h"
 
-NS_BEGIN(Engine)
-class CModel;
-NS_END
+using namespace Player;
 
 NS_BEGIN(Client)
 
-class CPlayerAnimMachine final : public CBase
+class CPlayerAnimMachine final : public CAnimMachine
 {
 private:
 	CPlayerAnimMachine();
 	virtual ~CPlayerAnimMachine() = default;
 
-
 public:
-	void	Initialize();
-	void	Initialize_IDLE();
-	void	Initialize_MOVE();
-	void	Initialize_ATTACK();
-	void	Initialize_SMASH();
-	void	Initialize_GUARD();
-	void	Initialize_HEAVYSTAND();
-	void	Initialize_ROLL();
-	void	Initialize_HIT();
-
-	HRESULT Set_Animation(CModel* pModelCom, _uint iState);
-
-private:
-	unordered_map<_uint, ANIM_DATA> m_AnimDatas;
+	virtual void	Initialize();
+	void			Initialize_IDLE();
+	void			Initialize_MOVE();
+	void			Initialize_ATTACK();
+	void			Initialize_SMASH();
+	void			Initialize_GUARD();
+	void			Initialize_HEAVYSTAND();
+	void			Initialize_ROLL();
+	void			Initialize_HIT();
 
 public:
 	static CPlayerAnimMachine*	Create();

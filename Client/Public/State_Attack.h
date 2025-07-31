@@ -18,8 +18,8 @@ public:
 	virtual void	Exit(CPlayerPawn* pPlayerPawn) override;
 
 private:
-	_bool			m_bAttack = {};
-	_bool			m_bSmash = {};
+	_bool			m_bReadyAttack = {};
+
 	_float			m_fKeepTime = {};
 	_float			m_fCurrentKeepTime = {};
 public:

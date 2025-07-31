@@ -45,6 +45,7 @@ private:
 	_float				m_fHeight = {};
 
 	_vector				m_vLook = {};
+	_vector				m_vTargetPosition = {};
 	_vector				m_vPosition = {};
 	_float				m_fPitch = {};
 	_float				m_fYaw = {};

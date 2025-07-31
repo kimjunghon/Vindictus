@@ -38,6 +38,7 @@ public:
 
 	HRESULT			EquipArmor(const _wstring& strArmorTag, CArmor* pArmor, ARMOR_TYPE eArmorType);
 	HRESULT			UnEquipArmor(ARMOR_TYPE eArmorType);
+
 private:
 	CPlayerBody*			m_pPlayerBody = { nullptr };
 	CCamera_Target*			m_pCamera = { nullptr };
@@ -52,10 +53,16 @@ private:
 
 	_float					m_fSpeed = {};
 	_float					m_fSpeedRatio = {};
+
 	_uint					m_iStateFlag = {};
 	_uint					m_iComboCount = {};
 	_vector					m_vPlayerMoveDir = {};
+	
+	_vector					m_vPlayerRoationQuat = {};
+	_vector					m_vPrevPlayerRotationQuat = {};
+	
 	const _vector*			m_pAnimMovement = {};
+	const _vector*			m_pAnimRotation = {};
 
 private:
 	HRESULT Ready_Components();

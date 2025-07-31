@@ -43,11 +43,11 @@ public:
 	_bool				CanChangeAnimation();
 	_bool				CurrentAnim_Finished() { return m_IsFinished; }
 
-	void				Compute_RootBoneMovement();
+	void				RootMotion();
 
 	const _float4x4*	Find_SocketBoneCombinedMatrix(const string& strSocketBoneName);
 	const _vector*		Get_AnimMovementPtr() { return &m_vAnimMovement; }
-
+	const _vector*		Get_AnimRotationPtr() { return &m_vAnimRotation; }
 	vector<CBone*>&		Get_Bones() { return m_Bones; }
 
 private:
@@ -80,6 +80,8 @@ private:
 
 	_vector						m_vPrevRootPosition = {};
 	_vector						m_vAnimMovement = {};
+	_vector						m_vAnimRotation = {};
+
 private:
 	CAnimation* Find_Animation(const string& strAnimationTag);
 #pragma region FBX

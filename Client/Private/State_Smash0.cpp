@@ -38,6 +38,7 @@ void CState_Smash0::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInpu
 		{
 			ChangeActionFlag(ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END));
 			m_bSmashEnd = true;
+			m_fChargeTime = 0.f;
 		}
 		else
 		{
@@ -53,6 +54,7 @@ void CState_Smash0::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInpu
 			ChangeActionFlag(ENUM_CLASS(SMASH_FLAG::SMASH0));
 
 		m_bSmashEnd = true;
+		m_fChargeTime = 0.f;
 	}
 }
 

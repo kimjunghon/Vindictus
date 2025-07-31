@@ -170,11 +170,11 @@ HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 
     m_pCurrentAnimation = pAnimation;
 
+    m_vPrevRootPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+
     m_pCurrentAnimation->Enter();
 
     m_CurrentAnimData = AnimData;
-
-    m_vPrevRootPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 
     return S_OK;
 }
@@ -185,15 +185,18 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     {
         m_IsFinished = false;
 
-        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed);
+        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed, m_vPrevRootPosition);
     }
 
-    if (m_iRootBoneIndex != -1)
-        Compute_RootBoneMovement();
-
-    for (auto& pBone : m_Bones)
+    
+    for(_uint i =0; i< m_Bones.size(); i++)
     {
-        pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+        m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+
+        if (m_iRootBoneIndex != -1 && i == m_iRootBoneIndex)
+        {
+            RootMotion();
+        }
     }
 
     return m_IsFinished;
@@ -526,24 +529,26 @@ _bool CModel::CanChangeAnimation()
     return m_pCurrentAnimation->CurrentAnim_InRangeOfRatio(m_CurrentAnimData.vRange.x, m_CurrentAnimData.vRange.y);
 }
 
-void CModel::Compute_RootBoneMovement()
+void CModel::RootMotion()
 {
     _vector vScale = {};
     _vector vRotation = {};
     _vector vPosition = {};
 
-    XMMatrixDecompose(&vScale, &vRotation, &vPosition, m_Bones[m_iRootBoneIndex]->Get_TransformationMatrix());
+    XMMatrixDecompose(&vScale, &vRotation, &vPosition, m_Bones[m_iRootBoneIndex]->Get_CombinedTransformationMatrix());
 
-    m_vAnimMovement = XMVectorSubtract(vPosition, m_vPrevRootPosition);
-    
+    m_vAnimMovement = XMVectorSetY(XMVectorSubtract(vPosition, m_vPrevRootPosition), 0.f);
+
+    m_vAnimRotation = vRotation;
+
     m_vPrevRootPosition = vPosition;
 
     vPosition = XMVectorSetX(vPosition, 0.f);
-    vPosition = XMVectorSetY(vPosition, 0.f);
+    vPosition = XMVectorSetZ(vPosition, 0.f);
 
-    _matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
+    _matrix CombinedTransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 
-    m_Bones[m_iRootBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
+    m_Bones[m_iRootBoneIndex]->Set_CombinedTransformationMatrix(CombinedTransformationMatrix);
 }
 
 const _float4x4* CModel::Find_SocketBoneCombinedMatrix(const string& strSocketBoneName)

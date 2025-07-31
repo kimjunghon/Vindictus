@@ -11,3 +11,6 @@ Engine/Bin
 Engine/Default/x64
 EngineSDK
 Engine/Public/RapidJson
+x64
+Client/Bin/Debug
+Client/Bin/Release

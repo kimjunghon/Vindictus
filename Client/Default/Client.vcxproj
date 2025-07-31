@@ -154,9 +154,15 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\public\AnimMachine.h" />
     <ClInclude Include="..\public\Armor.h" />
     <ClInclude Include="..\public\BastardSword.h" />
+    <ClInclude Include="..\public\Body.h" />
     <ClInclude Include="..\Public\Client_Struct.h" />
+    <ClInclude Include="..\public\Glasgavelen.h" />
+    <ClInclude Include="..\public\GlasgavelenBody.h" />
+    <ClInclude Include="..\public\GlasgavelenSword.h" />
+    <ClInclude Include="..\public\Monster.h" />
     <ClInclude Include="..\public\PlayerAnimMachine.h" />
     <ClInclude Include="..\public\PlayerBody.h" />
     <ClInclude Include="..\public\PlayerPawn.h" />
@@ -186,6 +192,8 @@
     <ClInclude Include="..\public\OptionMain.h" />
     <ClInclude Include="..\public\Panel.h" />
     <ClInclude Include="..\public\MainApp.h" />
+    <ClInclude Include="..\public\Queen.h" />
+    <ClInclude Include="..\public\Queen_Body.h" />
     <ClInclude Include="..\public\RoundShield.h" />
     <ClInclude Include="..\Public\StateBar.h" />
     <ClInclude Include="..\Public\StateFactory.h" />
@@ -200,6 +208,15 @@
     <ClInclude Include="..\public\State_Smash2.h" />
     <ClInclude Include="..\public\State_Smash3.h" />
     <ClInclude Include="..\public\State_Smash4.h" />
+    <ClInclude Include="..\public\Vampire.h" />
+    <ClInclude Include="..\public\VampireAI.h" />
+    <ClInclude Include="..\public\Vampire_AnimMachine.h" />
+    <ClInclude Include="..\public\Vampire_Basic.h" />
+    <ClInclude Include="..\public\Vampire_Basic_Body.h" />
+    <ClInclude Include="..\public\Vampire_Elder.h" />
+    <ClInclude Include="..\Public\Vampire_Elder_Body.h" />
+    <ClInclude Include="..\Public\Vampire_Royal.h" />
+    <ClInclude Include="..\Public\Vampire_Royal_Body.h" />
     <ClInclude Include="AnimTable.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
@@ -207,8 +224,14 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\private\AnimMachine.cpp" />
     <ClCompile Include="..\private\Armor.cpp" />
     <ClCompile Include="..\private\BastardSword.cpp" />
+    <ClCompile Include="..\private\Body.cpp" />
+    <ClCompile Include="..\private\Glasgavelen.cpp" />
+    <ClCompile Include="..\private\GlasgavelenBody.cpp" />
+    <ClCompile Include="..\private\GlasgavelenSword.cpp" />
+    <ClCompile Include="..\private\Monster.cpp" />
     <ClCompile Include="..\Private\OptionMain.cpp" />
     <ClCompile Include="..\private\PlayerAnimMachine.cpp" />
     <ClCompile Include="..\private\PlayerBody.cpp" />
@@ -238,6 +261,8 @@
     <ClCompile Include="..\private\OptionController.cpp" />
     <ClCompile Include="..\private\Panel.cpp" />
     <ClCompile Include="..\private\MainApp.cpp" />
+    <ClCompile Include="..\private\Queen.cpp" />
+    <ClCompile Include="..\private\Queen_Body.cpp" />
     <ClCompile Include="..\private\RoundShield.cpp" />
     <ClCompile Include="..\Private\StateBar.cpp" />
     <ClCompile Include="..\Private\StateFactory.cpp" />
@@ -252,6 +277,15 @@
     <ClCompile Include="..\private\State_Smash2.cpp" />
     <ClCompile Include="..\private\State_Smash3.cpp" />
     <ClCompile Include="..\private\State_Smash4.cpp" />
+    <ClCompile Include="..\private\Vampire.cpp" />
+    <ClCompile Include="..\private\VampireAI.cpp" />
+    <ClCompile Include="..\private\Vampire_AnimMachine.cpp" />
+    <ClCompile Include="..\private\Vampire_Basic.cpp" />
+    <ClCompile Include="..\private\Vampire_Basic_Body.cpp" />
+    <ClCompile Include="..\private\Vampire_Elder.cpp" />
+    <ClCompile Include="..\Private\Vampire_Elder_Body .cpp" />
+    <ClCompile Include="..\Private\Vampire_Royal.cpp" />
+    <ClCompile Include="..\Private\Vampire_Royal_Body.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>

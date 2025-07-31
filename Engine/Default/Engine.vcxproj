@@ -156,8 +156,13 @@ call Copy.bat</Command>
     <ClInclude Include="..\..\..\VindictusBack\Vindictus\Engine\Public\Light.h" />
     <ClInclude Include="..\public\Animation.h" />
     <ClInclude Include="..\public\Base.h" />
+    <ClInclude Include="..\public\BehaviorTree.h" />
     <ClInclude Include="..\Public\Binary_Struct.h" />
     <ClInclude Include="..\public\Bone.h" />
+    <ClInclude Include="..\public\BT_ActionNode.h" />
+    <ClInclude Include="..\public\BT_Node.h" />
+    <ClInclude Include="..\public\BT_SelectorNode.h" />
+    <ClInclude Include="..\public\BT_SequenceNode.h" />
     <ClInclude Include="..\public\Camera.h" />
     <ClInclude Include="..\Public\Camera_Manager.h" />
     <ClInclude Include="..\public\Channel.h" />
@@ -212,7 +217,12 @@ call Copy.bat</Command>
     <ClCompile Include="..\..\..\VindictusBack\Vindictus\Engine\Private\Light.cpp" />
     <ClCompile Include="..\private\Animation.cpp" />
     <ClCompile Include="..\private\Base.cpp" />
+    <ClCompile Include="..\private\BehaviorTree.cpp" />
     <ClCompile Include="..\private\Bone.cpp" />
+    <ClCompile Include="..\private\BT_ActionNode.cpp" />
+    <ClCompile Include="..\private\BT_Node.cpp" />
+    <ClCompile Include="..\private\BT_SelectorNode.cpp" />
+    <ClCompile Include="..\private\BT_SequenceNode.cpp" />
     <ClCompile Include="..\private\Camera.cpp" />
     <ClCompile Include="..\Private\Camera_Manager.cpp" />
     <ClCompile Include="..\private\Channel.cpp" />

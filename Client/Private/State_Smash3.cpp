@@ -13,6 +13,8 @@ HRESULT CState_Smash3::Initialize()
 	m_iActionFlag = ENUM_CLASS(SMASH_FLAG::SMASH3_0);
 	m_iMaxComboCount = 2;
 
+	m_fKeepTime = 0.5f;
+
 	return S_OK;
 }
 
@@ -21,20 +23,36 @@ void CState_Smash3::Enter(CPlayerPawn* pPlayerPawn)
 	ChangeActionFlag(ENUM_CLASS(SMASH_FLAG::SMASH3_0));
 
 	m_iComboCount = 0;
+
+	m_bReadySmash = false;
 }
 
 void CState_Smash3::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput)
 {
-	if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::SMASH) && false == pPlayerPawn->AnimIsFinished() && pPlayerPawn->AnimCanChange())
+	if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::SMASH) || m_bReadySmash)
 	{
-		if (MoveInput.bMove)
-			pPlayerPawn->Compute_PlayerMoveDir();
 
-		m_iComboCount++;
-		if (m_iComboCount >= m_iMaxComboCount)
-			m_iComboCount = m_iMaxComboCount;
+		if (pPlayerPawn->AnimCanChange())
+		{
+			m_bReadySmash = false;
 
-		ChangeActionFlag(m_iActionFlag << m_iComboCount);
+			if (MoveInput.bMove)
+				pPlayerPawn->Compute_PlayerMoveDir();
+
+			m_iComboCount++;
+			if (m_iComboCount >= m_iMaxComboCount)
+				m_iComboCount = m_iMaxComboCount;
+
+			ChangeActionFlag(m_iActionFlag << m_iComboCount);
+		}
+		else
+		{
+			if (false == m_bReadySmash)
+			{
+				m_bReadySmash = true;
+				m_fCurrentKeepTime = 0.f;
+			}
+		}
 	}
 	else
 	{
@@ -44,6 +62,12 @@ void CState_Smash3::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInpu
 
 void CState_Smash3::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 {
+	if (m_bReadySmash)
+	{
+		m_fCurrentKeepTime += fTimeDelta;
+		if (m_fCurrentKeepTime >= m_fKeepTime)
+			m_bReadySmash = false;
+	}
 }
 
 void CState_Smash3::Exit(CPlayerPawn* pPlayerPawn)

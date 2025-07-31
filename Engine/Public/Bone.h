@@ -11,6 +11,7 @@ private:
 
 public:
 	_matrix				Get_CombinedTransformationMatrix() { return XMLoadFloat4x4(&m_CombinedTransformationMatrix); }
+	void				Set_CombinedTransformationMatrix(_fmatrix Matrix) { XMStoreFloat4x4(&m_CombinedTransformationMatrix, Matrix); }
 	const _float4x4*	Get_CombinedTransformationMatrixPtr() { return &m_CombinedTransformationMatrix; }
 	void				Set_TransformationMatrix(_fmatrix Matrix) { XMStoreFloat4x4(&m_TransformationMatrix, Matrix); }
 	_matrix				Get_TransformationMatrix() { return XMLoadFloat4x4(&m_TransformationMatrix); }

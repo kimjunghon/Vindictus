@@ -21,6 +21,10 @@ public:
 	_uint		m_iActionFlag = {};
 	_uint		m_iComboCount = {}; 
 	_uint		m_iMaxComboCount = {};
+
+	_bool		m_bReadySmash = {};
+	_float		m_fKeepTime = {};
+	_float		m_fCurrentKeepTime = {};
 public:
 	static CState_Smash2*	Create();
 	virtual void			Free() override;

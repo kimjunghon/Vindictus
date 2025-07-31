@@ -122,14 +122,16 @@ void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones
 
 	if(*pFirstCall)
 	{
-		if (m_iBoneIndex == 5)
-			int a = 10;
-
 		_matrix PrevTransformationMatrix = Bones[m_iBoneIndex]->Get_TransformationMatrix();
-		
-		DirectX::XMMatrixDecompose(&m_vChangePrevScale, &m_vChangePrevRotation, &m_vChangePrevPosition, PrevTransformationMatrix);
-	}
 
+		XMMatrixDecompose(&m_vChangePrevScale, &m_vChangePrevRotation, &m_vChangePrevPosition, PrevTransformationMatrix);
+
+		if (Bones[m_iBoneIndex]->Compare_Name("ValveBiped.Bip01"))
+		{
+			m_vChangePrevPosition = XMVectorSetX(m_vChangePrevPosition, 0.f);
+			m_vChangePrevPosition = XMVectorSetY(m_vChangePrevPosition, 0.f);
+		}
+	}
 
 	vScale = XMVectorLerp(m_vChangePrevScale, XMLoadFloat3(&m_KeyFrames[0].vScale), fRatio);
 	vRotation = XMQuaternionSlerp(m_vChangePrevRotation, XMLoadFloat4(&m_KeyFrames[0].vRotation), fRatio);

@@ -17,6 +17,18 @@
 #include "RoundShield.h"
 #include "Armor.h"
 
+#include "Glasgavelen.h"
+#include "GlasgavelenBody.h"
+#include "GlasgavelenSword.h"
+#include "Vampire_Basic.h"
+#include "Vampire_Basic_Body.h"
+#include "Vampire_Elder.h"
+#include "Vampire_Elder_Body.h"
+#include "Vampire_Royal.h"
+#include "Vampire_Royal_Body.h"
+#include "Queen.h"
+#include "Queen_Body.h"
+
 CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: m_pDevice { pDevice}
 	, m_pDeviceContext { pDeviceContext}
@@ -245,24 +257,53 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 	/* Prototype_Component_Model_Player */
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
-	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
+	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Player"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Piona.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_BastardSword */
-	PreTransformMatrix = XMMatrixIdentity();
-	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BastardSword"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Sword_Bastard.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_RoundShield */
-	PreTransformMatrix = XMMatrixIdentity();
-	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_RoundShield"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/RoundShield.dat", PreTransformMatrix))))
 		return E_FAIL;
+
+	/* Prototype_Component_Model_Glasgavelen */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Glasgavelen"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_RoundShield */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_GavelneSword"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen_Sword.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Vampire_Basic_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Basic_Body"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Vampire_Elder_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Elder_Body"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Elder.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Vampire_Royal_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Royal_Body"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Royal.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Vampire_Queen_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Queen_Body"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Queen.dat", PreTransformMatrix))))
+		return E_FAIL;
+
 
 	if (FAILED(Loading_For_GamePlay_ArmorModel()))
 		return E_FAIL;
@@ -346,6 +387,61 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	/* Prototype_GameObject_Armor */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"),
 		CArmor::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Glasgavelen */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Glasgavelen"),
+		CGlasgavelen::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Glasgavelen_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Glasgavelen_Body"),
+		CGlasgavelenBody::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Glasgavelen_Sword */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Glasgavelen_Sword"),
+		CGlasgavelenSword::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Basic */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Basic"),
+		CVampire_Basic::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Basic_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Basic_Body"),
+		CVampire_Basic_Body::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Elder */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Elder"),
+		CVampire_Elder::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Elder_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Elder_Body"),
+		CVampire_Elder_Body::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Royal */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Royal"),
+		CVampire_Royal::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Royal_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Royal_Body"),
+		CVampire_Royal_Body::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Royal_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Queen"),
+		CQueen::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Royal_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Queen_Body"),
+		CQueen_Body::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 #pragma endregion
 

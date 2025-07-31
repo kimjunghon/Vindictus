@@ -11,7 +11,7 @@ HRESULT CState_Attack::Initialize()
 {
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
-	m_fKeepTime = 1.f;
+	m_fKeepTime = 0.5f;
 
 	return S_OK;
 }
@@ -22,18 +22,18 @@ void CState_Attack::Enter(CPlayerPawn* pPlayerPawn)
 
 	pPlayerPawn->Increase_ComboCount();
 
-	m_bSmash = false;
+	m_bReadyAttack = false;
 
 	ChangeActionFlag(ENUM_CLASS(ATTACK_FLAG::COMBO1));
 }
 
 void CState_Attack::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput)
 {
-	if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::ATTACK) || m_bAttack)
+	if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::ATTACK) || m_bReadyAttack)
 	{
 		if(pPlayerPawn->AnimCanChange())
 		{
-			m_bAttack = false;
+			m_bReadyAttack = false;
 
 			if (MoveInput.bMove)
 				pPlayerPawn->Compute_PlayerMoveDir();
@@ -52,9 +52,9 @@ void CState_Attack::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInpu
 		}
 		else
 		{
-			if (false == m_bAttack)
+			if (false == m_bReadyAttack)
 			{
-				m_bAttack = true;
+				m_bReadyAttack = true;
 				m_fCurrentKeepTime = 0.f;
 			}
 		}
@@ -80,11 +80,11 @@ void CState_Attack::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInpu
 
 void CState_Attack::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 {
-	if (m_bAttack)
+	if (m_bReadyAttack)
 	{
 		m_fCurrentKeepTime += fTimeDelta;
 		if (m_fCurrentKeepTime >= m_fKeepTime)
-			m_bAttack = false;
+			m_bReadyAttack = false;
 	}
 }
 
@@ -93,8 +93,6 @@ void CState_Attack::Exit(CPlayerPawn* pPlayerPawn)
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
 	pPlayerPawn->Reset_ComboCount();
-
-	m_bSmash = false;
 }
 
 CState_Attack* CState_Attack::Create()

@@ -151,7 +151,31 @@ HRESULT CLevel_GamePlay::Ready_Controller()
 
 HRESULT CLevel_GamePlay::Ready_GameObject(const _wstring& strLayerTag)
 {
-	if (FAILED(Ready_MapObject(TEXT("Layer_MapObject"))))
+	//if (FAILED(Ready_MapObject(TEXT("Layer_MapObject"))))
+	//	return E_FAIL;
+
+	CGameObject::GAMEOBJECT_DESC GameObjectDesc = {};
+	GameObjectDesc.fSpeedPerSec = 10.f;
+	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.f);
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Glasgavelen"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Basic"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Elder"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Royal"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Queen"),
+		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
 		return E_FAIL;
 
 	return S_OK;

@@ -16,8 +16,8 @@ private:
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
 	HRESULT Initialize(ifstream& File, const vector<class CBone*>& Bones);
-	void	Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta);
-	
+	void	Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _vector& vPrevRootPostion);
+	_bool	IsAnimChanging() { return m_bAnimChange; }
 public:
 	_bool	CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio);
 

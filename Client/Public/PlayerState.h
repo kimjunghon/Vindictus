@@ -2,6 +2,8 @@
 #include "Client_Defines.h"
 #include "Base.h"
 
+using namespace Player;
+
 NS_BEGIN(Client)
 
 class CPlayerPawn;

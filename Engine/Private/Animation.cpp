@@ -63,9 +63,8 @@ HRESULT CAnimation::Initialize(ifstream& File, const vector<class CBone*>& Bones
 	return S_OK;
 }
 
-void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta)
+void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _vector& vPrevRootPostion)
 {
-
 	if (m_bAnimChange)
 	{
 		m_fCurrentTrackPosition += fTimeDelta;
@@ -99,7 +98,10 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 				m_fCurrentTrackPosition = m_fDuration;
 			}
 			else
+			{
+				vPrevRootPostion = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 				m_fCurrentTrackPosition = 0.f;
+			}
 		}
 
 		for (_uint i =0; i< m_iNumChannels; i++)

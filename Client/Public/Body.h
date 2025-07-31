@@ -1,0 +1,51 @@
+#pragma once
+#include "Client_Defines.h"
+#include "PawnObject.h"
+
+NS_BEGIN(Engine)
+class CModel;
+class CShader;
+NS_END
+
+NS_BEGIN(Client)
+
+class CBody abstract : public CPawnObject
+{
+public:
+	typedef struct tagBodyDesc : public PAWNOBJECT_DESC
+	{
+		_uint* pStateFlag = { nullptr };
+	}BODY_DESC;
+
+protected:
+	CBody(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
+	CBody(const CBody& Prototype);
+	virtual ~CBody() = default;
+
+public:
+	_bool				AnimIsFinished() { return m_pModelCom->CurrentAnim_Finished(); }
+	_bool				AnimCanChange() { return m_pModelCom->CanChangeAnimation(); }
+	const _vector*		Get_AnimMovementPtr() { return m_pModelCom->Get_AnimMovementPtr(); }
+	const _vector*		Get_AnimRotationPtr() { return m_pModelCom->Get_AnimRotationPtr(); }
+	const _float4x4*	SocketCombinedMatrixPtr(const string& strSocektBoneName) { return m_pModelCom->Find_SocketBoneCombinedMatrix(strSocektBoneName); }
+	CModel*				Get_ParentModelPtr() { return m_pModelCom; }
+
+public:
+	virtual HRESULT		Initialize_Prototype() override;
+	virtual HRESULT		Initialize(void* pArg) override;
+	virtual void		Priority_Update(_float fTimeDelta) override;
+	virtual void		Update(_float fTimeDelta) override;
+	virtual void		Late_Update(_float fTimeDelta) override;
+	virtual HRESULT		Render() override;
+
+protected:
+	CModel*		m_pModelCom = { nullptr };
+	CShader*	m_pShaderCom = { nullptr };
+	_uint*		m_pStateFlag = {};
+
+public:
+	virtual CGameObject*	Clone(void* pArg) PURE;
+	virtual void			Free() override;
+};
+
+NS_END

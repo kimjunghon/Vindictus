@@ -84,13 +84,13 @@ void CArmor::Late_Update(_float fTimeDelta)
 
 	if (m_tArmorInfo.fHealth <= 0.f)
 	{
+		m_eArmorState = ARMOR_STATE::BROKEN;		
 		if (m_eArmorType == ARMOR_TYPE::HEAD)
 		{
 			EVENT_BROKEN_HEAD Event;
 			m_pGameInstance->Publish(ENUM_CLASS(LEVEL::GAMEPLAY), Event);
+			return;
 		}
-
-		m_eArmorState = ARMOR_STATE::BROKEN;
 	}
 
 	if (m_pModelCom[ENUM_CLASS(m_eArmorState)])

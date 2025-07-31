@@ -1,15 +1,14 @@
 #include "ClientPch.h"
 #include "PlayerBody.h"
-#include "GameInstance.h"
 #include "PlayerAnimMachine.h"
 
 CPlayerBody::CPlayerBody(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CPawnObject { pDevice, pDeviceContext }
+	: CBody{ pDevice, pDeviceContext }
 {
 }
 
 CPlayerBody::CPlayerBody(const CPlayerBody& Prototype)
-	: CPawnObject { Prototype }
+	: CBody{ Prototype }
 {
 }
 
@@ -20,14 +19,8 @@ HRESULT CPlayerBody::Initialize_Prototype()
 
 HRESULT CPlayerBody::Initialize(void* pArg)
 {
-	if (nullptr == pArg)
-		return E_FAIL;
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
-	BODY_DESC* pDesc = static_cast<BODY_DESC*>(pArg);
-	m_pStateFlag = pDesc->pStateFlag;
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
@@ -53,7 +46,6 @@ void CPlayerBody::Update(_float fTimeDelta)
 
 void CPlayerBody::Late_Update(_float fTimeDelta)
 {
-
 	if(FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
 }

@@ -25,9 +25,6 @@ HRESULT CPlayerPawn::Initialize_Prototype()
 
 HRESULT CPlayerPawn::Initialize(void* pArg)
 {
-	if (nullptr == pArg)
-		return E_FAIL;
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -43,11 +40,18 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	if (FAILED(Ready_States()))
 		return E_FAIL;
 
-	m_vPlayerMoveDir = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+	m_vPlayerMoveDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+
+	m_vPlayerRoationQuat = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+
+	m_vPrevPlayerRotationQuat = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 
 	m_fSpeed = 10.f;
 
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::DEFAULT);
+
+	//test
+	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(-10.f, 0.f, 10.f, 1.f));
 
 	return S_OK;
 }
@@ -109,8 +113,12 @@ _bool CPlayerPawn::AnimCanChange()
 }
 
 void CPlayerPawn::Compute_PlayerMoveDir()
-{ 
+{
 	m_vPlayerMoveDir = m_pCamera->Compute_PlayerMoveDir(m_MoveInput.vDir);
+
+	_float fYaw = atan2f(XMVectorGetX(m_vPlayerMoveDir), XMVectorGetZ(m_vPlayerMoveDir));
+	m_vPlayerRoationQuat = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw);
+
 }
 
 HRESULT CPlayerPawn::EquipArmor(const _wstring& strArmorTag, CArmor* pArmor, ARMOR_TYPE eArmorType)
@@ -145,6 +153,7 @@ HRESULT CPlayerPawn::UnEquipArmor(ARMOR_TYPE eArmorType)
 
 void CPlayerPawn::Move(_float fTimeDelta)
 {
+
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
 
 	vPosition = XMVectorAdd(vPosition, XMVectorScale(m_vPlayerMoveDir, m_fSpeed * m_fSpeedRatio * fTimeDelta));
@@ -218,6 +227,10 @@ HRESULT CPlayerPawn::Ready_PlayerBody()
 
 	m_pAnimMovement = m_pPlayerBody->Get_AnimMovementPtr();
 	if (nullptr == m_pAnimMovement)
+		return E_FAIL;
+
+	m_pAnimRotation = m_pPlayerBody->Get_AnimRotationPtr();
+	if (nullptr == m_pAnimRotation)
 		return E_FAIL;
 
 	return S_OK;
@@ -317,19 +330,31 @@ void CPlayerPawn::Compute_WorldMatrix()
 	_float3 vScale = m_pTransformCom->Get_Scaled();
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vAnimPosition = *m_pAnimMovement;
-	
-	vAnimPosition = XMVectorSwizzle(vAnimPosition, XM_SWIZZLE_X, XM_SWIZZLE_Z, XM_SWIZZLE_Y, XM_SWIZZLE_W);
+	_vector vAnimRotation = *m_pAnimRotation;
 
-	_vector vAnimPosScale = XMVectorSet(0.3f, 0.f, -0.3f, 1.f);
+	_vector vRotation = {};
 
-	_float fAngle = atan2f(XMVectorGetX(m_vPlayerMoveDir), XMVectorGetZ(m_vPlayerMoveDir));
-	_matrix RotationMatrix = XMMatrixRotationY(fAngle);
+	if (false == XMVector4Equal(m_vPlayerRoationQuat, m_vPrevPlayerRotationQuat))
+	{
+		vRotation = XMQuaternionMultiply(m_vPlayerRoationQuat, XMQuaternionInverse(m_vPrevPlayerRotationQuat));
 
-	vAnimPosition = XMVectorMultiply(vAnimPosition, vAnimPosScale);
+		vRotation = XMQuaternionSlerp(XMQuaternionIdentity(), vRotation, 0.125f);
+
+		m_vPrevPlayerRotationQuat = XMQuaternionMultiply(vRotation, m_vPrevPlayerRotationQuat);
+
+		vRotation = m_vPrevPlayerRotationQuat;
+	}
+	else
+		vRotation = m_vPlayerRoationQuat;
+
+	_matrix RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+
+	if (XMVectorGetX(XMVector3Length(vAnimPosition)) >= 30.f)
+		int a = 10;
 
 	vAnimPosition = XMVector3Transform(vAnimPosition, RotationMatrix);
 
-	vPosition = XMVectorAdd(vPosition, vAnimPosition);
+	vPosition = XMVectorSetW(XMVectorAdd(vPosition, vAnimPosition), 1.f);
 
 	_matrix ScaleMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&vScale));
 	_matrix PositionMatrix = XMMatrixTranslationFromVector(vPosition);
@@ -355,7 +380,7 @@ void CPlayerPawn::Bind_InputData(_float fTimeDelta)
 
 	m_pCamera->Bind_InputData(m_CameraInput);
 	
-	if(m_MoveInput.bMove && m_pCurrentState->CanMove())
+	if (m_MoveInput.bMove && m_pCurrentState->CanMove())
 	{
 		Compute_PlayerMoveDir();
 		Move(fTimeDelta);

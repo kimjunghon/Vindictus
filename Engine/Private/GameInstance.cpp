@@ -260,6 +260,10 @@ HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iPrototypeLevelIndex, const 
 {
     return m_pObject_Manager->Add_GameObject_ToLayer(iLayerIndex, strLayerTag, iPrototypeLevelIndex, strPrototypeTag, pArg);
 }
+CComponent* CGameInstance::Get_Component(_uint iLayerIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex)
+{
+    return m_pObject_Manager->Get_Component(iLayerIndex, strLayerTag, strComponentTag, iIndex);
+}
 #pragma endregion
 
 #pragma region OCTREE

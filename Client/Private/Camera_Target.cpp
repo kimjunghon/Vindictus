@@ -30,7 +30,6 @@ HRESULT CCamera_Target::Initialize(void* pArg)
 	m_fDistance = pDesc->fDistance;
 	m_fHeight = pDesc->fHeight;
 
-
 	m_fMinDistance = 10.f;
 	m_fMaxDistance = 300.f;
 
@@ -102,8 +101,9 @@ _vector CCamera_Target::Compute_PlayerMoveDir(_vector vInputDir)
 	_vector vLook = XMVectorSet(XMVectorGetX(m_vLook), 0.f, XMVectorGetZ(m_vLook), 0.f);
 	_vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
 
-	vPlayerMoveDir = XMVector3Normalize(XMVectorAdd(XMVectorScale(XMVector3Normalize(vLook), XMVectorGetZ(vInputDir)),
-													XMVectorScale(XMVector3Normalize(vRight), XMVectorGetX(vInputDir))));
+	vPlayerMoveDir = XMVectorAdd(XMVectorScale(XMVector3Normalize(vLook), XMVectorGetZ(vInputDir)), XMVectorScale(XMVector3Normalize(vRight), XMVectorGetX(vInputDir)));
+
+	vPlayerMoveDir = XMVector3Normalize(XMVectorSetY(vPlayerMoveDir, 0.f));
 
 	return vPlayerMoveDir;
 }

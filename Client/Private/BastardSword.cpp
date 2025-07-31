@@ -18,9 +18,6 @@ HRESULT CBastardSword::Initialize_Prototype()
 
 HRESULT CBastardSword::Initialize(void* pArg)
 {
-	if (nullptr == pArg)
-		return E_FAIL;
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 

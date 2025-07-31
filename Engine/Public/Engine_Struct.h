@@ -146,7 +146,6 @@ namespace Engine
 		XMFLOAT2	vRange;
 		float		fAnimSpeed;
 	}ANIM_DATA;
-
 }
 
 

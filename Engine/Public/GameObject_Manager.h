@@ -24,7 +24,6 @@ public:
 	void	Late_Update(_float fTimeDelta);
 	void	Clear();
 
-
 private:
 	class CGameInstance*	m_pGameInstance = { nullptr };
 

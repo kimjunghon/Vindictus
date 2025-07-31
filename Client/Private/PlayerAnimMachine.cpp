@@ -1,6 +1,5 @@
 #include "ClientPch.h"
 #include "PlayerAnimMachine.h"
-#include "Model.h"
 
 CPlayerAnimMachine::CPlayerAnimMachine()
 {
@@ -8,6 +7,8 @@ CPlayerAnimMachine::CPlayerAnimMachine()
 
 void CPlayerAnimMachine::Initialize()
 {
+	__super::Initialize();
+
 	Initialize_IDLE();
 	Initialize_MOVE();
 	Initialize_ATTACK();
@@ -55,11 +56,11 @@ void CPlayerAnimMachine::Initialize_SMASH()
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH1)] =			{ "Smash_01", false, _float2{0.4f, 1.f} , 2.f };
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH2_0)] =			{ "Smash_02_00", false, _float2{0.4f, 1.f}  , 2.f};
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH2_1)] =			{ "Smash_02_01", false, _float2{0.4f, 1.f}  , 2.f};
-	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH2_2)] =			{ "Smash_02_02", false, _float2{0.4f, 1.f}  , 2.f};
+	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH2_2)] =			{ "Smash_02_02", false, _float2{0.6f, 1.f}  , 2.f};
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH3_0)] =			{ "Smash_03_00", false, _float2{0.4f, 1.f}  , 2.f};
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH3_1)] =			{ "Smash_03_01", false, _float2{0.4f, 1.f}  , 2.f};
-	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH3_2)] =			{ "Smash_03_02", false, _float2{0.4f, 1.f}  , 2.f};
-	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH4)] =			{ "Smash_04", false, _float2{0.4f, 1.f} , 2.f };
+	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH3_2)] =			{ "Smash_03_02", false, _float2{0.6f, 1.f}  , 2.f};
+	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH4)] =			{ "Smash_04", false, _float2{0.5f, 1.f} , 2.f };
 }
 
 void CPlayerAnimMachine::Initialize_GUARD()
@@ -67,7 +68,7 @@ void CPlayerAnimMachine::Initialize_GUARD()
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::GUARD);
 
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_BEGIN)] =		{ "Guard_Begin", false, _float2{0.4f, 1.f}, 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_DURING)] =		{ "Gurad_During", true, _float2{0.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_DURING)] =		{ "Guard_During", true, _float2{0.f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_END)] =		{ "Guard_End", false, _float2{0.4f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_HIT)] =		{ "Guard_Hit", false, _float2{0.f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_BREAK)] =		{ "Guard_Break", false, _float2{0.8f, 1.f}, 2.f };
@@ -107,17 +108,6 @@ void CPlayerAnimMachine::Initialize_HIT()
 	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_LEFT)] =	{ "Hit_Left", false, _float2{1.f, 1.f}, 2.f };
 	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_STRONG)] =	{ "Hit_Strong", false, _float2{1.f, 1.f}, 2.f };
 	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_DOWN)] =	{ "Hit_Down", false, _float2{1.f, 1.f}, 2.f };
-}
-
-HRESULT CPlayerAnimMachine::Set_Animation(CModel* pModelCom, _uint iState)
-{
-	if (nullptr == pModelCom)
-		return E_FAIL;
-
-	if (false == pModelCom->CanChangeAnimation())
-		return S_OK;
-
-	return 	pModelCom->Set_Animation(m_AnimDatas[iState]);
 }
 
 CPlayerAnimMachine* CPlayerAnimMachine::Create()

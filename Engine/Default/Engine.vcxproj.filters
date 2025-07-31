@@ -157,6 +157,21 @@
     <Filter Include="01.Utility\04.Component\Models\Model">
       <UniqueIdentifier>{2a0f8936-b037-4542-9f45-9e1713569a31}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\07.BehaviorTree">
+      <UniqueIdentifier>{68223bff-4205-4198-a305-47064f7bbcd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07.BehaviorTree\Node">
+      <UniqueIdentifier>{58f01a55-75d7-46a3-a2b1-cfdfe8bf36ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07.BehaviorTree\Node\ActionNode">
+      <UniqueIdentifier>{8ac45ef1-4d88-414a-a064-5a0cf9ace50a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07.BehaviorTree\Node\SelectorNode">
+      <UniqueIdentifier>{c837bb5a-d477-4e8c-8e5f-65113bea82d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\07.BehaviorTree\Node\SequenceNode">
+      <UniqueIdentifier>{6aea4a6c-10e5-4c06-8295-59bea12936dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -321,6 +336,21 @@
     <ClInclude Include="..\public\Model.h">
       <Filter>01.Utility\04.Component\Models\Model</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\BT_Node.h">
+      <Filter>01.Utility\07.BehaviorTree\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BT_ActionNode.h">
+      <Filter>01.Utility\07.BehaviorTree\Node\ActionNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BT_SequenceNode.h">
+      <Filter>01.Utility\07.BehaviorTree\Node\SequenceNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BT_SelectorNode.h">
+      <Filter>01.Utility\07.BehaviorTree\Node\SelectorNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BehaviorTree.h">
+      <Filter>01.Utility\07.BehaviorTree</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -460,6 +490,21 @@
     </ClCompile>
     <ClCompile Include="..\private\Model.cpp">
       <Filter>01.Utility\04.Component\Models\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BT_Node.cpp">
+      <Filter>01.Utility\07.BehaviorTree\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BT_ActionNode.cpp">
+      <Filter>01.Utility\07.BehaviorTree\Node\ActionNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BT_SequenceNode.cpp">
+      <Filter>01.Utility\07.BehaviorTree\Node\SequenceNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BT_SelectorNode.cpp">
+      <Filter>01.Utility\07.BehaviorTree\Node\SelectorNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BehaviorTree.cpp">
+      <Filter>01.Utility\07.BehaviorTree</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -9,7 +9,7 @@ CPlayerState::CPlayerState()
 _bool CPlayerState::CanMove()
 {
 	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::IDLE) ||
-		m_iStateFlag & ENUM_CLASS(STATE_FLAG::MOVE))
+		(m_iStateFlag & ENUM_CLASS(STATE_FLAG::MOVE) && ~m_iStateFlag & ENUM_CLASS(MOVE_FLAG::STOP)))
 		return true;
 
 	return false;

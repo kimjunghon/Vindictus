@@ -25,6 +25,8 @@ namespace Engine
 	enum class SHADER_VTXPOSTEX { DEFAULT, PROGRESSBAR, LOADINGPOINT};
 
 	enum class MODELTYPE { ANIM, NONANIM, INFILE };
+
+	enum class BT_STATE { RUN, SUCCESS, FAILED };
 }
 
 #endif // Engine_Enum_h__
