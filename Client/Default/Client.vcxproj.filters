@@ -10,194 +10,245 @@
     <Filter Include="00.MainApp">
       <UniqueIdentifier>{6dc40b73-3221-4ce1-b4e7-e0142a2df85d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Levels">
-      <UniqueIdentifier>{47241e83-a0f6-4b8c-a78f-19fce34818f4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\GamePlay">
-      <UniqueIdentifier>{9fcec439-8bb5-46e7-81bc-f401093c77a2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Loading">
-      <UniqueIdentifier>{b4ff1bb4-8c5f-4c91-9074-7b5f0fd3068e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Loading\Loader">
-      <UniqueIdentifier>{aef88141-ab26-4dc9-a8fe-7010776d6d5b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Levels\Logo">
-      <UniqueIdentifier>{8efafbf9-e876-47cc-88ba-ad25bc38c69e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject">
-      <UniqueIdentifier>{13d34374-d51a-4b83-9983-e1a08fc692f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject">
-      <UniqueIdentifier>{12c19376-a6c9-4db0-95ca-b116485a18bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\Logo">
-      <UniqueIdentifier>{663f6d98-11ba-438c-99b9-1406a1fe843d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\Loading">
-      <UniqueIdentifier>{fc7e9559-cc44-48d5-b0fb-55ccbd6ae479}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\GamePlay">
-      <UniqueIdentifier>{e09314ea-c9cf-4170-9b10-fc01544610b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\GamePlay\HUD">
-      <UniqueIdentifier>{1cff8f92-4619-46e0-8494-51c719def440}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\GamePlay\Option">
-      <UniqueIdentifier>{3c7af0dd-663d-4b6f-bfab-39c72a7e68b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\GamePlay\OptionController">
-      <UniqueIdentifier>{166339c0-8123-4505-957b-e8cbbd01a34d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.Controller">
-      <UniqueIdentifier>{99dc2a59-58e4-4f27-b4b2-83c785ce242e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\Static">
-      <UniqueIdentifier>{9b5a3425-2493-4e94-a944-22b17a5c2c60}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\Static\Background">
-      <UniqueIdentifier>{894bcd7f-e626-4263-b8aa-5837632cb147}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\Static\Button">
-      <UniqueIdentifier>{3f709017-faa8-4a54-896b-0a8fa92454cc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\Static\Panel">
-      <UniqueIdentifier>{75274f8e-fba3-4800-9d95-1645c708fcda}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\UIObject\Static\Bar">
-      <UniqueIdentifier>{ac98ff6d-3684-43f3-891f-9f78d974127a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{5191c7ce-16b1-4664-9c92-827c72f29e2e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\MapObject">
-      <UniqueIdentifier>{639bf950-2ac8-4e65-bfca-1855b29a1905}</UniqueIdentifier>
+    <Filter Include="01.PlayerInstance">
+      <UniqueIdentifier>{45a16465-b941-427e-9267-f77f110f5b9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns">
+    <Filter Include="02.Levels">
+      <UniqueIdentifier>{47241e83-a0f6-4b8c-a78f-19fce34818f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Levels\GamePlay">
+      <UniqueIdentifier>{9fcec439-8bb5-46e7-81bc-f401093c77a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Levels\GamePlay\Level_Queen">
+      <UniqueIdentifier>{d0a9840e-de1d-4068-868e-094dabb0d7ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Levels\GamePlay\Level_Town">
+      <UniqueIdentifier>{e880dd5d-c09f-4b4f-b3ab-c7ecfc0c55b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Levels\GamePlay\Level_Glasgavelen">
+      <UniqueIdentifier>{fe0988ea-156b-4f3e-afd6-19622e2b3c3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Levels\GamePlay\Level_Field">
+      <UniqueIdentifier>{779accb7-f276-4003-ba64-d0fc3d326288}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Levels\Loading">
+      <UniqueIdentifier>{b4ff1bb4-8c5f-4c91-9074-7b5f0fd3068e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Levels\Loading\Loader">
+      <UniqueIdentifier>{aef88141-ab26-4dc9-a8fe-7010776d6d5b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02.Levels\Logo">
+      <UniqueIdentifier>{8efafbf9-e876-47cc-88ba-ad25bc38c69e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject">
+      <UniqueIdentifier>{13d34374-d51a-4b83-9983-e1a08fc692f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject">
+      <UniqueIdentifier>{12c19376-a6c9-4db0-95ca-b116485a18bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\Logo">
+      <UniqueIdentifier>{663f6d98-11ba-438c-99b9-1406a1fe843d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\Loading">
+      <UniqueIdentifier>{fc7e9559-cc44-48d5-b0fb-55ccbd6ae479}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay">
+      <UniqueIdentifier>{e09314ea-c9cf-4170-9b10-fc01544610b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\HUD">
+      <UniqueIdentifier>{1cff8f92-4619-46e0-8494-51c719def440}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Option">
+      <UniqueIdentifier>{3c7af0dd-663d-4b6f-bfab-39c72a7e68b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\OptionController">
+      <UniqueIdentifier>{166339c0-8123-4505-957b-e8cbbd01a34d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\Static">
+      <UniqueIdentifier>{9b5a3425-2493-4e94-a944-22b17a5c2c60}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\Static\Background">
+      <UniqueIdentifier>{894bcd7f-e626-4263-b8aa-5837632cb147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\Static\Button">
+      <UniqueIdentifier>{3f709017-faa8-4a54-896b-0a8fa92454cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\Static\Panel">
+      <UniqueIdentifier>{75274f8e-fba3-4800-9d95-1645c708fcda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\Static\Bar">
+      <UniqueIdentifier>{ac98ff6d-3684-43f3-891f-9f78d974127a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\UI_Container">
+      <UniqueIdentifier>{e291e355-7730-4036-898f-491d9fec5e5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns">
       <UniqueIdentifier>{1aab49b5-79b9-43ff-8212-3679a70b6f73}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Player">
-      <UniqueIdentifier>{e76ae3c2-b617-455a-9f85-87db20d7fe33}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\Camera">
-      <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState">
-      <UniqueIdentifier>{9c5ababc-c939-4237-8bf0-78ed58b5efe5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Idle">
-      <UniqueIdentifier>{4ada9e0c-e083-4662-831d-2b5c6f7df67c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Move">
-      <UniqueIdentifier>{7f0d4b68-c147-4e32-9aad-93d86d133fe6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action">
-      <UniqueIdentifier>{074df14b-8afe-4ba1-a37c-75b49080f444}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Attack">
-      <UniqueIdentifier>{8d39bad7-709e-4384-ba4f-6ea63b1f5f12}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Smash">
-      <UniqueIdentifier>{5148baf3-bed3-4bca-aff5-ef973cb04bd6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0">
-      <UniqueIdentifier>{10e44a59-e3bf-43c5-98af-f38950efcf03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1">
-      <UniqueIdentifier>{900ea364-329a-4dcf-9d5e-519d02914d18}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2">
-      <UniqueIdentifier>{70693b5b-b082-4c1d-ae48-74d11c02e8b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3">
-      <UniqueIdentifier>{217a5d9e-29e0-4de5-b03d-753042d9a9db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4">
-      <UniqueIdentifier>{fbcf3960-2f16-49bb-921f-6d8abcfd8c79}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Roll">
-      <UniqueIdentifier>{2765dfee-9bfc-4383-ab17-1b42a6701ce1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\Guard">
-      <UniqueIdentifier>{b49bc489-9688-46f2-9bb8-aa5fdcfb07ee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand">
-      <UniqueIdentifier>{eee2bfe9-de81-43da-ba21-65cdea455db1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerState\Factory">
-      <UniqueIdentifier>{335beab5-b4db-450a-90f7-61654d3a5d04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\PlayerBody">
-      <UniqueIdentifier>{5325e74b-3782-48d9-a55e-3ddd265ebfdc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\Sword">
-      <UniqueIdentifier>{bb5b346c-11b1-41ae-bd18-cd2d7523df64}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\Sword\BastardSword">
-      <UniqueIdentifier>{29d67f86-ad4b-482e-b7f3-994660d2360d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\Shield">
-      <UniqueIdentifier>{a64da96d-c1a5-4d30-87b3-0e5b06c7c906}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\Shield\RoundShield">
-      <UniqueIdentifier>{15fe760a-64dc-436a-9670-8ada20414c0d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Player\Armor">
-      <UniqueIdentifier>{09e49895-4a60-4d26-9390-7e100e3dc131}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\BodyBase">
+    <Filter Include="03.GameObject\Pawns\BodyBase">
       <UniqueIdentifier>{15d1217b-6f9a-4078-99f1-29c0665ce198}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster">
+    <Filter Include="03.GameObject\Pawns\Monster">
       <UniqueIdentifier>{8ecc1fa5-89a1-44dc-bdc3-a07b71bdf744}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Glasgavelen">
+    <Filter Include="03.GameObject\Pawns\Monster\Glasgavelen">
       <UniqueIdentifier>{fba34bb4-ef2a-44c1-bc55-3092f9f5b863}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Glasgavelen\Weapon">
+    <Filter Include="03.GameObject\Pawns\Monster\Glasgavelen\Weapon">
       <UniqueIdentifier>{05a18f33-96e4-4ee3-927d-238270bd23bb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Glasgavelen\Body">
+    <Filter Include="03.GameObject\Pawns\Monster\Glasgavelen\Body">
       <UniqueIdentifier>{eb60fe9f-be20-4352-bc1d-ef2edb3f1c12}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Vampire">
+    <Filter Include="03.GameObject\Pawns\Monster\Vampire">
       <UniqueIdentifier>{7828b2ce-d475-41a9-a04a-e91696ed03ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Vampire\AI">
+    <Filter Include="03.GameObject\Pawns\Monster\Vampire\AI">
       <UniqueIdentifier>{14b90a9b-9c67-4765-8af6-a10d29731678}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Vampire\Vampire_Basic">
+    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Basic">
       <UniqueIdentifier>{ec67b74a-ce37-499f-97f5-a2eefe8da597}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body">
+    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body">
       <UniqueIdentifier>{60a78b80-9acf-47b3-bfcb-7f722d16dba2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\AnimMachine">
-      <UniqueIdentifier>{cd175e51-17a2-47e5-8529-4a632529b651}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\AnimMachine\PlayerAnimMachine">
-      <UniqueIdentifier>{225f42ad-e275-4cbd-aab0-9e91f7b06c3e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\AnimMachine\Vampire_AnimMachine">
-      <UniqueIdentifier>{f1f5c96a-445e-4878-834f-17d635e72cb2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Vampire\Vampire_Elder">
+    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Elder">
       <UniqueIdentifier>{1c7c6a9f-8c16-4cc1-b3e0-9a091652fa5d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Vampire\Vampire_Royal">
-      <UniqueIdentifier>{7493406b-6a72-4cb7-9bcc-90c992bcec89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body">
+    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body">
       <UniqueIdentifier>{670d2eb9-f412-41e8-814d-191ae15a99f0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body">
+    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Royal">
+      <UniqueIdentifier>{7493406b-6a72-4cb7-9bcc-90c992bcec89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body">
       <UniqueIdentifier>{f2b3461c-1419-4c5c-aa4b-0433d422a754}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Queen">
+    <Filter Include="03.GameObject\Pawns\Monster\Queen">
       <UniqueIdentifier>{9561be97-2964-441c-806c-d65c609a75aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02.GameObject\Pawns\Monster\Queen\Body">
+    <Filter Include="03.GameObject\Pawns\Monster\Queen\Body">
       <UniqueIdentifier>{e11c14fd-fb35-48fc-9d31-c46c69323abb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Monster\Queen\AI">
+      <UniqueIdentifier>{8be7c1ef-abfe-46be-9133-c76b0309897a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\AnimMachine">
+      <UniqueIdentifier>{cd175e51-17a2-47e5-8529-4a632529b651}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\AnimMachine\PlayerAnimMachine">
+      <UniqueIdentifier>{225f42ad-e275-4cbd-aab0-9e91f7b06c3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\AnimMachine\Vampire_AnimMachine">
+      <UniqueIdentifier>{f1f5c96a-445e-4878-834f-17d635e72cb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\AnimMachine\QueenAnimMachine">
+      <UniqueIdentifier>{2d70b516-1a5e-445f-b0d9-dd1656657bcd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player">
+      <UniqueIdentifier>{e76ae3c2-b617-455a-9f85-87db20d7fe33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState">
+      <UniqueIdentifier>{9c5ababc-c939-4237-8bf0-78ed58b5efe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Idle">
+      <UniqueIdentifier>{4ada9e0c-e083-4662-831d-2b5c6f7df67c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Move">
+      <UniqueIdentifier>{7f0d4b68-c147-4e32-9aad-93d86d133fe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action">
+      <UniqueIdentifier>{074df14b-8afe-4ba1-a37c-75b49080f444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Attack">
+      <UniqueIdentifier>{8d39bad7-709e-4384-ba4f-6ea63b1f5f12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash">
+      <UniqueIdentifier>{5148baf3-bed3-4bca-aff5-ef973cb04bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0">
+      <UniqueIdentifier>{10e44a59-e3bf-43c5-98af-f38950efcf03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1">
+      <UniqueIdentifier>{900ea364-329a-4dcf-9d5e-519d02914d18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2">
+      <UniqueIdentifier>{70693b5b-b082-4c1d-ae48-74d11c02e8b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3">
+      <UniqueIdentifier>{217a5d9e-29e0-4de5-b03d-753042d9a9db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4">
+      <UniqueIdentifier>{fbcf3960-2f16-49bb-921f-6d8abcfd8c79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Roll">
+      <UniqueIdentifier>{2765dfee-9bfc-4383-ab17-1b42a6701ce1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Guard">
+      <UniqueIdentifier>{b49bc489-9688-46f2-9bb8-aa5fdcfb07ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand">
+      <UniqueIdentifier>{eee2bfe9-de81-43da-ba21-65cdea455db1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerState\Factory">
+      <UniqueIdentifier>{335beab5-b4db-450a-90f7-61654d3a5d04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\PlayerBody">
+      <UniqueIdentifier>{5325e74b-3782-48d9-a55e-3ddd265ebfdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\Armor">
+      <UniqueIdentifier>{09e49895-4a60-4d26-9390-7e100e3dc131}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Maps">
+      <UniqueIdentifier>{2ca07e59-9edc-42f6-af4c-ed7ef0be0179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Maps\Town">
+      <UniqueIdentifier>{55f6936f-6f3c-4f40-bcfa-00ea2662f107}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Maps\MapObject">
+      <UniqueIdentifier>{639bf950-2ac8-4e65-bfca-1855b29a1905}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Maps\Queen">
+      <UniqueIdentifier>{684360aa-4bb9-4215-a437-f1b4c0a1b090}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Maps\Glasgavelen">
+      <UniqueIdentifier>{33099991-7e63-40bb-b4fa-f387464048dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Camera">
+      <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Camera\Free">
+      <UniqueIdentifier>{2fd30b60-82b7-4ac1-8ab0-64196203461d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Controller">
+      <UniqueIdentifier>{99dc2a59-58e4-4f27-b4b2-83c785ce242e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Controller\Keyboard">
+      <UniqueIdentifier>{2b06519a-845e-4345-9a41-e97c38e6d282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Controller\Mouse">
+      <UniqueIdentifier>{a97b03b1-0f42-433f-a2f5-3bb7da669fa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="04.Controller\UI">
+      <UniqueIdentifier>{d8dd0ca2-6487-4e68-b02e-097fe2c84746}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\Weapon">
+      <UniqueIdentifier>{02a5ea1d-58fc-4cb8-912d-1a4ff712897f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\Weapon\Sword">
+      <UniqueIdentifier>{bb5b346c-11b1-41ae-bd18-cd2d7523df64}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\Weapon\Sword\BastardSword">
+      <UniqueIdentifier>{29d67f86-ad4b-482e-b7f3-994660d2360d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\Weapon\Shield">
+      <UniqueIdentifier>{a64da96d-c1a5-4d30-87b3-0e5b06c7c906}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\Player\Weapon\Shield\RoundShield">
+      <UniqueIdentifier>{15fe760a-64dc-436a-9670-8ada20414c0d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -217,16 +268,16 @@
       <Filter>00.MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_GamePlay.h">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>02.Levels\GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Loading.h">
-      <Filter>01.Levels\Loading</Filter>
+      <Filter>02.Levels\Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Loader.h">
-      <Filter>01.Levels\Loading\Loader</Filter>
+      <Filter>02.Levels\Loading\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Logo.h">
-      <Filter>01.Levels\Logo</Filter>
+      <Filter>02.Levels\Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Client_Defines.h">
       <Filter>99.Defines</Filter>
@@ -238,172 +289,211 @@
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LoadingScreen.h">
-      <Filter>02.GameObject\UIObject\Loading</Filter>
+      <Filter>03.GameObject\UIObject\Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LogoScreen.h">
-      <Filter>02.GameObject\UIObject\Logo</Filter>
+      <Filter>03.GameObject\UIObject\Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LoadingBar.h">
-      <Filter>02.GameObject\UIObject\Loading</Filter>
+      <Filter>03.GameObject\UIObject\Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\public\LoadingPoint.h">
-      <Filter>02.GameObject\UIObject\Loading</Filter>
+      <Filter>03.GameObject\UIObject\Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Camera_Target.h">
-      <Filter>02.GameObject\Pawns\Player\Camera</Filter>
+      <Filter>03.GameObject\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\public\HUD.h">
-      <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StateBar.h">
-      <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClInclude>
     <ClInclude Include="..\public\OptionMain.h">
-      <Filter>02.GameObject\UIObject\GamePlay\Option</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\Option</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ClientPch.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\OptionController.h">
-      <Filter>02.GameObject\UIObject\GamePlay\OptionController</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\Controller_UI.h">
-      <Filter>03.Controller</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Controller_KeyBoard.h">
-      <Filter>03.Controller</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\OptionController</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Background.h">
-      <Filter>02.GameObject\UIObject\Static\Background</Filter>
+      <Filter>03.GameObject\UIObject\Static\Background</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Button.h">
-      <Filter>02.GameObject\UIObject\Static\Button</Filter>
+      <Filter>03.GameObject\UIObject\Static\Button</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Panel.h">
-      <Filter>02.GameObject\UIObject\Static\Panel</Filter>
+      <Filter>03.GameObject\UIObject\Static\Panel</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Bar.h">
-      <Filter>02.GameObject\UIObject\Static\Bar</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\LoadingBack.h">
-      <Filter>02.GameObject\UIObject\Loading</Filter>
+      <Filter>03.GameObject\UIObject\Static\Bar</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MapObject.h">
-      <Filter>02.GameObject\MapObject</Filter>
+      <Filter>03.GameObject\Maps\MapObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerState.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Idle.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Idle</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Idle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Move.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Move</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Move</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Attack.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Attack</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Guard.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Guard</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Guard</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Roll.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Roll</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Roll</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerPawn.h">
-      <Filter>02.GameObject\Pawns\Player</Filter>
+      <Filter>03.GameObject\Pawns\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerBody.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerBody</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerBody</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StateFactory.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\Factory</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\Factory</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerAnimMachine.h">
-      <Filter>02.GameObject\Pawns\AnimMachine\PlayerAnimMachine</Filter>
+      <Filter>03.GameObject\Pawns\AnimMachine\PlayerAnimMachine</Filter>
     </ClInclude>
     <ClInclude Include="AnimTable.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash0.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash2.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash1.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash4.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash3.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_HeavyStand.h">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BastardSword.h">
-      <Filter>02.GameObject\Pawns\Player\Sword\BastardSword</Filter>
+      <Filter>03.GameObject\Pawns\Player\Weapon\Sword\BastardSword</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RoundShield.h">
-      <Filter>02.GameObject\Pawns\Player\Shield\RoundShield</Filter>
+      <Filter>03.GameObject\Pawns\Player\Weapon\Shield\RoundShield</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Armor.h">
-      <Filter>02.GameObject\Pawns\Player\Armor</Filter>
+      <Filter>03.GameObject\Pawns\Player\Armor</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Client_Struct.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GlasgavelenBody.h">
-      <Filter>02.GameObject\Pawns\Monster\Glasgavelen\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Glasgavelen.h">
-      <Filter>02.GameObject\Pawns\Monster\Glasgavelen</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Glasgavelen</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GlasgavelenSword.h">
-      <Filter>02.GameObject\Pawns\Monster\Glasgavelen\Weapon</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="..\public\VampireAI.h">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\AI</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\AI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Monster.h">
-      <Filter>02.GameObject\Pawns\Monster</Filter>
+      <Filter>03.GameObject\Pawns\Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire.h">
-      <Filter>02.GameObject\Pawns\Monster\Vampire</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire_Basic.h">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Basic</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Basic</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire_Basic_Body.h">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Body.h">
-      <Filter>02.GameObject\Pawns\BodyBase</Filter>
+      <Filter>03.GameObject\Pawns\BodyBase</Filter>
     </ClInclude>
     <ClInclude Include="..\public\AnimMachine.h">
-      <Filter>02.GameObject\Pawns\AnimMachine</Filter>
+      <Filter>03.GameObject\Pawns\AnimMachine</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire_AnimMachine.h">
-      <Filter>02.GameObject\Pawns\AnimMachine\Vampire_AnimMachine</Filter>
+      <Filter>03.GameObject\Pawns\AnimMachine\Vampire_AnimMachine</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire_Elder.h">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Elder</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Elder</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Vampire_Elder_Body.h">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Vampire_Royal.h">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Royal</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Royal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Vampire_Royal_Body.h">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Queen.h">
-      <Filter>02.GameObject\Pawns\Monster\Queen</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Queen</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Queen_Body.h">
-      <Filter>02.GameObject\Pawns\Monster\Queen\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Queen\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\QueenAI.h">
+      <Filter>03.GameObject\Pawns\Monster\Queen\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\QueenAnimMachine.h">
+      <Filter>03.GameObject\Pawns\AnimMachine\QueenAnimMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Town.h">
+      <Filter>03.GameObject\Maps\Town</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Map.h">
+      <Filter>03.GameObject\Maps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Town.h">
+      <Filter>02.Levels\GamePlay\Level_Town</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Free.h">
+      <Filter>03.GameObject\Camera\Free</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Queen.h">
+      <Filter>02.Levels\GamePlay\Level_Queen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Field.h">
+      <Filter>02.Levels\GamePlay\Level_Field</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Level_Glasgavelen.h">
+      <Filter>02.Levels\GamePlay\Level_Glasgavelen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\UI_Container.h">
+      <Filter>03.GameObject\UIObject\UI_Container</Filter>
+    </ClInclude>
+    <ClInclude Include="UITable.h">
+      <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Controller_KeyBoard.h">
+      <Filter>04.Controller\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Controller_Mouse.h">
+      <Filter>04.Controller\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Controller_UI.h">
+      <Filter>04.Controller\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerInstance.h">
+      <Filter>01.PlayerInstance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Weapon.h">
+      <Filter>03.GameObject\Pawns\Player\Weapon</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -427,178 +517,214 @@
       <Filter>00.MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_GamePlay.cpp">
-      <Filter>01.Levels\GamePlay</Filter>
+      <Filter>02.Levels\GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Loading.cpp">
-      <Filter>01.Levels\Loading</Filter>
+      <Filter>02.Levels\Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Loader.cpp">
-      <Filter>01.Levels\Loading\Loader</Filter>
+      <Filter>02.Levels\Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Logo.cpp">
-      <Filter>01.Levels\Logo</Filter>
+      <Filter>02.Levels\Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LoadingScreen.cpp">
-      <Filter>02.GameObject\UIObject\Loading</Filter>
+      <Filter>03.GameObject\UIObject\Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LogoScreen.cpp">
-      <Filter>02.GameObject\UIObject\Logo</Filter>
+      <Filter>03.GameObject\UIObject\Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LoadingBar.cpp">
-      <Filter>02.GameObject\UIObject\Loading</Filter>
+      <Filter>03.GameObject\UIObject\Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\private\LoadingPoint.cpp">
-      <Filter>02.GameObject\UIObject\Loading</Filter>
+      <Filter>03.GameObject\UIObject\Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Camera_Target.cpp">
-      <Filter>02.GameObject\Pawns\Player\Camera</Filter>
+      <Filter>03.GameObject\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\private\HUD.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StateBar.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay\HUD</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ClientPch.cpp">
       <Filter>99.Defines</Filter>
     </ClCompile>
     <ClCompile Include="..\private\OptionController.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay\OptionController</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\Controller_UI.cpp">
-      <Filter>03.Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Controller_KeyBoard.cpp">
-      <Filter>03.Controller</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\OptionController</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Background.cpp">
-      <Filter>02.GameObject\UIObject\Static\Background</Filter>
+      <Filter>03.GameObject\UIObject\Static\Background</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Button.cpp">
-      <Filter>02.GameObject\UIObject\Static\Button</Filter>
+      <Filter>03.GameObject\UIObject\Static\Button</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Panel.cpp">
-      <Filter>02.GameObject\UIObject\Static\Panel</Filter>
+      <Filter>03.GameObject\UIObject\Static\Panel</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Bar.cpp">
-      <Filter>02.GameObject\UIObject\Static\Bar</Filter>
-    </ClCompile>
-    <ClCompile Include="..\private\LoadingBack.cpp">
-      <Filter>02.GameObject\UIObject\Loading</Filter>
+      <Filter>03.GameObject\UIObject\Static\Bar</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MapObject.cpp">
-      <Filter>02.GameObject\MapObject</Filter>
+      <Filter>03.GameObject\Maps\MapObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerState.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Idle.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Idle</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Idle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Move.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Move</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Move</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Attack.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Attack</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Guard.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Guard</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Guard</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Roll.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Roll</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Roll</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerPawn.cpp">
-      <Filter>02.GameObject\Pawns\Player</Filter>
+      <Filter>03.GameObject\Pawns\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerBody.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerBody</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerBody</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StateFactory.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\Factory</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\Factory</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerAnimMachine.cpp">
-      <Filter>02.GameObject\Pawns\AnimMachine\PlayerAnimMachine</Filter>
+      <Filter>03.GameObject\Pawns\AnimMachine\PlayerAnimMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\OptionMain.cpp">
-      <Filter>02.GameObject\UIObject\GamePlay\Option</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\Option</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash0.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash2.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash1.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash4.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash3.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_HeavyStand.cpp">
-      <Filter>02.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand</Filter>
+      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BastardSword.cpp">
-      <Filter>02.GameObject\Pawns\Player\Sword\BastardSword</Filter>
+      <Filter>03.GameObject\Pawns\Player\Weapon\Sword\BastardSword</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RoundShield.cpp">
-      <Filter>02.GameObject\Pawns\Player\Shield\RoundShield</Filter>
+      <Filter>03.GameObject\Pawns\Player\Weapon\Shield\RoundShield</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Armor.cpp">
-      <Filter>02.GameObject\Pawns\Player\Armor</Filter>
+      <Filter>03.GameObject\Pawns\Player\Armor</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GlasgavelenBody.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Glasgavelen\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Glasgavelen.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Glasgavelen</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Glasgavelen</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GlasgavelenSword.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Glasgavelen\Weapon</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\private\VampireAI.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\AI</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\AI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Monster.cpp">
-      <Filter>02.GameObject\Pawns\Monster</Filter>
+      <Filter>03.GameObject\Pawns\Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Vampire</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire_Basic.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Basic</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Basic</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire_Basic_Body.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Body.cpp">
-      <Filter>02.GameObject\Pawns\BodyBase</Filter>
+      <Filter>03.GameObject\Pawns\BodyBase</Filter>
     </ClCompile>
     <ClCompile Include="..\private\AnimMachine.cpp">
-      <Filter>02.GameObject\Pawns\AnimMachine</Filter>
+      <Filter>03.GameObject\Pawns\AnimMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire_AnimMachine.cpp">
-      <Filter>02.GameObject\Pawns\AnimMachine\Vampire_AnimMachine</Filter>
+      <Filter>03.GameObject\Pawns\AnimMachine\Vampire_AnimMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire_Elder.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Elder</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Elder</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Vampire_Elder_Body .cpp">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Vampire_Royal.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Royal</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Royal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Vampire_Royal_Body.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Queen.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Queen</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Queen</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Queen_Body.cpp">
-      <Filter>02.GameObject\Pawns\Monster\Queen\Body</Filter>
+      <Filter>03.GameObject\Pawns\Monster\Queen\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\QueenAI.cpp">
+      <Filter>03.GameObject\Pawns\Monster\Queen\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\QueenAnimMachine.cpp">
+      <Filter>03.GameObject\Pawns\AnimMachine\QueenAnimMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Town.cpp">
+      <Filter>03.GameObject\Maps\Town</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Map.cpp">
+      <Filter>03.GameObject\Maps</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Town.cpp">
+      <Filter>02.Levels\GamePlay\Level_Town</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Free.cpp">
+      <Filter>03.GameObject\Camera\Free</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Queen.cpp">
+      <Filter>02.Levels\GamePlay\Level_Queen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Field.cpp">
+      <Filter>02.Levels\GamePlay\Level_Field</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Level_Glasgavelen.cpp">
+      <Filter>02.Levels\GamePlay\Level_Glasgavelen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\UI_Container.cpp">
+      <Filter>03.GameObject\UIObject\UI_Container</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Controller_KeyBoard.cpp">
+      <Filter>04.Controller\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Controller_Mouse.cpp">
+      <Filter>04.Controller\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Controller_UI.cpp">
+      <Filter>04.Controller\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerInstance.cpp">
+      <Filter>01.PlayerInstance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Weapon.cpp">
+      <Filter>03.GameObject\Pawns\Player\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

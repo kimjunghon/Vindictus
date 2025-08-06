@@ -172,6 +172,30 @@
     <Filter Include="01.Utility\07.BehaviorTree\Node\SequenceNode">
       <UniqueIdentifier>{6aea4a6c-10e5-4c06-8295-59bea12936dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\04.Component\Navigation">
+      <UniqueIdentifier>{550a420a-24fc-4b6c-aa18-7f49d6a0330a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Navigation\Cell">
+      <UniqueIdentifier>{14b19c98-08c2-4190-8749-b5c953fd8aad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\08.Fonts">
+      <UniqueIdentifier>{f0fe2d58-5f28-47c7-aa6a-d9042ec4ec02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\08.Fonts\Manager">
+      <UniqueIdentifier>{9c3a5eca-c2bb-4c97-a6f4-195cba270737}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\VIBuffer\Cell">
+      <UniqueIdentifier>{40370507-9917-4749-b32a-3456c376734f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="95.ShaderFiles">
+      <UniqueIdentifier>{4ab087b8-5943-403b-8307-f3445d8af18e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\VIBuffer\Sphere">
+      <UniqueIdentifier>{e1b6baad-ef2f-44af-8a7e-7e2c52337648}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Navigation\Manager">
+      <UniqueIdentifier>{1aabab80-2841-46d3-817c-df274a1eb4af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -351,6 +375,27 @@
     <ClInclude Include="..\public\BehaviorTree.h">
       <Filter>01.Utility\07.BehaviorTree</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Font_Manager.h">
+      <Filter>01.Utility\08.Fonts\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\CustomFont.h">
+      <Filter>01.Utility\08.Fonts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Navigation.h">
+      <Filter>01.Utility\04.Component\Navigation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Cell.h">
+      <Filter>01.Utility\04.Component\Navigation\Cell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Cell.h">
+      <Filter>01.Utility\04.Component\VIBuffer\Cell</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Sphere.h">
+      <Filter>01.Utility\04.Component\VIBuffer\Sphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Navigation_Manager.h">
+      <Filter>01.Utility\04.Component\Navigation\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -506,5 +551,31 @@
     <ClCompile Include="..\private\BehaviorTree.cpp">
       <Filter>01.Utility\07.BehaviorTree</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Font_Manager.cpp">
+      <Filter>01.Utility\08.Fonts\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\CustomFont.cpp">
+      <Filter>01.Utility\08.Fonts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Navigation.cpp">
+      <Filter>01.Utility\04.Component\Navigation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Cell.cpp">
+      <Filter>01.Utility\04.Component\Navigation\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Cell.cpp">
+      <Filter>01.Utility\04.Component\VIBuffer\Cell</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Sphere.cpp">
+      <Filter>01.Utility\04.Component\VIBuffer\Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Navigation_Manager.cpp">
+      <Filter>01.Utility\04.Component\Navigation\Manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Cell.hlsl">
+      <Filter>95.ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

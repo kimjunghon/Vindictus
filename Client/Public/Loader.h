@@ -39,9 +39,10 @@ private:
 	_float							m_fLoadingRatio = {0.f};
 private:
 	HRESULT Loading_For_Logo_Level();
+	HRESULT Loading_For_Town_Level();
+	HRESULT Loading_For_MapModel(LEVEL eLevel, const _char* pMapFilePath);
 
 	HRESULT Loading_For_GamePlay_Level();
-	HRESULT Loading_For_GamePlay_MapModel();
 	HRESULT Loading_For_GamePlay_ArmorModel();
 	
 public:

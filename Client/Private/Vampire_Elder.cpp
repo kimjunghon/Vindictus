@@ -15,7 +15,13 @@ CVampire_Elder::CVampire_Elder(const CVampire_Elder& Prototype)
 
 HRESULT CVampire_Elder::Initialize_Prototype()
 {
-	m_fAttackCoolTime = 10.f;
+	m_iNumAttacks = END;
+
+	m_AttackCoolTime.resize(m_iNumAttacks, 0.f);
+	m_AttackTime.resize(m_iNumAttacks, 0.f);
+
+	m_AttackCoolTime[ATTACK_NORMAL] = 10.f;
+
 	m_fAttackRange = 150.f;
 	m_fChaseRange = 120.f;
 	m_fMinDistance = 50.f;
@@ -30,19 +36,8 @@ HRESULT CVampire_Elder::Initialize(void* pArg)
 
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
 
-	if (FAILED(Ready_AI()))
-		return E_FAIL;
-
 	if (FAILED(Ready_PawnObject()))
 		return E_FAIL;
-
-	m_fAttackTime = 0.f;
-
-	//TEST
-	m_pTargetTransform = static_cast<CTransform*>(m_pGameInstance->Get_Component(ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_Player"), TEXT("Com_Transform"), 0));
-	if (nullptr == m_pTargetTransform)
-		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -55,7 +50,7 @@ void CVampire_Elder::Priority_Update(_float fTimeDelta)
 
 void CVampire_Elder::Update(_float fTimeDelta)
 {
-	m_fAttackTime += fTimeDelta;
+	CMonster::Update_AttackCoolTime(fTimeDelta);
 
 	m_pAI->Update();
 
@@ -84,71 +79,19 @@ HRESULT CVampire_Elder::Render()
 	return S_OK;
 }
 
-BT_STATE CVampire_Elder::CanOtherAction()
-{
-	if (m_pBody->AnimCanChange() || m_pBody->AnimIsFinished())
-		return BT_STATE::FAILED;
-
-	return BT_STATE::RUN;
-}
-
-BT_STATE CVampire_Elder::CanAttackRange()
-{
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
-
-	if (abs(fDistance) <= m_fAttackRange)
-		return BT_STATE::SUCCESS;
-
-	return BT_STATE::FAILED;
-}
 
 BT_STATE CVampire_Elder::Attack()
 {
 	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
 
 	if (abs(fDistance) <= m_fMinDistance)
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | ENUM_CLASS(ATTACK_FLAG::ATTACK_MELEE);
+		m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | ENUM_CLASS(ATTACK_FLAG::MELEE);
 	else
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | ENUM_CLASS(ATTACK_FLAG::ATTACK_RANGE);
+		m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | ENUM_CLASS(ATTACK_FLAG::RANGE);
 
-	m_fAttackTime = 0.f;
+	m_AttackTime[m_iCurrentAttack] = 0.f;
 
 	return BT_STATE::SUCCESS;
-}
-
-BT_STATE CVampire_Elder::Chase()
-{
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
-
-	if (abs(fDistance) >= m_fChaseRange)
-	{
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::RUN_FRONT);
-
-		return BT_STATE::SUCCESS;
-	}
-
-	return BT_STATE::FAILED;
-}
-
-BT_STATE CVampire_Elder::Patrol()
-{
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
-
-	if (abs(fDistance) <= m_fMinDistance)
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::RUN_BACK);
-	else
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | (rand() % 2 == 0 ? ENUM_CLASS(MOVE_FLAG::RUN_LEFT) : ENUM_CLASS(MOVE_FLAG::RUN_RIGHT));
-
-	return BT_STATE::SUCCESS;
-}
-
-HRESULT CVampire_Elder::Ready_AI()
-{
-	m_pAI = CVampireAI::Create(this);
-	if (nullptr == m_pAI)
-		return E_FAIL;
-
-	return S_OK;
 }
 
 HRESULT CVampire_Elder::Ready_PawnObject()
@@ -169,19 +112,13 @@ HRESULT CVampire_Elder::Ready_PawnObject()
 
 void CVampire_Elder::Compute_AnimPosition()
 {
-	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
-	_vector vAnimPosition = *m_pAnimMovement;
+	_vector vAnimPosition = XMVectorSetY(*m_pAnimMovement, 0.f);
 
-	_vector vLook = XMVector3Normalize(m_pTransformCom->Get_State(STATE::LOOK));
-	_float fYaw = atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook));
+	_matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
 
-	_matrix RotationMatrix = XMMatrixRotationY(fYaw);
+	_matrix PositionMatrix = XMMatrixTranslationFromVector(vAnimPosition);
 
-	vAnimPosition = XMVector3Transform(vAnimPosition, RotationMatrix);
-
-	vPosition = XMVectorSetW(XMVectorAdd(vPosition, vAnimPosition), 1.f);
-
-	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+	m_pTransformCom->Set_WorldMatrix((PositionMatrix)*WorldMatrix);
 }
 
 CVampire_Elder* CVampire_Elder::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
@@ -210,5 +147,4 @@ void CVampire_Elder::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pAI);
 }

@@ -18,7 +18,6 @@ public:
 	virtual HRESULT	MoveInput(INPUT_MOVE_DESC* pOut) override;
 	virtual HRESULT	ActionInput(INPUT_ACTION_DESC* pOut) override;
 	virtual HRESULT	CameraInput(INPUT_CAMERA_DESC* pOut) override;
-	virtual HRESULT UI_Input(INPUT_UI_DESC* pOut) override;
 
 private:
 	_float		m_fSensor = {};

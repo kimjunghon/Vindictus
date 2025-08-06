@@ -1,5 +1,6 @@
 #include "ClientPch.h"
 #include "Vampire.h"
+#include "VampireAI.h"
 
 CVampire::CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -8,21 +9,21 @@ CVampire::CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 
 CVampire::CVampire(const CVampire& Prototype)
 	: CMonster { Prototype }
-	, m_fAttackCoolTime { Prototype.m_fAttackCoolTime }
-	, m_fAttackRange { Prototype.m_fAttackRange }
-	, m_fChaseRange { Prototype.m_fChaseRange }
-	, m_fMinDistance { Prototype.m_fMinDistance }
 {
 }
 
 HRESULT CVampire::Initialize_Prototype()
 {
+
 	return S_OK;
 }
 
 HRESULT CVampire::Initialize(void* pArg)
 {
 	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
+
+	if (FAILED(Ready_AI()))
 		return E_FAIL;
 
 	return S_OK;
@@ -45,40 +46,53 @@ HRESULT CVampire::Render()
 	return S_OK;
 }
 
-BT_STATE CVampire::CanAttack()
-{
-	if (m_fAttackTime >= m_fAttackCoolTime)
-		return BT_STATE::SUCCESS;
-
-	return BT_STATE::FAILED;
-}
-
-BT_STATE CVampire::CanOtherAction()
-{
-	return BT_STATE();
-}
-
-BT_STATE CVampire::CanAttackRange()
-{
-	return BT_STATE();
-}
-
 BT_STATE CVampire::Attack()
 {
-	return BT_STATE();
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+
+	m_AttackTime[m_iCurrentAttack] = 0.f;
+
+	return BT_STATE::SUCCESS;
 }
 
 BT_STATE CVampire::Chase()
 {
-	return BT_STATE();
+	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
+
+	if (abs(fDistance) >= m_fChaseRange)
+	{
+		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::FRONT);
+
+		return BT_STATE::SUCCESS;
+	}
+
+	return BT_STATE::FAILED;
 }
 
 BT_STATE CVampire::Patrol()
 {
-	return BT_STATE();
+	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
+
+	if (abs(fDistance) <= m_fMinDistance)
+		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::BACK);
+	else
+		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | (rand() % 2 == 0 ? ENUM_CLASS(MOVE_FLAG::LEFT) : ENUM_CLASS(MOVE_FLAG::RIGHT));
+
+	return BT_STATE::SUCCESS;
+}
+
+HRESULT CVampire::Ready_AI()
+{
+	m_pAI = CVampireAI::Create(this);
+
+	if (nullptr == m_pAI)
+		return E_FAIL;
+
+	return S_OK;
 }
 
 void CVampire::Free()
 {
 	__super::Free();
+
 }

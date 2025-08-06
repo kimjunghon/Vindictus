@@ -14,16 +14,17 @@ class CArmor final : public CPawnObject
 {
 public:
 	typedef struct tagArmorInfo {
-		_float fDefense;
-		_float fBrokenDefense;
-		_float fHealth;
+		_wstring	strArmorName;
+		_float		fDefense;
+		_float		fBrokenDefense;
+		_float		fHealth;
 	}ARMOR_INFO;
 
 	typedef struct tagArmorDesc : public PAWNOBJECT_DESC {
 		_uint				iArmorModelPrototypeLevelIndex;
 		_wstring			strArmorModelPrototypeTag;
 		ARMOR_TYPE			eArmorType;
-		ARMOR_INFO			tArmorInfo;
+		ARMOR_INFO			ArmorInfo;
 	}ARMOR_DESC;
 	
 private:
@@ -39,14 +40,16 @@ public:
 	virtual void			Late_Update(_float fTimeDelta) override;
 	virtual HRESULT			Render() override;
 
-	HRESULT					Equip(CModel* pParentModelCom);
+	const _wstring&			Get_ArmorName() { return m_ArmorInfo.strArmorName; }
+	ARMOR_TYPE				Get_ArmorType() { return m_eArmorType; }
+	HRESULT					Equip(const _float4x4* pPawnMatrix, CModel* pParentModelCom);
 	HRESULT					UnEquip();
 
-protected:
+private:
 	_bool					m_IsEquip = { false };
 	ARMOR_TYPE				m_eArmorType = { ARMOR_TYPE::END };
 	ARMOR_STATE				m_eArmorState = { ARMOR_STATE::DEFAULT };
-	ARMOR_INFO				m_tArmorInfo = {};
+	ARMOR_INFO				m_ArmorInfo = {};
 
 	CModel*					m_pModelCom[ENUM_CLASS(ARMOR_STATE::END)] = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };
@@ -62,8 +65,6 @@ public:
 	static CArmor*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;
 	virtual void			Free() override;
-
-
 };
 
 NS_END

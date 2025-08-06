@@ -23,6 +23,8 @@ public:
 	
 	HRESULT			Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones);
 
+	_bool			Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist);
+
 private:
 	_char				m_szName[MAX_PATH] = {};
 	_uint				m_iMaterialIndex = {};
@@ -31,6 +33,11 @@ private:
 	_float4x4			m_BoneMatrices[MAX_BONES] = {};
 	vector<_int>		m_BoneIndices;
 	vector<_float4x4>	m_OffsetMatrices;
+
+#ifdef _DEBUG
+	vector<VTXMESH>		m_Vertices;
+	vector<_uint>		m_Indices;
+#endif
 	
 private:
 	HRESULT Ready_Vertices_For_NonAnim_Assimp(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);

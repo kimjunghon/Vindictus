@@ -21,7 +21,7 @@ public:
 public:
 	_bool	CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio);
 
-	void	Enter();
+	void	Enter(_bool IsChange);
 
 private:
 	_float				m_fDuration = {};

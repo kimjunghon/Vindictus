@@ -2,12 +2,18 @@
 #include "Client_Defines.h"
 #include "Pawn.h"
 
+NS_BEGIN(Engine)
+class CNavigation;
+NS_END
+
 NS_BEGIN(Client)
 
 class CCamera_Target;
 class CPlayerState;
 class CPlayerBody;
 class CArmor;
+class CWeapon;
+class CPlayerInstance;
 
 class CPlayerPawn final : public CPawn
 {
@@ -34,14 +40,21 @@ public:
 	void			Compute_PlayerMoveDir();
 
 	void			Run() { m_fSpeedRatio = 1.f; }
-	void			Sprint() { m_fSpeedRatio = 5.f; }
+	void			Sprint() { m_fSpeedRatio = 2.f; }
 
-	HRESULT			EquipArmor(const _wstring& strArmorTag, CArmor* pArmor, ARMOR_TYPE eArmorType);
+	HRESULT			EquipWeapon(CWeapon* pWeapon);
+	HRESULT			UnEquipWeapon(WEAPON_TYPE eWeaponType);
+
+	HRESULT			EquipArmor(CArmor* pArmor);
 	HRESULT			UnEquipArmor(ARMOR_TYPE eArmorType);
 
 private:
+	CPlayerInstance*		m_pPlayerInstance = { nullptr };
+
 	CPlayerBody*			m_pPlayerBody = { nullptr };
 	CCamera_Target*			m_pCamera = { nullptr };
+
+	_wstring				m_strEquipWeapons[ENUM_CLASS(WEAPON_TYPE::END)] = {};
 	_wstring				m_strEquipArmors[ENUM_CLASS(ARMOR_TYPE::END)] = {};
 
 	INPUT_MOVE_DESC			m_MoveInput = {};

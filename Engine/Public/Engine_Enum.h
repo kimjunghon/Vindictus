@@ -27,6 +27,9 @@ namespace Engine
 	enum class MODELTYPE { ANIM, NONANIM, INFILE };
 
 	enum class BT_STATE { RUN, SUCCESS, FAILED };
+
+	enum class CELL_POINT { A, B, C, END };
+	enum class LINE { AB, BC, CA, END};
 }
 
 #endif // Engine_Enum_h__

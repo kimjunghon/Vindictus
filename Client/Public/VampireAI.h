@@ -22,8 +22,8 @@ private:
 	HRESULT Ready_Nodes();
 
 public:
-	static CVampireAI* Create(CVampire* pControlledVampire);
-	virtual void Free() override;
+	static CVampireAI*	Create(CVampire* pControlledVampire);
+	virtual void		Free() override;
 };
 
 NS_END

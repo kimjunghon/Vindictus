@@ -124,6 +124,7 @@ void CLoadingBar::Update_BarRatio(_float fTimeDelta)
 	{
 		EVENT_LOADING_COMPLETE Event;
 		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::LOADING), Event);
+		m_fBarRatio = 0.f;
 	}
 }
 

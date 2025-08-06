@@ -58,30 +58,33 @@ CController* CController_Manager::Find_Controller(const _wstring& strControllerT
 
 void CController_Manager::Clear()
 {
+	for (_uint i = 0; i < ENUM_CLASS(CONTROLLER_CHANNEL::END); i++)
+		m_pCurrentController[i] = nullptr;
+	
 	for (auto& Pair : m_Controllers)
 		Safe_Release(Pair.second);
 
 	m_Controllers.clear();
 }
 
-HRESULT CController_Manager::MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut)
+HRESULT CController_Manager::MoveInput(INPUT_MOVE_DESC* pOut)
 {
-	return m_pCurrentController[iChannelIndex]->MoveInput(pOut);
+	return m_pCurrentController[ENUM_CLASS(CONTROLLER_CHANNEL::MAIN)]->MoveInput(pOut);
 }
 
-HRESULT CController_Manager::ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut)
+HRESULT CController_Manager::ActionInput(INPUT_ACTION_DESC* pOut)
 {
-	return m_pCurrentController[iChannelIndex]->ActionInput(pOut);
+	return m_pCurrentController[ENUM_CLASS(CONTROLLER_CHANNEL::MAIN)]->ActionInput(pOut);
 }
 
-HRESULT CController_Manager::CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut)
+HRESULT CController_Manager::CameraInput(INPUT_CAMERA_DESC* pOut)
 {
-	return m_pCurrentController[iChannelIndex]->CameraInput(pOut);
+	return m_pCurrentController[ENUM_CLASS(CONTROLLER_CHANNEL::MAIN)]->CameraInput(pOut);
 }
 
-HRESULT CController_Manager::UI_Input(_uint iChannelIndex, INPUT_UI_DESC* pOut)
+HRESULT CController_Manager::UI_Input(INPUT_UI_DESC* pOut)
 {
-	return m_pCurrentController[iChannelIndex]->UI_Input(pOut);
+	return m_pCurrentController[ENUM_CLASS(CONTROLLER_CHANNEL::MAIN)]->UI_Input(pOut);
 }
 
 CController_Manager* CController_Manager::Create()
@@ -92,6 +95,9 @@ CController_Manager* CController_Manager::Create()
 void CController_Manager::Free()
 {
 	__super::Free();
+
+	for (_uint i = 0; i < ENUM_CLASS(CONTROLLER_CHANNEL::END); i++)
+		m_pCurrentController[i] = nullptr;
 
 	for (auto& Pair : m_Controllers)
 		Safe_Release(Pair.second);

@@ -7,15 +7,21 @@
 #include "StateFactory.h"
 #include "PlayerBody.h"
 #include "Armor.h"
+#include "Weapon.h"
+#include "PlayerInstance.h"
 
 CPlayerPawn::CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CPawn { pDevice, pDeviceContext }
+	, m_pPlayerInstance{ CPlayerInstance::GetInstance() }
 {
+	Safe_AddRef(m_pPlayerInstance);
 }
 
 CPlayerPawn::CPlayerPawn(const CPlayerPawn& Prototype)
 	: CPawn { Prototype }
+	, m_pPlayerInstance { Prototype.m_pPlayerInstance}
 {
+	Safe_AddRef(m_pPlayerInstance);
 }
 
 HRESULT CPlayerPawn::Initialize_Prototype()
@@ -46,11 +52,11 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 
 	m_vPrevPlayerRotationQuat = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 
-	m_fSpeed = 10.f;
+	m_fSpeed = 50.f;
 
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::DEFAULT);
 
-	//test
+	
 	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(-10.f, 0.f, 10.f, 1.f));
 
 	return S_OK;
@@ -121,10 +127,48 @@ void CPlayerPawn::Compute_PlayerMoveDir()
 
 }
 
-HRESULT CPlayerPawn::EquipArmor(const _wstring& strArmorTag, CArmor* pArmor, ARMOR_TYPE eArmorType)
+HRESULT CPlayerPawn::EquipWeapon(CWeapon* pWeapon)
 {
-	if (nullptr == pArmor || eArmorType == ARMOR_TYPE::END)
+	if (nullptr == pWeapon)
 		return E_FAIL;
+
+	_wstring strWeaponName = pWeapon->Get_WeaponName();
+	WEAPON_TYPE eWeaponType = pWeapon->Get_WeaponType();
+
+	if (m_strEquipWeapons[ENUM_CLASS(eWeaponType)].size() > 0)
+		UnEquipWeapon(eWeaponType);
+
+	m_strEquipWeapons[ENUM_CLASS(eWeaponType)] = strWeaponName;
+
+	string strSocketBoneName = "";
+
+	eWeaponType == WEAPON_TYPE::SWORD ? strSocketBoneName = "ValveBiped.Anim_Attachment_RH" : strSocketBoneName = "Anim_Attachment_LF";
+
+	pWeapon->Equip(m_pPlayerBody->SocketCombinedMatrixPtr(strSocketBoneName));
+
+	Add_PawnObject(strWeaponName, pWeapon);
+
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::UnEquipWeapon(WEAPON_TYPE eWeaponType)
+{
+	if (FAILED(Remove_PawnObject(m_strEquipWeapons[ENUM_CLASS(eWeaponType)])))
+		return E_FAIL;
+
+	m_strEquipWeapons[ENUM_CLASS(eWeaponType)].clear();
+
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::EquipArmor(CArmor* pArmor)
+{
+	if (nullptr == pArmor)
+		return E_FAIL;
+
+	_wstring strArmorName = pArmor->Get_ArmorName();
+	ARMOR_TYPE eArmorType = pArmor->Get_ArmorType();
+
 
 	if (eArmorType == ARMOR_TYPE::HEAD)
 		m_pPlayerBody->EquipHead();
@@ -132,11 +176,11 @@ HRESULT CPlayerPawn::EquipArmor(const _wstring& strArmorTag, CArmor* pArmor, ARM
 	if (m_strEquipArmors[ENUM_CLASS(eArmorType)].size() > 0)
 		UnEquipArmor(eArmorType);
 
-	m_strEquipArmors[ENUM_CLASS(eArmorType)] = strArmorTag;
+	m_strEquipArmors[ENUM_CLASS(eArmorType)] = strArmorName;
 	
 	pArmor->Equip(m_pPlayerBody->Get_ParentModelPtr());
 
-	Add_PawnObject(strArmorTag, pArmor);
+	Add_PawnObject(strArmorName, pArmor);
 
 	return S_OK;
 }
@@ -238,29 +282,20 @@ HRESULT CPlayerPawn::Ready_PlayerBody()
 
 HRESULT CPlayerPawn::Ready_Weapons()
 {
-	CSocketObject::SOCKETOBJECT_DESC SocketObjectDesc = {};
-	SocketObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-	SocketObjectDesc.pSocketMatrix = m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH");
+	for (_uint i = 0; i < ENUM_CLASS(WEAPON_TYPE::END); i++)
+	{
+		CWeapon* pWeapon = m_pPlayerInstance->BindPlayerEquipWeapon(i);
+		if (nullptr == pWeapon)
+			continue;
 
-	if (FAILED(__super::Add_PawnObject(TEXT("Bastard_Sword"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_BastardSword"), &SocketObjectDesc)))
-		return E_FAIL;
-
-	SocketObjectDesc.pSocketMatrix = m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_LF");
-
-	if (FAILED(__super::Add_PawnObject(TEXT("Round_Shield"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_RoundShield"), &SocketObjectDesc)))
-		return E_FAIL;
+		EquipWeapon(pWeapon);
+	}
 
 	return S_OK;
 }
 
 HRESULT CPlayerPawn::Ready_Armors()
 {
-	CArmor::ARMOR_DESC ArmorDesc = {};
-	ArmorDesc.eArmorType = ARMOR_TYPE::UPPER;
-	ArmorDesc.iArmorModelPrototypeLevelIndex = ENUM_CLASS(LEVEL::GAMEPLAY);
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Upper");
-	ArmorDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-	ArmorDesc.tArmorInfo = { 10.f, 5.f, 30.f };
 
 	CArmor* pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	if (nullptr == pArmor)
@@ -318,8 +353,6 @@ HRESULT CPlayerPawn::Ready_States()
 	m_States[ENUM_CLASS(PLAYER_STATE::HEAVYSTAND)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::HEAVYSTAND));
 	m_States[ENUM_CLASS(PLAYER_STATE::ROLL)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::ROLL));
 
-	Safe_Release(pStateFactory);
-
 	m_pCurrentState = m_States[ENUM_CLASS(PLAYER_STATE::IDLE)];
 
 	return S_OK;
@@ -327,9 +360,7 @@ HRESULT CPlayerPawn::Ready_States()
 
 void CPlayerPawn::Compute_WorldMatrix()
 {
-	_float3 vScale = m_pTransformCom->Get_Scaled();
-	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
-	_vector vAnimPosition = *m_pAnimMovement;
+	_vector vAnimPosition = XMVectorSetY(*m_pAnimMovement, 0.f);
 	_vector vAnimRotation = *m_pAnimRotation;
 
 	_vector vRotation = {};
@@ -347,28 +378,21 @@ void CPlayerPawn::Compute_WorldMatrix()
 	else
 		vRotation = m_vPlayerRoationQuat;
 
-	_matrix RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+	m_pTransformCom->RotateQuaternion(vRotation);
 
-	if (XMVectorGetX(XMVector3Length(vAnimPosition)) >= 30.f)
-		int a = 10;
+	_matrix PositionMatrix = XMMatrixTranslationFromVector(vAnimPosition);
 
-	vAnimPosition = XMVector3Transform(vAnimPosition, RotationMatrix);
-
-	vPosition = XMVectorSetW(XMVectorAdd(vPosition, vAnimPosition), 1.f);
-
-	_matrix ScaleMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&vScale));
-	_matrix PositionMatrix = XMMatrixTranslationFromVector(vPosition);
-
-	_matrix WorldMatrix = XMMatrixMultiply(XMMatrixMultiply(ScaleMatrix, RotationMatrix), PositionMatrix);
+	_matrix WorldMatrix = PositionMatrix * m_pTransformCom->Get_WorldMatrix();
+		
 
 	m_pTransformCom->Set_WorldMatrix(WorldMatrix);
 }
 
 void CPlayerPawn::Bind_InputData(_float fTimeDelta)
 {
-	m_pGameInstance->MoveInput(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), &m_MoveInput);
-	m_pGameInstance->ActionInput(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), &m_ActionInput);
-	m_pGameInstance->CameraInput(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), &m_CameraInput);
+	m_pGameInstance->MoveInput(&m_MoveInput);
+	m_pGameInstance->ActionInput(&m_ActionInput);
+	m_pGameInstance->CameraInput(&m_CameraInput);
 
 
 	if (m_pCurrentState)
@@ -418,4 +442,6 @@ void CPlayerPawn::Free()
 		Safe_Release(pState);
 
 	Safe_Release(m_pCamera);
+
+	Safe_Release(m_pPlayerInstance);
 }

@@ -131,10 +131,16 @@ public:
 	HRESULT			Add_Controller_ToManager(const _wstring& strControllerTag, class CController* pController);
 	HRESULT			Change_Controller(_uint iChannelIndex, const _wstring& strControllerTag);
 	HRESULT			Change_Controller(_uint iChannelIndex, class CController* pNewController);
-	HRESULT			MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut);
-	HRESULT			ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut);
-	HRESULT			CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut);
-	HRESULT			UI_Input(_uint iChannelIndex, INPUT_UI_DESC* pOut);
+	HRESULT			MoveInput(INPUT_MOVE_DESC* pOut);
+	HRESULT			ActionInput(INPUT_ACTION_DESC* pOut);
+	HRESULT			CameraInput(INPUT_CAMERA_DESC* pOut);
+	HRESULT			UI_Input(INPUT_UI_DESC* pOut);
+#pragma endregion
+
+#pragma region NAVIGATION
+	HRESULT				Add_Navigation(_uint iNavigationLevel, const _tchar* pNavigationFilePath);
+	HRESULT				Change_Navigation(_uint iNavigationLevel);
+	class CNavigation*	Clone_CurrentNavigation(_int iCellIndex);
 #pragma endregion
 
 private:
@@ -154,11 +160,10 @@ private:
 	CEventBus*					m_pEventBus = { nullptr };
 	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
 	class CController_Manager*	m_pController_Manager = { nullptr };
-
+	class CNavigation_Manager*	m_pNavigation_Manager = { nullptr };
 public:
 	void Release_Engine();
 	virtual void Free() override;
-
 };
 
 NS_END

@@ -30,7 +30,7 @@ HRESULT CArmor::Initialize(void* pArg)
 	ARMOR_DESC* pDesc = static_cast<ARMOR_DESC*>(pArg);
 
 	m_eArmorType = pDesc->eArmorType;
-	m_tArmorInfo = pDesc->tArmorInfo;
+	m_ArmorInfo = pDesc->ArmorInfo;
 
 	if (FAILED(Ready_Components(pDesc->iArmorModelPrototypeLevelIndex, pDesc->strArmorModelPrototypeTag)))
 		return E_FAIL;
@@ -49,28 +49,28 @@ void CArmor::Update(_float fTimeDelta)
 	if (m_pGameInstance->Get_KeyDown(DIK_1))
 	{
 		if (m_eArmorType == ARMOR_TYPE::HEAD)
-			m_tArmorInfo.fHealth = 0.f;
+			m_ArmorInfo.fHealth = 0.f;
 	}
 
 	if (m_pGameInstance->Get_KeyDown(DIK_2))
 	{
 		if (m_eArmorType == ARMOR_TYPE::UPPER)
-			m_tArmorInfo.fHealth = 0.f;
+			m_ArmorInfo.fHealth = 0.f;
 	}
 	if (m_pGameInstance->Get_KeyDown(DIK_3))
 	{
 		if (m_eArmorType == ARMOR_TYPE::LOWER)
-			m_tArmorInfo.fHealth = 0.f;
+			m_ArmorInfo.fHealth = 0.f;
 	}
 	if (m_pGameInstance->Get_KeyDown(DIK_4))
 	{
 		if (m_eArmorType == ARMOR_TYPE::HAND)
-			m_tArmorInfo.fHealth = 0.f;
+			m_ArmorInfo.fHealth = 0.f;
 	}
 	if (m_pGameInstance->Get_KeyDown(DIK_5))
 	{
 		if (m_eArmorType == ARMOR_TYPE::FOOT)
-			m_tArmorInfo.fHealth = 0.f;
+			m_ArmorInfo.fHealth = 0.f;
 	}
 
 	if (false == m_IsEquip)
@@ -82,7 +82,7 @@ void CArmor::Late_Update(_float fTimeDelta)
 	if (false == m_IsEquip)
 		return;
 
-	if (m_tArmorInfo.fHealth <= 0.f)
+	if (m_ArmorInfo.fHealth <= 0.f)
 	{
 		m_eArmorState = ARMOR_STATE::BROKEN;		
 		if (m_eArmorType == ARMOR_TYPE::HEAD)
@@ -125,10 +125,12 @@ HRESULT CArmor::Render()
 	return S_OK;
 }
 
-HRESULT CArmor::Equip(CModel* pParentModelCom)
+HRESULT CArmor::Equip(const _float4x4* pPawnMatrix, CModel* pParentModelCom)
 {
 	if (FAILED(Bind_ParentBones(pParentModelCom)))
 		return E_FAIL;
+
+	m_pPawnMatrix = pPawnMatrix;
 
 	m_IsEquip = true;
 

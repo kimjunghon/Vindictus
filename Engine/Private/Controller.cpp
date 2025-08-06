@@ -17,6 +17,26 @@ void CController::Update(_float fTimeDelta)
 {
 }
 
+HRESULT CController::MoveInput(INPUT_MOVE_DESC* pOut)
+{
+    return S_OK;
+}
+
+HRESULT CController::ActionInput(INPUT_ACTION_DESC* pOut)
+{
+    return S_OK;
+}
+
+HRESULT CController::CameraInput(INPUT_CAMERA_DESC* pOut)
+{
+    return S_OK;
+}
+
+HRESULT CController::UI_Input(INPUT_UI_DESC* pOut)
+{
+    return S_OK;
+}
+
 void CController::Free()
 {
     __super::Free();

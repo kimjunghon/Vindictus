@@ -18,6 +18,7 @@
 #include "PipeLine.h"
 #include "Camera_Manager.h"
 #include "Controller_Manager.h"
+#include "Navigation_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -86,6 +87,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pController_Manager)
         return E_FAIL;
 
+    m_pNavigation_Manager = CNavigation_Manager::Create(*ppDevice, *ppDeviceContext);
+    if (nullptr == m_pNavigation_Manager)
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -111,7 +116,6 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
     m_pEventBus->Clear(iClearLevelID);
     m_pObject_Manager->Clear();
     m_pCamera_Manager->Clear();
-    m_pController_Manager->Clear();
     m_pLight_Manager->Clear();
 
     return S_OK;
@@ -376,21 +380,36 @@ HRESULT CGameInstance::Change_Controller(_uint iChannelIndex, CController* pNewC
 {
     return m_pController_Manager->Change_Controller(iChannelIndex, pNewController);
 }
-HRESULT CGameInstance::MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut)
+HRESULT CGameInstance::MoveInput(INPUT_MOVE_DESC* pOut)
 {
-    return m_pController_Manager->MoveInput(iChannelIndex, pOut);
+    return m_pController_Manager->MoveInput(pOut);
 }
-HRESULT CGameInstance::ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut)
+HRESULT CGameInstance::ActionInput(INPUT_ACTION_DESC* pOut)
 {
-    return m_pController_Manager->ActionInput(iChannelIndex, pOut);
+    return m_pController_Manager->ActionInput(pOut);
 }
-HRESULT CGameInstance::CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut)
+HRESULT CGameInstance::CameraInput(INPUT_CAMERA_DESC* pOut)
 {
-    return m_pController_Manager->CameraInput(iChannelIndex, pOut);
+    return m_pController_Manager->CameraInput(pOut);
 }
-HRESULT CGameInstance::UI_Input(_uint iChannelIndex, INPUT_UI_DESC* pOut)
+HRESULT CGameInstance::UI_Input(INPUT_UI_DESC* pOut)
 {
-    return m_pController_Manager->UI_Input(iChannelIndex, pOut);
+    return m_pController_Manager->UI_Input(pOut);
+}
+#pragma endregion
+
+#pragma region NAVIGATION
+HRESULT CGameInstance::Add_Navigation(_uint iNavigationLevel, const _tchar* pNavigationFilePath)
+{
+    return m_pNavigation_Manager->Add_Navigation(iNavigationLevel, pNavigationFilePath);
+}
+HRESULT CGameInstance::Change_Navigation(_uint iNavigationLevel)
+{
+    return m_pNavigation_Manager->Change_Navigation(iNavigationLevel);
+}
+CNavigation* CGameInstance::Clone_CurrentNavigation(_int iCellIndex)
+{
+    return m_pNavigation_Manager->Clone_CurrentNavigation(iCellIndex);
 }
 #pragma endregion
 
@@ -411,6 +430,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pLight_Manager);
     Safe_Release(m_pCamera_Manager);
     Safe_Release(m_pController_Manager);
+    Safe_Release(m_pNavigation_Manager);
 }
 
 void CGameInstance::Free()

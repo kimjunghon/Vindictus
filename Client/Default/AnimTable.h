@@ -105,25 +105,77 @@ namespace Client
 		};
 
 		enum class MOVE_FLAG {
-			MOVE_FRONT = 1 << 8,
-			RUN_FRONT = 1 << 9,
-			RUN_BACK = 1 << 10,
-			RUN_LEFT = 1 << 11,
-			RUN_RIGHT = 1 << 12,
+			WALK = 1 << 8,
+			FRONT = 1 << 9,
+			BACK = 1 << 10,
+			LEFT = 1 << 11,
+			RIGHT = 1 << 12,
 		};
 
 		enum class HIT_FLAG
 		{
-			HIT_FRONT = 1<<8,
-			HIT_BACK  = 1 << 9,
-			HIT_LEFT  = 1 << 10,
-			HIT_RIGHT = 1 << 11,
+			FRONT = 1<<8,
+			BACK  = 1 << 9,
+			LEFT  = 1 << 10,
+			RIGHT = 1 << 11,
 		};
 
 		enum class ATTACK_FLAG
 		{
-			ATTACK_MELEE = 1 << 8,
-			ATTACK_RANGE = 1 << 9
+			MELEE = 1 << 8,
+			RANGE = 1 << 9
+		};
+	}
+
+	namespace Queen
+	{
+		enum class STATE_FLAG {
+			CUTSEAN = 1 << 0,
+			IDLE = 1 << 1,
+			MOVE = 1 << 2,
+			ATTACK = 1 << 3,
+			BURROW = 1 << 4,
+			HIT = 1 << 5,
+			DEAD = 1 << 31
+		};
+
+		enum class IDLE_FLAG {
+			THREAT = 1 << 8,
+			LOW_HEALTH = 1 << 9
+		};
+
+		enum class MOVE_FLAG {
+			RUN = 1 << 8,
+			TURN_LEFT = 1 << 9,
+			TURN_RIGHT = 1 << 10
+		};
+
+		enum class ATTACK_FLAG {
+			DOUBLE = 1 << 8,
+			SWOOP = 1 << 9,
+			POSION = 1 << 10,
+			LEFTHAND = 1 << 11,
+			RIGHTHAND = 1 << 12,
+			MELLE = 1 << 13,
+			TAIL = 1 << 14,
+			TURN_LEFT = 1 << 15,
+			TURN_RIGHT = 1 << 16
+		};
+
+		enum class BURROW_FLAG {
+			BEGIN = 1 << 8,
+			STAY = 1 << 9,
+			MOVE = 1 << 10,
+			ATTACK1 = 1 << 11,
+			ATTACK2 = 1 << 12,
+			END = 1 << 13
+		};
+
+		enum class HIT_FLAG {
+			DAMAGE = 1 << 8,
+			DOWN_BEGIN = 1 << 9,
+			DOWN_DURING = 1 << 10,
+			DOWN_END = 1 << 11
 		};
 	}
 }

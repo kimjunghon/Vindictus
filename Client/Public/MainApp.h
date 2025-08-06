@@ -8,7 +8,9 @@ class CGameInstance;
 class CLevel;
 NS_END
 
-NS_BEGIN(Client) 
+NS_BEGIN(Client)
+class CStateFactory;
+class CPlayerInstance;
 
 class CMainApp final : public CBase
 {
@@ -31,10 +33,19 @@ private:
 	_uint					m_iChange_Level = {};
 	_bool					m_bIsLoading = { false };
 
+	CStateFactory*			m_pStateFactory = {nullptr};
+	CPlayerInstance*		m_pPlayerInstance = { nullptr };
 private:
 	void	Event_LevelChange(const EVENT_LEVEL_CHANGE& Event);
 	CLevel* Create_NewLevel(_uint iChangeLevel);
+
 	HRESULT Ready_Prototype_ForStatic();
+	HRESULT Ready_Prototype_ForStatic_Texture();
+	HRESULT Ready_Prototype_ForStatic_UI();
+	HRESULT Ready_UI_Container();
+	HRESULT Ready_Controller();
+	HRESULT Ready_Navigations();
+
 	HRESULT Start_Level(LEVEL eStartLevelID);
 	
 

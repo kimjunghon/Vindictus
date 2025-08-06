@@ -128,7 +128,6 @@ void CGameObject_Manager::Free()
 	{
 		for (auto& Pair : m_pLayers[i])
 			Safe_Release(Pair.second);
-
 		m_pLayers[i].clear();
 	}
 

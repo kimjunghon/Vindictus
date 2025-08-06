@@ -1,4 +1,3 @@
-#include "Controller.h"
 #include "ClientPch.h"
 #include "Controller_KeyBoard.h"
 
@@ -72,10 +71,10 @@ HRESULT CController_KeyBoard::ActionInput(INPUT_ACTION_DESC* pOut)
         ActionDesc.byAction |= ENUM_CLASS(ACTION_INPUT::ATTACK);
 
     if (m_pGameInstance->Get_KeyDown(DIK_D) || m_pGameInstance->Get_KeyPressing(DIK_D))
-        ActionDesc.byAction = ENUM_CLASS(ACTION_INPUT::SMASH);
+        ActionDesc.byAction |= ENUM_CLASS(ACTION_INPUT::SMASH);
 
     if (m_pGameInstance->Get_KeyDown(DIK_SPACE))
-        ActionDesc.byAction = ENUM_CLASS(ACTION_INPUT::ROLL);
+        ActionDesc.byAction |= ENUM_CLASS(ACTION_INPUT::ROLL);
 
     if (ActionDesc.byAction > 0)
         ActionDesc.bAction = true;
@@ -113,11 +112,6 @@ HRESULT CController_KeyBoard::CameraInput(INPUT_CAMERA_DESC* pOut)
 
     *pOut = CameraDesc;
 
-    return S_OK;
-}
-
-HRESULT CController_KeyBoard::UI_Input(INPUT_UI_DESC* pOut)
-{
     return S_OK;
 }
 

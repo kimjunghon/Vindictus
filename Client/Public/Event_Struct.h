@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Event.h"
-#include "Client_Enum.h"
 
 namespace Client
 {
@@ -10,6 +9,12 @@ namespace Client
 		_uint			iChange_Level;
 		_bool			bIsLoading;
 	}EVENT_LEVEL_CHANGE;
+
+	typedef struct tagEventUILevelChange final : public CEvent
+	{
+		_uint			iChange_Level;
+		_bool			bIsLoading;
+	}EVENT_UI_LEVEL_CHANGE;
 
 	typedef struct tagEventProgressBar final : public CEvent
 	{

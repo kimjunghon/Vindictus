@@ -9,13 +9,11 @@ COptionMain::COptionMain(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceCont
 
 COptionMain::COptionMain(const COptionMain& Prototype)
 	: CUI_Panel{ Prototype }
-	, m_byVisibleType{ Prototype.m_byVisibleType }
 {
 }
 
 HRESULT COptionMain::Initialize_Prototype()
 {
-	m_byVisibleType = ENUM_CLASS(GAMEPLAY_UI::OPTION);
 
 	return S_OK;
 }
@@ -27,32 +25,26 @@ HRESULT COptionMain::Initialize(void* pArg)
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
-	m_bVisible = false;
-
 	Ready_Children();
-
-	m_pGameInstance->Subscribe<EVENT_UI_CHANGE>(ENUM_CLASS(LEVEL::GAMEPLAY), [this](const EVENT_UI_CHANGE& Event) {
-		this->Event_UI_Change(Event); });
 
 	return S_OK;
 }
 
 void COptionMain::Priority_Update(_float fTimeDelta)
 {
-	if (m_bVisible)
+	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
 		__super::Children_Priority_Update(fTimeDelta);
 }
 
 void COptionMain::Update(_float fTimeDelta)
 {
-	if (m_bVisible)
+	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
 		__super::Children_Update(fTimeDelta);
 }
 
 void COptionMain::Late_Update(_float fTimeDelta)
 {
-	if (m_bVisible)
+	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
 		__super::Children_Late_Update(fTimeDelta);
 }
 
@@ -72,13 +64,11 @@ HRESULT COptionMain::Ready_Children()
 	Button_Desc.fOffsetX = 0.f;
 	Button_Desc.fOffsetY = -100.f;
 	Button_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
-	Button_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::GAMEPLAY);
+	Button_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_OptionButton");
 
 	Button_Desc.Callback = [this]() {
-		EVENT_UI_CHANGE Event;
-		Event.byVisibleType = ENUM_CLASS(GAMEPLAY_UI::DEFAULT);
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::GAMEPLAY), Event);
+		*m_iUIState = ENUM_CLASS(UI_LEVEL::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::DEFAULT);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
@@ -87,9 +77,7 @@ HRESULT COptionMain::Ready_Children()
 	Button_Desc.fOffsetY += 120.f;
 
 	Button_Desc.Callback = [this]() {
-		EVENT_UI_CHANGE Event;
-		Event.byVisibleType = ENUM_CLASS(GAMEPLAY_UI::DEFAULT) + ENUM_CLASS(GAMEPLAY_UI::CONTROLLER);
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::GAMEPLAY), Event);
+		*m_iUIState = ENUM_CLASS(UI_LEVEL::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
@@ -108,14 +96,6 @@ HRESULT COptionMain::Ready_Children()
 		return E_FAIL;
 
 	return S_OK;
-}
-
-void COptionMain::Event_UI_Change(const EVENT_UI_CHANGE& Event)
-{
-	if (Event.byVisibleType & m_byVisibleType)
-		m_bVisible = true;
-	else
-		m_bVisible = false;
 }
 
 COptionMain* COptionMain::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

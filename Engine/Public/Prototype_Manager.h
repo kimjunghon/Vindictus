@@ -2,11 +2,14 @@
 
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Terrain.h"
+#include "VIBuffer_Sphere.h"
 #include "Transform.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "TextureUI.h"
 #include "Model.h"
+#include "Navigation.h"
+
 
 NS_BEGIN(Engine)
 

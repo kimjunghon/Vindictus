@@ -14,12 +14,17 @@
 
 #include "DirectXTK/DDSTextureLoader.h"
 #include "DirectXTK/WICTextureLoader.h"
+
+#include "DirectXTK/SpriteBatch.h"
+#include "DirectXTK/SpriteFont.h"
+
 #include "Assimp/scene.h"
 #include "Assimp/postprocess.h"
 #include "Assimp/Importer.hpp"
 #include <RapidJson/document.h>
 #include <RapidJson/filereadstream.h>
 #include <RapidJson/writer.h>
+#include <RapidJson/prettywriter.h>
 #include <RapidJson/stringbuffer.h>
 #include <RapidJson//istreamwrapper.h>
 #include "Json/json.hpp"
@@ -48,9 +53,10 @@ using namespace std;
 #include "Engine_Function.h"
 #include "Binary_Struct.h"
 
-#define UI_FAR 1.f
+#define UI_FAR		1.f
+#define PI			DirectX::XM_PI
 
-#define MAX_BONES		512
+#define MAX_BONES	512
 
 #ifdef _DEBUG
 

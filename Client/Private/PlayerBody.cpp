@@ -84,6 +84,14 @@ HRESULT CPlayerBody::Ready_Components()
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
+	ROOTMOTION_OPTION Option = {};
+	Option.PositionX = true;
+	Option.PositionY = false;
+	Option.PositionZ = true;
+	Option.Rotation = false;
+
+	m_pModelCom->Set_RootMotionOption(Option);
+
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;

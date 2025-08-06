@@ -1,16 +1,39 @@
 #include "ClientPch.h"
 
 #include "MainApp.h"
-#include "Panel.h"
-#include "Button.h"
-#include "Bar.h"
+
+//LEVEL
 #include "Level_Loading.h"
 #include "Level_GamePlay.h"
 #include "Level_Logo.h"
+#include "Level_Town.h"
+#include "Level_Field.h"
+#include "Level_Queen.h"
+#include "Level_Glasgavelen.h"
+
+//UI
+#include "Panel.h"
+#include "Button.h"
+#include "Bar.h"
 #include "LoadingScreen.h"
 #include "LoadingBar.h"
 #include "LoadingPoint.h"
+#include "LogoScreen.h"
+#include "HUD.h"
+#include "OptionMain.h"
+#include "OptionController.h"
+#include "StateBar.h"
+#include "UI_Container.h"
 
+//Controller
+#include "Controller_KeyBoard.h"
+#include "Controller_UI.h"
+
+//STATE FACTORY
+#include "StateFactory.h"
+
+//PlayerInstance
+#include "PlayerInstance.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
@@ -30,20 +53,23 @@ HRESULT CMainApp::Initialize()
 	EngineDesc.iNumLevels = ENUM_CLASS(LEVEL::END);
 	
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pDeviceContext)))
-	{
-		MSG_BOX(TEXT("ENGINE"));
 		return E_FAIL;
-	}
+	
 	if (FAILED(Ready_Prototype_ForStatic()))
-	{
-		MSG_BOX(TEXT("STATIC"));
 		return E_FAIL;
-	}
+	
+	if (FAILED(Ready_UI_Container()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Navigations()))
+		return E_FAIL;
+
 	if (FAILED(Start_Level(LEVEL::LOGO)))
-	{
-		MSG_BOX(TEXT("LOGO"));
 		return E_FAIL;
-	}
+	
+	m_pStateFactory = CStateFactory::GetInstance();
+	m_pPlayerInstance = CPlayerInstance::GetInstance();
+
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
@@ -56,7 +82,12 @@ void CMainApp::Post_Update()
 	{
 		if (FAILED(m_pGameInstance->Clear_Resources()))
 			MSG_BOX(TEXT("Failed Clear Resrouces"));
-		
+
+		EVENT_UI_LEVEL_CHANGE Event_UIChange;
+		Event_UIChange.iChange_Level = m_iChange_Level;
+		Event_UIChange.bIsLoading = m_bIsLoading;
+		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event_UIChange);
+
 		CLevel* pNextLevel = Create_NewLevel(m_iChange_Level);
 
 		if (FAILED(m_pGameInstance->Open_Level(m_iChange_Level, pNextLevel)))
@@ -103,6 +134,40 @@ CLevel* CMainApp::Create_NewLevel(_uint iChangeLevel)
 		case LEVEL::GAMEPLAY:
 			pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pDeviceContext);
 			break;
+		case LEVEL::TOWN:
+		{
+			if (FAILED(m_pGameInstance->Change_Navigation(m_iChange_Level)))
+				MSG_BOX(TEXT("Failed Change Navigation"));
+
+			pNewLevel = CLevel_Town::Create(m_pDevice, m_pDeviceContext);
+
+			break;
+		}
+		case LEVEL::FIELD:
+		{
+			if (FAILED(m_pGameInstance->Change_Navigation(m_iChange_Level)))
+				MSG_BOX(TEXT("Failed Change Navigation"));
+			pNewLevel = CLevel_Field::Create(m_pDevice, m_pDeviceContext);
+			break;
+		}
+		case LEVEL::QUEEN:
+		{
+			if (FAILED(m_pGameInstance->Change_Navigation(m_iChange_Level)))
+				MSG_BOX(TEXT("Failed Change Navigation"));
+
+			pNewLevel = CLevel_Queen::Create(m_pDevice, m_pDeviceContext);
+
+			break;
+		}
+		case LEVEL::GLASGAVELEN:
+		{
+			if (FAILED(m_pGameInstance->Change_Navigation(m_iChange_Level)))
+				MSG_BOX(TEXT("Failed Change Navigation"));
+
+			pNewLevel = CLevel_Glasgavelen::Create(m_pDevice, m_pDeviceContext);
+
+			break;
+		}
 		}
 	}
 	else
@@ -143,8 +208,130 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
 		CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Sphere */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Sphere"),
+		CVIBuffer_Sphere::Create(m_pDevice, m_pDeviceContext, 32, 32))))
+		return E_FAIL;
 #pragma endregion
 
+	if (FAILED(Ready_Prototype_ForStatic_UI()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Prototype_ForStatic_Texture()))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
+{	
+#pragma region LOADING_UI
+	/* Ready_Prototype_Component_Texture_LoadingScreen */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingScreen%d.png"), 5))))
+		return E_FAIL;
+
+	/* Ready_Prototype_Component_Texture_LoadingBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingBar.png"), 1))))
+		return E_FAIL;
+
+	/* Ready_Prototype_Component_Texture_LoadingBar_Back */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingBack.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_LoadingBar_Point */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Point"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/Point.png"), 1))))
+		return E_FAIL;
+#pragma endregion
+
+#pragma region LOGO_UI
+	/* Prototype_Component_Texture_SkyBox */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SkyBox"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Logo/Sky_Box.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_Logo_WaterMark */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Logo_WaterMark"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Logo/Logo_Watermark.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_Logo_WaterMark_Back */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Logo_WaterMark_Back"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Logo/Logo_Watermark_Back.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_Logo_Button */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Logo_Button"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Logo/Logo_Button.png"), 1))))
+		return E_FAIL;
+#pragma endregion
+
+#pragma region GAMEPLAY_UI
+	/* Prototype_Component_Texture_GamePlay_Back_PlayerHpBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Back_PlayerHpBar"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/PlayerHpBar_Back.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Lerp_PlayerHpBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Lerp_PlayerHpBar"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/PlayerHpBar_Lerp.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_PlayerHpBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_PlayerHpBar"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/PlayerHpBar.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Back_PlayerStaminaBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Back_PlayerStaminaBar"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/PlayerStaminaBar_Back.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Lerp_PlayerStaminaBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Lerp_PlayerStaminaBar"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/PlayerStaminaBar_Lerp.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_PlayerStaminaBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_PlayerStaminaBar"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/PlayerStaminaBar.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Option_Background */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Option_Background"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Option_Back.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Keyboard */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Keyboard"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/KeyBoard.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Mouse */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Mouse"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Mouse.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_OptionButton */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_OptionButton"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Option_Button.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Inventory */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Inventory"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Inventory.png"), 1))))
+		return E_FAIL;
+#pragma endregion
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
+{
 #pragma region UI
 	/* Ready_Prototype_GameObject_Button */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"),
@@ -171,36 +358,86 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"),
 		CPanel::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
-	
+
 	/* Prototype_UIObject_LoadingPoint */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingPoint"),
 		CLoadingPoint::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Ready_Prototype_Component_Texture_LoadingScreen */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen0"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingScreen0.png"), 1))))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen1"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingScreen1.png"), 1))))
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_UIContainer"),
+		CUI_Container::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Ready_Prototype_Component_Texture_LoadingBar */
-	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingBar.png"),1))))
-		return E_FAIL;
+#pragma endregion
 
-	/* Ready_Prototype_Component_Texture_LoadingBar_Back */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Back"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/LoadingBack.png"), 1))))
-		return E_FAIL;
-
-	/* Prototype_Component_Texture_LoadingBar_Point */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingBar_Point"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Loading/Point.png"), 1))))
+#pragma region LOGO_UI
+	/* Prototype_UIObject_LogoScreen */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LogoScreen"),
+		CLogoScreen::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 #pragma endregion
+
+#pragma region GAMEPLAY_UI
+	/* Prototype_UIObject_HUD */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_HUD"),
+		CHUD::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_StateBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_StateBar"),
+		CStateBar::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_Option */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Option"),
+		COptionMain::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_OptionController */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_OptionController"),
+		COptionController::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 #pragma endregion
+
+#pragma endregion
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_UI_Container()
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_UIContainer"),
+		ENUM_CLASS(LAYERTYPE::STATIC), TEXT("Layer_UI_Container"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Controller()
+{
+	if (FAILED(m_pGameInstance->Add_Controller_ToManager(TEXT("Controller_KeyBoard"), CController_KeyBoard::Create())))
+		return E_FAIL;
+	
+	if (FAILED(m_pGameInstance->Change_Controller(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), TEXT("Controller_KeyBoard"))))
+		return E_FAIL;
+	
+	return S_OK;
+	
+}
+
+HRESULT CMainApp::Ready_Navigations()
+{
+	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::TOWN), TEXT("../Bin/Resources/Navigation/Town_Navigation.dat"))))
+	//	return E_FAIL;
+	//
+	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::FILED), TEXT("../Bin/Resources/Navigation/Field_Navigation.dat"))))
+	//	return E_FAIL;
+	//
+	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::QUEEN), TEXT("../Bin/Resources/Navigation/Queen_Navigation.dat"))))
+	//	return E_FAIL;
+	//
+	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("../Bin/Resources/Navigation/Glasgavelen_Navigation.dat"))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -227,10 +464,12 @@ void CMainApp::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pStateFactory);
+	Safe_Release(m_pPlayerInstance);
+
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pDeviceContext);
 
 	m_pGameInstance->Release_Engine();
-
 	Safe_Release(m_pGameInstance);
 }

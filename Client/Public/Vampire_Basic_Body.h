@@ -1,8 +1,6 @@
 #pragma once
 #include "Body.h"
 
-using namespace Vampire;
-
 NS_BEGIN(Client)
 
 class CAnimMachine;

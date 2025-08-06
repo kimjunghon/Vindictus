@@ -29,6 +29,7 @@ HRESULT CUIObject::Initialize(void* pArg)
 
 	m_fX = pDesc->fX + pDesc->fOffsetX;
 	m_fY = pDesc->fY + pDesc->fOffsetY;
+	
 	m_iDepth = pDesc->iDepth;
 	m_fSizeX = pDesc->fSizeX;
 	m_fSizeY = pDesc->fSizeY;
@@ -82,12 +83,6 @@ _bool CUIObject::IsPick(HWND hWnd)
 	ScreenToClient(hWnd, &ptMouse);
 
 	return PtInRect(&rcRect, ptMouse);
-}
-
-
-void CUIObject::Change_Visible()
-{
-	m_bVisible = !m_bVisible;
 }
 
 HRESULT CUIObject::Begin()

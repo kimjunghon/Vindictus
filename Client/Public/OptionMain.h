@@ -2,6 +2,10 @@
 #include "Client_Defines.h"
 #include "UI_Panel.h"
 
+NS_BEGIN(Client)
+
+using namespace UI;
+
 class COptionMain final : public CUI_Panel
 {
 private:
@@ -18,10 +22,7 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_byte		m_byVisibleType = {};
-private:
 	HRESULT Ready_Children();
-	void	Event_UI_Change(const EVENT_UI_CHANGE& Event);
 
 public:
 	static COptionMain*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
@@ -29,3 +30,4 @@ public:
 	virtual void			Free() override;
 };
 
+NS_END

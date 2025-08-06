@@ -12,6 +12,10 @@ CMesh::CMesh(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 CMesh::CMesh(const CMesh& Prototype)
 	: CVIBuffer { Prototype }
 	, m_iMaterialIndex { Prototype.m_iMaterialIndex }
+#ifdef _DEBUG
+	, m_Vertices { Prototype.m_Vertices}
+	, m_Indices {Prototype.m_Indices }
+#endif
 {
 }
 
@@ -105,6 +109,14 @@ HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, cons
 		File.read(reinterpret_cast<_char*>(&pIndices[iIndex++]), sizeof(_uint));
 	}
 
+#ifdef _DEBUG
+	if(eType == MODELTYPE::NONANIM)
+	{
+		m_Indices.resize(m_iNumIndices);
+		memcpy(m_Indices.data(), pIndices, sizeof(_uint) * m_iNumIndices);
+	}
+#endif
+
 	D3D11_SUBRESOURCE_DATA IBInitialData{};
 	IBInitialData.pSysMem = pIndices;
 
@@ -130,6 +142,40 @@ HRESULT CMesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, c
 	}
 
 	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
+}
+
+_bool CMesh::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist)
+{
+	_uint iIndex = {};
+
+	_bool IsHit = false;
+	_float fMin_Dist = FLT_MAX;
+
+	while(iIndex < m_iNumIndices)
+	{	
+		_vector vVertexPosition[3] = {
+		XMLoadFloat3(&(m_Vertices[m_Indices[iIndex++]].vPosition)),
+		XMLoadFloat3(&(m_Vertices[m_Indices[iIndex++]].vPosition)),
+		XMLoadFloat3(&(m_Vertices[m_Indices[iIndex++]].vPosition)),
+		};
+
+		_float fCurrentDist = {};
+
+		if (TriangleTests::Intersects(vLocalPickPosition, vLocalPickDir, vVertexPosition[0], vVertexPosition[1], vVertexPosition[2], fCurrentDist))
+		{
+			IsHit = true;
+			if (fCurrentDist <= fMin_Dist)
+				fMin_Dist = fCurrentDist;
+		}
+	}
+
+	if (IsHit)
+	{
+		fDist = fMin_Dist;
+		return true;
+	}
+
+	return false;
 }
 
 HRESULT CMesh::Ready_Vertices_For_NonAnim_Assimp(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
@@ -303,6 +349,11 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTra
 		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
 
 	}
+
+#ifdef _DEBUG
+	m_Vertices.resize(m_iNumVertices);
+	memcpy(m_Vertices.data(), pVertices, sizeof(VTXMESH) * m_iNumVertices);
+#endif
 
 	D3D11_SUBRESOURCE_DATA VBInitialData{};
 	VBInitialData.pSysMem = pVertices;

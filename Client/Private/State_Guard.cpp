@@ -18,6 +18,7 @@ void CState_Guard::Enter(CPlayerPawn* pPlayerPawn)
 {
 	m_bGuardEnd = false;
 	m_bGuardBegin = true;
+
 	ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_BEGIN));
 }
 
@@ -35,7 +36,12 @@ void CState_Guard::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput
 	}
 	else if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::GUARD) && pPlayerPawn->AnimCanChange())
 	{
-		if(false == m_bGuardBegin)
+		if (m_bGuardBegin)
+		{
+			m_bGuardBegin = false;
+			ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_DURING));
+		}
+		else
 			ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_DURING));
 		
 		if(ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::ATTACK) && m_iStateFlag & ENUM_CLASS(GUARD_FLAG::GUARD_DURING))
@@ -50,11 +56,7 @@ void CState_Guard::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput
 
 void CState_Guard::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 {
-	if(m_bGuardBegin && pPlayerPawn->AnimCanChange())
-	{
-		m_bGuardBegin = false;
-		ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_DURING));
-	}
+
 }
 
 void CState_Guard::Exit(CPlayerPawn* pPlayerPawn)

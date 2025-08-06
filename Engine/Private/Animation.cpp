@@ -106,9 +106,7 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 
 		for (_uint i =0; i< m_iNumChannels; i++)
 			m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i]);
-
 	}
-
 }
 
 _bool CAnimation::CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio)
@@ -116,14 +114,14 @@ _bool CAnimation::CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRati
 	return (m_fCurrentTrackPosition / m_fDuration) >= fBeginRatio && (m_fCurrentTrackPosition / m_fDuration) <= fEndRatio;
 }
 
-void CAnimation::Enter()
+void CAnimation::Enter(_bool IsChange)
 {
 	fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);
 
 	m_fCurrentTrackPosition = 0.f;
 
-	m_bAnimChange = true;
-	m_bAnimChangeFirstCall = true;
+	m_bAnimChange = IsChange;
+	m_bAnimChangeFirstCall = IsChange;
 }
 
 CAnimation* CAnimation::Create(const aiAnimation* pAIAnimation, const vector<CBone*>& Bones)

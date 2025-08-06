@@ -20,6 +20,10 @@ public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	virtual BT_STATE		Attack() override;
+	virtual BT_STATE		Chase() override;
+	virtual BT_STATE		Patrol() override;
+
 private:
 	HRESULT Ready_PawnObjects();
 

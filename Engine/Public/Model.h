@@ -43,12 +43,14 @@ public:
 	_bool				CanChangeAnimation();
 	_bool				CurrentAnim_Finished() { return m_IsFinished; }
 
-	void				RootMotion();
+	void				Set_RootMotionOption(ROOTMOTION_OPTION RootMotionOption) { m_RootMotionOption = RootMotionOption; };
 
 	const _float4x4*	Find_SocketBoneCombinedMatrix(const string& strSocketBoneName);
 	const _vector*		Get_AnimMovementPtr() { return &m_vAnimMovement; }
 	const _vector*		Get_AnimRotationPtr() { return &m_vAnimRotation; }
 	vector<CBone*>&		Get_Bones() { return m_Bones; }
+
+	_bool				Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist);
 
 private:
 	const aiScene*				m_pAIScene = { nullptr };
@@ -78,11 +80,18 @@ private:
 	_bool						m_bAnimChange = {};	
 	_bool						m_IsFinished = {};
 
+	// RootMotion
+	ROOTMOTION_OPTION			m_RootMotionOption = {};
+	_bool						m_IsAnimStart = {};
 	_vector						m_vPrevRootPosition = {};
 	_vector						m_vAnimMovement = {};
+
+	_vector						m_vPrevRootRotation = {};
 	_vector						m_vAnimRotation = {};
 
+
 private:
+	void		RootMotion();
 	CAnimation* Find_Animation(const string& strAnimationTag);
 #pragma region FBX
 private:

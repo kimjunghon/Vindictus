@@ -128,6 +128,12 @@
       <Command>cd $(ProjectDir)../../
 call Copy.bat</Command>
     </PostBuildEvent>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,6 +157,12 @@ call Copy.bat</Command>
       <AdditionalDependencies>d3d11.lib;dxguid.lib;dinput8.lib;Effects11.lib;DirectXTK.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../ThirdPartyLib/</AdditionalLibraryDirectories>
     </Link>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+    </FxCompile>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\VindictusBack\Vindictus\Engine\Public\Light.h" />
@@ -165,11 +177,13 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\BT_SequenceNode.h" />
     <ClInclude Include="..\public\Camera.h" />
     <ClInclude Include="..\Public\Camera_Manager.h" />
+    <ClInclude Include="..\public\Cell.h" />
     <ClInclude Include="..\public\Channel.h" />
     <ClInclude Include="..\Public\CollisionObject.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\Public\Controller.h" />
     <ClInclude Include="..\Public\Controller_Manager.h" />
+    <ClInclude Include="..\public\CustomFont.h" />
     <ClInclude Include="..\public\DynamicAABBTree.h" />
     <ClInclude Include="..\Public\EnginePch.h" />
     <ClInclude Include="..\Public\Engine_Defines.h" />
@@ -180,6 +194,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\Public\Engine_Typedef.h" />
     <ClInclude Include="..\Public\Event.h" />
     <ClInclude Include="..\Public\EventBus.h" />
+    <ClInclude Include="..\public\Font_Manager.h" />
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\GameObject_Manager.h" />
@@ -192,6 +207,8 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\Mesh.h" />
     <ClInclude Include="..\public\MeshMaterial.h" />
     <ClInclude Include="..\public\Model.h" />
+    <ClInclude Include="..\public\Navigation.h" />
+    <ClInclude Include="..\public\Navigation_Manager.h" />
     <ClInclude Include="..\public\Octree.h" />
     <ClInclude Include="..\public\Pawn.h" />
     <ClInclude Include="..\public\PawnObject.h" />
@@ -210,7 +227,9 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\UI_Panel.h" />
     <ClInclude Include="..\public\UI_Slot.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
+    <ClInclude Include="..\public\VIBuffer_Cell.h" />
     <ClInclude Include="..\public\VIBuffer_Rect.h" />
+    <ClInclude Include="..\public\VIBuffer_Sphere.h" />
     <ClInclude Include="..\public\VIBuffer_Terrain.h" />
   </ItemGroup>
   <ItemGroup>
@@ -225,11 +244,13 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\BT_SequenceNode.cpp" />
     <ClCompile Include="..\private\Camera.cpp" />
     <ClCompile Include="..\Private\Camera_Manager.cpp" />
+    <ClCompile Include="..\private\Cell.cpp" />
     <ClCompile Include="..\private\Channel.cpp" />
     <ClCompile Include="..\Private\CollisionObject.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\Private\Controller.cpp" />
     <ClCompile Include="..\Private\Controller_Manager.cpp" />
+    <ClCompile Include="..\private\CustomFont.cpp" />
     <ClCompile Include="..\private\DynamicAABBTree.cpp" />
     <ClCompile Include="..\Private\EnginePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -238,6 +259,7 @@ call Copy.bat</Command>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">EnginePch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\Private\EventBus.cpp" />
+    <ClCompile Include="..\private\Font_Manager.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
     <ClCompile Include="..\private\GameObject_Manager.cpp" />
@@ -250,6 +272,8 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\Mesh.cpp" />
     <ClCompile Include="..\private\MeshMaterial.cpp" />
     <ClCompile Include="..\private\Model.cpp" />
+    <ClCompile Include="..\private\Navigation.cpp" />
+    <ClCompile Include="..\private\Navigation_Manager.cpp" />
     <ClCompile Include="..\private\Octree.cpp" />
     <ClCompile Include="..\private\Pawn.cpp" />
     <ClCompile Include="..\private\PawnObject.cpp" />
@@ -268,8 +292,13 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\UI_Panel.cpp" />
     <ClCompile Include="..\private\UI_Slot.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Cell.cpp" />
     <ClCompile Include="..\private\VIBuffer_Rect.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Sphere.cpp" />
     <ClCompile Include="..\private\VIBuffer_Terrain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Cell.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

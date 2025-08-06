@@ -36,17 +36,20 @@ HRESULT CLogoScreen::Initialize(void* pArg)
 
 void CLogoScreen::Priority_Update(_float fTimeDelta)
 {
-	__super::Children_Priority_Update(fTimeDelta);
+	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
+		__super::Children_Priority_Update(fTimeDelta);
 }
 
 void CLogoScreen::Update(_float fTimeDelta)
 {
-	__super::Children_Update(fTimeDelta);
+	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
+		__super::Children_Update(fTimeDelta);
 }
 
 void CLogoScreen::Late_Update(_float fTimeDelta)
 {
-	__super::Children_Late_Update(fTimeDelta);
+	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
+		__super::Children_Late_Update(fTimeDelta);
 }
 
 HRESULT CLogoScreen::Render()
@@ -65,7 +68,7 @@ HRESULT CLogoScreen::Ready_Children()
 	Children_Desc.fOffsetX = 0.f;
 	Children_Desc.fOffsetY = 0.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
-	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::LOGO);
+	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_SkyBox");
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
@@ -102,7 +105,7 @@ HRESULT CLogoScreen::Ready_Button()
 	Button_Desc.fOffsetX = 0.f;
 	Button_Desc.fOffsetY = 100.f;
 	Button_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
-	Button_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::LOGO);
+	Button_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_Logo_Button");
 
 	Button_Desc.Callback = [&]() {

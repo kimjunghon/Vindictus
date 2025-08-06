@@ -4,6 +4,8 @@
 
 NS_BEGIN(Client)
 
+using namespace UI;
+
 class CLogoScreen final : public CUI_Panel
 {
 private:

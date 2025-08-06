@@ -16,6 +16,9 @@ HRESULT CTransform::Initialize_Prototype()
 
 HRESULT CTransform::Initialize(void* pArg)
 {
+	if (nullptr == pArg)
+		return S_OK;
+
 	TRANSFORM_DESC* pDesc = static_cast<TRANSFORM_DESC*>(pArg);
 
 	m_fSpeedPerSec = pDesc->fSpeedPerSec;
@@ -96,9 +99,17 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 
 void CTransform::RotateQuaternion(_fvector Quaternion)
 {
-	_matrix Rotation = XMMatrixRotationQuaternion(Quaternion);
+	_float3 vScaled = Get_Scaled();
 
-	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixMultiply(Rotation, XMLoadFloat4x4(&m_WorldMatrix)));
+	_vector vRight = XMVectorScale(XMVectorSet(1.f, 0.f, 0.f, 0.f), vScaled.x);
+	_vector vUp = XMVectorScale(XMVectorSet(0.f, 1.f, 0.f, 0.f), vScaled.y);
+	_vector vLook = XMVectorScale(XMVectorSet(0.f, 0.f, 1.f, 0.f), vScaled.z);
+
+	_matrix RotationMatrix = XMMatrixRotationQuaternion(Quaternion);
+
+	Set_State(STATE::RIGHT, XMVector4Transform(vRight, RotationMatrix));
+	Set_State(STATE::UP, XMVector4Transform(vUp, RotationMatrix));
+	Set_State(STATE::LOOK, XMVector4Transform(vLook, RotationMatrix));
 }
 
 void CTransform::Turn(_fvector vAxis, _float fTimeDelta)

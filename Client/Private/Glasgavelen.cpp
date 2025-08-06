@@ -53,6 +53,21 @@ HRESULT CGlasgavelen::Render()
 	return S_OK;
 }
 
+BT_STATE CGlasgavelen::Attack()
+{
+	return BT_STATE();
+}
+
+BT_STATE CGlasgavelen::Chase()
+{
+	return BT_STATE();
+}
+
+BT_STATE CGlasgavelen::Patrol()
+{
+	return BT_STATE();
+}
+
 HRESULT CGlasgavelen::Ready_PawnObjects()
 {
 	CBody::BODY_DESC BodyObjectDesc = {};

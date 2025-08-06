@@ -37,20 +37,6 @@ HRESULT CLevel_Loading::Render()
 
 HRESULT CLevel_Loading::Ready_GameObjects()
 {
-	CLoadingScreen::LOADING_DESC Loading_Desc{};
-
-	Loading_Desc.fX = g_iWinSizeX >> 1;
-	Loading_Desc.fY = g_iWinSizeY >> 1;
-	Loading_Desc.fSizeX = g_iWinSizeX;
-	Loading_Desc.fSizeY = g_iWinSizeY;
-	Loading_Desc.fOffsetX = 0;
-	Loading_Desc.fOffsetY = 0;
-	Loading_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
-	Loading_Desc.iLoadingLevelID = ENUM_CLASS(m_eNextLevelID);
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_UI"), &Loading_Desc)))
-		return E_FAIL;
 
 	return S_OK;
 }

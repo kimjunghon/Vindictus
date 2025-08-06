@@ -8,6 +8,9 @@ NS_BEGIN(Client)
 class CVampire abstract : public CMonster
 {
 protected:
+	enum VAMPIRE_ATTACK { ATTACK_NORMAL, END};
+
+protected:
 	CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CVampire(const CVampire& Prototype);
 	virtual ~CVampire() = default;
@@ -21,20 +24,12 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	virtual BT_STATE		CanAttack();
-	virtual BT_STATE		CanOtherAction();
-	virtual BT_STATE		CanAttackRange();
-	virtual BT_STATE		Attack();
-	virtual BT_STATE		Chase();
-	virtual BT_STATE		Patrol();
+	virtual BT_STATE		Attack() override;
+	virtual BT_STATE		Chase() override;
+	virtual BT_STATE		Patrol() override;
 
 protected:
-	_float		m_fAttackTime = {};
-	_float		m_fAttackCoolTime = {};
-	_float		m_fAttackRange = {};
-	_float		m_fChaseRange = {};
-	_float		m_fMinDistance = {};
-
+	HRESULT Ready_AI();
 
 public:
 	virtual CGameObject* Clone(void* pArg) PURE;

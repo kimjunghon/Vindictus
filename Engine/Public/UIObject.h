@@ -13,7 +13,6 @@ public:
 		_float fSizeX{}; 
 		_float fSizeY{};
 		_uint  iDepth{};
-
 		_float fOffsetX = 0.f;
 		_float fOffsetY = 0.f;
 	}UIOBJECT_DESC;
@@ -38,7 +37,6 @@ public:
 	virtual void	Set_Offset(_float fOffsetX, _float fOffsetY);
 
 protected:
-	_bool			m_bVisible = {};
 
 	_float4x4		m_ViewMatrix = {};
 	_float4x4		m_ProjMatrix = {};
@@ -56,7 +54,6 @@ protected:
 protected:	
 	HRESULT			Begin();
 
-	void			Change_Visible();
 	virtual _bool	IsPick(HWND hWnd);
 	
 

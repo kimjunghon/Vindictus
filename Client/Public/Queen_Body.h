@@ -21,7 +21,9 @@ public:
 	virtual HRESULT		Render() override;
 
 private:
-	CAnimMachine* m_pAnimMachine = { nullptr };
+	CAnimMachine*	m_pAnimMachine = { nullptr };
+	_float4x4		m_CombinedMatrix = { };
+
 
 private:
 	HRESULT Ready_Components();

@@ -26,6 +26,8 @@ HRESULT CVampireAI::Ready_Nodes()
     m_pRootNode = pSelectorNode;
 
         CBT_SelectorNode* pActionSelectorNode = CBT_SelectorNode::Create();
+        
+        pSelectorNode->Add_Child(pActionSelectorNode);
 
         pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledVampire->CanOtherAction(); }));
 
@@ -48,8 +50,7 @@ HRESULT CVampireAI::Ready_Nodes()
             
             pActionSelectorNode->Add_Child(pChaseSequenceNode);
             
-            pSelectorNode->Add_Child(pActionSelectorNode);
-
+            
     return S_OK;
 
 }

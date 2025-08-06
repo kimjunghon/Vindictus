@@ -21,6 +21,7 @@ CModel::CModel(const CModel& Prototype)
     , m_PreTransformMatrix { Prototype.m_PreTransformMatrix}
     , m_iNumAnimation { Prototype.m_iNumAnimation }
     , m_iRootBoneIndex{ Prototype.m_iRootBoneIndex }
+    , m_eModelType { Prototype.m_eModelType }
 {
     for (auto& pPrototypeBone : Prototype.m_Bones)
         m_Bones.push_back(pPrototypeBone->Clone());
@@ -162,7 +163,7 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
 HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 {
     if (m_CurrentAnimData.strAnimKey == AnimData.strAnimKey)
-        return S_OK;
+        return E_FAIL;
 
     CAnimation* pAnimation = Find_Animation(AnimData.strAnimKey);
     if (nullptr == pAnimation)
@@ -172,7 +173,16 @@ HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 
     m_vPrevRootPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 
-    m_pCurrentAnimation->Enter();
+    m_vPrevRootRotation = XMQuaternionIdentity();
+
+    _bool IsAnimChange = false;
+
+    if (false == m_IsFinished)
+        IsAnimChange = true;
+
+    m_pCurrentAnimation->Enter(IsAnimChange);
+
+    m_IsAnimStart = true;
 
     m_CurrentAnimData = AnimData;
 
@@ -188,7 +198,6 @@ _bool CModel::Play_Animation(_float fTimeDelta)
         m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed, m_vPrevRootPosition);
     }
 
-    
     for(_uint i =0; i< m_Bones.size(); i++)
     {
         m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
@@ -534,17 +543,37 @@ void CModel::RootMotion()
     _vector vScale = {};
     _vector vRotation = {};
     _vector vPosition = {};
-
+ 
     XMMatrixDecompose(&vScale, &vRotation, &vPosition, m_Bones[m_iRootBoneIndex]->Get_CombinedTransformationMatrix());
-
-    m_vAnimMovement = XMVectorSetY(XMVectorSubtract(vPosition, m_vPrevRootPosition), 0.f);
-
-    m_vAnimRotation = vRotation;
-
+ 
+    if (m_IsAnimStart)
+    {
+        m_vPrevRootPosition = vPosition;
+        m_vPrevRootRotation = vRotation;
+        m_IsAnimStart = false;
+    }
+ 
+    m_vAnimMovement = XMVectorSubtract(vPosition, m_vPrevRootPosition);
+    
+    m_vAnimRotation = XMQuaternionMultiply(vRotation, XMQuaternionInverse(m_vPrevRootRotation));
+ 
     m_vPrevRootPosition = vPosition;
-
-    vPosition = XMVectorSetX(vPosition, 0.f);
-    vPosition = XMVectorSetZ(vPosition, 0.f);
+    m_vPrevRootRotation = vRotation;
+ 
+    if(m_RootMotionOption.PositionX)
+        vPosition = XMVectorSetX(vPosition, 0.f);
+    if (m_RootMotionOption.PositionY)
+        vPosition = XMVectorSetY(vPosition, 0.f);
+    if (m_RootMotionOption.PositionZ)
+        vPosition = XMVectorSetZ(vPosition, 0.f);
+    if (m_RootMotionOption.Rotation)
+    {
+        _matrix RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+        _vector vLook = XMVector3Normalize(RotationMatrix.r[2]);
+        _float fYaw = atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook));
+        _vector vRotationInverse = XMQuaternionInverse(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw));
+        vRotation = XMQuaternionMultiply(vRotation, vRotationInverse);
+    }
 
     _matrix CombinedTransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 
@@ -565,6 +594,35 @@ const _float4x4* CModel::Find_SocketBoneCombinedMatrix(const string& strSocketBo
     return (*iter)->Get_CombinedTransformationMatrixPtr();
 }
 
+_bool CModel::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist)
+{
+    if (m_eModelType != MODELTYPE::NONANIM)
+        return false;
+
+
+    _bool IsHit = false;
+    _float fMin_Dist = FLT_MAX;
+    _float fCurrentDist = {};
+
+    for (_uint i = 0; i < m_iNumMeshes; i++)
+    {
+        if (m_Meshes[i]->Is_Pick(vLocalPickPosition, vLocalPickDir, fCurrentDist))
+        {
+            IsHit = true;
+            if (fCurrentDist <= fMin_Dist)
+                fMin_Dist = fCurrentDist;
+        }
+    }
+
+    if (IsHit)
+    {
+        fDist = fMin_Dist;
+        return true;
+    }
+
+    return false;
+}
+
 HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
 {
     CBone* pBone = CBone::Create(File, iParentIndex);
@@ -575,7 +633,7 @@ HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
     
     if(m_iRootBoneIndex == -1)
     {
-        if (pBone->Compare_Name("ValveBiped.Bip01"))
+        if (pBone->Compare_Name("ValveBiped.Bip01") || pBone->Compare_Name("root"))
             m_iRootBoneIndex = static_cast<_uint>(m_Bones.size() - 1);
     }
 

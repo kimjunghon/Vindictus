@@ -1,5 +1,6 @@
 #include "ClientPch.h"
 #include "Queen_Body.h"
+#include "QueenAnimMachine.h"
 
 CQueen_Body::CQueen_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CBody{ pDevice, pDeviceContext }
@@ -24,7 +25,7 @@ HRESULT CQueen_Body::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	//m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
+	m_pTransformCom->RotateQuaternion(XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(90.f), 0.f));
 
 	return S_OK;
 }
@@ -35,15 +36,15 @@ void CQueen_Body::Priority_Update(_float fTimeDelta)
 
 void CQueen_Body::Update(_float fTimeDelta)
 {
-	//m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
+	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
 
-	ANIM_DATA Data = { "Threat", true, _float2(1.f, 1.f), 2.f };
-	m_pModelCom->Set_Animation(Data);
 	m_pModelCom->Play_Animation(fTimeDelta);
 }
 
 void CQueen_Body::Late_Update(_float fTimeDelta)
 {
+	XMStoreFloat4x4(&m_CombinedMatrix, XMMatrixMultiply(m_pTransformCom->Get_WorldMatrix(), XMLoadFloat4x4(m_pPawnMatrix)));
+
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
 }
@@ -78,8 +79,20 @@ HRESULT CQueen_Body::Ready_Components()
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
+	ROOTMOTION_OPTION Option = {};
+	Option.PositionX = true;
+	Option.PositionY = false;
+	Option.PositionZ = true;
+	Option.Rotation = true;
+
+	m_pModelCom->Set_RootMotionOption(Option);
+
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
+
+	m_pAnimMachine = CQueenAnimMachine::Create();
+	if (nullptr == m_pAnimMachine)
 		return E_FAIL;
 
 	return S_OK;
@@ -87,7 +100,8 @@ HRESULT CQueen_Body::Ready_Components()
 
 HRESULT CQueen_Body::Bind_ShaderResources()
 {
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pPawnMatrix)))
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedMatrix)))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
@@ -140,5 +154,5 @@ void CQueen_Body::Free()
 {
 	__super::Free();
 
-	//Safe_Release(m_pAnimMachine);
+	Safe_Release(m_pAnimMachine);
 }

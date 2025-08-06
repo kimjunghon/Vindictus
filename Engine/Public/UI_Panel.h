@@ -5,6 +5,11 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL CUI_Panel abstract : public CUIObject
 {
+public:
+	typedef struct tagPanelDesc : public UIOBJECT_DESC {
+		_uint* iUIState;
+	}PANEL_DESC;
+
 protected:
 	CUI_Panel(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CUI_Panel(const CUI_Panel& Prototype);
@@ -22,7 +27,8 @@ public:
 	virtual void	Set_Offset(_float fOffsetX, _float fOffsetY) override;
 
 protected:
-	vector<CUIObject*> m_Children;
+	_uint*				m_iUIState = {};
+	vector<CUIObject*>	m_Children;
 
 protected:
 	HRESULT			Add_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* UIChildDesc);

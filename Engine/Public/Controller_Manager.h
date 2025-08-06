@@ -22,10 +22,10 @@ public:
 	void				Clear();
 
 public:
-	HRESULT	MoveInput(_uint iChannelIndex, INPUT_MOVE_DESC* pOut);
-	HRESULT	ActionInput(_uint iChannelIndex, INPUT_ACTION_DESC* pOut);
-	HRESULT	CameraInput(_uint iChannelIndex, INPUT_CAMERA_DESC* pOut);
-	HRESULT UI_Input(_uint iChannelIndex, INPUT_UI_DESC* pOut);
+	HRESULT	MoveInput(INPUT_MOVE_DESC* pOut);
+	HRESULT	ActionInput(INPUT_ACTION_DESC* pOut);
+	HRESULT	CameraInput(INPUT_CAMERA_DESC* pOut);
+	HRESULT UI_Input(INPUT_UI_DESC* pOut);
 
 private:
 	CONTROLLERS					m_Controllers;
