@@ -3,6 +3,7 @@
 namespace Client
 {
 	enum class LEVEL { STATIC, LOADING, LOGO, GAMEPLAY, TOWN, FIELD, QUEEN, GLASGAVELEN, END };
+
 	enum class UI_LEVEL { LOADING, LOGO, GAMEPLAY, END };
 	enum class PROGRESS_TYPE { LOADING, HP, STAMINA };
 	enum class GAMEPLAY_UI { DEFAULT, OPTION = 1<<1, CONTROLLER = 1<<2};
@@ -12,6 +13,7 @@ namespace Client
 
 	enum class ANIM_PHASE { BEGIN, DURING, END};
 	
+	enum class ITEM_TYPE { WEAPON, ARMOR, OTHERS };
 	enum class WEAPON_TYPE { SWORD, SHIELD, END};
 	enum class ARMOR_TYPE { HEAD, UPPER, LOWER, HAND, FOOT, END};
 	enum class ARMOR_STATE { DEFAULT, BROKEN, END };

@@ -42,14 +42,21 @@ HRESULT CWeapon::Initialize(void* pArg)
 
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
+	if (false == m_IsEquip)
+		return;
 }
 
 void CWeapon::Update(_float fTimeDelta)
 {
+	if (false == m_IsEquip)
+		return;
 }
 
 void CWeapon::Late_Update(_float fTimeDelta)
 {
+	if (false == m_IsEquip)
+		return;
+
 	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
 	for (size_t i = 0; i < 3; i++)
@@ -97,6 +104,7 @@ HRESULT CWeapon::Equip(const _float4x4* pPawnMatrix, const _float4x4* pSocketMat
 
 HRESULT CWeapon::UnEquip()
 {
+	m_pPawnMatrix = nullptr;
 	m_pSocketMatrix = nullptr;
 
 	m_IsEquip = false;

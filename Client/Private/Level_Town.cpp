@@ -14,10 +14,7 @@ CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceCont
 
 HRESULT CLevel_Town::Initialize()
 {
-	if (FAILED(Ready_Right()))
-		return E_FAIL;
-
-	if (FAILED(Ready_Controller()))
+	if (FAILED(Ready_Light()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Player(TEXT("Layer_Player"))))
@@ -25,10 +22,6 @@ HRESULT CLevel_Town::Initialize()
 
 	if (FAILED(Ready_GameObject(TEXT("Layer_GameObject"))))
 		return E_FAIL;
-
-	if (FAILED(Ready_UI(TEXT("Layer_UI"))))
-		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -66,7 +59,6 @@ HRESULT CLevel_Town::Ready_Player(const _wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
 		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
-
 		return E_FAIL;
 
 	return S_OK;

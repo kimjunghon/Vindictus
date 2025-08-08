@@ -44,7 +44,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 
 		File.read(reinterpret_cast<_char*>(&vPoints), sizeof(_float3) * ENUM_CLASS(CELL_POINT::END));
 	
-		CCell* pCell = CCell::Create(m_pDevice, m_pDeviceContext, vPoints, m_Cells.size());
+		CCell* pCell = CCell::Create(m_pDevice, m_pDeviceContext, vPoints, static_cast<_uint>(m_Cells.size()));
 		if (nullptr == pCell)
 			return E_FAIL;
 

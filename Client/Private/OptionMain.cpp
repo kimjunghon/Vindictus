@@ -32,19 +32,19 @@ HRESULT COptionMain::Initialize(void* pArg)
 
 void COptionMain::Priority_Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
 		__super::Children_Priority_Update(fTimeDelta);
 }
 
 void COptionMain::Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
 		__super::Children_Update(fTimeDelta);
 }
 
 void COptionMain::Late_Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::OPTION))
 		__super::Children_Late_Update(fTimeDelta);
 }
 
@@ -68,7 +68,7 @@ HRESULT COptionMain::Ready_Children()
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_OptionButton");
 
 	Button_Desc.Callback = [this]() {
-		*m_iUIState = ENUM_CLASS(UI_LEVEL::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::DEFAULT);
+		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
@@ -77,7 +77,7 @@ HRESULT COptionMain::Ready_Children()
 	Button_Desc.fOffsetY += 120.f;
 
 	Button_Desc.Callback = [this]() {
-		*m_iUIState = ENUM_CLASS(UI_LEVEL::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER);
+		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))

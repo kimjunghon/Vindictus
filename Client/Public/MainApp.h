@@ -42,6 +42,7 @@ private:
 	HRESULT Ready_Prototype_ForStatic();
 	HRESULT Ready_Prototype_ForStatic_Texture();
 	HRESULT Ready_Prototype_ForStatic_UI();
+	HRESULT Ready_Prototype_ForStatic_Player();
 	HRESULT Ready_UI_Container();
 	HRESULT Ready_Controller();
 	HRESULT Ready_Navigations();

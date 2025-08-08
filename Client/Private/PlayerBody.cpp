@@ -27,7 +27,7 @@ HRESULT CPlayerBody::Initialize(void* pArg)
 
 	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
 
-	m_pGameInstance->Subscribe<EVENT_BROKEN_HEAD>(ENUM_CLASS(LEVEL::GAMEPLAY), [&](const EVENT_BROKEN_HEAD& Event) {
+	m_pGameInstance->Subscribe<EVENT_BROKEN_HEAD>(ENUM_CLASS(LEVEL::STATIC), [&](const EVENT_BROKEN_HEAD& Event) {
 		this->UnEquipHead(); });
 
 	return S_OK;
@@ -80,7 +80,7 @@ HRESULT CPlayerBody::Render()
 
 HRESULT CPlayerBody::Ready_Components()
 {
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Player"),
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Player"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 

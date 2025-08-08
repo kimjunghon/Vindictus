@@ -5,9 +5,6 @@
 
 #include "MapObject.h"
 
-#include "Camera_Target.h"
-#include "PlayerPawn.h"
-#include "PlayerBody.h"
 #include "BastardSword.h"
 #include "RoundShield.h"
 #include "Armor.h"
@@ -175,41 +172,15 @@ HRESULT CLoader::Loading_For_Town_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 
-	/* Prototype_Component_Model_Player */
-	_matrix		PreTransformMatrix = XMMatrixIdentity();
-	_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
-	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vRotation);
-	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Player"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Piona.dat", PreTransformMatrix))))
-		return E_FAIL;
-
-	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
 
 #pragma region MODEL
 
-	/* Prototype_Component_Model_Player */
-	_matrix		PreTransformMatrix = XMMatrixIdentity();
-	_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
-	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vRotation);
-	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_Player"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Piona.dat", PreTransformMatrix))))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_BastardSword */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_BastardSword"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Sword_Bastard.dat", PreTransformMatrix))))
-		return E_FAIL;
-
-	/* Prototype_Component_Model_RoundShield */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_RoundShield"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/RoundShield.dat", PreTransformMatrix))))
-		return E_FAIL;
-
 	if (FAILED(Loading_For_MapModel(LEVEL::TOWN, "../Bin/Resources/Town.dat")))
 		return E_FAIL;
+
+
+	Event.fRatio += 0.2f;
+	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
 
 #pragma endregion
 
@@ -227,9 +198,6 @@ HRESULT CLoader::Loading_For_Town_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Navigation_Town"),
-		CNavigation::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Test.dat")))))
-		return E_FAIL;
 	//////////////////////////////////////////////////////////////GAMEOBJECT//////////////////////////////////////////////////////////////
 
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
@@ -247,16 +215,6 @@ HRESULT CLoader::Loading_For_Town_Level()
 	/* Prototype_GameObject_MapObject */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_MapObject"),
 		CMapObject::Create(m_pDevice, m_pDeviceContext))))
-		return E_FAIL;
-
-	/* Prototype_GameObject_Player_Body */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Player_Body"),
-		CPlayerBody::Create(m_pDevice, m_pDeviceContext))))
-		return E_FAIL;
-
-	/* Prototype_GameObject_PlayerPawn */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_PlayerPawn"),
-		CPlayerPawn::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	/* Prototype_GameObject_BastardSword */
@@ -381,7 +339,10 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 #pragma region MODEL
 
-
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
+	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
 
 	/* Prototype_Component_Model_BastardSword */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BastardSword"),
@@ -455,24 +416,9 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 #pragma endregion
 
-	/* Prototype_GameObject_Camera_Target */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Target"),
-		CCamera_Target::Create(m_pDevice, m_pDeviceContext))))
-		return E_FAIL;
-
 	/* Prototype_GameObject_MapObject */
 	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_MapObject"),
 		CMapObject::Create(m_pDevice, m_pDeviceContext))))
-		return E_FAIL;
-
-	/* Prototype_GameObject_Player_Body */
-	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player_Body"),
-		CPlayerBody::Create(m_pDevice, m_pDeviceContext))))
-		return E_FAIL;
-
-	/* Prototype_GameObject_PlayerPawn */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_PlayerPawn"),
-		CPlayerPawn::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	/* Prototype_GameObject_BastardSword */

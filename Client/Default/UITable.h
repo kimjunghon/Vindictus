@@ -19,9 +19,10 @@ namespace Client
 		};
 
 		enum class GAMEPLAY_FLAG {
-			DEFAULT =		1 << 4,
-			OPTION =		1 << 5,
-			CONTROLLER =	1 << 6,
+			OPTION =		1 << 4,
+			CONTROLLER =	1 << 5,
+			MOUSE =			1 << 6,
+			INVENTORY =		1 << 7,
 		};
 	}
 

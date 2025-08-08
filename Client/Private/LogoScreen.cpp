@@ -36,20 +36,17 @@ HRESULT CLogoScreen::Initialize(void* pArg)
 
 void CLogoScreen::Priority_Update(_float fTimeDelta)
 {
-	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
-		__super::Children_Priority_Update(fTimeDelta);
+	__super::Children_Priority_Update(fTimeDelta);
 }
 
 void CLogoScreen::Update(_float fTimeDelta)
 {
-	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
-		__super::Children_Update(fTimeDelta);
+	__super::Children_Update(fTimeDelta);
 }
 
 void CLogoScreen::Late_Update(_float fTimeDelta)
 {
-	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
-		__super::Children_Late_Update(fTimeDelta);
+	__super::Children_Late_Update(fTimeDelta);
 }
 
 HRESULT CLogoScreen::Render()

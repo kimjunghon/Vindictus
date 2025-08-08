@@ -50,7 +50,7 @@ void CLoadingScreen::Late_Update(_float fTimeDelta)
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
 		return;
 
-	_uint iTextureFlag = (*m_iUIState);
+	_uint iTextureFlag = (*m_pUIState);
 	iTextureFlag ^= ENUM_CLASS(STATE_FLAG::LOADING);
 	m_iTextureIndex = ComputeBitIndex(iTextureFlag);
 }

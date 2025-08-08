@@ -14,6 +14,7 @@ class CPlayerBody;
 class CArmor;
 class CWeapon;
 class CPlayerInstance;
+class CNavigation;
 
 class CPlayerPawn final : public CPawn
 {
@@ -38,15 +39,8 @@ public:
 	_bool			AnimIsFinished();
 	_bool			AnimCanChange();
 	void			Compute_PlayerMoveDir();
-
 	void			Run() { m_fSpeedRatio = 1.f; }
 	void			Sprint() { m_fSpeedRatio = 2.f; }
-
-	HRESULT			EquipWeapon(CWeapon* pWeapon);
-	HRESULT			UnEquipWeapon(WEAPON_TYPE eWeaponType);
-
-	HRESULT			EquipArmor(CArmor* pArmor);
-	HRESULT			UnEquipArmor(ARMOR_TYPE eArmorType);
 
 private:
 	CPlayerInstance*		m_pPlayerInstance = { nullptr };
@@ -78,18 +72,27 @@ private:
 	const _vector*			m_pAnimRotation = {};
 
 private:
-	HRESULT Ready_Components();
-	HRESULT Ready_Camera();
-	HRESULT Ready_PawnObjects();
-	HRESULT Ready_PlayerBody();
-	HRESULT Ready_Weapons();
-	HRESULT Ready_Armors();
-	HRESULT Ready_States();
+	HRESULT		Ready_Components();
+	HRESULT		Ready_Camera();
+	HRESULT		Ready_PawnObjects();
+	HRESULT		Ready_PlayerBody();
+	HRESULT		Ready_Weapons();
+	HRESULT		Ready_Armors();
+	HRESULT		Ready_States();
 
-	void	Compute_WorldMatrix();
-	void	Bind_InputData(_float fTimeDelta);
-	void	Move(_float fTimeDelta);
+	void		Compute_WorldMatrix();
+	void		Bind_InputData(_float fTimeDelta);
+	void		Move(_float fTimeDelta);
 
+	HRESULT		EquipWeapon(CWeapon* pWeapon);
+	HRESULT		UnEquipWeapon(_uint iWeaponTypeIndex);
+
+	HRESULT		EquipArmor(CArmor* pArmor);
+	HRESULT		UnEquipArmor(_uint iArmorTypeIndex);
+
+
+	void		Event_ChangeWeapon(const EVENT_CHANGE_WEAPON& Event);
+	void		Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event);
 public:
 	static CPlayerPawn*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

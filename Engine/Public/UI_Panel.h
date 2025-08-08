@@ -7,7 +7,7 @@ class ENGINE_DLL CUI_Panel abstract : public CUIObject
 {
 public:
 	typedef struct tagPanelDesc : public UIOBJECT_DESC {
-		_uint* iUIState;
+		UI_STATE_DESC StateDesc;
 	}PANEL_DESC;
 
 protected:
@@ -27,7 +27,7 @@ public:
 	virtual void	Set_Offset(_float fOffsetX, _float fOffsetY) override;
 
 protected:
-	_uint*				m_iUIState = {};
+	_uint*				m_pUIState = {};
 	vector<CUIObject*>	m_Children;
 
 protected:

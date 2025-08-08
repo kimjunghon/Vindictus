@@ -34,8 +34,15 @@ namespace Engine
 
 	typedef struct tagInputUIDesc 
 	{
-		bool		bESC;
+		bool		bOption;
+		bool		bMouse;
+		bool		bInventory;
 	}INPUT_UI_DESC;
+
+	typedef struct tagUIStateDesc
+	{
+		unsigned int* iUIState;
+	}UI_STATE_DESC;
 
 	typedef struct tagLightDesc
 	{

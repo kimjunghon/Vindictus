@@ -10,7 +10,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CStateBar : public CUI_Slot
+class CStateBar final : public CUI_Slot
 {
 private:
 	enum class STATE_SLOT { BACKGROUND, BAR, LERP_BAR, END };

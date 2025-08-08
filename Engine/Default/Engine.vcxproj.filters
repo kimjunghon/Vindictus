@@ -464,9 +464,6 @@
     <ClCompile Include="..\Private\Controller.cpp">
       <Filter>01.Utility\06.Controller</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\VindictusBack\Vindictus\Engine\Private\Light.cpp">
-      <Filter>01.Utility\96.Light</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\EnginePch.cpp">
       <Filter>99.Defines</Filter>
     </ClCompile>
@@ -571,6 +568,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Navigation_Manager.cpp">
       <Filter>01.Utility\04.Component\Navigation\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light.cpp">
+      <Filter>01.Utility\96.Light</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -23,7 +23,9 @@ public:
 	
 	HRESULT			Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones);
 
+#ifdef _DEBUG
 	_bool			Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist);
+#endif
 
 private:
 	_char				m_szName[MAX_PATH] = {};

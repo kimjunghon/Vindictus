@@ -67,7 +67,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pObject_Manager)
         return E_FAIL;
 
-    m_pEventBus = CEventBus::Create(EngineDesc.iNumLevels);
+    m_pEventBus = CEventBus::Create();
     if (nullptr == m_pEventBus)
         return E_FAIL;
 
@@ -113,7 +113,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 {
     m_pPrototype_Manager->Clear(iClearLevelID);
-    m_pEventBus->Clear(iClearLevelID);
+    m_pEventBus->Clear();
     m_pObject_Manager->Clear();
     m_pCamera_Manager->Clear();
     m_pLight_Manager->Clear();
@@ -314,9 +314,9 @@ HRESULT CGameInstance::Add_Light(const _wstring& strLightTag, const LIGHT_DESC& 
 #pragma endregion
 
 #pragma region EVENTBUS
-void CGameInstance::Publish(_uint iEventLevelIndex, const CEvent& Event)
+void CGameInstance::Publish(_uint iEventTypeIndex, const CEvent& Event)
 {
-    m_pEventBus->Publish(iEventLevelIndex, Event);
+    m_pEventBus->Publish(iEventTypeIndex, Event);
 }
 #pragma endregion
 
@@ -431,6 +431,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pCamera_Manager);
     Safe_Release(m_pController_Manager);
     Safe_Release(m_pNavigation_Manager);
+
 }
 
 void CGameInstance::Free()

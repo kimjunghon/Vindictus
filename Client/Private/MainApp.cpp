@@ -24,6 +24,7 @@
 #include "OptionController.h"
 #include "StateBar.h"
 #include "UI_Container.h"
+#include "Mouse.h"
 
 //Controller
 #include "Controller_KeyBoard.h"
@@ -34,6 +35,10 @@
 
 //PlayerInstance
 #include "PlayerInstance.h"
+#include "Camera_Target.h"
+#include "PlayerPawn.h"
+#include "PlayerBody.h"
+
 
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
@@ -62,6 +67,9 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Navigations()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
 	if (FAILED(Start_Level(LEVEL::LOGO)))
@@ -215,10 +223,18 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 #pragma endregion
 
+	/* Prototype_GameObject_Camera_Target */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Target"),
+		CCamera_Target::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 	if (FAILED(Ready_Prototype_ForStatic_UI()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_ForStatic_Texture()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Prototype_ForStatic_Player()))
 		return E_FAIL;
 
 	return S_OK;
@@ -325,6 +341,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Inventory"),
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Inventory.png"), 1))))
 		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Mouse */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Cursor"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Cursor%d.png"), 2))))
+		return E_FAIL;
+
 #pragma endregion
 
 	return S_OK;
@@ -364,6 +386,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 		CLoadingPoint::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_UIObject_Mouse */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"),
+		CMouse::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_UIContainer */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_UIContainer"),
 		CUI_Container::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
@@ -404,6 +432,32 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 	return S_OK;
 }
 
+HRESULT CMainApp::Ready_Prototype_ForStatic_Player()
+{
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
+	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
+
+	/* Prototype_Component_Model_Player */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Player"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Piona.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+
+	/* Prototype_GameObject_Player_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Player_Body"),
+		CPlayerBody::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_PlayerPawn */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
+		CPlayerPawn::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CMainApp::Ready_UI_Container()
 {
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_UIContainer"),
@@ -421,14 +475,20 @@ HRESULT CMainApp::Ready_Controller()
 	if (FAILED(m_pGameInstance->Change_Controller(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), TEXT("Controller_KeyBoard"))))
 		return E_FAIL;
 	
+	if (FAILED(m_pGameInstance->Add_Controller_ToManager(TEXT("Controller_UI"), CController_UI::Create())))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Change_Controller(ENUM_CLASS(CONTROLLER_CHANNEL::UI), TEXT("Controller_UI"))))
+		return E_FAIL;
+
 	return S_OK;
 	
 }
 
 HRESULT CMainApp::Ready_Navigations()
 {
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::TOWN), TEXT("../Bin/Resources/Navigation/Town_Navigation.dat"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::TOWN), TEXT("../Bin/Resources/Navigation/Town_Navigation.dat"))))
+		return E_FAIL;
 	//
 	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::FILED), TEXT("../Bin/Resources/Navigation/Field_Navigation.dat"))))
 	//	return E_FAIL;

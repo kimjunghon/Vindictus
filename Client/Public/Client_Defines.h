@@ -4,7 +4,6 @@
 #include <process.h>
 
 #include "Event_Struct.h"
-#include "Client_Enum.h"
 #include "Client_Struct.h"
 
 #include "../Default/AnimTable.h"

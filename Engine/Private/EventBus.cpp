@@ -5,9 +5,9 @@ CEventBus::CEventBus()
 {
 }
 
-HRESULT CEventBus::Initialize(_uint iNumLevels)
+HRESULT CEventBus::Initialize()
 {
-    m_Subscribers = new SUBSCRIBERS[iNumLevels];
+    m_Subscribers = new SUBSCRIBERS[ENUM_CLASS(EVENTTYPE::END)];
 
     if (nullptr == m_Subscribers)
         return E_FAIL;
@@ -15,18 +15,18 @@ HRESULT CEventBus::Initialize(_uint iNumLevels)
     return S_OK;
 }
 
-void CEventBus::Clear(_uint iClearLevel)
+void CEventBus::Clear()
 {
-    for (auto& Pair : m_Subscribers[iClearLevel])
+    for (auto& Pair : m_Subscribers[ENUM_CLASS(EVENTTYPE::NONSTATIC)])
         Pair.second.clear();
 
-    m_Subscribers[iClearLevel].clear();
+    m_Subscribers[ENUM_CLASS(EVENTTYPE::NONSTATIC)].clear();
 }
 
-CEventBus* CEventBus::Create(_uint iNumLevels)
+CEventBus* CEventBus::Create()
 {
     CEventBus* pInstance = new CEventBus();
-    if (FAILED(pInstance->Initialize(iNumLevels)))
+    if (FAILED(pInstance->Initialize()))
     {
         MSG_BOX(TEXT("Failed Created : CEventBus"));
         Safe_Release(pInstance);
@@ -39,7 +39,7 @@ void CEventBus::Free()
 {
     __super::Free();
 
-    for (_uint i = 0; i < m_iNumLevels; i++)
+    for (_uint i = 0; i < ENUM_CLASS(EVENTTYPE::END); i++)
     {
         for (auto& Pair : m_Subscribers[i])
         {

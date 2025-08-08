@@ -79,9 +79,9 @@ HRESULT CVIBuffer_Sphere::Initialize_Prototype(_uint iSphereX, _uint iSphereY)
 
 	_uint iNumIndex = {};
 
-	for (size_t i = 0; i < m_iSphereY; i++)
+	for (_uint i = 0; i < m_iSphereY; i++)
 	{
-		for (size_t j = 0; j < m_iSphereX; j++)
+		for (_uint j = 0; j < m_iSphereX; j++)
 		{
 			_uint		iIndex = i * (m_iSphereX + 1) + j;
 

@@ -46,6 +46,8 @@ HRESULT CController_Mouse::MoveInput(INPUT_MOVE_DESC* pOut)
     pOut->vDir = XMLoadFloat4(&vMoveDir);
     pOut->bMove = bMove;
     pOut->bSprint = bSprint;
+
+    return S_OK;
 }
 
 HRESULT CController_Mouse::ActionInput(INPUT_ACTION_DESC* pOut)

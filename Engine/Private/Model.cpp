@@ -594,6 +594,7 @@ const _float4x4* CModel::Find_SocketBoneCombinedMatrix(const string& strSocketBo
     return (*iter)->Get_CombinedTransformationMatrixPtr();
 }
 
+#ifdef _DEBUG
 _bool CModel::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist)
 {
     if (m_eModelType != MODELTYPE::NONANIM)
@@ -622,6 +623,7 @@ _bool CModel::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _floa
 
     return false;
 }
+#endif
 
 HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
 {

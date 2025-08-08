@@ -34,19 +34,19 @@ HRESULT COptionController::Initialize(void* pArg)
 
 void COptionController::Priority_Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
 		__super::Children_Priority_Update(fTimeDelta);
 }
 
 void COptionController::Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
 		__super::Children_Update(fTimeDelta);
 }
 
 void COptionController::Late_Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
 		__super::Children_Late_Update(fTimeDelta);
 }
 
@@ -109,7 +109,7 @@ HRESULT COptionController::Ready_Children()
 		m_pGameInstance->Change_Controller(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), m_strChangeControllerTag);
 		m_strChangeControllerTag = {};
 
-		*m_iUIState = ENUM_CLASS(UI_LEVEL::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::OPTION);
+		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::OPTION);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))

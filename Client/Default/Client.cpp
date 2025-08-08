@@ -48,6 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    ShowCursor(FALSE);
 
     CGameInstance* pGameInstance = CGameInstance::GetInstance();
     if (nullptr == pGameInstance)

@@ -2,6 +2,10 @@
 #include "Client_Defines.h"
 #include "Base.h"
 
+NS_BEGIN(Engine)
+class CGameInstance;
+NS_END
+
 NS_BEGIN(Client)
 
 class CWeapon;
@@ -29,6 +33,7 @@ public:
 	PLAYER_STATUS	BindPlayerStatus();
 
 private:
+	CGameInstance*	m_pGameInstance = { nullptr };
 	CWeapon*		m_pPlayerEquipWeapon[ENUM_CLASS(WEAPON_TYPE::END)] = { nullptr };
 	CArmor*			m_pPlayerEquipArmor[ENUM_CLASS(ARMOR_TYPE::END)] = { nullptr };
 	

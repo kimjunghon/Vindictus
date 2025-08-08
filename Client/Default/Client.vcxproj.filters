@@ -199,9 +199,6 @@
     <Filter Include="03.GameObject\Pawns\Player\PlayerBody">
       <UniqueIdentifier>{5325e74b-3782-48d9-a55e-3ddd265ebfdc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Armor">
-      <UniqueIdentifier>{09e49895-4a60-4d26-9390-7e100e3dc131}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.GameObject\Maps">
       <UniqueIdentifier>{2ca07e59-9edc-42f6-af4c-ed7ef0be0179}</UniqueIdentifier>
     </Filter>
@@ -235,20 +232,38 @@
     <Filter Include="04.Controller\UI">
       <UniqueIdentifier>{d8dd0ca2-6487-4e68-b02e-097fe2c84746}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon">
+    <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy">
+      <UniqueIdentifier>{db52d8e0-565a-4e24-b4a3-81f9bbe811c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy\Equipment">
+      <UniqueIdentifier>{8c237587-b7fb-42c6-9864-37d919be9155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy\Storage">
+      <UniqueIdentifier>{16ab35c8-9b48-4a15-ba6b-12bba384e984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Equipment">
+      <UniqueIdentifier>{79feeda7-8804-4340-8ba5-400a80af0a5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Equipment\Armor">
+      <UniqueIdentifier>{09e49895-4a60-4d26-9390-7e100e3dc131}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Equipment\Weapon">
       <UniqueIdentifier>{02a5ea1d-58fc-4cb8-912d-1a4ff712897f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon\Sword">
+    <Filter Include="03.GameObject\Equipment\Weapon\Sword">
       <UniqueIdentifier>{bb5b346c-11b1-41ae-bd18-cd2d7523df64}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon\Sword\BastardSword">
+    <Filter Include="03.GameObject\Equipment\Weapon\Sword\BastardSword">
       <UniqueIdentifier>{29d67f86-ad4b-482e-b7f3-994660d2360d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon\Shield">
+    <Filter Include="03.GameObject\Equipment\Weapon\Shield">
       <UniqueIdentifier>{a64da96d-c1a5-4d30-87b3-0e5b06c7c906}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon\Shield\RoundShield">
+    <Filter Include="03.GameObject\Equipment\Weapon\Shield\RoundShield">
       <UniqueIdentifier>{15fe760a-64dc-436a-9670-8ada20414c0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Mouse">
+      <UniqueIdentifier>{e4680a30-a4a9-43ad-b61f-9a34ab727da2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -385,13 +400,13 @@
       <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BastardSword.h">
-      <Filter>03.GameObject\Pawns\Player\Weapon\Sword\BastardSword</Filter>
+      <Filter>03.GameObject\Equipment\Weapon\Sword\BastardSword</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RoundShield.h">
-      <Filter>03.GameObject\Pawns\Player\Weapon\Shield\RoundShield</Filter>
+      <Filter>03.GameObject\Equipment\Weapon\Shield\RoundShield</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Armor.h">
-      <Filter>03.GameObject\Pawns\Player\Armor</Filter>
+      <Filter>03.GameObject\Equipment\Armor</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Client_Struct.h">
       <Filter>99.Defines</Filter>
@@ -493,7 +508,16 @@
       <Filter>01.PlayerInstance</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Weapon.h">
-      <Filter>03.GameObject\Pawns\Player\Weapon</Filter>
+      <Filter>03.GameObject\Equipment\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Storage.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Mouse.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Equipment.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Equipment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -622,13 +646,13 @@
       <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BastardSword.cpp">
-      <Filter>03.GameObject\Pawns\Player\Weapon\Sword\BastardSword</Filter>
+      <Filter>03.GameObject\Equipment\Weapon\Sword\BastardSword</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RoundShield.cpp">
-      <Filter>03.GameObject\Pawns\Player\Weapon\Shield\RoundShield</Filter>
+      <Filter>03.GameObject\Equipment\Weapon\Shield\RoundShield</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Armor.cpp">
-      <Filter>03.GameObject\Pawns\Player\Armor</Filter>
+      <Filter>03.GameObject\Equipment\Armor</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GlasgavelenBody.cpp">
       <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Body</Filter>
@@ -724,7 +748,16 @@
       <Filter>01.PlayerInstance</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Weapon.cpp">
-      <Filter>03.GameObject\Pawns\Player\Weapon</Filter>
+      <Filter>03.GameObject\Equipment\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Storage.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Mouse.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Equipment.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Equipment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

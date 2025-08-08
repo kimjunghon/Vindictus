@@ -102,10 +102,10 @@ public:
 #pragma region EVENTBUS
 public:
 	template <typename EVENT>
-	void Subscribe(_uint iEventLevelIndex, function<void(const EVENT&)> Subscriber) {
-		m_pEventBus->Subscribe(iEventLevelIndex, Subscriber); }
+	void Subscribe(_uint iEventTypeIndex, function<void(const EVENT&)> Subscriber) {
+		m_pEventBus->Subscribe(iEventTypeIndex, Subscriber); }
 
-	void Publish(_uint iEventLevelIndex, const CEvent& Event);
+	void Publish(_uint iEventTypeIndex, const CEvent& Event);
 #pragma endregion
 
 #pragma region CAMERA_MANAGER

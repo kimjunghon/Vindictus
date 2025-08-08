@@ -24,9 +24,6 @@ HRESULT CLevel_GamePlay::Initialize()
 	
 	if (FAILED(Ready_UI(TEXT("Layer_UI"))))
 		return E_FAIL;
-	
-	if (FAILED(Ready_Controller()))
-		return E_FAIL;
 
     return S_OK;
 }
@@ -63,13 +60,6 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 		Event.eType = PROGRESS_TYPE::STAMINA;
 
 		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
-	}
-
-	if (m_pGameInstance->Get_KeyDown(DIK_ESCAPE))
-	{
-		EVENT_UI_CHANGE Event;
-		Event.byVisibleType = ENUM_CLASS(GAMEPLAY_UI::DEFAULT) + ENUM_CLASS(GAMEPLAY_UI::OPTION);
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::GAMEPLAY), Event);
 	}
 
 	if(m_pGameInstance->Get_KeyDown(DIK_RETURN))
@@ -117,9 +107,8 @@ HRESULT CLevel_GamePlay::Ready_Player(const _wstring& strLayerTag)
 	GameObjectDesc.fSpeedPerSec = 10.f;
 	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.f);
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_PlayerPawn"),
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
 		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
-
 		return E_FAIL;
 
     return S_OK;

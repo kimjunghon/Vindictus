@@ -12,7 +12,7 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;
 
-	m_pGameInstance->Subscribe<EVENT_LOADING_COMPLETE>(ENUM_CLASS(LEVEL::LOADING), [this](const EVENT_LOADING_COMPLETE& Event) {
+	m_pGameInstance->Subscribe<EVENT_LOADING_COMPLETE>(ENUM_CLASS(EVENTTYPE::NONSTATIC), [this](const EVENT_LOADING_COMPLETE& Event) {
 		this->Event_LoadingComplete(Event); });
 
 	if (FAILED(Ready_GameObjects()))

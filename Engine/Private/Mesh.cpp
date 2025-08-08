@@ -144,6 +144,7 @@ HRESULT CMesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, c
 	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
 }
 
+#ifdef _DEBUG
 _bool CMesh::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist)
 {
 	_uint iIndex = {};
@@ -177,6 +178,7 @@ _bool CMesh::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float
 
 	return false;
 }
+#endif
 
 HRESULT CMesh::Ready_Vertices_For_NonAnim_Assimp(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
 {

@@ -139,11 +139,12 @@ HRESULT CArmor::Equip(const _float4x4* pPawnMatrix, CModel* pParentModelCom)
 
 HRESULT CArmor::UnEquip()
 {
+	m_pPawnMatrix = nullptr;
+
 	for (auto& pBone : m_ParentBones)
 		Safe_Release(pBone);
 
 	m_ParentBones.clear();
-
 
 	return S_OK;
 }

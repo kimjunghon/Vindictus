@@ -26,7 +26,7 @@ HRESULT CUI_Panel::Initialize(void* pArg)
         return E_FAIL;
 
     PANEL_DESC* pDesc = static_cast<PANEL_DESC*>(pArg);
-    m_iUIState = pDesc->iUIState;
+    m_pUIState = pDesc->StateDesc.iUIState;
 
     return S_OK;
 }

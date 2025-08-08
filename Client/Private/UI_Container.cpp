@@ -1,6 +1,7 @@
 #include "ClientPch.h"
 #include "UI_Container.h"
 #include "UI_Panel.h"
+#include "Mouse.h"
 
 CUI_Container::CUI_Container(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CGameObject { pDevice, pDeviceContext }
@@ -42,6 +43,9 @@ HRESULT CUI_Container::Initialize(void* pArg)
 
 void CUI_Container::Priority_Update(_float fTimeDelta)
 {
+	if (m_iUIState & ENUM_CLASS(STATE_FLAG::GAMEPLAY))
+		Bind_InputData();
+
 	for (auto& pUI : m_UIObjects[m_iArrayState])
 		pUI->Priority_Update(fTimeDelta);
 }
@@ -65,6 +69,31 @@ HRESULT CUI_Container::Render()
 
 void CUI_Container::Bind_InputData()
 {
+	m_pGameInstance->UI_Input(&m_UI_Input);
+
+	if (m_UI_Input.bOption)
+	{
+		if (m_iUIState & ~ENUM_CLASS(STATE_FLAG::GAMEPLAY))
+			m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
+		else
+			m_iUIState |= ENUM_CLASS(GAMEPLAY_FLAG::OPTION);
+	}
+
+	if (m_UI_Input.bMouse)
+	{
+		if (m_iUIState == ENUM_CLASS(STATE_FLAG::GAMEPLAY))
+			m_iUIState |= ENUM_CLASS(GAMEPLAY_FLAG::MOUSE);
+		else if(m_iUIState == (ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::MOUSE)))
+			m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
+	}
+
+	if (m_UI_Input.bInventory)
+	{
+		if (m_iUIState == ENUM_CLASS(STATE_FLAG::GAMEPLAY))
+			m_iUIState |= ENUM_CLASS(GAMEPLAY_FLAG::INVENTORY);
+		else if(m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::INVENTORY))
+			m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
+	}
 }
 
 HRESULT CUI_Container::Ready_Loading_UI()
@@ -78,7 +107,7 @@ HRESULT CUI_Container::Ready_Loading_UI()
 	Panel_Desc.fOffsetX = 0;
 	Panel_Desc.fOffsetY = 0;
 	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
-	Panel_Desc.iUIState = &m_iUIState;
+	Panel_Desc.StateDesc.iUIState = &m_iUIState;
 
 	CUIObject* pUI = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"), &Panel_Desc));
 	if (nullptr == pUI)
@@ -96,10 +125,10 @@ HRESULT CUI_Container::Ready_Logo_UI()
 	Panel_Desc.fY = g_iWinSizeY >> 1;
 	Panel_Desc.fSizeX = g_iWinSizeX;
 	Panel_Desc.fSizeY = g_iWinSizeY;
-	Panel_Desc.fOffsetX = 0;
-	Panel_Desc.fOffsetY = 0;
+	Panel_Desc.fOffsetX = 0.f;
+	Panel_Desc.fOffsetY = 0.f;
 	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
-	Panel_Desc.iUIState = &m_iUIState;
+	Panel_Desc.StateDesc.iUIState = &m_iUIState;
 
 	CUIObject* pUI = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LogoScreen"), &Panel_Desc));
 	if (nullptr == pUI)
@@ -107,11 +136,43 @@ HRESULT CUI_Container::Ready_Logo_UI()
 
 	m_UIObjects[ENUM_CLASS(UI_LEVEL::LOGO)].push_back(pUI);
 
+	CMouse::UI_MOUSE_DESC Mouse_Desc{};
+	Mouse_Desc.fX = g_iWinSizeX >> 1;
+	Mouse_Desc.fY = g_iWinSizeY >> 1;
+	Mouse_Desc.fSizeX = 30.f;
+	Mouse_Desc.fSizeY = 30.f;
+	Mouse_Desc.fOffsetX = 10.f;
+	Mouse_Desc.fOffsetY = 10.f;
+	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
+	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
+
+	CUIObject* pMouse = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), &Mouse_Desc));
+	if (nullptr == pMouse)
+		return E_FAIL;
+
+	m_UIObjects[ENUM_CLASS(UI_LEVEL::LOGO)].push_back(pMouse);
+
 	return S_OK;
 }
 
 HRESULT CUI_Container::Ready_GamePlay_UI()
 {
+	CMouse::UI_MOUSE_DESC Mouse_Desc{};
+	Mouse_Desc.fX = g_iWinSizeX >> 1;
+	Mouse_Desc.fY = g_iWinSizeY >> 1;
+	Mouse_Desc.fSizeX = 30.f;
+	Mouse_Desc.fSizeY = 30.f;
+	Mouse_Desc.fOffsetX = 0.f;
+	Mouse_Desc.fOffsetY = 0.f;
+	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
+	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
+
+	CUIObject* pMouse = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), &Mouse_Desc));
+	if (nullptr == pMouse)
+		return E_FAIL;
+
+	m_UIObjects[ENUM_CLASS(UI_LEVEL::GAMEPLAY)].push_back(pMouse);
+
 	CUI_Panel::PANEL_DESC Panel_Desc{};
 	Panel_Desc.fX = g_iWinSizeX >> 1;
 	Panel_Desc.fY = g_iWinSizeY >> 1;
@@ -119,8 +180,8 @@ HRESULT CUI_Container::Ready_GamePlay_UI()
 	Panel_Desc.fSizeY = g_iWinSizeY;
 	Panel_Desc.fOffsetX = 0.f;
 	Panel_Desc.fOffsetY = 0.f;
-	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
-	Panel_Desc.iUIState = &m_iUIState;
+	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
+	Panel_Desc.StateDesc.iUIState = &m_iUIState;
 
 	CUIObject* pHUD = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_HUD"), &Panel_Desc));
 	if (nullptr == pHUD)
@@ -128,7 +189,7 @@ HRESULT CUI_Container::Ready_GamePlay_UI()
 
 	m_UIObjects[ENUM_CLASS(UI_LEVEL::GAMEPLAY)].push_back(pHUD);
 
-	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
+	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 
 	CUIObject* pOption = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Option"), &Panel_Desc));
 	if (nullptr == pOption)

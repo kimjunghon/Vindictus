@@ -9,7 +9,11 @@ namespace Engine
 	enum class D3DTS { VIEW, PROJ, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
+
 	enum class LAYERTYPE { STATIC, NONSTATIC, END};
+
+	enum class EVENTTYPE { STATIC, NONSTATIC, END };
+
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
 	enum class OBJECTGROUP { STATIC, DYNAMIC};
 	enum class WINMODE { FULL, WIN, END };

@@ -56,8 +56,13 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::DEFAULT);
 
-	
 	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(-10.f, 0.f, 10.f, 1.f));
+	
+	m_pGameInstance->Subscribe<EVENT_CHANGE_WEAPON>(ENUM_CLASS(EVENTTYPE::NONSTATIC), [this](const EVENT_CHANGE_WEAPON& Event) {
+		this->Event_ChangeWeapon(Event); });
+	
+	m_pGameInstance->Subscribe<EVENT_CHANGE_ARMOR>(ENUM_CLASS(EVENTTYPE::NONSTATIC), [this](const EVENT_CHANGE_ARMOR& Event) {
+		this->Event_ChangeArmor(Event); });
 
 	return S_OK;
 }
@@ -136,7 +141,7 @@ HRESULT CPlayerPawn::EquipWeapon(CWeapon* pWeapon)
 	WEAPON_TYPE eWeaponType = pWeapon->Get_WeaponType();
 
 	if (m_strEquipWeapons[ENUM_CLASS(eWeaponType)].size() > 0)
-		UnEquipWeapon(eWeaponType);
+		UnEquipWeapon(ENUM_CLASS(eWeaponType));
 
 	m_strEquipWeapons[ENUM_CLASS(eWeaponType)] = strWeaponName;
 
@@ -144,19 +149,22 @@ HRESULT CPlayerPawn::EquipWeapon(CWeapon* pWeapon)
 
 	eWeaponType == WEAPON_TYPE::SWORD ? strSocketBoneName = "ValveBiped.Anim_Attachment_RH" : strSocketBoneName = "Anim_Attachment_LF";
 
-	pWeapon->Equip(m_pPlayerBody->SocketCombinedMatrixPtr(strSocketBoneName));
+	pWeapon->Equip(m_pTransformCom->Get_WorldMatrixPtr(), m_pPlayerBody->SocketCombinedMatrixPtr(strSocketBoneName));
 
 	Add_PawnObject(strWeaponName, pWeapon);
 
 	return S_OK;
 }
 
-HRESULT CPlayerPawn::UnEquipWeapon(WEAPON_TYPE eWeaponType)
+HRESULT CPlayerPawn::UnEquipWeapon(_uint iWeaponTypeIndex)
 {
-	if (FAILED(Remove_PawnObject(m_strEquipWeapons[ENUM_CLASS(eWeaponType)])))
+	if(nullptr == Find_PawnObject(m_strEquipWeapons[iWeaponTypeIndex]))
+		return S_OK;
+
+	if (FAILED(Remove_PawnObject(m_strEquipWeapons[iWeaponTypeIndex])))
 		return E_FAIL;
 
-	m_strEquipWeapons[ENUM_CLASS(eWeaponType)].clear();
+	m_strEquipWeapons[iWeaponTypeIndex].clear();
 
 	return S_OK;
 }
@@ -169,30 +177,42 @@ HRESULT CPlayerPawn::EquipArmor(CArmor* pArmor)
 	_wstring strArmorName = pArmor->Get_ArmorName();
 	ARMOR_TYPE eArmorType = pArmor->Get_ArmorType();
 
-
 	if (eArmorType == ARMOR_TYPE::HEAD)
 		m_pPlayerBody->EquipHead();
 
 	if (m_strEquipArmors[ENUM_CLASS(eArmorType)].size() > 0)
-		UnEquipArmor(eArmorType);
+		UnEquipArmor(ENUM_CLASS(eArmorType));
 
 	m_strEquipArmors[ENUM_CLASS(eArmorType)] = strArmorName;
 	
-	pArmor->Equip(m_pPlayerBody->Get_ParentModelPtr());
+	pArmor->Equip(m_pTransformCom->Get_WorldMatrixPtr(), m_pPlayerBody->Get_ParentModelPtr());
 
 	Add_PawnObject(strArmorName, pArmor);
 
 	return S_OK;
 }
 
-HRESULT CPlayerPawn::UnEquipArmor(ARMOR_TYPE eArmorType)
+HRESULT CPlayerPawn::UnEquipArmor(_uint iArmorTypeIndex)
 {
-	if (FAILED(Remove_PawnObject(m_strEquipArmors[ENUM_CLASS(eArmorType)])))
+	if (nullptr == Find_PawnObject(m_strEquipArmors[iArmorTypeIndex]))
+		return S_OK;
+
+	if (FAILED(Remove_PawnObject(m_strEquipArmors[iArmorTypeIndex])))
 		return E_FAIL;
 
-	m_strEquipArmors[ENUM_CLASS(eArmorType)].clear();
+	m_strEquipArmors[iArmorTypeIndex].clear();
 
 	return S_OK;
+}
+
+void CPlayerPawn::Event_ChangeWeapon(const EVENT_CHANGE_WEAPON& Event)
+{
+	EquipWeapon(m_pPlayerInstance->BindPlayerEquipWeapon(Event.iWeaponTypeIndex));
+}
+
+void CPlayerPawn::Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event)
+{
+	EquipArmor(m_pPlayerInstance->BindPlayerEquipArmor(Event.iArmorTypeIndex));
 }
 
 void CPlayerPawn::Move(_float fTimeDelta)
@@ -228,7 +248,7 @@ HRESULT CPlayerPawn::Ready_Camera()
 
 	CCamera* pCamera = { nullptr };
 
-	if (FAILED(m_pGameInstance->Add_CameraToManager(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Camera_Target"), TEXT("Player_Camera"), &pCamera, &CameraDesc)))
+	if (FAILED(m_pGameInstance->Add_CameraToManager(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Target"), TEXT("Player_Camera"), &pCamera, &CameraDesc)))
 		return E_FAIL;
 
 
@@ -247,11 +267,11 @@ HRESULT CPlayerPawn::Ready_PawnObjects()
 	if (FAILED(Ready_PlayerBody()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Weapons()))
-		return E_FAIL;
-
-	if (FAILED(Ready_Armors()))
-		return E_FAIL;
+	//if (FAILED(Ready_Weapons()))
+	//	return E_FAIL;
+	//
+	//if (FAILED(Ready_Armors()))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -262,7 +282,7 @@ HRESULT CPlayerPawn::Ready_PlayerBody()
 	PlayerBodyDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	PlayerBodyDesc.pStateFlag = &m_iStateFlag;
 
-	if (FAILED(__super::Add_PawnObject(TEXT("Player_Body"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Player_Body"), &PlayerBodyDesc)))
+	if (FAILED(__super::Add_PawnObject(TEXT("Player_Body"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Player_Body"), &PlayerBodyDesc)))
 		return E_FAIL;
 
 	m_pPlayerBody = static_cast<CPlayerBody*>(Find_PawnObject(TEXT("Player_Body")));
@@ -297,39 +317,14 @@ HRESULT CPlayerPawn::Ready_Weapons()
 HRESULT CPlayerPawn::Ready_Armors()
 {
 
-	CArmor* pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-	if (nullptr == pArmor)
-		return E_FAIL;
+	for (_uint i = 0; i < ENUM_CLASS(ARMOR_TYPE::END); i++)
+	{
+		CArmor* pArmor = m_pPlayerInstance->BindPlayerEquipArmor(i);
+		if (nullptr == pArmor)
+			continue;
 
-	EquipArmor(TEXT("LightMale_Upper"), pArmor, ARMOR_TYPE::UPPER);
-
-
-	ArmorDesc.eArmorType = ARMOR_TYPE::LOWER;
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Lower");
-	pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-
-	EquipArmor(TEXT("LightMale_Lower"), pArmor, ARMOR_TYPE::LOWER);
-
-
-	ArmorDesc.eArmorType = ARMOR_TYPE::HAND;
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Hand");
-	pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-
-	EquipArmor(TEXT("LightMale_Hand"), pArmor, ARMOR_TYPE::HAND);
-
-
-	ArmorDesc.eArmorType = ARMOR_TYPE::HEAD;
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Head");
-	pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-
-	EquipArmor(TEXT("LightMale_Head"), pArmor, ARMOR_TYPE::HEAD);
-
-
-	ArmorDesc.eArmorType = ARMOR_TYPE::FOOT;
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Foot");
-	pArmor = static_cast<CArmor*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-
-	EquipArmor(TEXT("LightMale_Foot"), pArmor, ARMOR_TYPE::FOOT);
+		EquipArmor(pArmor);
+	}
 
 
 	return S_OK;

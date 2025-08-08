@@ -50,7 +50,9 @@ public:
 	const _vector*		Get_AnimRotationPtr() { return &m_vAnimRotation; }
 	vector<CBone*>&		Get_Bones() { return m_Bones; }
 
+#ifdef _DEBUG
 	_bool				Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist);
+#endif
 
 private:
 	const aiScene*				m_pAIScene = { nullptr };

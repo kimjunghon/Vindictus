@@ -66,6 +66,10 @@ void CNavigation_Manager::Free()
 {
 	__super::Free();
 
+	for (auto& Pair : m_Navigations)
+		Safe_Release(Pair.second);
+	m_Navigations.clear();
+
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pDeviceContext);
 }
