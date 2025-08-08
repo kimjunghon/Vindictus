@@ -25,6 +25,8 @@
 #include "StateBar.h"
 #include "UI_Container.h"
 #include "Mouse.h"
+#include "Inventory.h"
+#include "Storage.h"
 
 //Controller
 #include "Controller_KeyBoard.h"
@@ -347,6 +349,16 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Cursor%d.png"), 2))))
 		return E_FAIL;
 
+	/* Prototype_Component_Texture_GamePlay_Inventroy_Background */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Inventroy_Background"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Inventory_Back.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Storage */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Storage"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Storage.png"), 1))))
+		return E_FAIL;
+
 #pragma endregion
 
 	return S_OK;
@@ -424,6 +436,14 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 	/* Prototype_UIObject_OptionController */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_OptionController"),
 		COptionController::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Inventory"),
+		CInventory::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Storage"),
+		CStorage::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 #pragma endregion
 

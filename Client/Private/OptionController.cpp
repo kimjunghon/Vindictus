@@ -68,6 +68,8 @@ HRESULT COptionController::Ready_Children()
 	Background_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Background_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_Option_Background");
 	Background_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
+	Background_Desc.IsBlend = false;
+	Background_Desc.fAlpha = 1.f;
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Background_Desc)))
 		return E_FAIL;
@@ -82,6 +84,8 @@ HRESULT COptionController::Ready_Children()
 	Button_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 	Button_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_Keyboard");
+	Button_Desc.IsBlend = false;
+	Button_Desc.fAlpha = 1.f;
 
 	Button_Desc.Callback = [this]() {
 		m_strChangeControllerTag = TEXT("Controller_KeyBoard");

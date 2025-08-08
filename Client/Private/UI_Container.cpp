@@ -96,9 +96,20 @@ void CUI_Container::Bind_InputData()
 	}
 }
 
+HRESULT CUI_Container::Add_UIObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, _uint iUI_LevelIndex, void* pArg)
+{
+	CUIObject* pUI = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strPrototypeTag, pArg));
+	if (nullptr == pUI)
+		return E_FAIL;
+
+	m_UIObjects[iUI_LevelIndex].push_back(pUI);
+
+	return S_OK;
+}
+
 HRESULT CUI_Container::Ready_Loading_UI()
 {
-	CUI_Panel::PANEL_DESC Panel_Desc{};
+	CUI_Panel::PANEL_DESC Panel_Desc = {};
 
 	Panel_Desc.fX = g_iWinSizeX >> 1;
 	Panel_Desc.fY = g_iWinSizeY >> 1;
@@ -109,11 +120,8 @@ HRESULT CUI_Container::Ready_Loading_UI()
 	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
 	Panel_Desc.StateDesc.iUIState = &m_iUIState;
 
-	CUIObject* pUI = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"), &Panel_Desc));
-	if (nullptr == pUI)
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingScreen"), ENUM_CLASS(UI_LEVEL::LOADING), &Panel_Desc)))
 		return E_FAIL;
-
-	m_UIObjects[ENUM_CLASS(UI_LEVEL::LOADING)].push_back(pUI);
 
 	return S_OK;
 }
@@ -130,11 +138,8 @@ HRESULT CUI_Container::Ready_Logo_UI()
 	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
 	Panel_Desc.StateDesc.iUIState = &m_iUIState;
 
-	CUIObject* pUI = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LogoScreen"), &Panel_Desc));
-	if (nullptr == pUI)
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LogoScreen"), ENUM_CLASS(UI_LEVEL::LOGO), &Panel_Desc)))
 		return E_FAIL;
-
-	m_UIObjects[ENUM_CLASS(UI_LEVEL::LOGO)].push_back(pUI);
 
 	CMouse::UI_MOUSE_DESC Mouse_Desc{};
 	Mouse_Desc.fX = g_iWinSizeX >> 1;
@@ -146,11 +151,8 @@ HRESULT CUI_Container::Ready_Logo_UI()
 	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
 	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
 
-	CUIObject* pMouse = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), &Mouse_Desc));
-	if (nullptr == pMouse)
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), ENUM_CLASS(UI_LEVEL::LOGO), &Mouse_Desc)))
 		return E_FAIL;
-
-	m_UIObjects[ENUM_CLASS(UI_LEVEL::LOGO)].push_back(pMouse);
 
 	return S_OK;
 }
@@ -167,11 +169,8 @@ HRESULT CUI_Container::Ready_GamePlay_UI()
 	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
 	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
 
-	CUIObject* pMouse = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), &Mouse_Desc));
-	if (nullptr == pMouse)
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Mouse_Desc)))
 		return E_FAIL;
-
-	m_UIObjects[ENUM_CLASS(UI_LEVEL::GAMEPLAY)].push_back(pMouse);
 
 	CUI_Panel::PANEL_DESC Panel_Desc{};
 	Panel_Desc.fX = g_iWinSizeX >> 1;
@@ -183,25 +182,19 @@ HRESULT CUI_Container::Ready_GamePlay_UI()
 	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
 	Panel_Desc.StateDesc.iUIState = &m_iUIState;
 
-	CUIObject* pHUD = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_HUD"), &Panel_Desc));
-	if (nullptr == pHUD)
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_HUD"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
 		return E_FAIL;
-
-	m_UIObjects[ENUM_CLASS(UI_LEVEL::GAMEPLAY)].push_back(pHUD);
 
 	Panel_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 
-	CUIObject* pOption = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Option"), &Panel_Desc));
-	if (nullptr == pOption)
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Option"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
 		return E_FAIL;
 
-	m_UIObjects[ENUM_CLASS(UI_LEVEL::GAMEPLAY)].push_back(pOption);
-
-	CUIObject* pOptionController = static_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_OptionController"), &Panel_Desc));
-	if (nullptr == pOptionController)
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_OptionController"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
 		return E_FAIL;
 
-	m_UIObjects[ENUM_CLASS(UI_LEVEL::GAMEPLAY)].push_back(pOptionController);
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Inventory"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
+		return E_FAIL;
 
 	return S_OK;
 }

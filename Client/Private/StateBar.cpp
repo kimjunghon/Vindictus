@@ -113,9 +113,10 @@ HRESULT CStateBar::Ready_Children()
 	Children_Desc.fOffsetX = 0.f;
 	Children_Desc.fOffsetY = 0.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
-
 	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_") + m_strType;
+	Children_Desc.IsBlend = false;
+	Children_Desc.fAlpha = 1.f;
 
 	if (FAILED(CUI_Slot::Add_Child(ENUM_CLASS(STATE_SLOT::BAR), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"), &Children_Desc)))
 		return E_FAIL;

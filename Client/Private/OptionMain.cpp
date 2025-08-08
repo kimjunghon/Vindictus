@@ -66,6 +66,8 @@ HRESULT COptionMain::Ready_Children()
 	Button_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 	Button_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_OptionButton");
+	Button_Desc.IsBlend = false;
+	Button_Desc.fAlpha = 1.f;
 
 	Button_Desc.Callback = [this]() {
 		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);

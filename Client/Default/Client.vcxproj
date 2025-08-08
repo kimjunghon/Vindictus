@@ -165,6 +165,7 @@
     <ClInclude Include="..\public\Glasgavelen.h" />
     <ClInclude Include="..\public\GlasgavelenBody.h" />
     <ClInclude Include="..\public\GlasgavelenSword.h" />
+    <ClInclude Include="..\public\Inventory.h" />
     <ClInclude Include="..\public\Level_Field.h" />
     <ClInclude Include="..\public\Level_Glasgavelen.h" />
     <ClInclude Include="..\public\Level_Queen.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="..\private\Glasgavelen.cpp" />
     <ClCompile Include="..\private\GlasgavelenBody.cpp" />
     <ClCompile Include="..\private\GlasgavelenSword.cpp" />
+    <ClCompile Include="..\private\Inventory.cpp" />
     <ClCompile Include="..\private\Level_Field.cpp" />
     <ClCompile Include="..\private\Level_Glasgavelen.cpp" />
     <ClCompile Include="..\private\Level_Queen.cpp" />

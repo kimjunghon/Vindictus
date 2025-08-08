@@ -151,9 +151,6 @@
     <Filter Include="01.Utility\04.Component\Models\Animation\Channel">
       <UniqueIdentifier>{900a0d21-5ecc-4372-98cf-bef9b073f4f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\04.Component\Models\EquipModel">
-      <UniqueIdentifier>{61e4c4ed-a9e9-44c0-9f48-eb3698ef317a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\04.Component\Models\Model">
       <UniqueIdentifier>{2a0f8936-b037-4542-9f45-9e1713569a31}</UniqueIdentifier>
     </Filter>

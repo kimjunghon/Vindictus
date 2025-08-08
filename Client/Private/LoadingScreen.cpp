@@ -88,7 +88,7 @@ HRESULT CLoadingScreen::Ready_Children()
 	Children_Desc.fSizeX = m_fSizeX - 100.f;
 	Children_Desc.fSizeY = 10.f;
 	Children_Desc.fOffsetX = 0.f;
-	Children_Desc.fOffsetY = 260.f;
+	Children_Desc.fOffsetY = 360.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"), &Children_Desc)))

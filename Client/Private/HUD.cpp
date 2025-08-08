@@ -67,8 +67,8 @@ HRESULT CHUD::Ready_PlayerStateBar()
 	Children_Desc.fY = m_fY;
 	Children_Desc.fSizeX = 612.f;
 	Children_Desc.fSizeY = 17.f;
-	Children_Desc.fOffsetX = -200.f;
-	Children_Desc.fOffsetY = -300.f;
+	Children_Desc.fOffsetX = -440.f;
+	Children_Desc.fOffsetY = -400.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
 	Children_Desc.eType = PROGRESS_TYPE::HP;
 
@@ -76,7 +76,7 @@ HRESULT CHUD::Ready_PlayerStateBar()
 		return E_FAIL;
 
 	Children_Desc.fSizeY = 12.f;
-	Children_Desc.fOffsetY = -270.f;
+	Children_Desc.fOffsetY = -380.f;
 	Children_Desc.eType = PROGRESS_TYPE::STAMINA;
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_StateBar"), &Children_Desc)))
 		return E_FAIL;

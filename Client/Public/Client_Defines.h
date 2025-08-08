@@ -11,8 +11,8 @@
 
 namespace Client
 {
-	const unsigned int			g_iWinSizeX = 1280;
-	const unsigned int			g_iWinSizeY = 720;
+	const unsigned int			g_iWinSizeX = 1600;
+	const unsigned int			g_iWinSizeY = 900;
 }
 
 extern HWND g_hWnd;

@@ -519,6 +519,9 @@
     <ClInclude Include="..\public\Equipment.h">
       <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Equipment</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Inventory.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -758,6 +761,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Equipment.cpp">
       <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Equipment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Inventory.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

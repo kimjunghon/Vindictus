@@ -83,6 +83,8 @@ HRESULT CLoadingBar::Ready_Children()
 	Children_Desc.iDepth = m_iDepth;
 	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_LoadingBar_Back");
+	Children_Desc.IsBlend = false;
+	Children_Desc.fAlpha = 1.f;
 
 	if (FAILED(CUI_Slot::Add_Child(ENUM_CLASS(LOADING_SLOT::BACKGROUND), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
 		return E_FAIL;
