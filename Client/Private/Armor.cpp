@@ -97,6 +97,9 @@ void CArmor::Late_Update(_float fTimeDelta)
 	{
 		if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 			MSG_BOX(TEXT("Failed Add RenderGroup"));
+
+
+		m_pModelCom[ENUM_CLASS(m_eArmorState)]->Bind_ParentBone(m_ParentBones);
 	}
 
 }

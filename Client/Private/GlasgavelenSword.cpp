@@ -39,6 +39,8 @@ void CGlasgavelenSword::Update(_float fTimeDelta)
 void CGlasgavelenSword::Late_Update(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this);
+
+	m_pModelCom->Bind_ParentBone(m_ParentBones);
 }
 
 HRESULT CGlasgavelenSword::Render()
