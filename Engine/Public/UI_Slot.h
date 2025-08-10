@@ -23,7 +23,7 @@ public:
 
 protected:
 	_uint					m_iNumSlots = {};
-	vector<CUIObject*>		m_Children;  //CUIOBject ¹è¿­
+	vector<CUIObject*>		m_Children;
 
 protected:
 	void			Children_Priority_Update(_float fTimeDelta);

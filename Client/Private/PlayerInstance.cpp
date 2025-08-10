@@ -11,6 +11,17 @@ CPlayerInstance::CPlayerInstance()
 	Safe_AddRef(m_pGameInstance);
 }
 
+HRESULT CPlayerInstance::Initialize(_uint iInventorySlotCount)
+{
+	m_iInventorySlotCount = iInventorySlotCount;
+	m_Inventory.resize(iInventorySlotCount, nullptr);
+	
+	for (_uint i = 0; i < m_iInventorySlotCount; i++)
+		m_EmptySlotIndex.insert(i);
+
+	return S_OK;
+}
+
 HRESULT CPlayerInstance::EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon)
 {
 	if (iWeaponTypeIndex >= ENUM_CLASS(WEAPON_TYPE::END))
@@ -56,12 +67,12 @@ HRESULT CPlayerInstance::UnEquipWeapon(_uint iWeaponTypeIndex)
 	if (nullptr == m_pPlayerEquipWeapon[iWeaponTypeIndex])
 		return S_OK;
 
+	Safe_Release(m_pPlayerEquipWeapon[iWeaponTypeIndex]);
+	m_pPlayerEquipWeapon[iWeaponTypeIndex] = nullptr;
+
 	EVENT_CHANGE_WEAPON Event = {};
 	Event.iWeaponTypeIndex = iWeaponTypeIndex;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::NONSTATIC), Event);
-
-	Safe_Release(m_pPlayerEquipWeapon[iWeaponTypeIndex]);
-	m_pPlayerEquipWeapon[iWeaponTypeIndex] = nullptr;
 
 	return S_OK;
 }
@@ -74,12 +85,13 @@ HRESULT CPlayerInstance::UnEquipArmor(_uint iArmorTypeIndex)
 	if (nullptr == m_pPlayerEquipArmor[iArmorTypeIndex])
 		return S_OK;
 
+	Safe_Release(m_pPlayerEquipArmor[iArmorTypeIndex]);
+	m_pPlayerEquipArmor[iArmorTypeIndex] = nullptr;
+
 	EVENT_CHANGE_ARMOR Event = {};
 	Event.iArmorTypeIndex = iArmorTypeIndex;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::NONSTATIC), Event);
 
-	Safe_Release(m_pPlayerEquipArmor[iArmorTypeIndex]);
-	m_pPlayerEquipArmor[iArmorTypeIndex] = nullptr;
 
 	return S_OK;
 }
@@ -91,7 +103,7 @@ HRESULT CPlayerInstance::SavePlayerStatus(const PLAYER_STATUS& PlayerStatus)
 	return S_OK;
 }
 
-CWeapon* CPlayerInstance::BindPlayerEquipWeapon(_uint iWeaponTypeIndex)
+CWeapon* CPlayerInstance::UpdatePlayerEquipWeapon(_uint iWeaponTypeIndex) const
 {
 	if (iWeaponTypeIndex >= ENUM_CLASS(WEAPON_TYPE::END))
 		return nullptr;
@@ -99,7 +111,7 @@ CWeapon* CPlayerInstance::BindPlayerEquipWeapon(_uint iWeaponTypeIndex)
 	return m_pPlayerEquipWeapon[iWeaponTypeIndex];
 }
 
-CArmor* CPlayerInstance::BindPlayerEquipArmor(_uint iArmorTypeIndex)
+CArmor* CPlayerInstance::UpdatePlayerEquipArmor(_uint iArmorTypeIndex) const
 {
 	if (iArmorTypeIndex >= ENUM_CLASS(ARMOR_TYPE::END))
 		return nullptr;
@@ -107,20 +119,87 @@ CArmor* CPlayerInstance::BindPlayerEquipArmor(_uint iArmorTypeIndex)
 	return m_pPlayerEquipArmor[iArmorTypeIndex];
 }
 
-PLAYER_STATUS CPlayerInstance::BindPlayerStatus()
+PLAYER_STATUS CPlayerInstance::UpdatePlayerStatus() const
 {
 	return m_PlayerStatus;
 }
 
-void CPlayerInstance::Free()
+Shared_ITEM CPlayerInstance::GetInventory(_uint iInventoryIndex)
 {
-	__super::Free();
+	if (iInventoryIndex >= m_iInventorySlotCount)
+		return nullptr;
+
+	return m_Inventory[iInventoryIndex];
+}
+
+HRESULT CPlayerInstance::Add_Item(ITEM_TYPE eItemType, CGameObject* pItem)
+{
+	if (nullptr == pItem)
+		return E_FAIL;
+
+	_uint iEmptySlotIndex = *m_EmptySlotIndex.begin();
+	m_Inventory[iEmptySlotIndex] = make_shared<ITEM>(eItemType, pItem);
+
+	m_EmptySlotIndex.erase(iEmptySlotIndex);
+	
+	EVENT_ADD_ITEM Event = {};
+	Event.iInventoryIndex = iEmptySlotIndex;
+
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+
+	return S_OK;
+}
+
+HRESULT CPlayerInstance::Swap_Item(_uint iMouseItemIndex, _uint iInventoryIndex)
+{
+	if (nullptr == m_Inventory[iInventoryIndex])
+	{
+		m_Inventory[iInventoryIndex] = m_Inventory[iMouseItemIndex];
+		m_EmptySlotIndex.erase(iInventoryIndex);
+
+		m_Inventory[iMouseItemIndex] = nullptr;
+		m_EmptySlotIndex.insert(iMouseItemIndex);
+	}
+	else
+	{
+		Shared_ITEM pTemp = m_Inventory[iInventoryIndex];
+		m_Inventory[iInventoryIndex] = m_Inventory[iMouseItemIndex];
+		m_Inventory[iMouseItemIndex] = pTemp;
+	}
+
+	EVENT_UPDATE_INVENTORY Event = {};
+	
+	_uint iIndices[2] = { iMouseItemIndex, iInventoryIndex };
+	Event.iNumIndices = 2;
+	Event.pIndices = iIndices;
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+
+	return S_OK;
+}
+
+void CPlayerInstance::Release_PlayerInstance()
+{
 
 	Safe_Release(m_pGameInstance);
 
 	for (_uint i = 0; i < ENUM_CLASS(WEAPON_TYPE::END); i++)
 		Safe_Release(m_pPlayerEquipWeapon[i]);
-	
+
 	for (_uint j = 0; j < ENUM_CLASS(ARMOR_TYPE::END); j++)
 		Safe_Release(m_pPlayerEquipArmor[j]);
+
+	for (auto& pItem : m_Inventory)
+	{
+		if(pItem)
+			Safe_Release(pItem->second);
+
+		int a = 10;
+	}
+
+	m_Inventory.clear();
+}
+
+void CPlayerInstance::Free()
+{
+	__super::Free();
 }

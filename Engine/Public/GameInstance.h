@@ -143,6 +143,11 @@ public:
 	class CNavigation*	Clone_CurrentNavigation(_int iCellIndex);
 #pragma endregion
 
+#pragma region MOUSE_POINT
+	void				Set_MousePoint(POINT ptMouse) { m_ptMousePoint = ptMouse; }
+	POINT				Get_MousePoint() { return m_ptMousePoint; }
+#pragma endregion
+
 private:
 	class CGraphic_Device*		m_pGraphic_Device = { nullptr };
 	class CInput_Device*		m_pInput_Device = { nullptr };
@@ -161,6 +166,8 @@ private:
 	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
 	class CController_Manager*	m_pController_Manager = { nullptr };
 	class CNavigation_Manager*	m_pNavigation_Manager = { nullptr };
+
+	POINT						m_ptMousePoint = {};
 public:
 	void Release_Engine();
 	virtual void Free() override;

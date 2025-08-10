@@ -7,6 +7,8 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "TextureUI.h"
+#include "UI_Slot.h"
+#include "UI_Panel.h"
 #include "Model.h"
 #include "Navigation.h"
 

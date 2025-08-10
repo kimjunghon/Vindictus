@@ -31,7 +31,7 @@ protected:
 	vector<CUIObject*>	m_Children;
 
 protected:
-	HRESULT			Add_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* UIChildDesc);
+	HRESULT			Add_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* UIChildDesc, CUIObject** ppUIObject = nullptr);
 	
 	void			Children_Priority_Update(_float fTimeDelta);
 	void			Children_Update(_float fTimeDelta);

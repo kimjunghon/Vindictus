@@ -12,6 +12,8 @@ NS_BEGIN(Client)
 
 using namespace UI;
 
+class CPlayerInstance;
+
 class CMouse final : public CUIObject
 {
 public:
@@ -34,14 +36,20 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_uint*		m_pUIState = { nullptr };
+	CPlayerInstance*	m_pPlayerInstance = { nullptr };
+	Shared_ITEM			m_pItem = {};
+	_int				m_iItemIndex = { -1};
+	_uint*				m_pUIState = { nullptr };
 
-	CTexture*	m_pTextureCom = { nullptr };
-	CVIBuffer*	m_pVIBufferCom = { nullptr };
-	CShader*	m_pShaderCom = { nullptr };
+	CTexture*			m_pTextureCom = { nullptr };
+	CVIBuffer*			m_pVIBufferCom = { nullptr };
+	CShader*			m_pShaderCom = { nullptr };
 
 private:
 	HRESULT			Ready_Components();
+	void			Clear_ItemData();
+	void			Event_PickEquipment(const EVENT_PICK_EQUIPMENT& Event);
+	void			Event_PickInventory(const EVENT_PICK_STORAGE& Event);
 
 public:
 	static CMouse*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

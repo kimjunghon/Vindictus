@@ -1,6 +1,6 @@
 #pragma once
 #include "Client_Defines.h"
-#include "UI_Slot.h"
+#include "UI_Panel.h"
 
 NS_BEGIN(Engine)
 class CVIBuffer;
@@ -10,11 +10,8 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CStateBar final : public CUI_Slot
+class CStateBar final : public CUI_Panel
 {
-private:
-	enum class STATE_SLOT { BACKGROUND, BAR, LERP_BAR, END };
-
 public:
 	typedef struct tagStateBarDesc : public UIOBJECT_DESC {
 		PROGRESS_TYPE eType{};

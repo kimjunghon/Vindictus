@@ -265,6 +265,9 @@
     <Filter Include="03.GameObject\UIObject\GamePlay\Mouse">
       <UniqueIdentifier>{e4680a30-a4a9-43ad-b61f-9a34ab727da2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy\Slot">
+      <UniqueIdentifier>{0fff30b0-f1fd-46a5-ae21-4db296e07821}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -522,6 +525,9 @@
     <ClInclude Include="..\public\Inventory.h">
       <Filter>03.GameObject\UIObject\GamePlay\Inventroy</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Slot.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Slot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -764,6 +770,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Inventory.cpp">
       <Filter>03.GameObject\UIObject\GamePlay\Inventroy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Slot.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Slot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

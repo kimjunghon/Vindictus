@@ -38,12 +38,6 @@ namespace Client
 	typedef struct tagEventBrokenHead final : public CEvent
 	{}EVENT_BROKEN_HEAD;
 
-	typedef struct tagEventAddItem final : public CEvent
-	{
-		ITEM_TYPE eItemType;
-		CGameObject* pItem;
-	}EVENT_ADD_ITEM;
-
 	typedef struct tagEventChangeWeapon final : public CEvent
 	{
 		_uint		iWeaponTypeIndex;
@@ -53,5 +47,27 @@ namespace Client
 	{
 		_uint		iArmorTypeIndex;
 	}EVENT_CHANGE_ARMOR;
+	
+	typedef struct tagEventAddItem final : public CEvent
+	{
+		_uint iInventoryIndex;
+	}EVENT_ADD_ITEM;
 
+	typedef struct tagEventPickStorage final : public CEvent
+	{
+		_uint iInventoryIndex;
+	}EVENT_PICK_STORAGE;
+
+	typedef struct tagEventPickEquipment final : public CEvent
+	{
+		ITEM_TYPE eItemType;
+		WEAPON_TYPE eWeaponType;
+		ARMOR_TYPE eArmorType;
+	}EVENT_PICK_EQUIPMENT;
+
+	typedef struct tagEventUpdateInventory final : public CEvent
+	{
+		_uint iNumIndices;
+		_uint* pIndices = { nullptr };
+	}EVENT_UPDATE_INVENTORY;
 }

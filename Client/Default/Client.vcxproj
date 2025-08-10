@@ -207,6 +207,7 @@
     <ClInclude Include="..\public\QueenAnimMachine.h" />
     <ClInclude Include="..\public\Queen_Body.h" />
     <ClInclude Include="..\public\RoundShield.h" />
+    <ClInclude Include="..\public\Slot.h" />
     <ClInclude Include="..\Public\StateBar.h" />
     <ClInclude Include="..\Public\StateFactory.h" />
     <ClInclude Include="..\public\State_Attack.h" />
@@ -293,6 +294,7 @@
     <ClCompile Include="..\private\QueenAnimMachine.cpp" />
     <ClCompile Include="..\private\Queen_Body.cpp" />
     <ClCompile Include="..\private\RoundShield.cpp" />
+    <ClCompile Include="..\private\Slot.cpp" />
     <ClCompile Include="..\Private\StateBar.cpp" />
     <ClCompile Include="..\Private\StateFactory.cpp" />
     <ClCompile Include="..\private\State_Attack.cpp" />

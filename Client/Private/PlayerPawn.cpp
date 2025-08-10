@@ -8,7 +8,6 @@
 #include "PlayerBody.h"
 #include "Armor.h"
 #include "Weapon.h"
-#include "PlayerInstance.h"
 
 CPlayerPawn::CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CPawn { pDevice, pDeviceContext }
@@ -207,12 +206,12 @@ HRESULT CPlayerPawn::UnEquipArmor(_uint iArmorTypeIndex)
 
 void CPlayerPawn::Event_ChangeWeapon(const EVENT_CHANGE_WEAPON& Event)
 {
-	EquipWeapon(m_pPlayerInstance->BindPlayerEquipWeapon(Event.iWeaponTypeIndex));
+	EquipWeapon(m_pPlayerInstance->UpdatePlayerEquipWeapon(Event.iWeaponTypeIndex));
 }
 
 void CPlayerPawn::Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event)
 {
-	EquipArmor(m_pPlayerInstance->BindPlayerEquipArmor(Event.iArmorTypeIndex));
+	EquipArmor(m_pPlayerInstance->UpdatePlayerEquipArmor(Event.iArmorTypeIndex));
 }
 
 void CPlayerPawn::Move(_float fTimeDelta)
@@ -304,7 +303,7 @@ HRESULT CPlayerPawn::Ready_Weapons()
 {
 	for (_uint i = 0; i < ENUM_CLASS(WEAPON_TYPE::END); i++)
 	{
-		CWeapon* pWeapon = m_pPlayerInstance->BindPlayerEquipWeapon(i);
+		CWeapon* pWeapon = m_pPlayerInstance->UpdatePlayerEquipWeapon(i);
 		if (nullptr == pWeapon)
 			continue;
 
@@ -319,7 +318,7 @@ HRESULT CPlayerPawn::Ready_Armors()
 
 	for (_uint i = 0; i < ENUM_CLASS(ARMOR_TYPE::END); i++)
 	{
-		CArmor* pArmor = m_pPlayerInstance->BindPlayerEquipArmor(i);
+		CArmor* pArmor = m_pPlayerInstance->UpdatePlayerEquipArmor(i);
 		if (nullptr == pArmor)
 			continue;
 

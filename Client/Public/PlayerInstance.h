@@ -4,6 +4,7 @@
 
 NS_BEGIN(Engine)
 class CGameInstance;
+class CGameObject;
 NS_END
 
 NS_BEGIN(Client)
@@ -20,27 +21,41 @@ private:
 	virtual ~CPlayerInstance() = default;
 
 public:
-	HRESULT			EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon);
-	HRESULT			EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmor);
+	HRESULT					Initialize(_uint iInventorySlotCount);
 
-	HRESULT			UnEquipWeapon(_uint iWeaponTypeIndex);
-	HRESULT			UnEquipArmor(_uint iArmorTypeIndex);
+public:
+	HRESULT					EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon);
+	HRESULT					EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmor);
 
-	HRESULT			SavePlayerStatus(const PLAYER_STATUS& PlayerStatus);
+	HRESULT					UnEquipWeapon(_uint iWeaponTypeIndex);
+	HRESULT					UnEquipArmor(_uint iArmorTypeIndex);
 
-	CWeapon*		BindPlayerEquipWeapon(_uint iWeaponTypeIndex);
-	CArmor*			BindPlayerEquipArmor(_uint iArmorTypeIndex);
-	PLAYER_STATUS	BindPlayerStatus();
+	HRESULT					SavePlayerStatus(const PLAYER_STATUS& PlayerStatus);
+
+	CWeapon*				UpdatePlayerEquipWeapon(_uint iWeaponTypeIndex) const;
+	CArmor*					UpdatePlayerEquipArmor(_uint iArmorTypeIndex) const;
+	PLAYER_STATUS			UpdatePlayerStatus() const;
+
+	Shared_ITEM				GetInventory(_uint iInventoryIndex);
+
+	HRESULT					Add_Item(ITEM_TYPE eItemType, CGameObject* pItem);
+	HRESULT					Swap_Item(_uint iMouseItemIndex, _uint iInventoryIndex);
+	_bool					IsInventoryFull() { return m_EmptySlotIndex.empty();}
 
 private:
-	CGameInstance*	m_pGameInstance = { nullptr };
-	CWeapon*		m_pPlayerEquipWeapon[ENUM_CLASS(WEAPON_TYPE::END)] = { nullptr };
-	CArmor*			m_pPlayerEquipArmor[ENUM_CLASS(ARMOR_TYPE::END)] = { nullptr };
+	CGameInstance*			m_pGameInstance = { nullptr };
+	CWeapon*				m_pPlayerEquipWeapon[ENUM_CLASS(WEAPON_TYPE::END)] = { nullptr };
+	CArmor*					m_pPlayerEquipArmor[ENUM_CLASS(ARMOR_TYPE::END)] = { nullptr };
 	
-	PLAYER_STATUS	m_PlayerStatus = {};
+	PLAYER_STATUS			m_PlayerStatus = {};
 	
+	_uint					m_iInventorySlotCount = {};
+	unordered_set<_uint>	m_EmptySlotIndex = {};
+	vector<Shared_ITEM>		m_Inventory;
+
 public:
-	virtual void Free() override;
+	void			Release_PlayerInstance();
+	virtual void	Free() override;
 };
 
 NS_END

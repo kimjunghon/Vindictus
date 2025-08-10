@@ -27,6 +27,7 @@
 #include "Mouse.h"
 #include "Inventory.h"
 #include "Storage.h"
+#include "Slot.h"
 
 //Controller
 #include "Controller_KeyBoard.h"
@@ -36,7 +37,6 @@
 #include "StateFactory.h"
 
 //PlayerInstance
-#include "PlayerInstance.h"
 #include "Camera_Target.h"
 #include "PlayerPawn.h"
 #include "PlayerBody.h"
@@ -79,8 +79,17 @@ HRESULT CMainApp::Initialize()
 	
 	m_pStateFactory = CStateFactory::GetInstance();
 	m_pPlayerInstance = CPlayerInstance::GetInstance();
+	if (FAILED(m_pPlayerInstance->Initialize(g_iInventoryCount)))
+		return E_FAIL;
 
-	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
+	CGameObject::GAMEOBJECT_DESC GameObjectDesc = {};
+	GameObjectDesc.fSpeedPerSec = 10.f;
+	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.f);
+
+	CGameObject* pTest = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"), &GameObjectDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::WEAPON, pTest);
+
+	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
 	return S_OK;
@@ -445,6 +454,10 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Storage"),
 		CStorage::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Slot"),
+		CSlot::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 #pragma endregion
 
 #pragma endregion
@@ -545,11 +558,12 @@ void CMainApp::Free()
 	__super::Free();
 
 	Safe_Release(m_pStateFactory);
-	Safe_Release(m_pPlayerInstance);
-
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pDeviceContext);
 
 	m_pGameInstance->Release_Engine();
 	Safe_Release(m_pGameInstance);
+
+	m_pPlayerInstance->Release_PlayerInstance();
+	Safe_Release(m_pPlayerInstance);
 }

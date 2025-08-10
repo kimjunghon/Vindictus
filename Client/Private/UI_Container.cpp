@@ -22,6 +22,8 @@ HRESULT CUI_Container::Initialize_Prototype()
 
 HRESULT CUI_Container::Initialize(void* pArg)
 {
+	if (FAILED(Ready_Mouse_UI()))
+		return E_FAIL;
 
 	if (FAILED(Ready_Loading_UI()))
 		return E_FAIL;
@@ -35,7 +37,7 @@ HRESULT CUI_Container::Initialize(void* pArg)
 	m_iArrayState = ENUM_CLASS(UI_LEVEL::LOADING);
 	m_iUIState = ENUM_CLASS(STATE_FLAG::LOADING) | ENUM_CLASS(LOADING_FLAG::LOGO);
 
-	m_pGameInstance->Subscribe<EVENT_UI_LEVEL_CHANGE>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_UI_LEVEL_CHANGE& Event) {
+	m_pGameInstance->Subscribe<EVENT_UI_LEVEL_CHANGE>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_UI_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
 	return S_OK;
@@ -107,6 +109,24 @@ HRESULT CUI_Container::Add_UIObject(_uint iPrototypeLevelIndex, const _wstring& 
 	return S_OK;
 }
 
+HRESULT CUI_Container::Ready_Mouse_UI()
+{
+	CMouse::UI_MOUSE_DESC Mouse_Desc{};
+	Mouse_Desc.fX = g_iWinSizeX >> 1;
+	Mouse_Desc.fY = g_iWinSizeY >> 1;
+	Mouse_Desc.fSizeX = 30.f;
+	Mouse_Desc.fSizeY = 30.f;
+	Mouse_Desc.fOffsetX = 10.f;
+	Mouse_Desc.fOffsetY = 10.f;
+	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
+	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), ENUM_CLASS(LAYERTYPE::STATIC), TEXT("Layer_Mouse"), &Mouse_Desc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CUI_Container::Ready_Loading_UI()
 {
 	CUI_Panel::PANEL_DESC Panel_Desc = {};
@@ -141,37 +161,11 @@ HRESULT CUI_Container::Ready_Logo_UI()
 	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LogoScreen"), ENUM_CLASS(UI_LEVEL::LOGO), &Panel_Desc)))
 		return E_FAIL;
 
-	CMouse::UI_MOUSE_DESC Mouse_Desc{};
-	Mouse_Desc.fX = g_iWinSizeX >> 1;
-	Mouse_Desc.fY = g_iWinSizeY >> 1;
-	Mouse_Desc.fSizeX = 30.f;
-	Mouse_Desc.fSizeY = 30.f;
-	Mouse_Desc.fOffsetX = 10.f;
-	Mouse_Desc.fOffsetY = 10.f;
-	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
-	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
-
-	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), ENUM_CLASS(UI_LEVEL::LOGO), &Mouse_Desc)))
-		return E_FAIL;
-
 	return S_OK;
 }
 
 HRESULT CUI_Container::Ready_GamePlay_UI()
 {
-	CMouse::UI_MOUSE_DESC Mouse_Desc{};
-	Mouse_Desc.fX = g_iWinSizeX >> 1;
-	Mouse_Desc.fY = g_iWinSizeY >> 1;
-	Mouse_Desc.fSizeX = 30.f;
-	Mouse_Desc.fSizeY = 30.f;
-	Mouse_Desc.fOffsetX = 0.f;
-	Mouse_Desc.fOffsetY = 0.f;
-	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
-	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
-
-	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Mouse_Desc)))
-		return E_FAIL;
-
 	CUI_Panel::PANEL_DESC Panel_Desc{};
 	Panel_Desc.fX = g_iWinSizeX >> 1;
 	Panel_Desc.fY = g_iWinSizeY >> 1;

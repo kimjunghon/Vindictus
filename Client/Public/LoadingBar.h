@@ -1,13 +1,11 @@
 #pragma once
-#include "UI_Slot.h"
+#include "Client_Defines.h"
+#include "UI_Panel.h"
 
 NS_BEGIN(Client)
 
-class CLoadingBar final : public CUI_Slot
+class CLoadingBar final : public CUI_Panel
 {
-private:
-	enum class LOADING_SLOT { BACKGROUND, BAR, POINT, END};
-
 private:
 	CLoadingBar(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CLoadingBar(const CLoadingBar& Prototype);
@@ -22,14 +20,15 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	PROGRESS_TYPE	m_eType = {};
+	PROGRESS_TYPE			m_eType = {};
 
-	_float			m_fRatio = {};
-	_float			m_fBarRatio = {};
-	_float			m_fFillSpeed = {};
-	_float			m_fPointX = {};
+	_float					m_fRatio = {};
+	_float					m_fBarRatio = {};
+	_float					m_fFillSpeed = {};
+	_float					m_fPointX = {};
 
-	class CBar*		m_pBar = { nullptr };
+	class CBar*				m_pBar = { nullptr };
+	class CLoadingPoint*	m_pLoadingPoint = { nullptr };
 
 private:
 	HRESULT			Ready_Children();

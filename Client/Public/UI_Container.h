@@ -34,6 +34,7 @@ private:
 	void			Bind_InputData();
 	HRESULT			Add_UIObject(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, _uint iUI_LevelIndex, void* pArg = nullptr);
 
+	HRESULT			Ready_Mouse_UI();
 	HRESULT			Ready_Loading_UI();
 	HRESULT			Ready_Logo_UI();
 	HRESULT			Ready_GamePlay_UI();

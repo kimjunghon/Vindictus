@@ -53,11 +53,8 @@ protected:
 
 protected:	
 	HRESULT			Begin();
-
 	virtual _bool	IsPick(HWND hWnd);
-	
 
-	
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;
 	virtual void			Free() override;

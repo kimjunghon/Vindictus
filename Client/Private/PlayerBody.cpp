@@ -27,7 +27,7 @@ HRESULT CPlayerBody::Initialize(void* pArg)
 
 	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
 
-	m_pGameInstance->Subscribe<EVENT_BROKEN_HEAD>(ENUM_CLASS(LEVEL::STATIC), [&](const EVENT_BROKEN_HEAD& Event) {
+	m_pGameInstance->Subscribe<EVENT_BROKEN_HEAD>(ENUM_CLASS(EVENTTYPE::NONSTATIC), [&](const EVENT_BROKEN_HEAD& Event) {
 		this->UnEquipHead(); });
 
 	return S_OK;

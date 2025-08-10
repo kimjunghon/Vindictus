@@ -78,9 +78,7 @@ _bool CUIObject::IsPick(HWND hWnd)
 
 	RECT	rcRect = { LONG(fX - (m_fSizeX * 0.5f)), LONG(fY - (m_fSizeY * 0.5f)), LONG(fX + (m_fSizeX * 0.5f)), LONG(fY + (m_fSizeY * 0.5f)) };
 
-	POINT	ptMouse = {};
-	GetCursorPos(&ptMouse);
-	ScreenToClient(hWnd, &ptMouse);
+	POINT	ptMouse = m_pGameInstance->Get_MousePoint();
 
 	return PtInRect(&rcRect, ptMouse);
 }

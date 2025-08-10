@@ -63,12 +63,19 @@ void CUI_Panel::Set_Offset(_float fOffsetX, _float fOffsetY)
     m_fOffsetY = fOffsetY;
 }
 
-HRESULT CUI_Panel::Add_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* UIChildDesc)
+HRESULT CUI_Panel::Add_Child(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* UIChildDesc, CUIObject** ppUIObject)
 {
     CUIObject* pUIObject = dynamic_cast<CUIObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
         iPrototypeLevelIndex, strPrototypeTag, UIChildDesc));;
     if (nullptr == pUIObject)
         return E_FAIL;
+
+    if (nullptr != ppUIObject)
+    {
+       *ppUIObject = pUIObject;
+       Safe_AddRef(pUIObject);
+    }
+
 
     m_Children.push_back(pUIObject);
 

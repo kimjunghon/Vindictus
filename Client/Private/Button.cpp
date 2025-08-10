@@ -40,7 +40,7 @@ void CButton::Priority_Update(_float fTimeDelta)
 
 void CButton::Update(_float fTimeDelta)
 {
-    if (GetKeyState(VK_LBUTTON) & 0x8000 && CUIObject::IsPick(g_hWnd))
+    if (m_pGameInstance->Get_MouseState(MOUSEKEYSTATE::LB) && CUIObject::IsPick(g_hWnd))
     {
         if(m_Callback)
             m_Callback();
@@ -52,6 +52,7 @@ void CButton::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
+
     __super::Late_Update(fTimeDelta);
 }
 
