@@ -9,10 +9,12 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CEquipment_Manager;
+class CStorage_Manager;
 class CWeapon;
 class CArmor;
 
-class CPlayerInstance : public CBase
+class CPlayerInstance final : public CBase
 {
 	DECLARE_SINGLETON(CPlayerInstance)
 
@@ -23,35 +25,36 @@ private:
 public:
 	HRESULT					Initialize(_uint iInventorySlotCount);
 
+#pragma region EQUIPMENT_MANAGER
 public:
-	HRESULT					EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon);
-	HRESULT					EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmor);
-
-	HRESULT					UnEquipWeapon(_uint iWeaponTypeIndex);
-	HRESULT					UnEquipArmor(_uint iArmorTypeIndex);
-
-	HRESULT					SavePlayerStatus(const PLAYER_STATUS& PlayerStatus);
-
+	HRESULT					EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon, _int iItemInventoryIndex);
+	HRESULT					EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmor, _int iItemInventoryIndex);
+	HRESULT					UnEquipWeapon(_uint iWeaponTypeIndex, _int iItemInventoryIndex = -1);
+	HRESULT					UnEquipArmor(_uint iArmorTypeIndex, _int iItemInventoryIndex= -1);
 	CWeapon*				UpdatePlayerEquipWeapon(_uint iWeaponTypeIndex) const;
 	CArmor*					UpdatePlayerEquipArmor(_uint iArmorTypeIndex) const;
-	PLAYER_STATUS			UpdatePlayerStatus() const;
+#pragma endregion
 
+#pragma region STORAGE_MANAGER
+public:
 	Shared_ITEM				GetInventory(_uint iInventoryIndex);
 
-	HRESULT					Add_Item(ITEM_TYPE eItemType, CGameObject* pItem);
+	HRESULT					Add_Item(ITEM_TYPE eItemType, CGameObject* pItem, _int iEmptyInventoryIndex = -1);
 	HRESULT					Swap_Item(_uint iMouseItemIndex, _uint iInventoryIndex);
-	_bool					IsInventoryFull() { return m_EmptySlotIndex.empty();}
+	HRESULT					Remove_Item(_uint iInventoryIndex);
+	_bool					IsInventoryFull();
+#pragma endregion
+
+public:
+	PLAYER_STATUS			UpdatePlayerStatus() const;
+	HRESULT					SavePlayerStatus(const PLAYER_STATUS& PlayerStatus);
 
 private:
 	CGameInstance*			m_pGameInstance = { nullptr };
-	CWeapon*				m_pPlayerEquipWeapon[ENUM_CLASS(WEAPON_TYPE::END)] = { nullptr };
-	CArmor*					m_pPlayerEquipArmor[ENUM_CLASS(ARMOR_TYPE::END)] = { nullptr };
-	
+	CEquipment_Manager*		m_pEquipment_Manager = { nullptr };
+	CStorage_Manager*		m_pStorage_Manager = { nullptr };
+
 	PLAYER_STATUS			m_PlayerStatus = {};
-	
-	_uint					m_iInventorySlotCount = {};
-	unordered_set<_uint>	m_EmptySlotIndex = {};
-	vector<Shared_ITEM>		m_Inventory;
 
 public:
 	void			Release_PlayerInstance();

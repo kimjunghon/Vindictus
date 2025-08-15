@@ -41,6 +41,7 @@ using namespace DirectX;
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <set>
 #include <unordered_map>
 #include <ctime>
 #include <fstream>

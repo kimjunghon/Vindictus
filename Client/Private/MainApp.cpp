@@ -27,6 +27,7 @@
 #include "Mouse.h"
 #include "Inventory.h"
 #include "Storage.h"
+#include "Equipment.h"
 #include "Slot.h"
 
 //Controller
@@ -36,11 +37,12 @@
 //STATE FACTORY
 #include "StateFactory.h"
 
-//PlayerInstance
+//Player
 #include "Camera_Target.h"
 #include "PlayerPawn.h"
 #include "PlayerBody.h"
-
+#include "Armor.h"
+#include "Weapon.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
@@ -74,7 +76,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::LOGO)))
+	if (FAILED(Start_Level(LEVEL::TOWN)))
 		return E_FAIL;
 	
 	m_pStateFactory = CStateFactory::GetInstance();
@@ -82,12 +84,60 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(m_pPlayerInstance->Initialize(g_iInventoryCount)))
 		return E_FAIL;
 
-	CGameObject::GAMEOBJECT_DESC GameObjectDesc = {};
-	GameObjectDesc.fSpeedPerSec = 10.f;
-	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.f);
+	Safe_AddRef(m_pPlayerInstance);
 
-	CGameObject* pTest = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"), &GameObjectDesc));
-	m_pPlayerInstance->Add_Item(ITEM_TYPE::WEAPON, pTest);
+	m_pMonsterInstance = CMonsterInstance::GetInstance();
+	if (FAILED(m_pMonsterInstance->Initialize()))
+		return E_FAIL;
+
+	Safe_AddRef(m_pMonsterInstance);
+
+	//TEST
+
+	CArmor::ARMOR_DESC ArmorDesc= {};
+	ArmorDesc.iArmorModelPrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Upper");
+	ArmorDesc.eArmorType = ARMOR_TYPE::UPPER;
+	ArmorDesc.pPawnMatrix = nullptr;
+	ArmorDesc.ArmorInfo = {TEXT("LightMale_Upper"), 10.f, 5.f, 30.f};
+
+	CGameObject* pTest = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest);
+
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Lower");
+	ArmorDesc.eArmorType = ARMOR_TYPE::LOWER;
+	ArmorDesc.pPawnMatrix = nullptr;
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Lower"), 10.f, 5.f, 30.f };
+	
+	CGameObject* pTest2 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest2);
+
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Head");
+	ArmorDesc.eArmorType = ARMOR_TYPE::HEAD;
+	ArmorDesc.pPawnMatrix = nullptr;
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Head"), 10.f, 5.f, 30.f };
+
+	CGameObject* pTest3 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest3);
+
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Hand");
+	ArmorDesc.eArmorType = ARMOR_TYPE::HAND;
+	ArmorDesc.pPawnMatrix = nullptr;
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Hand"), 10.f, 5.f, 30.f };
+
+	CGameObject* pTest4 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest4);
+
+	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Foot");
+	ArmorDesc.eArmorType = ARMOR_TYPE::FOOT;
+	ArmorDesc.pPawnMatrix = nullptr;
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Foot"), 10.f, 5.f, 30.f };
+
+	CGameObject* pTest5 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest5);
+
+	CGameObject* pTest6 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest6);
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
@@ -102,10 +152,12 @@ void CMainApp::Post_Update()
 		if (FAILED(m_pGameInstance->Clear_Resources()))
 			MSG_BOX(TEXT("Failed Clear Resrouces"));
 
+		m_pMonsterInstance->Clear_MonsterDatas();
+
 		EVENT_UI_LEVEL_CHANGE Event_UIChange;
 		Event_UIChange.iChange_Level = m_iChange_Level;
 		Event_UIChange.bIsLoading = m_bIsLoading;
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event_UIChange);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event_UIChange);
 
 		CLevel* pNextLevel = Create_NewLevel(m_iChange_Level);
 
@@ -253,6 +305,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 {	
+	//test
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Test"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Test.png"), 1))))
+		return E_FAIL;
+
+
 #pragma region LOADING_UI
 	/* Ready_Prototype_Component_Texture_LoadingScreen */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen"),
@@ -348,11 +406,6 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Option_Button.png"), 1))))
 		return E_FAIL;
 
-	/* Prototype_Component_Texture_GamePlay_Inventory */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Inventory"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Inventory.png"), 1))))
-		return E_FAIL;
-
 	/* Prototype_Component_Texture_GamePlay_Mouse */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Cursor"),
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Cursor%d.png"), 2))))
@@ -366,6 +419,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 	/* Prototype_Component_Texture_GamePlay_Storage */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Storage"),
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Storage.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Equipment */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Equipment"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Equipment.png"), 1))))
 		return E_FAIL;
 
 #pragma endregion
@@ -447,14 +505,22 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 		COptionController::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_UIObject_Inventory */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Inventory"),
 		CInventory::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_UIObject_Storage */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Storage"),
 		CStorage::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_UIObject_Equipment */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Equipment"),
+		CEquipment::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_Slot */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Slot"),
 		CSlot::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
@@ -477,7 +543,6 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Player()
 		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Piona.dat", PreTransformMatrix))))
 		return E_FAIL;
 
-
 	/* Prototype_GameObject_Player_Body */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Player_Body"),
 		CPlayerBody::Create(m_pDevice, m_pDeviceContext))))
@@ -486,6 +551,46 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Player()
 	/* Prototype_GameObject_PlayerPawn */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
 		CPlayerPawn::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Head"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Head.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Upper"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Upper_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper_Broken.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Lower"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Lower.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Lower_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Lower_Broken.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Hand"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Hand.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Hand_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Hand_Broken.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Foot"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Foot.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_LightMale_Foot_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Foot_Broken.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"),
+		CArmor::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	return S_OK;
@@ -520,7 +625,7 @@ HRESULT CMainApp::Ready_Controller()
 
 HRESULT CMainApp::Ready_Navigations()
 {
-	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::TOWN), TEXT("../Bin/Resources/Navigation/Town_Navigation.dat"))))
+	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::TOWN), TEXT("../Bin/Resources/Map/Town_Navigation.dat"))))
 		return E_FAIL;
 	//
 	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::FILED), TEXT("../Bin/Resources/Navigation/Field_Navigation.dat"))))
@@ -566,4 +671,7 @@ void CMainApp::Free()
 
 	m_pPlayerInstance->Release_PlayerInstance();
 	Safe_Release(m_pPlayerInstance);
+
+	m_pMonsterInstance->Release_MonsterInstance();
+	Safe_Release(m_pMonsterInstance);
 }

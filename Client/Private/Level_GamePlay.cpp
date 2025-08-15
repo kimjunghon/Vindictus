@@ -36,7 +36,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 		Event.eType = PROGRESS_TYPE::HP;
 		Event.fRatio = 0.2f;
 
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 	}
 
 	if (m_pGameInstance->Get_KeyPressing(DIK_A))
@@ -46,7 +46,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 		Event.eType = PROGRESS_TYPE::STAMINA;
 		Event.fRatio = 0.5f;
 
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 	}
 
 	if (m_pGameInstance->Get_KeyUp(DIK_A))
@@ -55,11 +55,11 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 		Event.eType = PROGRESS_TYPE::HP;
 		Event.fRatio = 1.f;
 
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 		Event.eType = PROGRESS_TYPE::STAMINA;
 
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 	}
 
 	if(m_pGameInstance->Get_KeyDown(DIK_RETURN))
@@ -67,7 +67,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 		EVENT_LEVEL_CHANGE Event;
 		Event.iChange_Level = ENUM_CLASS(LEVEL::TOWN);
 		Event.bIsLoading = false;
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 	}
 }
 
@@ -119,29 +119,29 @@ HRESULT CLevel_GamePlay::Ready_GameObject(const _wstring& strLayerTag)
 	if (FAILED(Ready_MapObject(TEXT("Layer_MapObject"))))
 		return E_FAIL;
 
-	CGameObject::GAMEOBJECT_DESC GameObjectDesc = {};
-	GameObjectDesc.fSpeedPerSec = 10.f;
-	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.f);
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Glasgavelen"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Basic"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Elder"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Royal"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Queen"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
-		return E_FAIL;
+	//CGameObject::GAMEOBJECT_DESC GameObjectDesc = {};
+	//GameObjectDesc.fSpeedPerSec = 10.f;
+	//GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.f);
+	//
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Glasgavelen"),
+	//	ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+	//	return E_FAIL;
+	//
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Basic"),
+	//	ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+	//	return E_FAIL;
+	//
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Elder"),
+	//	ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+	//	return E_FAIL;
+	//
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Royal"),
+	//	ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+	//	return E_FAIL;
+	//
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Queen"),
+	//	ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
+	//	return E_FAIL;
 
 	return S_OK;
 }

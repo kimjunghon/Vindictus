@@ -111,7 +111,7 @@ HRESULT CLogoScreen::Ready_Button()
 		EVENT_LEVEL_CHANGE Event;
 		Event.iChange_Level = ENUM_CLASS(LEVEL::GAMEPLAY);
 		Event.bIsLoading = false;
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))

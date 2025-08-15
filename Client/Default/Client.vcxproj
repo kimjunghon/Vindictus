@@ -162,6 +162,7 @@
     <ClInclude Include="..\Public\Client_Struct.h" />
     <ClInclude Include="..\public\Controller_Mouse.h" />
     <ClInclude Include="..\public\Equipment.h" />
+    <ClInclude Include="..\public\Equipment_Manager.h" />
     <ClInclude Include="..\public\Glasgavelen.h" />
     <ClInclude Include="..\public\GlasgavelenBody.h" />
     <ClInclude Include="..\public\GlasgavelenSword.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="..\public\Level_Town.h" />
     <ClInclude Include="..\public\Map.h" />
     <ClInclude Include="..\public\Monster.h" />
+    <ClInclude Include="..\public\MonsterInstance.h" />
     <ClInclude Include="..\public\Mouse.h" />
     <ClInclude Include="..\public\PlayerAnimMachine.h" />
     <ClInclude Include="..\public\PlayerBody.h" />
@@ -222,6 +224,7 @@
     <ClInclude Include="..\public\State_Smash3.h" />
     <ClInclude Include="..\public\State_Smash4.h" />
     <ClInclude Include="..\public\Storage.h" />
+    <ClInclude Include="..\public\Storage_Manager.h" />
     <ClInclude Include="..\public\Town.h" />
     <ClInclude Include="..\public\UI_Container.h" />
     <ClInclude Include="..\public\Vampire.h" />
@@ -249,6 +252,7 @@
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Controller_Mouse.cpp" />
     <ClCompile Include="..\private\Equipment.cpp" />
+    <ClCompile Include="..\private\Equipment_Manager.cpp" />
     <ClCompile Include="..\private\Glasgavelen.cpp" />
     <ClCompile Include="..\private\GlasgavelenBody.cpp" />
     <ClCompile Include="..\private\GlasgavelenSword.cpp" />
@@ -259,6 +263,7 @@
     <ClCompile Include="..\private\Level_Town.cpp" />
     <ClCompile Include="..\private\Map.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
+    <ClCompile Include="..\private\MonsterInstance.cpp" />
     <ClCompile Include="..\private\Mouse.cpp" />
     <ClCompile Include="..\Private\OptionMain.cpp" />
     <ClCompile Include="..\private\PlayerAnimMachine.cpp" />
@@ -309,6 +314,7 @@
     <ClCompile Include="..\private\State_Smash3.cpp" />
     <ClCompile Include="..\private\State_Smash4.cpp" />
     <ClCompile Include="..\private\Storage.cpp" />
+    <ClCompile Include="..\private\Storage_Manager.cpp" />
     <ClCompile Include="..\private\Town.cpp" />
     <ClCompile Include="..\private\UI_Container.cpp" />
     <ClCompile Include="..\private\Vampire.cpp" />

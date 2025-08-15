@@ -3,6 +3,8 @@
 
 NS_BEGIN(Engine)
 
+class CGameObject;
+
 class CGameObject_Manager final : public CBase
 {
 private:
@@ -18,7 +20,11 @@ public:
 public:
 	HRESULT Initialize();
 	HRESULT Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, _uint iPrototypeLevel, const _wstring& strPrototypeTag, void* pArg);
+	//Pooling
+	HRESULT Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, CGameObject* pGameObject);
 
+
+	void	Post_Update(_float fTimeDelta);
 	void	Priority_Update(_float fTimeDelta);
 	void	Update(_float fTimeDelta);
 	void	Late_Update(_float fTimeDelta);

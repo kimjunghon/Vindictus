@@ -18,6 +18,23 @@ CComponent* CLayer::Get_Component(const _wstring& strComponentTag, _uint iIndex)
 }
 
 
+void CLayer::Post_Update(_float fTimeDelta)
+{
+	for (auto iter = m_GameObjects.begin(); iter != m_GameObjects.end();)
+	{
+		if (nullptr != (*iter))
+		{
+			if (false == (*iter)->Is_Active())
+			{
+				Safe_Release(*iter);
+				m_GameObjects.erase(iter);
+			}
+			else
+				iter++;
+		}
+	}
+}
+
 void CLayer::Priority_Update(_float fTimeDelta)
 {
 	for (auto& pGameObject : m_GameObjects)

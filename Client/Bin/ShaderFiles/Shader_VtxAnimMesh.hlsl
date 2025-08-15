@@ -50,6 +50,7 @@ VS_OUT VS_MAIN(VS_IN In)
                         g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
                         g_BoneMatrices[In.vBlendIndex.w] * fWeightW;
     
+
     vector vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
     vector vNormal = mul(float4(In.vNormal, 0.f), BoneMatrix);
     
@@ -66,7 +67,6 @@ VS_OUT VS_MAIN(VS_IN In)
     
     return Out;
 }
-
 
 struct PS_IN
 {

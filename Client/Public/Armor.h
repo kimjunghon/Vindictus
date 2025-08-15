@@ -39,6 +39,7 @@ public:
 	virtual void			Update(_float fTimeDelta) override;
 	virtual void			Late_Update(_float fTimeDelta) override;
 	virtual HRESULT			Render() override;
+	HRESULT					RenderSlot(SLOT_RENDER_DESC SlotRenderDesc);
 
 	const _wstring&			Get_ArmorName() { return m_ArmorInfo.strArmorName; }
 	ARMOR_TYPE				Get_ArmorType() { return m_eArmorType; }
@@ -59,7 +60,10 @@ private:
 private:
 	HRESULT					Ready_Components(_uint iArmorNodelPrototypeLevelIndex, const _wstring& strArmorModelPrototypeTag);
 	HRESULT					Bind_ShaderResources();
+	HRESULT					Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc);
 	HRESULT					Bind_ParentBones(CModel* pParentModelCom);
+
+	_matrix					Compute_OffsetMatrix();
 
 public:
 	static CArmor*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

@@ -96,6 +96,8 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+    m_pObject_Manager->Post_Update(fTimeDelta);
+
     m_pInput_Device->Update();
     m_pController_Manager->Update(fTimeDelta);
 
@@ -431,7 +433,6 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pCamera_Manager);
     Safe_Release(m_pController_Manager);
     Safe_Release(m_pNavigation_Manager);
-
 }
 
 void CGameInstance::Free()

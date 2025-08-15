@@ -13,9 +13,6 @@
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{5191c7ce-16b1-4664-9c92-827c72f29e2e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.PlayerInstance">
-      <UniqueIdentifier>{45a16465-b941-427e-9267-f77f110f5b9a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.Levels">
       <UniqueIdentifier>{47241e83-a0f6-4b8c-a78f-19fce34818f4}</UniqueIdentifier>
     </Filter>
@@ -268,6 +265,24 @@
     <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy\Slot">
       <UniqueIdentifier>{0fff30b0-f1fd-46a5-ae21-4db296e07821}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Instance">
+      <UniqueIdentifier>{45a16465-b941-427e-9267-f77f110f5b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Player">
+      <UniqueIdentifier>{4e5a0e78-895a-4a43-9b42-c385d7530386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Monster">
+      <UniqueIdentifier>{805079d1-d68c-4e0c-b909-03890185eafd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Monster\Pool_Manager">
+      <UniqueIdentifier>{ed93d96e-5f5b-416a-abd9-639c9af76c1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Player\Equip_Manager">
+      <UniqueIdentifier>{d42ce48f-7b21-450f-86a8-21cdf72a3a9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Player\Storage_Manager">
+      <UniqueIdentifier>{65ef9f0d-30ca-41e8-a776-0625986f80ab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -507,9 +522,6 @@
     <ClInclude Include="..\public\Controller_UI.h">
       <Filter>04.Controller\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\PlayerInstance.h">
-      <Filter>01.PlayerInstance</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Weapon.h">
       <Filter>03.GameObject\Equipment\Weapon</Filter>
     </ClInclude>
@@ -527,6 +539,18 @@
     </ClInclude>
     <ClInclude Include="..\public\Slot.h">
       <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Slot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerInstance.h">
+      <Filter>01.Instance\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MonsterInstance.h">
+      <Filter>01.Instance\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Storage_Manager.h">
+      <Filter>01.Instance\Player\Storage_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Equipment_Manager.h">
+      <Filter>01.Instance\Player\Equip_Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -753,9 +777,6 @@
     <ClCompile Include="..\private\Controller_UI.cpp">
       <Filter>04.Controller\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\PlayerInstance.cpp">
-      <Filter>01.PlayerInstance</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Weapon.cpp">
       <Filter>03.GameObject\Equipment\Weapon</Filter>
     </ClCompile>
@@ -773,6 +794,18 @@
     </ClCompile>
     <ClCompile Include="..\private\Slot.cpp">
       <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Slot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerInstance.cpp">
+      <Filter>01.Instance\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterInstance.cpp">
+      <Filter>01.Instance\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Storage_Manager.cpp">
+      <Filter>01.Instance\Player\Storage_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Equipment_Manager.cpp">
+      <Filter>01.Instance\Player\Equip_Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

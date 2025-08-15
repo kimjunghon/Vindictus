@@ -1,11 +1,9 @@
 #include "ClientPch.h"
 #include "Level_Town.h"
 
-#include "UIObject.h"
 #include "MapObject.h"
-#include "Pawn.h"
-#include "Controller_KeyBoard.h"
 #include "Camera_Free.h"
+#include "PlayerPawn.h"
 
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
@@ -17,9 +15,9 @@ HRESULT CLevel_Town::Initialize()
 	if (FAILED(Ready_Light()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Player(TEXT("Layer_Player"))))
+	if (FAILED(Ready_SpawnData()))
 		return E_FAIL;
-
+	
 	if (FAILED(Ready_GameObject(TEXT("Layer_GameObject"))))
 		return E_FAIL;
 
@@ -51,15 +49,49 @@ HRESULT CLevel_Town::Ready_Light()
 	return S_OK;
 }
 
+HRESULT CLevel_Town::Ready_SpawnData()
+{
+	ifstream File("../Bin/Resources/Map/TownBat.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed TownBat Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+	
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("Player") && Doc["Player"].IsObject())
+	{
+		const Value& Player = Doc["Player"];
+		_int iCellIndex = Player["CellIndex"].GetInt();
+		_float3 vPosition = _float3(Player["PositionX"].GetFloat(), Player["PositionY"].GetFloat(), Player["PositionZ"].GetFloat());
+
+		CPlayerPawn::PLAYER_DESC PlayerDesc = {};
+		PlayerDesc.fSpeedPerSec = 10.f;
+		PlayerDesc.fRotationPerSec = XMConvertToRadians(90.f);
+		PlayerDesc.iCellIndex = iCellIndex;
+		PlayerDesc.vPosition = vPosition;
+
+		if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
+			ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_Player"), &PlayerDesc)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
 HRESULT CLevel_Town::Ready_Player(const _wstring& strLayerTag)
 {
-	CGameObject::GAMEOBJECT_DESC GameObjectDesc = {};
-	GameObjectDesc.fSpeedPerSec = 10.f;
-	GameObjectDesc.fRotationPerSec = XMConvertToRadians(90.f);
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &GameObjectDesc)))
-		return E_FAIL;
 
 	return S_OK;
 }
@@ -69,7 +101,6 @@ HRESULT CLevel_Town::Ready_GameObject(const _wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Map_Town"),
 		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag)))
 		return E_FAIL;
-
 
 	return S_OK;
 }

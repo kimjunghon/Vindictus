@@ -40,10 +40,8 @@ HRESULT CUIObject::Initialize(void* pArg)
 
 	_uint			iNumViewports = { 1 };
 
-	// GraphicDevice 초기화하며 RSSetViewPort로 세팅한 ViewPort 가져옴
 	m_pDeviceContext->RSGetViewports(&iNumViewports, &Viewport);
 	
-	//XMMatrixLookAtLH가 XMMATRIX 반환, 그걸 Float4x4 변수에 저장(XMStore)
 	XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
 	XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(Viewport.Width, Viewport.Height, 0.f, UI_FAR));
 

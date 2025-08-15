@@ -70,4 +70,35 @@ namespace Client
 		_uint iNumIndices;
 		_uint* pIndices = { nullptr };
 	}EVENT_UPDATE_INVENTORY;
+
+	typedef struct tagEventPickItem final : public CEvent
+	{
+		_bool IsPick;
+		_uint iInventoryIndex;
+	}EVENT_PICK_ITEM;
+
+	typedef struct tagEventPickEquipItem final : public CEvent
+	{
+		_bool IsPick;
+		ITEM_TYPE eItemType;
+		WEAPON_TYPE eWeaponType;
+		ARMOR_TYPE eArmorType;
+	}EVENT_PICK_EQUIP_ITEM;
+
+
+	typedef struct tagEventNonePick final : public CEvent
+	{
+	}EVENT_NONE_PICK;
+
+	typedef struct tagEventEquipStorage final : public CEvent
+	{
+		_uint iInventoryIndex;
+	}EVENT_EQUIP_STORAGE;
+
+	typedef struct tagEventUnEquipEquipment final : public CEvent
+	{
+		ITEM_TYPE eItemType;
+		WEAPON_TYPE eWeaponType;
+		ARMOR_TYPE eArmorType;
+	}EVENT_UNEQUIP_EQUIPMENT;
 }

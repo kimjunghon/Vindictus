@@ -1,5 +1,7 @@
 #include "ClientPch.h"
 #include "Slot.h"
+#include "Armor.h"
+#include "Weapon.h"
 
 CSlot::CSlot(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CUIObject { pDevice, pDeviceContext }
@@ -21,10 +23,19 @@ HRESULT CSlot::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	_matrix ScalingMatrix = XMMatrixScaling(2.5f, 2.5f, 0.1f);	
+	_matrix TransformMatrix = XMMatrixTranslation(m_fX - (m_iWinSizeX * 0.5f) + 10.f, -m_fY + (m_iWinSizeY * 0.5f) + 5.f, (UI_FAR / (_float)m_iDepth));
+	_matrix WorldMatrix = ScalingMatrix * TransformMatrix;
 
-	//TEST
-	if (FAILED(Ready_Components()))
-		return E_FAIL;
+	XMStoreFloat4x4(&m_SlotRenderDesc.WorldMatrix, WorldMatrix);
+	m_SlotRenderWorldMatrix = m_SlotRenderDesc.WorldMatrix;
+
+	m_SlotRenderDesc.ViewMatrix = m_ViewMatrix;
+	
+	D3D11_VIEWPORT			Viewport{};
+	_uint			iNumViewports = { 1 };
+	m_pDeviceContext->RSGetViewports(&iNumViewports, &Viewport);
+	XMStoreFloat4x4(&m_SlotRenderDesc.ProjMatrix, XMMatrixOrthographicLH(Viewport.Width, Viewport.Height, 0.f, 100.f));
 
 	return S_OK;
 }
@@ -41,32 +52,39 @@ void CSlot::Late_Update(_float fTimeDelta)
 {
 	if(m_pItem)
 	{
-		if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
+		if (m_IsPick)
+		{
+			POINT ptMouse = m_pGameInstance->Get_MousePoint();
+			_float fX = static_cast<_float>(ptMouse.x);
+			_float fY = static_cast<_float>(ptMouse.y);
+
+			_matrix ScalingMatrix = XMMatrixScaling(2.f, 2.f, 0.1f);
+			_matrix TransformMatrix = XMMatrixTranslation(fX - (m_iWinSizeX * 0.5f) + 10.f, -fY + (m_iWinSizeY * 0.5f) + 5.f, (UI_FAR / (_float)m_iDepth));
+			_matrix WorldMatrix = ScalingMatrix * TransformMatrix;
+
+			XMStoreFloat4x4(&m_MouseRenderWorldMatirx, WorldMatrix);
+
+			m_SlotRenderDesc.WorldMatrix = m_MouseRenderWorldMatirx;
+		}
+		else
+			m_SlotRenderDesc.WorldMatrix = m_SlotRenderWorldMatrix;
+
+		if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
 			return;
 	}
 }
 
 HRESULT CSlot::Render()
 {
-	__super::Begin();
-
-	if (FAILED(m_pTransformCom->Bind_Shader_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-		return E_FAIL;
-
-	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", 0)))
-		return E_FAIL;
-
-	m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::DEFAULT));
-
-	m_pVIBufferCom->Bind_Resources();
-
-	m_pVIBufferCom->Render();
+	switch(m_pItem->first)
+	{
+	case ITEM_TYPE::WEAPON:
+		m_RenderSlot.pRenderWeapon->RenderSlot(m_SlotRenderDesc);
+		break;
+	case ITEM_TYPE::ARMOR:
+		m_RenderSlot.pRenderArmor->RenderSlot(m_SlotRenderDesc);
+		break;
+	}
 
 	return S_OK;
 }
@@ -78,35 +96,38 @@ HRESULT CSlot::UpdateItem(Shared_ITEM pItem)
 	m_pItem = pItem;
 	
 	if(m_pItem)
+	{
 		Safe_AddRef(m_pItem->second);
+
+		switch (m_pItem->first)
+		{
+		case ITEM_TYPE::WEAPON:
+			m_RenderSlot.pRenderWeapon = static_cast<CWeapon*>(m_pItem->second);
+			break;
+		case ITEM_TYPE::ARMOR:
+			m_RenderSlot.pRenderArmor = static_cast<CArmor*>(m_pItem->second);
+			break;
+		//case ITEM_TYPE::OTHERS:
+		}
+	}
 
 	return S_OK;
 }
 
 void CSlot::ClearItem()
 {
-	if (m_pItem)
-	{
-		Safe_Release(m_pItem->second);
-		m_pItem = nullptr;
-	}
+	if (nullptr == m_pItem)
+		return;
+
+	ClearRenderSlot();
+	Safe_Release(m_pItem->second);
+	m_pItem = nullptr;
 }
 
-HRESULT CSlot::Ready_Components()
+void CSlot::ClearRenderSlot()
 {
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
-		return E_FAIL;
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
-		return E_FAIL;
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_OptionButton"),
-		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-		return E_FAIL;
-
-	return S_OK;
+	m_RenderSlot.pRenderWeapon = nullptr;
+	m_RenderSlot.pRenderArmor = nullptr;
 }
 
 CSlot* CSlot::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
@@ -136,8 +157,4 @@ void CSlot::Free()
 	__super::Free();
 
 	ClearItem();
-
-	Safe_Release(m_pTextureCom);
-	Safe_Release(m_pVIBufferCom);
-	Safe_Release(m_pShaderCom);
 }

@@ -16,42 +16,46 @@ private:
 	virtual ~CModel() = default;
 
 public:
-	_uint				Get_NumMeshes() const { return m_iNumMeshes; }
+	_uint					Get_NumMeshes() const { return m_iNumMeshes; }
 
-	_float4x4			Get_PreTransformMatrix() const { return m_PreTransformMatrix; }
-	void				Set_PreTransformMatrix(_fmatrix PreTransformMatrix) { XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix); }
-
-public:
-	virtual HRESULT		Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
-	virtual HRESULT		Initialize(void* pArg);
-	HRESULT				Render(_uint iMeshIndex);
-
-	HRESULT				Bind_Shader_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iSRVIndex, _uint iTextureType, _bool* hasSPV = nullptr);
-	HRESULT				Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
-	HRESULT				Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, vector<CBone*>& Bones);
-	HRESULT				Set_Animation(const ANIM_DATA& AnimData);
-	_bool				Play_Animation(_float fTimeDelta);
-	void				Bind_ParentBone(vector<CBone*>& ParentBones);
-
-	HRESULT				Save_Binary(const _wstring& strSaveFilePath);
-	HRESULT				BonesToBinary(ofstream& File, const aiNode* pAINode);
-	HRESULT				MeshesToBinary(ofstream& File);
-	HRESULT				MaterialToBinary(ofstream& File);
-	HRESULT				AnimationToBinary(ofstream& File);
+	_float4x4				Get_PreTransformMatrix() const { return m_PreTransformMatrix; }
+	void					Set_PreTransformMatrix(_fmatrix PreTransformMatrix) { XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix); }
 
 public:
-	_bool				CanChangeAnimation();
-	_bool				CurrentAnim_Finished() { return m_IsFinished; }
+	virtual HRESULT			Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
+	virtual HRESULT			Initialize(void* pArg);
+	HRESULT					Render(_uint iMeshIndex);
 
-	void				Set_RootMotionOption(ROOTMOTION_OPTION RootMotionOption) { m_RootMotionOption = RootMotionOption; };
+	HRESULT					Bind_Shader_Material(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, _uint iSRVIndex, _uint iTextureType, _bool* hasSPV = nullptr);
+	HRESULT					Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
+	HRESULT					Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, vector<CBone*>& Bones);
+	HRESULT					Bind_PoseBoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 
-	const _float4x4*	Find_SocketBoneCombinedMatrix(const string& strSocketBoneName);
-	const _vector*		Get_AnimMovementPtr() { return &m_vAnimMovement; }
-	const _vector*		Get_AnimRotationPtr() { return &m_vAnimRotation; }
-	vector<CBone*>&		Get_Bones() { return m_Bones; }
+	HRESULT					Update_PoseCombinedTransformationMatrix();
+		
+	HRESULT					Set_Animation(const ANIM_DATA& AnimData);
+	_bool					Play_Animation(_float fTimeDelta);
+
+	void					Bind_ParentBone(vector<CBone*>& ParentBones);
+
+	HRESULT					Save_Binary(const _wstring& strSaveFilePath);
+
+public:
+	const MODEL_BOUNDING	Get_ModelBounding() const { return m_Bounding; }
+	
+
+	_bool					CanChangeAnimation();
+	_bool					CurrentAnim_Finished() { return m_IsFinished; }
+
+	void					Set_RootMotionOption(ROOTMOTION_OPTION RootMotionOption) { m_RootMotionOption = RootMotionOption; };
+
+	const _float4x4*		Find_SocketBoneCombinedMatrix(const string& strSocketBoneName);
+	const _vector*			Get_AnimMovementPtr() const { return &m_vAnimMovement; }
+	const _vector*			Get_AnimRotationPtr() const { return &m_vAnimRotation; }
+	vector<CBone*>&			Get_Bones() { return m_Bones; }
 
 #ifdef _DEBUG
-	_bool				Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist);
+	_bool					Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist);
 #endif
 
 private:
@@ -91,6 +95,8 @@ private:
 	_vector						m_vPrevRootRotation = {};
 	_vector						m_vAnimRotation = {};
 
+	MODEL_BOUNDING				m_Bounding = {};
+	_float4x4					m_OffsetMatrix = {};
 
 private:
 	void		RootMotion();
@@ -105,6 +111,11 @@ private:
 
 #pragma region BINARY
 private:
+	HRESULT	BonesToBinary(ofstream& File, const aiNode* pAINode);
+	HRESULT	MeshesToBinary(ofstream& File);
+	HRESULT	MaterialToBinary(ofstream& File);
+	HRESULT	AnimationToBinary(ofstream& File);
+
 	HRESULT Ready_Bones(ifstream& File, _int iParentIndex);
 	HRESULT Ready_Meshes(ifstream& File);
 	HRESULT Ready_Materials(ifstream& File, const _char* pModelFilePath);

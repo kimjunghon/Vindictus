@@ -95,13 +95,13 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	Event.eType = PROGRESS_TYPE::LOADING;
 	Event.fRatio = m_fLoadingRatio;
 
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region TEXTURE
 	
@@ -113,7 +113,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region MODEL
 #pragma endregion
@@ -123,7 +123,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region SHADER
 #pragma endregion
@@ -134,7 +134,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region GAMEOBJECT
 
@@ -143,7 +143,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 
 	Event.fRatio = 1.f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 	m_isFinished = true;
 
@@ -156,13 +156,13 @@ HRESULT CLoader::Loading_For_Town_Level()
 	Event.eType = PROGRESS_TYPE::LOADING;
 	Event.fRatio = m_fLoadingRatio;
 
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region TEXTURE
 
@@ -175,12 +175,12 @@ HRESULT CLoader::Loading_For_Town_Level()
 
 #pragma region MODEL
 
-	if (FAILED(Loading_For_MapModel(LEVEL::TOWN, "../Bin/Resources/Town.dat")))
+	if (FAILED(Loading_For_MapModel(LEVEL::TOWN, "../Bin/Resources/Map/Town.dat")))
 		return E_FAIL;
 
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma endregion
 
@@ -189,7 +189,7 @@ HRESULT CLoader::Loading_For_Town_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region SHADER
 #pragma endregion
@@ -203,7 +203,7 @@ HRESULT CLoader::Loading_For_Town_Level()
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region GAMEOBJECT
 
@@ -243,7 +243,7 @@ HRESULT CLoader::Loading_For_Town_Level()
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 	Event.fRatio = 1.f;
 
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 	m_isFinished = true;
 
@@ -316,13 +316,13 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	Event.eType = PROGRESS_TYPE::LOADING;
 	Event.fRatio = m_fLoadingRatio;
 
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 	
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region TEXTURE
 	
@@ -335,7 +335,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 	
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region MODEL
 
@@ -388,7 +388,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	if (FAILED(Loading_For_GamePlay_ArmorModel()))
 		return E_FAIL;
 
-	if (FAILED(Loading_For_MapModel(LEVEL::GAMEPLAY, "../Bin/Resources/QueenMap.dat")))
+	if (FAILED(Loading_For_MapModel(LEVEL::GAMEPLAY, "../Bin/Resources/Map/QueenMap.dat")))
 		return E_FAIL;
 
 #pragma endregion
@@ -398,7 +398,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region SHADER
 #pragma endregion
@@ -408,7 +408,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 #pragma region GAMEOBJECT
 
@@ -496,7 +496,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 	Event.fRatio = 1.f;
 
-	m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 
 	m_isFinished = true;
 

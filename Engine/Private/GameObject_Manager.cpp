@@ -50,6 +50,42 @@ HRESULT CGameObject_Manager::Add_GameObject_ToLayer(_uint iLayerIndex, const _ws
 	return pLayer->Add_GameObject(pGameObject);
 }
 
+HRESULT CGameObject_Manager::Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, CGameObject* pGameObject)
+{
+	if (nullptr == pGameObject)
+		return E_FAIL;
+
+	CLayer* pLayer = Find_Layer(iLayerIndex, strLayerTag);
+
+	if (nullptr == pLayer)
+	{
+		pLayer = CLayer::Create();
+
+		m_pLayers[iLayerIndex].emplace(strLayerTag, pLayer);
+	}
+
+	if (SUCCEEDED(pLayer->Add_GameObject(pGameObject)))
+		Safe_AddRef(pGameObject);
+	else
+		return E_FAIL;
+
+	return S_OK;
+}
+
+
+
+void CGameObject_Manager::Post_Update(_float fTimeDelta)
+{
+	for (_uint i = 0; i < ENUM_CLASS(LAYERTYPE::END); i++)
+	{
+		for (auto& Pair : m_pLayers[i])
+		{
+			if (nullptr != Pair.second)
+				Pair.second->Post_Update(fTimeDelta);
+		}
+	}
+}
+
 void CGameObject_Manager::Priority_Update(_float fTimeDelta)
 {
 	for (_uint i = 0; i < ENUM_CLASS(LAYERTYPE::END); i++)

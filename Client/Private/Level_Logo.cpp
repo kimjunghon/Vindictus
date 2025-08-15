@@ -25,7 +25,7 @@ void CLevel_Logo::Update(_float fTimeDleta)
 		Event.iChange_Level = ENUM_CLASS(LEVEL::GAMEPLAY);
 		Event.bIsLoading = false;
 
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 	}
 }
 

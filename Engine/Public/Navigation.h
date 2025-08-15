@@ -25,6 +25,7 @@ public:
 
 public:
 	_bool			isMove(_fvector vPosition);
+	_bool			isMove(_fmatrix WorldMatrix);
 	_vector			Compute_OnCell(_fvector vPosition);
 
 #ifdef _DEBUG

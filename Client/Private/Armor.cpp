@@ -35,6 +35,8 @@ HRESULT CArmor::Initialize(void* pArg)
 	if (FAILED(Ready_Components(pDesc->iArmorModelPrototypeLevelIndex, pDesc->strArmorModelPrototypeTag)))
 		return E_FAIL;
 
+	m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Update_PoseCombinedTransformationMatrix();
+
 	return S_OK;
 }
 
@@ -88,7 +90,7 @@ void CArmor::Late_Update(_float fTimeDelta)
 		if (m_eArmorType == ARMOR_TYPE::HEAD)
 		{
 			EVENT_BROKEN_HEAD Event;
-			m_pGameInstance->Publish(ENUM_CLASS(LEVEL::GAMEPLAY), Event);
+			m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
 			return;
 		}
 	}
@@ -124,6 +126,32 @@ HRESULT CArmor::Render()
 
 		m_pModelCom[ENUM_CLASS(m_eArmorState)]->Render(i);
 	}
+
+	return S_OK;
+}
+
+HRESULT CArmor::RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
+{
+	if (FAILED(Bind_ShaderResources_RenderSlot(SlotRenderDesc)))
+		return E_FAIL;
+
+	_uint iNumMeshes = m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Get_NumMeshes();
+
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+			return E_FAIL;
+
+		if (FAILED(m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Bind_PoseBoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+
+		m_pShaderCom->Begin(0);
+
+		m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Render(i);
+
+		m_pShaderCom->Bind_SPV("g_DiffuseTexture", nullptr);
+	}
+
 
 	return S_OK;
 }
@@ -203,6 +231,42 @@ HRESULT CArmor::Bind_ShaderResources()
 	return S_OK;
 }
 
+HRESULT CArmor::Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
+{
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &SlotRenderDesc.WorldMatrix)))
+		return E_FAIL;
+
+//	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+//		return E_FAIL;
+//
+//	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+//		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &SlotRenderDesc.ViewMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &SlotRenderDesc.ProjMatrix)))
+		return E_FAIL;
+
+	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(TEXT("DIRECTONAL"));
+	if (nullptr == pLightDesc)
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+
 HRESULT CArmor::Bind_ParentBones(CModel* pParentModelCom)
 {
 	vector<CBone*> ArmorBones = m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Get_Bones();
@@ -231,6 +295,19 @@ HRESULT CArmor::Bind_ParentBones(CModel* pParentModelCom)
 	}
 
 	return S_OK;
+}
+
+_matrix CArmor::Compute_OffsetMatrix()
+{
+	MODEL_BOUNDING Bounding = m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Get_ModelBounding();
+
+	_float fCenterX = (Bounding.vMinPosition.x + Bounding.vMaxPosition.x) * 0.5f;
+	_float fCenterY = (Bounding.vMinPosition.y + Bounding.vMaxPosition.y) * 0.5f;
+	_float fCenterZ = (Bounding.vMinPosition.z + Bounding.vMaxPosition.z) * 0.5f;
+
+	_matrix OffsetMatrix = XMMatrixTranslation(fCenterX * -1.f, fCenterZ , fCenterY * -1.f);
+
+	return OffsetMatrix;
 }
 
 CArmor* CArmor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

@@ -173,6 +173,11 @@ namespace Engine
 		bool		Rotation;
 	}ROOTMOTION_OPTION;
 
+	typedef struct tagModelBounding
+	{
+		XMFLOAT3 vMinPosition;
+		XMFLOAT3 vMaxPosition;
+	}MODEL_BOUNDING;
 }
 
 

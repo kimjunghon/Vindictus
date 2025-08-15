@@ -14,7 +14,7 @@ namespace Client
 	enum class ANIM_PHASE { BEGIN, DURING, END};
 	
 	enum class ITEM_TYPE { WEAPON, ARMOR, OTHERS };
-	enum class WEAPON_TYPE { SWORD, SHIELD, END};
+	enum class WEAPON_TYPE { SWORD, SHILED, END};
 	enum class ARMOR_TYPE { HEAD, UPPER, LOWER, HAND, FOOT, END};
 	enum class ARMOR_STATE { DEFAULT, BROKEN, END };
 }

@@ -109,6 +109,38 @@ _bool CNavigation::isMove(_fvector vPosition)
 	}
 }
 
+_bool CNavigation::isMove(_fmatrix WorldMatrix)
+{
+	_vector vPosition = WorldMatrix.r[3];
+
+	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+
+	_int		iNeighborIndex = { -1 };
+
+	if (true == m_Cells[m_iCurrentCellIndex]->IsInCell(vLocalPos, &iNeighborIndex))
+		return true;
+	else
+	{
+		if (-1 != iNeighborIndex)
+		{
+			while (true)
+			{
+				if (-1 == iNeighborIndex)
+					return false;
+
+				if (true == m_Cells[iNeighborIndex]->IsInCell(vLocalPos, &iNeighborIndex))
+					break;
+			}
+
+			m_iCurrentCellIndex = iNeighborIndex;
+
+			return true;
+		}
+		else
+			return false;
+	}
+}
+
 _vector CNavigation::Compute_OnCell(_fvector vPosition)
 {
 	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));

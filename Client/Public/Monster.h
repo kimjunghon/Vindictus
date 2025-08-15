@@ -3,9 +3,8 @@
 #include "Pawn.h"
 
 NS_BEGIN(Engine)
-
 class CBehaviorTree;
-
+class CNavigation;
 NS_END
 
 NS_BEGIN(Client)
@@ -29,6 +28,10 @@ public:
 
 
 public:
+	virtual HRESULT	Spawn(MONSTER_SPAWN_DATA SpawnData) PURE;
+
+	//State
+public:
 	virtual BT_STATE		CanAttack();
 	virtual BT_STATE		CanOtherAction();
 	virtual BT_STATE		CanAttackRange();
@@ -48,10 +51,11 @@ protected:
 	_float			m_fChaseRange = {};
 	_float			m_fMinDistance = {};
 	//Test
-	CTransform* m_pTargetTransform = { nullptr };
+	CTransform*		m_pTargetTransform = { nullptr };
 
 protected:
 	CBehaviorTree*		m_pAI = { nullptr };
+	CNavigation*		m_pNavigationCom = { nullptr };
 	CBody*				m_pBody = { nullptr };
 	const _vector*		m_pAnimMovement = {nullptr};
 	const _vector*		m_pAnimRotation = { nullptr };

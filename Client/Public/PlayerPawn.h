@@ -14,10 +14,17 @@ class CPlayerBody;
 class CArmor;
 class CWeapon;
 class CPlayerInstance;
-class CNavigation;
 
 class CPlayerPawn final : public CPawn
 {
+
+public:
+	typedef struct tagPlayerDesc : public GAMEOBJECT_DESC
+	{
+		_float3 vPosition;
+		_int iCellIndex;
+	}PLAYER_DESC;
+
 private:
 	CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CPlayerPawn(const CPlayerPawn& Prototype);
@@ -44,6 +51,7 @@ public:
 
 private:
 	CPlayerInstance*		m_pPlayerInstance = { nullptr };
+	CNavigation*			m_pNavigation = { nullptr };
 
 	CPlayerBody*			m_pPlayerBody = { nullptr };
 	CCamera_Target*			m_pCamera = { nullptr };
@@ -72,7 +80,7 @@ private:
 	const _vector*			m_pAnimRotation = {};
 
 private:
-	HRESULT		Ready_Components();
+	HRESULT		Init_Level(_int iCellIndex, _float3 vStartPostion);
 	HRESULT		Ready_Camera();
 	HRESULT		Ready_PawnObjects();
 	HRESULT		Ready_PlayerBody();

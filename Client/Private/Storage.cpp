@@ -18,7 +18,6 @@ CStorage::CStorage(const CStorage& Prototype)
 	, m_fSlotStartOffsetY { Prototype.m_fSlotStartOffsetY }
 	, m_fSlotOffsetX { Prototype.m_fSlotOffsetX }
 	, m_fSlotOffsetY { Prototype.m_fSlotOffsetY }
-	, m_fClickDelay{ Prototype.m_fClickDelay }
 {
 	Safe_AddRef(m_pPlayerInstance);
 }
@@ -34,7 +33,6 @@ HRESULT CStorage::Initialize_Prototype()
 	m_fSlotOffsetX = 43.5f;
 	m_fSlotOffsetY = 48.f;
 
-	m_fClickDelay = 0.2f;
 
 	return S_OK;
 }
@@ -47,8 +45,8 @@ HRESULT CStorage::Initialize(void* pArg)
 	if (FAILED(Ready_Children()))
 		return E_FAIL;
 
-	m_pGameInstance->Subscribe<EVENT_ADD_ITEM>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_ADD_ITEM& Event) {
-		this->Event_Add_Item(Event); });
+	m_pGameInstance->Subscribe<EVENT_PICK_ITEM>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_PICK_ITEM& Event) {
+		this->Event_Pick_Item(Event); });
 
 	m_pGameInstance->Subscribe<EVENT_UPDATE_INVENTORY>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_UPDATE_INVENTORY& Event) {
 		this->Event_Update_Inventory(Event); });
@@ -63,16 +61,6 @@ void CStorage::Priority_Update(_float fTimeDelta)
 
 void CStorage::Update(_float fTimeDelta)
 {
-
-	if(m_fClickDelay <= m_fCurrentClickDelay && m_pGameInstance->Get_MouseState(MOUSEKEYSTATE::LB) && IsPick(g_hWnd))
-	{
-		EVENT_PICK_STORAGE Event = {};
-		Event.iInventoryIndex = m_iPickIndex;
-		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
-		m_fCurrentClickDelay = 0.f;
-	}
-	else
-		m_fCurrentClickDelay += fTimeDelta;
 
 	__super::Children_Update(fTimeDelta);
 }
@@ -100,7 +88,7 @@ HRESULT CStorage::Ready_Children()
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_Inventroy_Background");
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
 	Children_Desc.IsBlend = true;
-	Children_Desc.fAlpha = 0.5f;
+	Children_Desc.fAlpha = 0.8f;
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
 		return E_FAIL;
@@ -171,14 +159,38 @@ _bool CStorage::IsPick(HWND hWnd)
 
 		m_iPickIndex = static_cast<_uint>((fX / m_fSlotOffsetX)) + ((m_iNumSlotsX) * static_cast<_uint>(fY / m_fSlotOffsetY));
 
+		EVENT_PICK_STORAGE Event = {};
+		Event.iInventoryIndex = m_iPickIndex;
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+
 		return true;
 	}
 	return false;
 }
 
-void CStorage::Event_Add_Item(const EVENT_ADD_ITEM& Event)
+_bool CStorage::IsEquip(HWND hWnd)
 {
-	m_Slots[Event.iInventoryIndex]->UpdateItem(m_pPlayerInstance->GetInventory(Event.iInventoryIndex));
+	POINT	ptMouse = m_pGameInstance->Get_MousePoint();
+
+	if (PtInRect(&m_SlotRect, ptMouse))
+	{
+		_float fX = static_cast<_float>(ptMouse.x - m_SlotRect.left);
+		_float fY = static_cast<_float>(ptMouse.y - m_SlotRect.top);
+
+		m_iPickIndex = static_cast<_uint>((fX / m_fSlotOffsetX)) + ((m_iNumSlotsX) * static_cast<_uint>(fY / m_fSlotOffsetY));
+
+		EVENT_EQUIP_STORAGE Event = {};
+		Event.iInventoryIndex = m_iPickIndex;
+		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+
+		return true;
+	}
+	return false;
+}
+
+void CStorage::Event_Pick_Item(const EVENT_PICK_ITEM& Event)
+{
+	m_Slots[Event.iInventoryIndex]->IsPick(Event.IsPick);
 }
 
 void CStorage::Event_Update_Inventory(const EVENT_UPDATE_INVENTORY& Event)

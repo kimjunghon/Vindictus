@@ -30,10 +30,10 @@ HRESULT CPlayerPawn::Initialize_Prototype()
 
 HRESULT CPlayerPawn::Initialize(void* pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
+	if (nullptr == pArg)
 		return E_FAIL;
-
-	if (FAILED(Ready_Components()))
+	
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Camera()))
@@ -43,6 +43,11 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 		return E_FAIL;
 
 	if (FAILED(Ready_States()))
+		return E_FAIL;
+
+	PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
+
+	if (FAILED(Init_Level(pDesc->iCellIndex, pDesc->vPosition)))
 		return E_FAIL;
 
 	m_vPlayerMoveDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
@@ -55,7 +60,6 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::DEFAULT);
 
-	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(-10.f, 0.f, 10.f, 1.f));
 	
 	m_pGameInstance->Subscribe<EVENT_CHANGE_WEAPON>(ENUM_CLASS(EVENTTYPE::NONSTATIC), [this](const EVENT_CHANGE_WEAPON& Event) {
 		this->Event_ChangeWeapon(Event); });
@@ -152,6 +156,8 @@ HRESULT CPlayerPawn::EquipWeapon(CWeapon* pWeapon)
 
 	Add_PawnObject(strWeaponName, pWeapon);
 
+	Safe_AddRef(pWeapon);
+
 	return S_OK;
 }
 
@@ -188,6 +194,8 @@ HRESULT CPlayerPawn::EquipArmor(CArmor* pArmor)
 
 	Add_PawnObject(strArmorName, pArmor);
 
+	Safe_AddRef(pArmor);
+
 	return S_OK;
 }
 
@@ -195,6 +203,9 @@ HRESULT CPlayerPawn::UnEquipArmor(_uint iArmorTypeIndex)
 {
 	if (nullptr == Find_PawnObject(m_strEquipArmors[iArmorTypeIndex]))
 		return S_OK;
+
+	if (iArmorTypeIndex == ENUM_CLASS(ARMOR_TYPE::HEAD))
+		m_pPlayerBody->UnEquipHead();
 
 	if (FAILED(Remove_PawnObject(m_strEquipArmors[iArmorTypeIndex])))
 		return E_FAIL;
@@ -206,26 +217,45 @@ HRESULT CPlayerPawn::UnEquipArmor(_uint iArmorTypeIndex)
 
 void CPlayerPawn::Event_ChangeWeapon(const EVENT_CHANGE_WEAPON& Event)
 {
-	EquipWeapon(m_pPlayerInstance->UpdatePlayerEquipWeapon(Event.iWeaponTypeIndex));
+	CWeapon* pWeapon = m_pPlayerInstance->UpdatePlayerEquipWeapon(Event.iWeaponTypeIndex);
+
+	if (pWeapon)
+		EquipWeapon(pWeapon);
+	else
+		UnEquipWeapon(Event.iWeaponTypeIndex);
+
 }
 
 void CPlayerPawn::Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event)
 {
-	EquipArmor(m_pPlayerInstance->UpdatePlayerEquipArmor(Event.iArmorTypeIndex));
+	CArmor* pArmor = m_pPlayerInstance->UpdatePlayerEquipArmor(Event.iArmorTypeIndex);
+
+	if (pArmor)
+		EquipArmor(pArmor);
+	else
+		UnEquipArmor(Event.iArmorTypeIndex);
 }
 
 void CPlayerPawn::Move(_float fTimeDelta)
 {
-
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
 
 	vPosition = XMVectorAdd(vPosition, XMVectorScale(m_vPlayerMoveDir, m_fSpeed * m_fSpeedRatio * fTimeDelta));
 
-	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+	if (m_pNavigation->isMove(vPosition))
+		m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 }
 
-HRESULT CPlayerPawn::Ready_Components()
+HRESULT CPlayerPawn::Init_Level(_int iCellIndex, _float3 vStartPostion)
 {
+	m_pNavigation = m_pGameInstance->Clone_CurrentNavigation(iCellIndex);
+	if (nullptr == m_pNavigation)
+		return E_FAIL;
+
+	_vector vPosition = XMLoadFloat3(&vStartPostion);
+
+	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+
 	return S_OK;
 }
 
@@ -354,7 +384,7 @@ HRESULT CPlayerPawn::Ready_States()
 
 void CPlayerPawn::Compute_WorldMatrix()
 {
-	_vector vAnimPosition = XMVectorSetY(*m_pAnimMovement, 0.f);
+	_vector vAnimPosition = XMVectorSetY(*m_pAnimMovement,0.f);
 	_vector vAnimRotation = *m_pAnimRotation;
 
 	_vector vRotation = {};
@@ -378,8 +408,11 @@ void CPlayerPawn::Compute_WorldMatrix()
 
 	_matrix WorldMatrix = PositionMatrix * m_pTransformCom->Get_WorldMatrix();
 		
+	if(m_pNavigation->isMove(WorldMatrix))
+		m_pTransformCom->Set_WorldMatrix(WorldMatrix);
 
-	m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+	m_pTransformCom->Set_State(STATE::POSITION,
+		m_pNavigation->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
 }
 
 void CPlayerPawn::Bind_InputData(_float fTimeDelta)
@@ -438,4 +471,5 @@ void CPlayerPawn::Free()
 	Safe_Release(m_pCamera);
 
 	Safe_Release(m_pPlayerInstance);
+	Safe_Release(m_pNavigation);
 }

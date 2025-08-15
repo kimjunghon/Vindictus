@@ -24,6 +24,8 @@ public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+	virtual _bool	IsPick(HWND hWnd);
+	virtual _bool	IsEquip(HWND hWnd);
 private:
 	CPlayerInstance*	m_pPlayerInstance = { nullptr };
 	RECT				m_SlotRect = {};
@@ -38,16 +40,12 @@ private:
 	_float				m_fSlotOffsetX = {};
 	_float				m_fSlotOffsetY = {};
 
-	_float				m_fClickDelay = { };
-	_float				m_fCurrentClickDelay = { };
 
 private:
 	HRESULT Ready_Children();
 	HRESULT Ready_Slots();
 
-	virtual _bool IsPick(HWND hWnd);
-
-	void	Event_Add_Item(const EVENT_ADD_ITEM& Event);
+	void	Event_Pick_Item(const EVENT_PICK_ITEM& Event);
 	void	Event_Update_Inventory(const EVENT_UPDATE_INVENTORY& Event);
 
 public:

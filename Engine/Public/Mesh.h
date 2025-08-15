@@ -18,11 +18,11 @@ public:
 
 public:
 	virtual HRESULT Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix);
-	virtual HRESULT Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix);
+	virtual HRESULT Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding);
 	virtual HRESULT Initialize(void* pArg) override;
 	
 	HRESULT			Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones);
-
+	HRESULT			Bind_PoseBoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones);
 #ifdef _DEBUG
 	_bool			Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist);
 #endif
@@ -45,12 +45,12 @@ private:
 	HRESULT Ready_Vertices_For_NonAnim_Assimp(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);
 	HRESULT Ready_Vertices_For_Anim_Assimp(const aiMesh* pAIMesh, const vector<CBone*>& Bones);
 
-	HRESULT Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTransformMatrix);
-	HRESULT Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone*>& Bones);
+	HRESULT Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding);
+	HRESULT Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone*>& Bones, MODEL_BOUNDING& ModelBounding);
 
 public:
 	static CMesh*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix);
-	static CMesh*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix);
+	static CMesh*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void		Free() override;
 };

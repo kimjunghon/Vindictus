@@ -18,6 +18,8 @@ public:
 
 private:
 	HRESULT Ready_Light();
+	HRESULT Ready_SpawnData();
+
 	HRESULT Ready_Player(const _wstring& strLayerTag);
 	HRESULT Ready_GameObject(const _wstring& strLayerTag);
 

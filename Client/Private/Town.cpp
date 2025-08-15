@@ -65,7 +65,7 @@ HRESULT CTown::Render()
 
 HRESULT CTown::Ready_MapObjects()
 {
-	ifstream File("../Bin/Resources/Town.dat", ios::binary);
+	ifstream File("../Bin/Resources/Map/Town.dat", ios::binary);
 	if (!File.is_open())
 	{
 		MSG_BOX(TEXT("Failed File Open TownMap"));

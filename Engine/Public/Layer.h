@@ -16,12 +16,14 @@ public:
         return S_OK; }
 
 public:
+    void Post_Update(_float fTimeDelta);
     void Priority_Update(_float fTimeDelta);
     void Update(_float fTimeDelta);
     void Late_Update(_float fTimeDelta);
 
 private:
-    list<class CGameObject*> m_GameObjects;
+    list<class CGameObject*>    m_GameObjects;
+    unordered_set<_uint>        m_NoneActiveObjectIndices;
 
 public:
     static CLayer*  Create();

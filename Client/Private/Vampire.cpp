@@ -1,6 +1,7 @@
 #include "ClientPch.h"
 #include "Vampire.h"
 #include "VampireAI.h"
+#include "Navigation.h"
 
 CVampire::CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -43,6 +44,21 @@ void CVampire::Late_Update(_float fTimeDelta)
 
 HRESULT CVampire::Render()
 {
+	return S_OK;
+}
+
+HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
+{
+	m_IsActive = true;
+
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
+
+	m_pNavigationCom = m_pGameInstance->Clone_CurrentNavigation(SpawnData.iCellIndex);
+	
+	_vector vPosition = XMLoadFloat3(&SpawnData.vPosition);
+
+	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+
 	return S_OK;
 }
 

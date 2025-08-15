@@ -4,8 +4,18 @@
 
 NS_BEGIN(Client)
 
+class CWeapon;
+class CArmor;
+//class Others;
+
 class CSlot final : public CUIObject
 {
+private:
+	typedef struct tagRenderSlot {
+		CWeapon* pRenderWeapon = { nullptr };
+		CArmor* pRenderArmor = { nullptr };
+	}RENDER_SLOT;
+
 private:
 	CSlot(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CSlot(const CSlot& Prototype);
@@ -21,18 +31,18 @@ public:
 
 public:
 	HRESULT			UpdateItem(Shared_ITEM pItem);
+	void			IsPick(_bool IsPick) { m_IsPick = IsPick; }
 	void			ClearItem();
+	void			ClearRenderSlot();
+
 private:
-	Shared_ITEM		m_pItem = {};
+	Shared_ITEM			m_pItem = {nullptr};
 
-
-	//TEST
-	HRESULT Ready_Components();
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer* m_pVIBufferCom = { nullptr };
-	CShader* m_pShaderCom = { nullptr };
-
-
+	_bool				m_IsPick = { false };
+	SLOT_RENDER_DESC	m_SlotRenderDesc = {};
+	_float4x4			m_SlotRenderWorldMatrix = {};
+	_float4x4			m_MouseRenderWorldMatirx = {};
+	RENDER_SLOT			m_RenderSlot = {};
 
 public:
 	static CSlot*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
