@@ -75,6 +75,7 @@ public:
 #pragma region OBJECT_MANAGER
 public:
 	HRESULT Add_GameObject_ToLayer(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, _uint iLayerIndex, const _wstring& strLayerTag, void* pArg = nullptr);
+	HRESULT Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, CGameObject* pGameObject);
 	class CComponent* Get_Component(_uint iLayerIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
 #pragma endregion
 

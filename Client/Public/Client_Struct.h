@@ -15,10 +15,9 @@ namespace Client
 	}SLOT_RENDER_DESC;
 
 	typedef struct tagMonsterSpawnData {
-		_uint		iRoomIndex;
-		string		strMonsterName;
-		int			iCellIndex;
-		XMFLOAT3	vPosition;
+		MONSTER_TYPE	eMonsterType;
+		int				iCellIndex;
+		XMFLOAT3		vPosition;
 	}MONSTER_SPAWN_DATA;
 
 }

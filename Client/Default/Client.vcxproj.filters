@@ -283,6 +283,9 @@
     <Filter Include="01.Instance\Player\Storage_Manager">
       <UniqueIdentifier>{65ef9f0d-30ca-41e8-a776-0625986f80ab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Instance\Monster\Spawn_Manager">
+      <UniqueIdentifier>{238be20a-b21b-489b-b8e1-6febf3104d12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -552,6 +555,12 @@
     <ClInclude Include="..\public\Equipment_Manager.h">
       <Filter>01.Instance\Player\Equip_Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Pooling_Manager.h">
+      <Filter>01.Instance\Monster\Pool_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Spawn_Manager.h">
+      <Filter>01.Instance\Monster\Spawn_Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -806,6 +815,12 @@
     </ClCompile>
     <ClCompile Include="..\private\Equipment_Manager.cpp">
       <Filter>01.Instance\Player\Equip_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pooling_Manager.cpp">
+      <Filter>01.Instance\Monster\Pool_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Spawn_Manager.cpp">
+      <Filter>01.Instance\Monster\Spawn_Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -27,7 +27,7 @@ void CLayer::Post_Update(_float fTimeDelta)
 			if (false == (*iter)->Is_Active())
 			{
 				Safe_Release(*iter);
-				m_GameObjects.erase(iter);
+				iter = m_GameObjects.erase(iter);
 			}
 			else
 				iter++;

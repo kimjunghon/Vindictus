@@ -72,8 +72,18 @@ HRESULT CLevel_Town::Ready_SpawnData()
 	if (Doc.HasMember("Player") && Doc["Player"].IsObject())
 	{
 		const Value& Player = Doc["Player"];
-		_int iCellIndex = Player["CellIndex"].GetInt();
-		_float3 vPosition = _float3(Player["PositionX"].GetFloat(), Player["PositionY"].GetFloat(), Player["PositionZ"].GetFloat());
+		_int iCellIndex = { };
+		_float3 vPosition = {};
+
+		if (Player.HasMember("CellIndex") && Player["CellIndex"].IsInt())
+			iCellIndex = Player["CellIndex"].GetInt();
+		
+		if (Player.HasMember("PositionX") && Player["PositionX"].IsFloat() 
+			&& Player.HasMember("PositionY") && Player["PositionY"].IsFloat() 
+			&& Player.HasMember("PositionZ") && Player["PositionZ"].IsFloat())
+		{
+			vPosition = _float3(Player["PositionX"].GetFloat(), Player["PositionY"].GetFloat(), Player["PositionZ"].GetFloat());
+		}
 
 		CPlayerPawn::PLAYER_DESC PlayerDesc = {};
 		PlayerDesc.fSpeedPerSec = 10.f;
