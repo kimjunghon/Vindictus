@@ -79,13 +79,13 @@ void CNavigation::Update(_fmatrix WorldMatrix)
 	XMStoreFloat4x4(&m_WorldMatrix, WorldMatrix);
 }
 
-_bool CNavigation::isMove(_fvector vPosition)
+_bool CNavigation::isMove(_fvector vPosition, _float3** ppInNormal)
 {
 	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
 
 	_int		iNeighborIndex = { -1 };
 
-	if (true == m_Cells[m_iCurrentCellIndex]->IsInCell(vLocalPos, &iNeighborIndex))
+	if (true == m_Cells[m_iCurrentCellIndex]->IsInCell(vLocalPos, &iNeighborIndex, ppInNormal))
 		return true;
 	else
 	{
@@ -96,7 +96,7 @@ _bool CNavigation::isMove(_fvector vPosition)
 				if (-1 == iNeighborIndex)
 					return false;
 
-				if (true == m_Cells[iNeighborIndex]->IsInCell(vLocalPos, &iNeighborIndex))
+				if (true == m_Cells[iNeighborIndex]->IsInCell(vLocalPos, &iNeighborIndex, ppInNormal))
 					break;
 			}
 
@@ -109,7 +109,7 @@ _bool CNavigation::isMove(_fvector vPosition)
 	}
 }
 
-_bool CNavigation::isMove(_fmatrix WorldMatrix)
+_bool CNavigation::isMove(_fmatrix WorldMatrix, _float3** ppInNormal)
 {
 	_vector vPosition = WorldMatrix.r[3];
 
@@ -117,7 +117,7 @@ _bool CNavigation::isMove(_fmatrix WorldMatrix)
 
 	_int		iNeighborIndex = { -1 };
 
-	if (true == m_Cells[m_iCurrentCellIndex]->IsInCell(vLocalPos, &iNeighborIndex))
+	if (true == m_Cells[m_iCurrentCellIndex]->IsInCell(vLocalPos, &iNeighborIndex, ppInNormal))
 		return true;
 	else
 	{
@@ -128,7 +128,7 @@ _bool CNavigation::isMove(_fmatrix WorldMatrix)
 				if (-1 == iNeighborIndex)
 					return false;
 
-				if (true == m_Cells[iNeighborIndex]->IsInCell(vLocalPos, &iNeighborIndex))
+				if (true == m_Cells[iNeighborIndex]->IsInCell(vLocalPos, &iNeighborIndex, ppInNormal))
 					break;
 			}
 

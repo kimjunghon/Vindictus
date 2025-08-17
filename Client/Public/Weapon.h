@@ -18,7 +18,7 @@ public:
 		_wstring			strWeaponModelPrototypeTag;
 		WEAPON_TYPE			eWeaponType;
 		WEAPON_INFO			WeaponInfo;
-		_float4				vRotationQuaternion;
+		_vector				vRotationQuaternion;
 	}WEAPON_DESC;
 
 private:
@@ -55,7 +55,7 @@ private:
 private:
 	HRESULT					Ready_Components(_uint iWeaponModelPrototypeLevelIndex, const _wstring& strWeaponModelPrototypeTag);
 	HRESULT					Bind_ShaderResources();
-	HRESULT					Bind_ShaderResources_RenderSlot(_float4x4 ViewMatrix, _float4x4 ProjMatirx);
+	HRESULT					Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc);
 public:
 	static CWeapon*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

@@ -18,7 +18,6 @@ namespace Client
 	//Typedef
 	typedef pair<ITEM_TYPE, CGameObject*> ITEM;
 	using Shared_ITEM = shared_ptr<ITEM>;
-
 }
 
 extern HWND g_hWnd;

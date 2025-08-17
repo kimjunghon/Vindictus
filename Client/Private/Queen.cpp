@@ -248,21 +248,18 @@ void CQueen::Compute_AnimPosition()
 	
 	_matrix RotationMatrix = XMMatrixRotationQuaternion(*m_pAnimRotation);
 	
-	{
-		_vector vLook = XMVector3Normalize(RotationMatrix.r[2]);
-		_float fYaw = atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook));
-		
-		RotationMatrix = XMMatrixRotationY(fYaw);
-	}
+	_vector vLook = XMVector3Normalize(RotationMatrix.r[2]);
+	_float fYaw = atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook));
 
-
-	_matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+	RotationMatrix = XMMatrixRotationY(fYaw);
 	
+	_vector vRotation = XMQuaternionRotationMatrix(RotationMatrix);
+
+	m_pTransformCom->RotateQuaternion(vRotation);
+
 	_matrix PositionMatrix = XMMatrixTranslationFromVector(vAnimPosition);
 
-	WorldMatrix = (PositionMatrix * RotationMatrix) * WorldMatrix;
-
-	m_pTransformCom->Set_WorldMatrix(WorldMatrix);
+	m_pTransformCom->MovePositionToMatrix(PositionMatrix, m_pNavigationCom);
 }
 
 void CQueen::Check_Near(_float fTimeDelta)

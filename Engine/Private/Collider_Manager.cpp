@@ -64,7 +64,7 @@ void CCollider_Manager::Clear_Collider()
 {
 	for (auto& BoundingPair : m_Boundings)
 	{
-		Safe_Release(BoundingPair.first);
+		Safe_Release(const_cast<CGameObject*&>(BoundingPair.first));
 		Safe_Release(BoundingPair.second);
 	}
 
@@ -72,7 +72,7 @@ void CCollider_Manager::Clear_Collider()
 
 	for (auto& ActionPair : m_Actions)
 	{
-		Safe_Release(ActionPair.first);
+		Safe_Release(const_cast<CGameObject*&>(ActionPair.first));
 		for (auto& pCollider : ActionPair.second)
 			Safe_Release(pCollider);
 		ActionPair.second.clear();

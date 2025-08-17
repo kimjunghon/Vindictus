@@ -354,15 +354,13 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTra
 
 	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
 
-	File.read(reinterpret_cast<_char*>(pVertices), sizeof(VTXMESH) * m_iNumVertices);
+	for (_uint i = 0; i < m_iNumVertices; i++)
+	{
+		File.read(reinterpret_cast<_char*>(&pVertices[i]), sizeof(VTXMESH));
+		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PreTransformMatrix));
+		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
 
-//	for (_uint i = 0; i < m_iNumVertices; i++)
-//	{
-//		File.read(reinterpret_cast<_char*>(&pVertices[i]), sizeof(VTXMESH));
-//		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PreTransformMatrix));
-//		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
-//
-//	}
+	}
 
 	_float fMinX = ModelBounding.vMinPosition.x;
 	_float fMinY = ModelBounding.vMinPosition.y;

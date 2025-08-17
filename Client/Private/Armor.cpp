@@ -236,12 +236,6 @@ HRESULT CArmor::Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &SlotRenderDesc.WorldMatrix)))
 		return E_FAIL;
 
-//	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
-//		return E_FAIL;
-//
-//	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
-//		return E_FAIL;
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &SlotRenderDesc.ViewMatrix)))
 		return E_FAIL;
 

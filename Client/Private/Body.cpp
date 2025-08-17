@@ -1,5 +1,7 @@
 #include "ClientPch.h"
 #include "Body.h"
+#include "AnimMachine.h"
+#include "Model.h"
 
 CBody::CBody(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CPawnObject { pDevice, pDeviceContext }
@@ -44,6 +46,16 @@ void CBody::Late_Update(_float fTimeDelta)
 
 HRESULT CBody::Render()
 {
+	return S_OK;
+}
+
+HRESULT CBody::Forcing_Play_Animation()
+{
+	if (FAILED(m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag)))
+		return E_FAIL;
+
+	m_pModelCom->Play_Animation(0.f);
+
 	return S_OK;
 }
 

@@ -1,6 +1,7 @@
 #include "EnginePch.h"
 #include "Transform.h"
 #include "Shader.h"
+#include "Navigation.h"
 
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CComponent {pDevice, pDeviceContext}
@@ -30,6 +31,72 @@ HRESULT CTransform::Initialize(void* pArg)
 HRESULT CTransform::Bind_Shader_WorldMatrix(CShader* pShader, const _char* pConstantWorldMatrixName)
 {
 	return pShader->Bind_Matrix(pConstantWorldMatrixName, &m_WorldMatrix);
+}
+
+void CTransform::MovePositionToVector(_fvector vMovePosition, CNavigation* pNavigation)
+{
+	_vector vPosition = Get_State(STATE::POSITION);
+	
+	_vector vNextPosition = XMVectorAdd(vPosition, vMovePosition);
+
+	_float3* pNormal = nullptr;
+	
+	_bool IsMove = pNavigation->isMove(vNextPosition, &pNormal);
+
+	if (IsMove)
+		Set_State(STATE::POSITION, vNextPosition);
+	else
+	{
+		if(nullptr != pNormal)	
+		{
+			_vector vMoveDir = XMVectorSubtract(vNextPosition, vPosition);
+			Sliding(vMoveDir, XMLoadFloat3(pNormal), pNavigation);
+		}
+	}
+}
+
+void CTransform::MovePositionToMatrix(_fmatrix PositionMatrix, CNavigation* pNavigation)
+{
+	_matrix WorldMatrix = Get_WorldMatrix();
+
+	_matrix NextWorldMatrix = PositionMatrix * WorldMatrix;
+
+	_float3* pNormal = nullptr;
+
+	_bool IsMove = pNavigation->isMove(NextWorldMatrix, &pNormal);
+
+	if (IsMove)
+		Set_WorldMatrix(NextWorldMatrix);
+	else
+	{
+		if (nullptr != pNormal)
+		{
+			_vector vNextPosition = NextWorldMatrix.r[3];
+			_vector vPosition = WorldMatrix.r[3];
+
+			_vector vMoveDir = XMVectorSubtract(vNextPosition, vPosition);
+			Sliding(vMoveDir, XMLoadFloat3(pNormal), pNavigation);
+		}
+	}
+}
+
+void CTransform::Sliding(_fvector vDir, _fvector vNormal, CNavigation* pNavigation)
+{
+	_vector vBlockNormal = XMVector3Normalize(vNormal);
+
+	if (XMVectorGetX(XMVector3Length(vBlockNormal)) == 0.f)
+		return;
+
+	_vector vSlideDir = vDir - XMVector3Dot(vDir, vBlockNormal) * vBlockNormal;
+
+	_vector vPosition = Get_State(STATE::POSITION);
+
+	_vector vNextPosition = XMVectorAdd(vPosition, vSlideDir);
+
+	_bool IsMove = pNavigation->isMove(vNextPosition);
+
+	if (IsMove)
+		Set_State(STATE::POSITION, vNextPosition);
 }
 
 void CTransform::Scale(_float3 vScale)

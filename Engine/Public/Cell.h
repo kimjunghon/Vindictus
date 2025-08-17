@@ -22,7 +22,7 @@ public:
 
 public:
 	HRESULT Initialize(const _float3* pPoints, _int iIndex);
-	_bool	IsInCell(_fvector vPosition, _int* pNeighborIndex);
+	_bool	IsInCell(_fvector vPosition, _int* pNeighborIndex, _float3** ppInNormal);
 
 	_bool	Compare_Points(_fvector vSourPoint, _fvector vDestPoint);
 	_float	Compute_Height(_fvector vLocalPos);
@@ -36,7 +36,8 @@ private:
 	ID3D11Device*			m_pDevice = { nullptr };
 	ID3D11DeviceContext*	m_pDeviceContext = { nullptr };
 	_float3					m_vPoints[ENUM_CLASS(CELL_POINT::END)] = {};
-	_float3					m_vNormals[ENUM_CLASS(LINE::END)] = {};
+	_float3					m_vOutNormals[ENUM_CLASS(LINE::END)] = {};
+	_float3					m_vInNormals[ENUM_CLASS(LINE::END)] = {};
 	_int					m_iIndex = {};
 	_int					m_iNeighborIndices[ENUM_CLASS(LINE::END)] = { -1, -1, -1 };
 

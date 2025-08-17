@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "Camera_Free.h"
 #include "PlayerPawn.h"
+#include "Weapon.h"
 #include "Armor.h"
 
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
@@ -22,6 +23,9 @@ HRESULT CLevel_Town::Initialize()
 		return E_FAIL;
 	
 	if (FAILED(Ready_Map(TEXT("Layer_Map"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_DefaultWeapon()))
 		return E_FAIL;
 
 	if (FAILED(Ready_DefaultArmor()))
@@ -122,10 +126,35 @@ HRESULT CLevel_Town::Ready_Player(const Value& Player)
 	return S_OK;
 }
 
+HRESULT CLevel_Town::Ready_DefaultWeapon()
+{
+	CWeapon::WEAPON_DESC WeaponDesc = {};
+	WeaponDesc.iWeaponModelPrototypeLevelIndex = ENUM_CLASS(LEVEL::TOWN);
+	WeaponDesc.strWeaponModelPrototypeTag = TEXT("Prototype_Component_Model_BastardSword");
+	WeaponDesc.pPawnMatrix = nullptr;
+	WeaponDesc.WeaponInfo = { TEXT("BastardSword"), 50.f, 0.f };
+	WeaponDesc.vRotationQuaternion = XMQuaternionRotationRollPitchYaw(0.f, 0.f, XMConvertToRadians(90.f));
+	WeaponDesc.eWeaponType = WEAPON_TYPE::SWORD;
+
+	CGameObject* pBastardSword = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::WEAPON, pBastardSword);
+
+
+	WeaponDesc.strWeaponModelPrototypeTag = TEXT("Prototype_Component_Model_RoundShield");
+	WeaponDesc.WeaponInfo = { TEXT("RoundShield"), 0.f, 20.f };
+	WeaponDesc.vRotationQuaternion = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(60.f), XMConvertToRadians(90.f), XMConvertToRadians(180.f));
+	WeaponDesc.eWeaponType = WEAPON_TYPE::SHILED;
+
+	CGameObject* pRoundShield = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc));
+	m_pPlayerInstance->Add_Item(ITEM_TYPE::WEAPON, pRoundShield);
+
+	return S_OK;
+}
+
 HRESULT CLevel_Town::Ready_DefaultArmor()
 {
 	CArmor::ARMOR_DESC ArmorDesc = {};
-	ArmorDesc.iArmorModelPrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
+	ArmorDesc.iArmorModelPrototypeLevelIndex = ENUM_CLASS(LEVEL::TOWN);
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Upper");
 	ArmorDesc.eArmorType = ARMOR_TYPE::UPPER;
 	ArmorDesc.pPawnMatrix = nullptr;

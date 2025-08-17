@@ -161,6 +161,7 @@
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Client_Struct.h" />
     <ClInclude Include="..\public\Controller_Mouse.h" />
+    <ClInclude Include="..\public\CreaturePawn.h" />
     <ClInclude Include="..\public\Equipment.h" />
     <ClInclude Include="..\public\Equipment_Manager.h" />
     <ClInclude Include="..\public\Glasgavelen.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\private\Body.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Controller_Mouse.cpp" />
+    <ClCompile Include="..\private\CreaturePawn.cpp" />
     <ClCompile Include="..\private\Equipment.cpp" />
     <ClCompile Include="..\private\Equipment_Manager.cpp" />
     <ClCompile Include="..\private\Glasgavelen.cpp" />

@@ -6,6 +6,8 @@ namespace Client
 		float fFullHealth;
 		float fHealth;
 		float fStamina;
+		float fAttackDamage;
+		float fDefense;
 	}PLAYER_STATUS;
 
 	typedef struct tagSlotRenderDesc {

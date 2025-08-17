@@ -277,6 +277,9 @@
     <Filter Include="03.GameObject\Map\MapObject">
       <UniqueIdentifier>{639bf950-2ac8-4e65-bfca-1855b29a1905}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\Pawns\CreaturePawn">
+      <UniqueIdentifier>{c512bfed-1937-4030-a7b8-199935542bb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -549,6 +552,7 @@
     <ClInclude Include="..\public\Spawn_Manager.h">
       <Filter>01.Instance\Monster\Spawn_Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\CreaturePawn.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -807,6 +811,7 @@
     <ClCompile Include="..\private\Spawn_Manager.cpp">
       <Filter>01.Instance\Monster\Spawn_Manager</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\CreaturePawn.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">

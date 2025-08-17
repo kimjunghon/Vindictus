@@ -39,7 +39,8 @@ void CPlayerBody::Priority_Update(_float fTimeDelta)
 
 void CPlayerBody::Update(_float fTimeDelta)
 {
-	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
+	if (FAILED(m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag)))
+		return;
 
 	m_pModelCom->Play_Animation(fTimeDelta);
 }

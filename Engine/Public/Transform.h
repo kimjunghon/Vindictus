@@ -3,6 +3,8 @@
 
 NS_BEGIN(Engine)
 
+class CNavigation;
+
 class ENGINE_DLL CTransform final : public CComponent
 {
 public:
@@ -59,17 +61,22 @@ public:
 	HRESULT Bind_Shader_WorldMatrix(class CShader* pShader, const _char* pConstantWorldMatrixName);
 	
 public:
-	void Scale(_float3 vScale);
-	void Scaling(_float3 vScale);
-	void Go_Straight(_float fTimeDelta);
-	void Go_Backward(_float fTimeDelta);
-	void Go_Left(_float fTimeDelta);
-	void Go_Right(_float fTimeDelta);
-	void Rotation(_fvector vAxis, _float fRadian);
-	void RotateQuaternion(_fvector Quaternion);
-	void Turn(_fvector vAxis, _float fTimeDelta);
-	void LookAt(_fvector vAt);
-	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);
+	void	MovePositionToVector(_fvector vMovePosition, CNavigation* pNavigation);
+	void	MovePositionToMatrix(_fmatrix PositionMatrix, CNavigation* pNavigation);
+	void	Sliding(_fvector vDir, _fvector vNormal, CNavigation* pNavigation);
+
+	void	Scale(_float3 vScale);
+	void	Scaling(_float3 vScale);
+	void	Go_Straight(_float fTimeDelta);
+	void	Go_Backward(_float fTimeDelta);
+	void	Go_Left(_float fTimeDelta);
+	void	Go_Right(_float fTimeDelta);
+	void	Rotation(_fvector vAxis, _float fRadian);
+	void	RotateQuaternion(_fvector Quaternion);
+	void	Turn(_fvector vAxis, _float fTimeDelta);
+	void	LookAt(_fvector vAt);
+	void	Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);
+
 
 private:
 	_float4x4			m_WorldMatrix = {};

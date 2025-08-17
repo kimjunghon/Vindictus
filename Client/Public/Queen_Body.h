@@ -3,8 +3,6 @@
 
 NS_BEGIN(Client)
 
-class CAnimMachine;
-
 class CQueen_Body final : public CBody
 {
 private:
@@ -21,7 +19,6 @@ public:
 	virtual HRESULT		Render() override;
 
 private:
-	CAnimMachine*	m_pAnimMachine = { nullptr };
 	_float4x4		m_CombinedMatrix = { };
 
 

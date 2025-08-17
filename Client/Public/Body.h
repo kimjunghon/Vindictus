@@ -9,6 +9,8 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CAnimMachine;
+
 class CBody abstract : public CPawnObject
 {
 public:
@@ -38,10 +40,13 @@ public:
 	virtual void		Late_Update(_float fTimeDelta) override;
 	virtual HRESULT		Render() override;
 
+	HRESULT				Forcing_Play_Animation();
+
 protected:
-	CModel*		m_pModelCom = { nullptr };
-	CShader*	m_pShaderCom = { nullptr };
-	_uint*		m_pStateFlag = {};
+	CAnimMachine*	m_pAnimMachine = { nullptr };
+	CModel*			m_pModelCom = { nullptr };
+	CShader*		m_pShaderCom = { nullptr };
+	_uint*			m_pStateFlag = {};
 
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;

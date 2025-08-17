@@ -4,8 +4,6 @@
 
 NS_BEGIN(Client)
 
-class CAnimMachine;
-
 class CPlayerBody final : public CBody
 {
 private:
@@ -23,9 +21,6 @@ public:
 
 	void				EquipHead() { m_IsEquipHead = true; }
 	void				UnEquipHead() { m_IsEquipHead = false; }
-
-private:
-	CAnimMachine*		m_pAnimMachine = { nullptr };
 
 	_bool				m_IsEquipHead = {};
 

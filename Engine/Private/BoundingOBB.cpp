@@ -25,6 +25,7 @@ HRESULT CBoundingOBB::Initialize(const BOUNDING_DESC* pDesc)
 void CBoundingOBB::Update(_fmatrix WorldMatrix)
 {
 	m_pOriginalDesc->Transform(*m_pDesc, WorldMatrix);
+	
 }
 
 _bool CBoundingOBB::Intersect(COLLIDER eType, CBounding* pTarget)

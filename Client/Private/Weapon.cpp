@@ -33,7 +33,7 @@ HRESULT CWeapon::Initialize(void* pArg)
 	if (FAILED(Ready_Components(pDesc->iWeaponModelPrototypeLevelIndex, pDesc->strWeaponModelPrototypeTag)))
 		return E_FAIL;
 
-	m_pTransformCom->RotateQuaternion(XMLoadFloat4(&pDesc->vRotationQuaternion));
+	m_pTransformCom->RotateQuaternion(pDesc->vRotationQuaternion);
 
 	XMStoreFloat4x4(&m_CombinedMatrix, XMMatrixIdentity());
 
@@ -91,9 +91,8 @@ HRESULT CWeapon::Render()
 
 HRESULT CWeapon::RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 {
-	if (FAILED(Bind_ShaderResources_RenderSlot(SlotRenderDesc.ViewMatrix, SlotRenderDesc.ViewMatrix)))
+	if (FAILED(Bind_ShaderResources_RenderSlot(SlotRenderDesc)))
 		return E_FAIL;
-
 
 	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
@@ -108,7 +107,6 @@ HRESULT CWeapon::RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 
 		m_pShaderCom->Bind_SPV("g_DiffuseTexture", nullptr);
 	}
-
 
 	return S_OK;
 }
@@ -178,19 +176,17 @@ HRESULT CWeapon::Bind_ShaderResources()
 	return S_OK;
 }
 
-HRESULT CWeapon::Bind_ShaderResources_RenderSlot(_float4x4 ViewMatrix, _float4x4 ProjMatirx)
+HRESULT CWeapon::Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 {
-	_float4x4 WorldMatrix = {};
-	XMStoreFloat4x4(&WorldMatrix, XMMatrixIdentity());
-
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &SlotRenderDesc.WorldMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &SlotRenderDesc.ViewMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatirx)))
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &SlotRenderDesc.ProjMatrix)))
 		return E_FAIL;
+
 
 	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(TEXT("DIRECTONAL"));
 	if (nullptr == pLightDesc)
@@ -212,14 +208,30 @@ HRESULT CWeapon::Bind_ShaderResources_RenderSlot(_float4x4 ViewMatrix, _float4x4
 
 CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 {
-	return nullptr;
+	CWeapon* pInstance = new CWeapon(pDevice, pDeviceContext);
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX(TEXT("Failed Created CWeapon"));
+		Safe_Release(pInstance);
+	}
+	return pInstance;
 }
 
 CGameObject* CWeapon::Clone(void* pArg)
 {
-	return nullptr;
+	CWeapon* pInstance = new CWeapon(*this);
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX(TEXT("Failed Cloned CWeapon"));
+		Safe_Release(pInstance);
+	}
+	return pInstance;
 }
 
 void CWeapon::Free()
 {
+	__super::Free();
+
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
 }

@@ -26,6 +26,7 @@ private:
 	HRESULT Ready_GameObjectToJson();
 	HRESULT Ready_Player(const Value& Player);
 
+	HRESULT Ready_DefaultWeapon();
 	HRESULT Ready_DefaultArmor();
 	HRESULT Ready_Map(const _wstring& strLayerTag);
 

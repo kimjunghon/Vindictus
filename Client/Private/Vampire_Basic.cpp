@@ -105,7 +105,7 @@ void CVampire_Basic::Compute_AnimPosition()
 
     _matrix PositionMatrix = XMMatrixTranslationFromVector(vAnimPosition);
 
-    m_pTransformCom->Set_WorldMatrix((PositionMatrix)*WorldMatrix);
+    m_pTransformCom->MovePositionToMatrix(PositionMatrix, m_pNavigationCom);
 }
 
 CVampire_Basic* CVampire_Basic::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
