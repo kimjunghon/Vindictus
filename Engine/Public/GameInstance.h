@@ -144,6 +144,11 @@ public:
 	class CNavigation*	Clone_CurrentNavigation(_int iCellIndex);
 #pragma endregion
 
+#pragma region COLLIDER
+	HRESULT				Add_BoundingCollider(CGameObject* pOwner, CCollider* pBounding_Collider);
+	HRESULT				Add_ActionCollider(CGameObject* pOwner, CCollider* pAction_Collider);
+#pragma endregion
+
 #pragma region MOUSE_POINT
 	void				Set_MousePoint(POINT ptMouse) { m_ptMousePoint = ptMouse; }
 	POINT				Get_MousePoint() { return m_ptMousePoint; }
@@ -162,11 +167,11 @@ private:
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
 
 	class COctree*				m_pOctree = { nullptr };
-	class CDynamicAABBTree*		m_pDynamicAABBTree = { nullptr };
 	CEventBus*					m_pEventBus = { nullptr };
 	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
 	class CController_Manager*	m_pController_Manager = { nullptr };
 	class CNavigation_Manager*	m_pNavigation_Manager = { nullptr };
+	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
 
 	POINT						m_ptMousePoint = {};
 public:

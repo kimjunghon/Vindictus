@@ -11,7 +11,6 @@
 #include "GameObject_Manager.h"
 #include "GameObject.h"
 #include "Renderer.h"
-#include "DynamicAABBTree.h"
 #include "Octree.h"
 #include "EventBus.h"
 #include "Light_Manager.h"
@@ -19,6 +18,7 @@
 #include "Camera_Manager.h"
 #include "Controller_Manager.h"
 #include "Navigation_Manager.h"
+#include "Collider_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -91,6 +91,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pNavigation_Manager)
         return E_FAIL;
 
+    m_pCollider_Manager = CCollider_Manager::Create();
+    if (nullptr == m_pCollider_Manager)
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -108,6 +112,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
     m_pObject_Manager->Update(fTimeDelta);
     m_pObject_Manager->Late_Update(fTimeDelta);
+
+    m_pCollider_Manager->Update();
 
     m_pLevel_Manager->Update(fTimeDelta);
 }
@@ -293,13 +299,6 @@ HRESULT CGameInstance::Add_Objects(CCollisionObject* pGameObject, const Bounding
 }
 #pragma endregion
 
-#pragma region DYNAMICAABB_TREE
-HRESULT CGameInstance::Add_Node(CGameObject* pGameObject, const BoundingBox& ObjectBoundingBox)
-{
-    return m_pDynamicAABBTree->Add_Node(pGameObject, ObjectBoundingBox);
-}
-#pragma endregion 
-
 #pragma region RENDERER
 HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRenderObject)
 {
@@ -417,6 +416,18 @@ CNavigation* CGameInstance::Clone_CurrentNavigation(_int iCellIndex)
 {
     return m_pNavigation_Manager->Clone_CurrentNavigation(iCellIndex);
 }
+
+#pragma endregion
+
+#pragma region COLLIDER
+HRESULT CGameInstance::Add_BoundingCollider(CGameObject* pOwner, CCollider* pBounding_Collider)
+{
+    return m_pCollider_Manager->Add_BoundingCollider(pOwner, pBounding_Collider);
+}
+HRESULT CGameInstance::Add_ActionCollider(CGameObject* pOwner, CCollider* pAction_Collider)
+{
+    return m_pCollider_Manager->Add_ActionCollider(pOwner, pAction_Collider);
+}
 #pragma endregion
 
 void CGameInstance::Release_Engine()
@@ -437,6 +448,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pCamera_Manager);
     Safe_Release(m_pController_Manager);
     Safe_Release(m_pNavigation_Manager);
+    Safe_Release(m_pCollider_Manager);
 }
 
 void CGameInstance::Free()

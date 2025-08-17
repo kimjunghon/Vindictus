@@ -18,9 +18,14 @@
 #include "DirectXTK/SpriteBatch.h"
 #include "DirectXTK/SpriteFont.h"
 
+#include "DirectXTK/PrimitiveBatch.h"
+#include "DirectXTK/VertexTypes.h"
+#include "DirectXTK/Effects.h"
+
 #include "Assimp/scene.h"
 #include "Assimp/postprocess.h"
 #include "Assimp/Importer.hpp"
+
 #include <RapidJson/document.h>
 #include <RapidJson/filereadstream.h>
 #include <RapidJson/writer.h>
