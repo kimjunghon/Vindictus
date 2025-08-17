@@ -85,7 +85,7 @@ HRESULT CVampire_Royal::Ready_PawnObject()
 	BodyObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	BodyObjectDesc.pStateFlag = &m_iStateFlag;
 
-	if (FAILED(__super::Add_PawnObject(TEXT("Vampire_Royal_Body"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Vampire_Royal_Body"), &BodyObjectDesc)))
+	if (FAILED(__super::Add_PawnObject(TEXT("Vampire_Royal_Body"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Vampire_Royal_Body"), &BodyObjectDesc)))
 		return E_FAIL;
 
 	m_pBody = static_cast<CBody*>(Find_PawnObject(TEXT("Vampire_Royal_Body")));

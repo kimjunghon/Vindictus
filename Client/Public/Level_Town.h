@@ -5,6 +5,8 @@
 
 NS_BEGIN(Client)
 
+class CPlayerInstance;
+
 class CLevel_Town final : public CLevel
 {
 private:
@@ -17,11 +19,15 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	HRESULT Ready_Light();
-	HRESULT Ready_SpawnData();
+	CPlayerInstance* m_pPlayerInstance = { nullptr };
 
-	HRESULT Ready_Player(const _wstring& strLayerTag);
-	HRESULT Ready_GameObject(const _wstring& strLayerTag);
+private:
+	HRESULT Ready_Light();
+	HRESULT Ready_GameObjectToJson();
+	HRESULT Ready_Player(const Value& Player);
+
+	HRESULT Ready_DefaultArmor();
+	HRESULT Ready_Map(const _wstring& strLayerTag);
 
 public:
 	static CLevel_Town*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

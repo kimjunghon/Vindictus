@@ -114,6 +114,8 @@ void CStorage_Manager::Free()
 {
 	__super::Free();
 
+	Safe_Release(m_pGameInstance);
+
 	for (auto& pItem : m_Inventory)
 	{
 		if (pItem)

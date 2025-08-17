@@ -196,21 +196,6 @@
     <Filter Include="03.GameObject\Pawns\Player\PlayerBody">
       <UniqueIdentifier>{5325e74b-3782-48d9-a55e-3ddd265ebfdc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Maps">
-      <UniqueIdentifier>{2ca07e59-9edc-42f6-af4c-ed7ef0be0179}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps\Town">
-      <UniqueIdentifier>{55f6936f-6f3c-4f40-bcfa-00ea2662f107}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps\MapObject">
-      <UniqueIdentifier>{639bf950-2ac8-4e65-bfca-1855b29a1905}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps\Queen">
-      <UniqueIdentifier>{684360aa-4bb9-4215-a437-f1b4c0a1b090}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps\Glasgavelen">
-      <UniqueIdentifier>{33099991-7e63-40bb-b4fa-f387464048dd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.GameObject\Camera">
       <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
     </Filter>
@@ -285,6 +270,12 @@
     </Filter>
     <Filter Include="01.Instance\Monster\Spawn_Manager">
       <UniqueIdentifier>{238be20a-b21b-489b-b8e1-6febf3104d12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Map">
+      <UniqueIdentifier>{2ca07e59-9edc-42f6-af4c-ed7ef0be0179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Map\MapObject">
+      <UniqueIdentifier>{639bf950-2ac8-4e65-bfca-1855b29a1905}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -367,7 +358,7 @@
       <Filter>03.GameObject\UIObject\Static\Bar</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MapObject.h">
-      <Filter>03.GameObject\Maps\MapObject</Filter>
+      <Filter>03.GameObject\Map\MapObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerState.h">
       <Filter>03.GameObject\Pawns\Player\PlayerState</Filter>
@@ -489,11 +480,8 @@
     <ClInclude Include="..\public\QueenAnimMachine.h">
       <Filter>03.GameObject\Pawns\AnimMachine\QueenAnimMachine</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Town.h">
-      <Filter>03.GameObject\Maps\Town</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Map.h">
-      <Filter>03.GameObject\Maps</Filter>
+      <Filter>03.GameObject\Map</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Town.h">
       <Filter>02.Levels\GamePlay\Level_Town</Filter>
@@ -634,7 +622,7 @@
       <Filter>03.GameObject\UIObject\Static\Bar</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MapObject.cpp">
-      <Filter>03.GameObject\Maps\MapObject</Filter>
+      <Filter>03.GameObject\Map\MapObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerState.cpp">
       <Filter>03.GameObject\Pawns\Player\PlayerState</Filter>
@@ -753,11 +741,8 @@
     <ClCompile Include="..\private\QueenAnimMachine.cpp">
       <Filter>03.GameObject\Pawns\AnimMachine\QueenAnimMachine</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Town.cpp">
-      <Filter>03.GameObject\Maps\Town</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Map.cpp">
-      <Filter>03.GameObject\Maps</Filter>
+      <Filter>03.GameObject\Map</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Town.cpp">
       <Filter>02.Levels\GamePlay\Level_Town</Filter>

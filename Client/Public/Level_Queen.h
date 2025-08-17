@@ -5,6 +5,8 @@
 
 NS_BEGIN(Client)
 
+class CMonsterInstance;
+
 class CLevel_Queen final : public CLevel
 {
 private:
@@ -17,9 +19,15 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	CMonsterInstance* m_pMonsterInstance = { nullptr };
+
+private:
 	HRESULT Ready_Light();
-	HRESULT Ready_Player(const _wstring& strLayerTag);
-	HRESULT Ready_GameObject(const _wstring& strLayerTag);
+	HRESULT Ready_GameObjectToJson();
+	HRESULT Ready_Player(const Value& Player);
+	HRESULT Ready_PoolingMonster();
+
+	HRESULT Ready_Map(const _wstring& strLayerTag);
 
 public:
 	static CLevel_Queen*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

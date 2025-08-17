@@ -252,8 +252,8 @@ HRESULT CPlayerPawn::Init_Level(_int iCellIndex, _float3 vStartPostion)
 	if (nullptr == m_pNavigation)
 		return E_FAIL;
 
-	_vector vPosition = XMLoadFloat3(&vStartPostion);
-
+	_vector vPosition = XMVectorSetW(XMLoadFloat3(&vStartPostion), 1.f);
+	
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 
 	return S_OK;
@@ -267,7 +267,7 @@ HRESULT CPlayerPawn::Ready_Camera()
 	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraDesc.fFov = XMConvertToRadians(60.0f);
 	CameraDesc.fNear = 0.1f;
-	CameraDesc.fFar = 1000.f;
+	CameraDesc.fFar = 2000.f;
 	CameraDesc.fSpeedPerSec = 0.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 

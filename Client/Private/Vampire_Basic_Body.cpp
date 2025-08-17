@@ -36,6 +36,7 @@ void CVampire_Basic_Body::Priority_Update(_float fTimeDelta)
 
 void CVampire_Basic_Body::Update(_float fTimeDelta)
 {
+
 	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
 
 	m_pModelCom->Play_Animation(fTimeDelta);
@@ -73,7 +74,7 @@ HRESULT CVampire_Basic_Body::Render()
 
 HRESULT CVampire_Basic_Body::Ready_Components()
 {
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Basic_Body"),
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Vampire_Basic_Body"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 

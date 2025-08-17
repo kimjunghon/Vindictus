@@ -44,10 +44,18 @@
 #include "Armor.h"
 #include "Weapon.h"
 
+//Map
+#include "Map.h"
+#include "MapObject.h"
+
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
+	, m_pPlayerInstance { CPlayerInstance::GetInstance()}
+	, m_pMonsterInstance { CMonsterInstance::GetInstance()}
 {
 	Safe_AddRef(m_pGameInstance);
+	Safe_AddRef(m_pPlayerInstance);
+	Safe_AddRef(m_pMonsterInstance);
 }
 
 HRESULT CMainApp::Initialize()
@@ -63,7 +71,15 @@ HRESULT CMainApp::Initialize()
 	
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pDeviceContext)))
 		return E_FAIL;
-	
+
+	m_pStateFactory = CStateFactory::GetInstance();
+
+	if (FAILED(m_pPlayerInstance->Initialize(g_iInventoryCount)))
+		return E_FAIL;
+
+	if (FAILED(m_pMonsterInstance->Initialize()))
+		return E_FAIL;
+
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
 	
@@ -79,65 +95,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Start_Level(LEVEL::TOWN)))
 		return E_FAIL;
 	
-	m_pStateFactory = CStateFactory::GetInstance();
-	m_pPlayerInstance = CPlayerInstance::GetInstance();
-	if (FAILED(m_pPlayerInstance->Initialize(g_iInventoryCount)))
-		return E_FAIL;
 
-	Safe_AddRef(m_pPlayerInstance);
-
-	m_pMonsterInstance = CMonsterInstance::GetInstance();
-	if (FAILED(m_pMonsterInstance->Initialize()))
-		return E_FAIL;
-
-	Safe_AddRef(m_pMonsterInstance);
-
-	//TEST
-
-	CArmor::ARMOR_DESC ArmorDesc= {};
-	ArmorDesc.iArmorModelPrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Upper");
-	ArmorDesc.eArmorType = ARMOR_TYPE::UPPER;
-	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = {TEXT("LightMale_Upper"), 10.f, 5.f, 30.f};
-
-	CGameObject* pTest = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest);
-
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Lower");
-	ArmorDesc.eArmorType = ARMOR_TYPE::LOWER;
-	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Lower"), 10.f, 5.f, 30.f };
-	
-	CGameObject* pTest2 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest2);
-
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Head");
-	ArmorDesc.eArmorType = ARMOR_TYPE::HEAD;
-	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Head"), 10.f, 5.f, 30.f };
-
-	CGameObject* pTest3 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest3);
-
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Hand");
-	ArmorDesc.eArmorType = ARMOR_TYPE::HAND;
-	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Hand"), 10.f, 5.f, 30.f };
-
-	CGameObject* pTest4 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest4);
-
-	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Foot");
-	ArmorDesc.eArmorType = ARMOR_TYPE::FOOT;
-	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Foot"), 10.f, 5.f, 30.f };
-
-	CGameObject* pTest5 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest5);
-
-	CGameObject* pTest6 = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
-	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pTest6);
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
@@ -152,7 +110,7 @@ void CMainApp::Post_Update()
 		if (FAILED(m_pGameInstance->Clear_Resources()))
 			MSG_BOX(TEXT("Failed Clear Resrouces"));
 
-		m_pMonsterInstance->Clear_MonsterDatas();
+		m_pMonsterInstance->ClearLevel();
 
 		EVENT_UI_LEVEL_CHANGE Event_UIChange;
 		Event_UIChange.iChange_Level = m_iChange_Level;
@@ -289,6 +247,16 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	/* Prototype_GameObject_Camera_Target */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Target"),
 		CCamera_Target::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_MapObject */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Map"),
+		CMap::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_MapObject */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_MapObject"),
+		CMapObject::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_ForStatic_UI()))
@@ -628,13 +596,13 @@ HRESULT CMainApp::Ready_Navigations()
 	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::TOWN), TEXT("../Bin/Resources/Map/Town_Navigation.dat"))))
 		return E_FAIL;
 	//
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::FILED), TEXT("../Bin/Resources/Navigation/Field_Navigation.dat"))))
+	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::FILED), TEXT("../Bin/Resources/Map/Field_Navigation.dat"))))
 	//	return E_FAIL;
 	//
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::QUEEN), TEXT("../Bin/Resources/Navigation/Queen_Navigation.dat"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::QUEEN), TEXT("../Bin/Resources/Map/QueenMap_Navigation.dat"))))
+		return E_FAIL;
 	//
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("../Bin/Resources/Navigation/Glasgavelen_Navigation.dat"))))
+	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("../Bin/Resources/Map/Glasgavelen_Navigation.dat"))))
 	//	return E_FAIL;
 
 	return S_OK;

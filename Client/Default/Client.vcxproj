@@ -227,7 +227,6 @@
     <ClInclude Include="..\public\State_Smash4.h" />
     <ClInclude Include="..\public\Storage.h" />
     <ClInclude Include="..\public\Storage_Manager.h" />
-    <ClInclude Include="..\public\Town.h" />
     <ClInclude Include="..\public\UI_Container.h" />
     <ClInclude Include="..\public\Vampire.h" />
     <ClInclude Include="..\public\VampireAI.h" />
@@ -319,7 +318,6 @@
     <ClCompile Include="..\private\State_Smash4.cpp" />
     <ClCompile Include="..\private\Storage.cpp" />
     <ClCompile Include="..\private\Storage_Manager.cpp" />
-    <ClCompile Include="..\private\Town.cpp" />
     <ClCompile Include="..\private\UI_Container.cpp" />
     <ClCompile Include="..\private\Vampire.cpp" />
     <ClCompile Include="..\private\VampireAI.cpp" />

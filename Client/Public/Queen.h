@@ -27,6 +27,7 @@ public:
 	virtual HRESULT	Spawn(MONSTER_SPAWN_DATA SpawnData) override;
 
 public:
+	virtual BT_STATE		IsSpawn() override;
 	virtual BT_STATE		Attack() override;
 	virtual BT_STATE		Chase() override;
 	virtual BT_STATE		Patrol() override;

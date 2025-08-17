@@ -29,9 +29,9 @@ HRESULT CSpawn_Manager::Ready_SpawnDatas(const Value& RoomDatas)
 
 			for (auto& Wave : Waves.GetArray())
 			{
-				if(Wave.HasMember("SpawnData") && Wave["SpawnData"].IsArray())
+				if(Wave.HasMember("Monsters") && Wave["Monsters"].IsArray())
 				{
-					const Value& SpawnDatas = Wave["SpawnData"];
+					const Value& SpawnDatas = Wave["Monsters"];
 
 					vector<MONSTER_SPAWN_DATA> MonsterSpawnDatas;
 

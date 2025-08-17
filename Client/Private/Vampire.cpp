@@ -2,6 +2,7 @@
 #include "Vampire.h"
 #include "VampireAI.h"
 #include "Navigation.h"
+#include "Body.h"
 
 CVampire::CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -54,12 +55,20 @@ HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
 
 	m_pNavigationCom = m_pGameInstance->Clone_CurrentNavigation(SpawnData.iCellIndex);
-	
-	_vector vPosition = XMLoadFloat3(&SpawnData.vPosition);
 
+	_vector vPosition = XMVectorSetW(XMLoadFloat3(&SpawnData.vPosition), 1.f);
+	
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 
 	return S_OK;
+}
+
+BT_STATE CVampire::IsSpawn()
+{
+	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::SPAWN) && false == m_pBody->AnimIsFinished())
+		return BT_STATE::SUCCESS;
+
+	return BT_STATE::FAILED;
 }
 
 BT_STATE CVampire::Attack()

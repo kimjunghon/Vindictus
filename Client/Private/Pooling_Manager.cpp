@@ -105,7 +105,7 @@ HRESULT CPooling_Manager::Add_MonsterToPool(MONSTER_TYPE eMonsterType, void* pAr
 	return S_OK;
 }
 
-CMonster* CPooling_Manager::Clone_Monster(MONSTER_TYPE eMonsterType, void* pArg = nullptr)
+CMonster* CPooling_Manager::Clone_Monster(MONSTER_TYPE eMonsterType, void* pArg)
 {
 	CMonster* pMonster = { nullptr };
 

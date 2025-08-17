@@ -100,6 +100,11 @@ HRESULT CQueen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	return S_OK;
 }
 
+BT_STATE CQueen::IsSpawn()
+{
+	return BT_STATE();
+}
+
 BT_STATE CQueen::Attack()
 {
 	_uint iAttackFlag = ENUM_CLASS(ATTACK_FLAG::DOUBLE) << m_iCurrentAttack;
@@ -216,7 +221,7 @@ HRESULT CQueen::Ready_PawnObjects()
 	BodyObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	BodyObjectDesc.pStateFlag = &m_iStateFlag;
 
-	if (FAILED(__super::Add_PawnObject(TEXT("Queen_Body"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Queen_Body"), &BodyObjectDesc)))
+	if (FAILED(__super::Add_PawnObject(TEXT("Queen_Body"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Queen_Body"), &BodyObjectDesc)))
 		return E_FAIL;
 
 	m_pBody = static_cast<CBody*>(Find_PawnObject(TEXT("Queen_Body")));

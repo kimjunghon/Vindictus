@@ -32,6 +32,7 @@ public:
 
 	//State
 public:
+	virtual BT_STATE		IsSpawn() PURE;
 	virtual BT_STATE		CanAttack();
 	virtual BT_STATE		CanOtherAction();
 	virtual BT_STATE		CanAttackRange();
