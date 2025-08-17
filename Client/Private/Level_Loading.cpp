@@ -12,7 +12,7 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;
 
-	m_pGameInstance->Subscribe<EVENT_LOADING_COMPLETE>(ENUM_CLASS(EVENTTYPE::NONSTATIC), [this](const EVENT_LOADING_COMPLETE& Event) {
+	m_pGameInstance->Subscribe<EVENT_LOADING_COMPLETE>(ENUM_CLASS(EVENT_TYPE::NONSTATIC), [this](const EVENT_LOADING_COMPLETE& Event) {
 		this->Event_LoadingComplete(Event); });
 
 	if (FAILED(Ready_GameObjects()))
@@ -56,7 +56,7 @@ void CLevel_Loading::Event_LoadingComplete(const EVENT_LOADING_COMPLETE& Event)
 	Event_LevelChange.iChange_Level = ENUM_CLASS(m_eNextLevelID);
 	Event_LevelChange.bIsLoading = true;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event_LevelChange);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event_LevelChange);
 }
 
 CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, LEVEL eNextLevelID)

@@ -25,8 +25,8 @@ HRESULT CEquipment_Manager::EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipW
 
 	EVENT_CHANGE_WEAPON Event = {};
 	Event.iWeaponTypeIndex = iWeaponTypeIndex;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::NONSTATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
 
 	return S_OK;
 }
@@ -45,8 +45,8 @@ HRESULT CEquipment_Manager::EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmo
 
 	EVENT_CHANGE_ARMOR Event = {};
 	Event.iArmorTypeIndex = iArmorTypeIndex;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::NONSTATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
 
 	return S_OK;
 }
@@ -65,8 +65,8 @@ HRESULT CEquipment_Manager::UnEquipWeapon(_uint iWeaponTypeIndex, _int iItemInve
 
 	EVENT_CHANGE_WEAPON Event = {};
 	Event.iWeaponTypeIndex = iWeaponTypeIndex;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::NONSTATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
 
 	return S_OK;
 }
@@ -84,8 +84,8 @@ HRESULT CEquipment_Manager::UnEquipArmor(_uint iArmorTypeIndex, _int iItemInvent
 
 	EVENT_CHANGE_ARMOR Event = {};
 	Event.iArmorTypeIndex = iArmorTypeIndex;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::NONSTATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
 
 	return S_OK;
 }

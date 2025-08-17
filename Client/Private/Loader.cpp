@@ -95,13 +95,13 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	Event.eType = PROGRESS_TYPE::LOADING;
 	Event.fRatio = m_fLoadingRatio;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region TEXTURE
 	
@@ -113,7 +113,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region MODEL
 #pragma endregion
@@ -123,7 +123,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region SHADER
 #pragma endregion
@@ -134,7 +134,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region GAMEOBJECT
 
@@ -143,7 +143,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 
 	Event.fRatio = 1.f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	m_isFinished = true;
 
@@ -156,13 +156,13 @@ HRESULT CLoader::Loading_For_Town_Level()
 	Event.eType = PROGRESS_TYPE::LOADING;
 	Event.fRatio = m_fLoadingRatio;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region TEXTURE
 
@@ -179,7 +179,7 @@ HRESULT CLoader::Loading_For_Town_Level()
 		return E_FAIL;
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma endregion
 
@@ -188,7 +188,7 @@ HRESULT CLoader::Loading_For_Town_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region SHADER
 #pragma endregion
@@ -202,7 +202,7 @@ HRESULT CLoader::Loading_For_Town_Level()
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region GAMEOBJECT
 
@@ -212,7 +212,7 @@ HRESULT CLoader::Loading_For_Town_Level()
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 	Event.fRatio = 1.f;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	m_isFinished = true;
 
@@ -225,13 +225,13 @@ HRESULT CLoader::Loading_For_Queen_Level()
 	Event.eType = PROGRESS_TYPE::LOADING;
 	Event.fRatio = m_fLoadingRatio;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region TEXTURE
 
@@ -250,29 +250,29 @@ HRESULT CLoader::Loading_For_Queen_Level()
 
 	/* Prototype_Component_Model_Vampire_Basic_Body */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Vampire_Basic_Body"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_Vampire_Elder_Body */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Vampire_Elder_Body"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Elder.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Elder.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_Vampire_Royal_Body */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Vampire_Royal_Body"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Royal.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Royal.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_Vampire_Queen_Body */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Queen_Body"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Queen.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Queen.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	if (FAILED(Loading_For_MapModel(LEVEL::TOWN, "../Bin/Resources/Map/QueenMap.dat")))
 		return E_FAIL;
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma endregion
 
@@ -281,7 +281,7 @@ HRESULT CLoader::Loading_For_Queen_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region SHADER
 #pragma endregion
@@ -335,7 +335,7 @@ HRESULT CLoader::Loading_For_Queen_Level()
 		return E_FAIL;
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region GAMEOBJECT
 
@@ -345,7 +345,7 @@ HRESULT CLoader::Loading_For_Queen_Level()
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 	Event.fRatio = 1.f;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	m_isFinished = true;
 
@@ -393,7 +393,7 @@ HRESULT CLoader::Loading_For_MapModel(LEVEL eLevel, const _char* pMapFilePath)
 		strcat_s(szFullFilePath, ".dat");
 
 		_matrix PreTransformationMatrix = XMMatrixIdentity();
-		CModel* pModel = CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, szFullFilePath, PreTransformationMatrix);
+		CModel* pModel = CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, szFullFilePath, PreTransformationMatrix);
 		if (pModel == nullptr)
 			return E_FAIL;
 
@@ -418,13 +418,13 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	Event.eType = PROGRESS_TYPE::LOADING;
 	Event.fRatio = m_fLoadingRatio;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 	
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region TEXTURE
 	
@@ -437,7 +437,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 	
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region MODEL
 
@@ -448,42 +448,42 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 	///* Prototype_Component_Model_BastardSword */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BastardSword"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/Sword_Bastard.dat", PreTransformMatrix))))
+	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/Sword_Bastard.dat", PreTransformMatrix))))
 	//	return E_FAIL;
 
 	///* Prototype_Component_Model_RoundShield */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_RoundShield"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/RoundShield.dat", PreTransformMatrix))))
+	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/RoundShield.dat", PreTransformMatrix))))
 	//	return E_FAIL;
 
 	///* Prototype_Component_Model_Glasgavelen */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Glasgavelen"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen.dat", PreTransformMatrix))))
+	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen.dat", PreTransformMatrix))))
 	//	return E_FAIL;
 
 	///* Prototype_Component_Model_RoundShield */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_GavelneSword"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen_Sword.dat", PreTransformMatrix))))
+	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen_Sword.dat", PreTransformMatrix))))
 	//	return E_FAIL;
 
 	///* Prototype_Component_Model_Vampire_Basic_Body */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Basic_Body"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire.dat", PreTransformMatrix))))
+	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire.dat", PreTransformMatrix))))
 	//	return E_FAIL;
 
 	///* Prototype_Component_Model_Vampire_Elder_Body */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Elder_Body"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Elder.dat", PreTransformMatrix))))
+	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Elder.dat", PreTransformMatrix))))
 	//	return E_FAIL;
 
 	///* Prototype_Component_Model_Vampire_Royal_Body */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Royal_Body"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Royal.dat", PreTransformMatrix))))
+	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Royal.dat", PreTransformMatrix))))
 	//	return E_FAIL;
 
 	///* Prototype_Component_Model_Vampire_Queen_Body */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Queen_Body"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Monster/Queen.dat", PreTransformMatrix))))
+	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Queen.dat", PreTransformMatrix))))
 	//	return E_FAIL;
 
 
@@ -500,7 +500,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region SHADER
 #pragma endregion
@@ -510,7 +510,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
 
 	Event.fRatio += 0.2f;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region GAMEOBJECT
 
@@ -558,7 +558,7 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
 	Event.fRatio = 1.f;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	m_isFinished = true;
 
@@ -572,47 +572,47 @@ HRESULT CLoader::Loading_For_GamePlay_ArmorModel()
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Foot"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Foot.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Foot.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_LightMale_Foot_Broken */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Foot_Broken"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Foot_Broken.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Foot_Broken.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_LightMale_Hand */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Hand"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Hand.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Hand.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_LightMale_Hand_Broken */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Hand_Broken"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Hand_Broken.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Hand_Broken.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_LightMale_Head */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Head"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Head.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Head.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_LightMale_Lower */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Lower"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Lower.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Lower.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_LightMale_Lower_Broken */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Lower_Broken"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Lower_Broken.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Lower_Broken.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_LightMale_Upper */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Upper"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_LightMale_Upper_Broken */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Upper_Broken"),
-		CModel::Create(m_pDevice, m_pDeviceContext, MODELTYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper_Broken.dat", PreTransformMatrix))))
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper_Broken.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	return S_OK;

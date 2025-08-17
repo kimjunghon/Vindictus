@@ -37,7 +37,7 @@ void CLevel_Town::Update(_float fTimeDelta)
 		EVENT_LEVEL_CHANGE Event;
 		Event.iChange_Level = ENUM_CLASS(LEVEL::QUEEN);
 		Event.bIsLoading = false;
-		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 	}
 }
 
@@ -116,7 +116,7 @@ HRESULT CLevel_Town::Ready_Player(const Value& Player)
 	PlayerDesc.vPosition = vPosition;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_Player"), &PlayerDesc)))
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Player"), &PlayerDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -175,7 +175,7 @@ HRESULT CLevel_Town::Ready_Map(const _wstring& strLayerTag)
 	MapDesc.strMapFilePath = "../Bin/Resources/Map/Town.dat";
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Map"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &MapDesc)))
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), strLayerTag, &MapDesc)))
 		return E_FAIL;
 
 	return S_OK;

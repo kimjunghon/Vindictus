@@ -91,7 +91,7 @@ HRESULT COptionMain::Ready_Children()
 		EVENT_LEVEL_CHANGE Event;
 		Event.iChange_Level = ENUM_CLASS(LEVEL::LOGO);
 		Event.bIsLoading = false;
-		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))

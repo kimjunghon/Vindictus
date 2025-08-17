@@ -128,7 +128,7 @@ HRESULT CLevel_Queen::Ready_Player(const Value& Player)
 	PlayerDesc.vPosition = vPosition;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_Player"), &PlayerDesc)))
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Player"), &PlayerDesc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -171,7 +171,7 @@ HRESULT CLevel_Queen::Ready_Map(const _wstring& strLayerTag)
 	MapDesc.strMapFilePath = "../Bin/Resources/Map/QueenMap.dat";
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Map"),
-		ENUM_CLASS(LAYERTYPE::NONSTATIC), strLayerTag, &MapDesc)))
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), strLayerTag, &MapDesc)))
 		return E_FAIL;
 
 	return S_OK;

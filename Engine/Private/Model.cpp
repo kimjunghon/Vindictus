@@ -39,7 +39,7 @@ CModel::CModel(const CModel& Prototype)
 }
 
 
-HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
+HRESULT CModel::Initialize_Prototype(MODEL_TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
     XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
 
@@ -52,7 +52,7 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
 
         _uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
-        if (MODELTYPE::NONANIM == m_eModelType)
+        if (MODEL_TYPE::NONANIM == m_eModelType)
             iFlag |= aiProcess_PreTransformVertices;
 
         m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
@@ -86,7 +86,7 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
 
         File.read(reinterpret_cast<_char*>(&tModelInfo), sizeof(MODEL_INFO));
 
-        m_eModelType = static_cast<MODELTYPE>(tModelInfo.iModelType);
+        m_eModelType = static_cast<MODEL_TYPE>(tModelInfo.iModelType);
         m_iNumMeshes = tModelInfo.iNumMeshes;
         m_iNumMaterials = tModelInfo.iNumMaterials;
 
@@ -320,7 +320,7 @@ HRESULT CModel::MeshesToBinary(ofstream& File)
         File.write(reinterpret_cast<_char*>(&iMeshNameLength), sizeof(size_t));
         File.write(pAIMesh->mName.data, sizeof(_char) * iMeshNameLength);
 
-        if(m_eModelType == MODELTYPE::NONANIM)
+        if(m_eModelType == MODEL_TYPE::NONANIM)
         {
             VTXMESH* pVertices = new VTXMESH[pAIMesh->mNumVertices];
 
@@ -340,7 +340,7 @@ HRESULT CModel::MeshesToBinary(ofstream& File)
 
             Safe_Delete_Array(pVertices);
         }
-        else if(m_eModelType == MODELTYPE::ANIM)
+        else if(m_eModelType == MODEL_TYPE::ANIM)
         {   
             VTXANIMMESH* pVertices = new VTXANIMMESH[pAIMesh->mNumVertices];
             ZeroMemory(pVertices, sizeof(VTXANIMMESH) * pAIMesh->mNumVertices);
@@ -626,7 +626,7 @@ const _float4x4* CModel::Find_SocketBoneCombinedMatrix(const string& strSocketBo
 #ifdef _DEBUG
 _bool CModel::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist)
 {
-    if (m_eModelType != MODELTYPE::NONANIM)
+    if (m_eModelType != MODEL_TYPE::NONANIM)
         return false;
 
 
@@ -808,7 +808,7 @@ HRESULT CModel::Ready_Animation()
     return S_OK;
 }
 
-CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
+CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
     CModel* pInstance = new CModel(pDevice, pDeviceContext);
 

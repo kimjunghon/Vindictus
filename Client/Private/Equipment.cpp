@@ -62,13 +62,13 @@ HRESULT CEquipment::Initialize(void* pArg)
 	if (FAILED(Ready_Children()))
 		return E_FAIL;
 
-	m_pGameInstance->Subscribe<EVENT_PICK_EQUIP_ITEM>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_PICK_EQUIP_ITEM& Event) {
+	m_pGameInstance->Subscribe<EVENT_PICK_EQUIP_ITEM>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PICK_EQUIP_ITEM& Event) {
 		this->Event_Pick_Equip_Item(Event); });
 
-	m_pGameInstance->Subscribe<EVENT_CHANGE_WEAPON>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_CHANGE_WEAPON& Event) {
+	m_pGameInstance->Subscribe<EVENT_CHANGE_WEAPON>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_CHANGE_WEAPON& Event) {
 		this->Event_Change_Weapon(Event); });
 
-	m_pGameInstance->Subscribe<EVENT_CHANGE_ARMOR>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_CHANGE_ARMOR& Event) {
+	m_pGameInstance->Subscribe<EVENT_CHANGE_ARMOR>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_CHANGE_ARMOR& Event) {
 		this->Event_Change_Armor(Event); });
 
     return S_OK;
@@ -331,7 +331,7 @@ _bool CEquipment::IsPick(HWND hWnd)
 			EVENT_PICK_EQUIPMENT Event = {};
 			Event = m_PickEvents[m_iPickIndex];
 
-			m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+			m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 			return true;
 		}
@@ -356,7 +356,7 @@ _bool CEquipment::IsUnEquip(HWND hWnd)
 			EVENT_UNEQUIP_EQUIPMENT Event = {};
 			Event = m_UnEqupEvents[m_iPickIndex];
 
-			m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+			m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 			return true;
 		}

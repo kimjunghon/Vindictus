@@ -7,7 +7,7 @@ CEventBus::CEventBus()
 
 HRESULT CEventBus::Initialize()
 {
-    m_Subscribers = new SUBSCRIBERS[ENUM_CLASS(EVENTTYPE::END)];
+    m_Subscribers = new SUBSCRIBERS[ENUM_CLASS(EVENT_TYPE::END)];
 
     if (nullptr == m_Subscribers)
         return E_FAIL;
@@ -17,10 +17,10 @@ HRESULT CEventBus::Initialize()
 
 void CEventBus::Clear()
 {
-    for (auto& Pair : m_Subscribers[ENUM_CLASS(EVENTTYPE::NONSTATIC)])
+    for (auto& Pair : m_Subscribers[ENUM_CLASS(EVENT_TYPE::NONSTATIC)])
         Pair.second.clear();
 
-    m_Subscribers[ENUM_CLASS(EVENTTYPE::NONSTATIC)].clear();
+    m_Subscribers[ENUM_CLASS(EVENT_TYPE::NONSTATIC)].clear();
 }
 
 CEventBus* CEventBus::Create()
@@ -39,7 +39,7 @@ void CEventBus::Free()
 {
     __super::Free();
 
-    for (_uint i = 0; i < ENUM_CLASS(EVENTTYPE::END); i++)
+    for (_uint i = 0; i < ENUM_CLASS(EVENT_TYPE::END); i++)
     {
         for (auto& Pair : m_Subscribers[i])
         {

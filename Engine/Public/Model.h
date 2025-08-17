@@ -22,7 +22,7 @@ public:
 	void					Set_PreTransformMatrix(_fmatrix PreTransformMatrix) { XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix); }
 
 public:
-	virtual HRESULT			Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
+	virtual HRESULT			Initialize_Prototype(MODEL_TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 	virtual HRESULT			Initialize(void* pArg);
 	HRESULT					Render(_uint iMeshIndex);
 
@@ -61,7 +61,7 @@ public:
 private:
 	const aiScene*				m_pAIScene = { nullptr };
 	Assimp::Importer			m_Importer = {};
-	MODELTYPE					m_eModelType = {};
+	MODEL_TYPE					m_eModelType = {};
 	_float4x4					m_PreTransformMatrix = {};
 
 private:
@@ -123,7 +123,7 @@ private:
 #pragma endregion
 
 public:
-	static CModel*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
+	static CModel*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void		Free() override;
 };

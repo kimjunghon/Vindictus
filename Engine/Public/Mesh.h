@@ -17,8 +17,8 @@ public:
 	_uint			Get_MaterialIndex() { return m_iMaterialIndex; }
 
 public:
-	virtual HRESULT Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix);
-	virtual HRESULT Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding);
+	virtual HRESULT Initialize_Prototype_Assimp(MODEL_TYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix);
+	virtual HRESULT Initialize_Prototype_Binary(MODEL_TYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding);
 	virtual HRESULT Initialize(void* pArg) override;
 	
 	HRESULT			Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones);
@@ -49,8 +49,8 @@ private:
 	HRESULT Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone*>& Bones, MODEL_BOUNDING& ModelBounding);
 
 public:
-	static CMesh*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix);
-	static CMesh*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding);
+	static CMesh*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix);
+	static CMesh*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void		Free() override;
 };

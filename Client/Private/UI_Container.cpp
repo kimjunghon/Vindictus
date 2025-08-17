@@ -37,7 +37,7 @@ HRESULT CUI_Container::Initialize(void* pArg)
 	m_iArrayState = ENUM_CLASS(UI_LEVEL::LOADING);
 	m_iUIState = ENUM_CLASS(STATE_FLAG::LOADING) | ENUM_CLASS(LOADING_FLAG::LOGO);
 
-	m_pGameInstance->Subscribe<EVENT_UI_LEVEL_CHANGE>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_UI_LEVEL_CHANGE& Event) {
+	m_pGameInstance->Subscribe<EVENT_UI_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_UI_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
 	return S_OK;
@@ -121,7 +121,7 @@ HRESULT CUI_Container::Ready_Mouse_UI()
 	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
 	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), ENUM_CLASS(LAYERTYPE::STATIC), TEXT("Layer_Mouse"), &Mouse_Desc)))
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"), ENUM_CLASS(LAYER_TYPE::STATIC), TEXT("Layer_Mouse"), &Mouse_Desc)))
 		return E_FAIL;
 
 	return S_OK;

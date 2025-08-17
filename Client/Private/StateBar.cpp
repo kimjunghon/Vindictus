@@ -43,7 +43,7 @@ HRESULT CStateBar::Initialize(void* pArg)
 		return E_FAIL;
 
 
-	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
+	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
 		this->Event_ProgressBar(Event); });
 
 	return S_OK;

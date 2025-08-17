@@ -90,7 +90,7 @@ void CArmor::Late_Update(_float fTimeDelta)
 		if (m_eArmorType == ARMOR_TYPE::HEAD)
 		{
 			EVENT_BROKEN_HEAD Event;
-			m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+			m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 			return;
 		}
 	}

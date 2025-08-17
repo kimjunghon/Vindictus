@@ -45,10 +45,10 @@ HRESULT CStorage::Initialize(void* pArg)
 	if (FAILED(Ready_Children()))
 		return E_FAIL;
 
-	m_pGameInstance->Subscribe<EVENT_PICK_ITEM>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_PICK_ITEM& Event) {
+	m_pGameInstance->Subscribe<EVENT_PICK_ITEM>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PICK_ITEM& Event) {
 		this->Event_Pick_Item(Event); });
 
-	m_pGameInstance->Subscribe<EVENT_UPDATE_INVENTORY>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_UPDATE_INVENTORY& Event) {
+	m_pGameInstance->Subscribe<EVENT_UPDATE_INVENTORY>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_UPDATE_INVENTORY& Event) {
 		this->Event_Update_Inventory(Event); });
 
 	return S_OK;
@@ -161,7 +161,7 @@ _bool CStorage::IsPick(HWND hWnd)
 
 		EVENT_PICK_STORAGE Event = {};
 		Event.iInventoryIndex = m_iPickIndex;
-		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 		return true;
 	}
@@ -181,7 +181,7 @@ _bool CStorage::IsEquip(HWND hWnd)
 
 		EVENT_EQUIP_STORAGE Event = {};
 		Event.iInventoryIndex = m_iPickIndex;
-		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 		return true;
 	}

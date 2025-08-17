@@ -61,10 +61,10 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::DEFAULT);
 
 	
-	m_pGameInstance->Subscribe<EVENT_CHANGE_WEAPON>(ENUM_CLASS(EVENTTYPE::NONSTATIC), [this](const EVENT_CHANGE_WEAPON& Event) {
+	m_pGameInstance->Subscribe<EVENT_CHANGE_WEAPON>(ENUM_CLASS(EVENT_TYPE::NONSTATIC), [this](const EVENT_CHANGE_WEAPON& Event) {
 		this->Event_ChangeWeapon(Event); });
 	
-	m_pGameInstance->Subscribe<EVENT_CHANGE_ARMOR>(ENUM_CLASS(EVENTTYPE::NONSTATIC), [this](const EVENT_CHANGE_ARMOR& Event) {
+	m_pGameInstance->Subscribe<EVENT_CHANGE_ARMOR>(ENUM_CLASS(EVENT_TYPE::NONSTATIC), [this](const EVENT_CHANGE_ARMOR& Event) {
 		this->Event_ChangeArmor(Event); });
 
 	return S_OK;

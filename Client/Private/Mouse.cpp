@@ -36,19 +36,19 @@ HRESULT CMouse::Initialize(void* pArg)
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
-	m_pGameInstance->Subscribe<EVENT_NONE_PICK>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_NONE_PICK& Event) {
+	m_pGameInstance->Subscribe<EVENT_NONE_PICK>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_NONE_PICK& Event) {
 		this->Event_NonePick(Event); });
 
-	m_pGameInstance->Subscribe<EVENT_PICK_STORAGE>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_PICK_STORAGE& Event) {
+	m_pGameInstance->Subscribe<EVENT_PICK_STORAGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PICK_STORAGE& Event) {
 		this->Event_PickStorage(Event); });
 
-	m_pGameInstance->Subscribe<EVENT_EQUIP_STORAGE>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_EQUIP_STORAGE& Event) {
+	m_pGameInstance->Subscribe<EVENT_EQUIP_STORAGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_EQUIP_STORAGE& Event) {
 		this->Event_EquipStorage(Event); });
 
-	m_pGameInstance->Subscribe<EVENT_PICK_EQUIPMENT>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_PICK_EQUIPMENT& Event) {
+	m_pGameInstance->Subscribe<EVENT_PICK_EQUIPMENT>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PICK_EQUIPMENT& Event) {
 		this->Event_PickEquipment(Event); });
 
-	m_pGameInstance->Subscribe<EVENT_UNEQUIP_EQUIPMENT>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_UNEQUIP_EQUIPMENT& Event) {
+	m_pGameInstance->Subscribe<EVENT_UNEQUIP_EQUIPMENT>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_UNEQUIP_EQUIPMENT& Event) {
 		this->Event_UnEquipEquipment(Event); });
 
 
@@ -196,7 +196,7 @@ void CMouse::Publish_PickEquip(_bool IsPick)
 	PickEvent.eWeaponType = m_EquipItemInfo.eWeaponType;
 	PickEvent.eArmorType = m_EquipItemInfo.eArmorType;
 
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), PickEvent);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), PickEvent);
 }
 
 void CMouse::Publish_PickStorage(_bool IsPick)
@@ -205,7 +205,7 @@ void CMouse::Publish_PickStorage(_bool IsPick)
 
 	PickEvent.IsPick = IsPick;
 	PickEvent.iInventoryIndex = m_iItemIndex;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), PickEvent);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), PickEvent);
 }
 
 void CMouse::Event_NonePick(const EVENT_NONE_PICK& Event)

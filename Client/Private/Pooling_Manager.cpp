@@ -88,7 +88,7 @@ HRESULT CPooling_Manager::Request_SpawnMonster(MONSTER_SPAWN_DATA SpawnData)
 	m_Monster_Pool[eMonsterType].pop();
 	m_Active_Monsters.push_back(make_pair(eMonsterType, pMonster));
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LAYERTYPE::NONSTATIC), TEXT("Layer_Monster"), pMonster)))
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Monster"), pMonster)))
 		return E_FAIL;
 
 	return S_OK;

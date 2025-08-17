@@ -19,7 +19,7 @@ CMesh::CMesh(const CMesh& Prototype)
 {
 }
 
-HRESULT CMesh::Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Initialize_Prototype_Assimp(MODEL_TYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
 	strcpy_s(m_szName, pAIMesh->mName.data);
 
@@ -31,7 +31,7 @@ HRESULT CMesh::Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMes
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	
-	HRESULT hr = MODELTYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Assimp(pAIMesh, PreTransformMatrix) : Ready_Vertices_For_Anim_Assimp(pAIMesh, Bones);
+	HRESULT hr = MODEL_TYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Assimp(pAIMesh, PreTransformMatrix) : Ready_Vertices_For_Anim_Assimp(pAIMesh, Bones);
 
 	if (FAILED(hr))
 		return E_FAIL;
@@ -68,7 +68,7 @@ HRESULT CMesh::Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMes
 	return S_OK;
 }
 
-HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding)
+HRESULT CMesh::Initialize_Prototype_Binary(MODEL_TYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding)
 {
 	MESH_INFO tMeshInfo = {};
 	size_t iMeshNameLenghth = {};
@@ -85,7 +85,7 @@ HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, cons
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	HRESULT hr = MODELTYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Binary(File, PreTransformMatrix, ModelBounding) : Ready_Vertices_For_Anim_Binary(File, Bones, ModelBounding);
+	HRESULT hr = MODEL_TYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Binary(File, PreTransformMatrix, ModelBounding) : Ready_Vertices_For_Anim_Binary(File, Bones, ModelBounding);
 
 	if (FAILED(hr))
 		return E_FAIL;
@@ -110,7 +110,7 @@ HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, cons
 	}
 
 #ifdef _DEBUG
-	if(eType == MODELTYPE::NONANIM)
+	if(eType == MODEL_TYPE::NONANIM)
 	{
 		m_Indices.resize(m_iNumIndices);
 		memcpy(m_Indices.data(), pIndices, sizeof(_uint) * m_iNumIndices);
@@ -528,7 +528,7 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
 	CMesh* pInstance = new CMesh(pDevice, pDeviceContext);
 	if (FAILED(pInstance->Initialize_Prototype_Assimp(eType, pAIMesh, Bones, PreTransformMatrix)))
@@ -540,7 +540,7 @@ CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,
 }
 
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding)
 {
 	CMesh* pInstance = new CMesh(pDevice, pDeviceContext);
 	if (FAILED(pInstance->Initialize_Prototype_Binary(eType, File, Bones, PreTransformMatrix, ModelBounding)))

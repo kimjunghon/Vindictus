@@ -18,7 +18,7 @@ public:
 	template<typename EVENT>
 	void Subscribe(_uint iEventTypeIndex, function<void(const EVENT&)> Subscriber)
 	{
-		if (iEventTypeIndex >= ENUM_CLASS(EVENTTYPE::END))
+		if (iEventTypeIndex >= ENUM_CLASS(EVENT_TYPE::END))
 		{
 			MSG_BOX(TEXT("Failed Subscribe Event"));
 			return;

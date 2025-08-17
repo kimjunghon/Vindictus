@@ -53,7 +53,7 @@ void CInventory::Update(_float fTimeDelta)
 				else
 				{
 					EVENT_NONE_PICK Event = {};
-					m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+					m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 					m_fCurrentClickDelay = 0.f;
 				}

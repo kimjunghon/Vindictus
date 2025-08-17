@@ -38,7 +38,7 @@ HRESULT CLoadingBar::Initialize(void* pArg)
 	if (FAILED(Ready_Children()))
 		return E_FAIL;
 
-	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(EVENTTYPE::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
+	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
 		this->Event_ProgressBar(Event); });
 	return S_OK;
 }
@@ -120,7 +120,7 @@ void CLoadingBar::Update_BarRatio(_float fTimeDelta)
 	if (m_fBarRatio >= 1.f)
 	{
 		EVENT_LOADING_COMPLETE Event;
-		m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::NONSTATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
 		m_fBarRatio = 0.f;
 	}
 }

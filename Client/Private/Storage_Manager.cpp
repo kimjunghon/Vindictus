@@ -46,7 +46,7 @@ HRESULT CStorage_Manager::Add_Item(ITEM_TYPE eItemType, CGameObject* pItem, _int
 	_uint iIndices[1] = { iEmptySlotIndex };
 	Event.iNumIndices = 1;
 	Event.pIndices = iIndices;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	return S_OK;
 }
@@ -73,7 +73,7 @@ HRESULT CStorage_Manager::Swap_Item(_uint iMouseItemIndex, _uint iInventoryIndex
 	_uint iIndices[2] = { iMouseItemIndex, iInventoryIndex };
 	Event.iNumIndices = 2;
 	Event.pIndices = iIndices;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	return S_OK;
 }
@@ -94,7 +94,7 @@ HRESULT CStorage_Manager::Remove_Item(_uint iInventoryIndex)
 	_uint iIndices[1] = { iInventoryIndex };
 	Event.iNumIndices = 1;
 	Event.pIndices = iIndices;
-	m_pGameInstance->Publish(ENUM_CLASS(EVENTTYPE::STATIC), Event);
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 	return S_OK;
 }

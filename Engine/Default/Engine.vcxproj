@@ -171,6 +171,10 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\BehaviorTree.h" />
     <ClInclude Include="..\Public\Binary_Struct.h" />
     <ClInclude Include="..\public\Bone.h" />
+    <ClInclude Include="..\public\Bounding.h" />
+    <ClInclude Include="..\public\BoundingAABB.h" />
+    <ClInclude Include="..\public\BoundingOBB.h" />
+    <ClInclude Include="..\public\BoundingSphere.h" />
     <ClInclude Include="..\public\BT_ActionNode.h" />
     <ClInclude Include="..\public\BT_Node.h" />
     <ClInclude Include="..\public\BT_SelectorNode.h" />
@@ -179,12 +183,14 @@ call Copy.bat</Command>
     <ClInclude Include="..\Public\Camera_Manager.h" />
     <ClInclude Include="..\public\Cell.h" />
     <ClInclude Include="..\public\Channel.h" />
+    <ClInclude Include="..\public\Collider.h" />
+    <ClInclude Include="..\public\Collider_Manager.h" />
     <ClInclude Include="..\Public\CollisionObject.h" />
     <ClInclude Include="..\public\Component.h" />
     <ClInclude Include="..\Public\Controller.h" />
     <ClInclude Include="..\Public\Controller_Manager.h" />
     <ClInclude Include="..\public\CustomFont.h" />
-    <ClInclude Include="..\public\DynamicAABBTree.h" />
+    <ClInclude Include="..\Public\DebugDraw.h" />
     <ClInclude Include="..\Public\EnginePch.h" />
     <ClInclude Include="..\Public\Engine_Defines.h" />
     <ClInclude Include="..\Public\Engine_Enum.h" />
@@ -237,6 +243,10 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\Base.cpp" />
     <ClCompile Include="..\private\BehaviorTree.cpp" />
     <ClCompile Include="..\private\Bone.cpp" />
+    <ClCompile Include="..\private\Bounding.cpp" />
+    <ClCompile Include="..\private\BoundingAABB.cpp" />
+    <ClCompile Include="..\private\BoundingOBB.cpp" />
+    <ClCompile Include="..\private\BoundingSphere.cpp" />
     <ClCompile Include="..\private\BT_ActionNode.cpp" />
     <ClCompile Include="..\private\BT_Node.cpp" />
     <ClCompile Include="..\private\BT_SelectorNode.cpp" />
@@ -245,12 +255,14 @@ call Copy.bat</Command>
     <ClCompile Include="..\Private\Camera_Manager.cpp" />
     <ClCompile Include="..\private\Cell.cpp" />
     <ClCompile Include="..\private\Channel.cpp" />
+    <ClCompile Include="..\private\Collider.cpp" />
+    <ClCompile Include="..\private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\CollisionObject.cpp" />
     <ClCompile Include="..\private\Component.cpp" />
     <ClCompile Include="..\Private\Controller.cpp" />
     <ClCompile Include="..\Private\Controller_Manager.cpp" />
     <ClCompile Include="..\private\CustomFont.cpp" />
-    <ClCompile Include="..\private\DynamicAABBTree.cpp" />
+    <ClCompile Include="..\Private\DebugDraw.cpp" />
     <ClCompile Include="..\Private\EnginePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">EnginePch.h</PrecompiledHeaderFile>
