@@ -20,11 +20,22 @@ public:
 		CBounding::BOUNDING_DESC*	BoundingDesc;
 	}COLLIDER_DESC;
 
+	typedef struct tagAttackCollisionData
+	{
+		_bool			IsDown = false;
+		_float			fDamage = 0.f;
+		_vector			vAttackPosition = XMVectorZero();
+	}ATTACK_COLLISON_DATA;
+
 	typedef struct tagCollisionData
 	{
-		CGameObject*	pOwner;
-		CCollider*		pCollider;
+		CGameObject*			pOwner;
+		CCollider*				pCollider;
+		_bool					IsAttack = false;
+		ATTACK_COLLISON_DATA	AttackData;
 	}COLLISION_DATA;
+
+
 
 private:
 	typedef function<void(const COLLISION_DATA&)> Collision_CallBack;
@@ -35,15 +46,16 @@ private:
 	virtual ~CCollider() = default;
 
 public:
-	COLLIDER_OWNER		Get_ColliderOwner() { return m_eOwner; }
-	COLLIDER_CHANNEL	Get_ColliderChannel() { return m_eChannel; }
-	void				SetCollisionCallBack(Collision_CallBack CallBack) { m_CallBack = CallBack; }
-
+	COLLIDER_OWNER					Get_ColliderOwner() { return m_eOwner; }
+	COLLIDER_CHANNEL				Get_ColliderChannel() { return m_eChannel; }
+	void							SetCollisionCallBack(Collision_CallBack CallBack) { m_CallBack = CallBack; }
+	void							SetAttackData(const ATTACK_COLLISON_DATA& AttackData) { m_AttackData = AttackData; }
+	const ATTACK_COLLISON_DATA&		GetAttackData() { return m_AttackData; }
 public:
 	virtual HRESULT Initialize_Prototype(COLLIDER eType);
 	virtual HRESULT Initialize(void* pArg) override;
 	void			Update(_fmatrix WorldMatrix);
-	void			OnCollision(CGameObject* pOwner, CCollider* pCollider);
+	void			OnCollision(const COLLISION_DATA& Data);
 
 public:
 	_bool			Intersect(CCollider* pOtherCollider);
@@ -56,7 +68,7 @@ private:
 	COLLIDER_OWNER			m_eOwner = { COLLIDER_OWNER::END };
 	COLLIDER_CHANNEL		m_eChannel = { COLLIDER_CHANNEL::END };
 	CBounding*				m_pBounding = { nullptr };
-
+	ATTACK_COLLISON_DATA	m_AttackData = {};
 	Collision_CallBack		m_CallBack = {};
 
 #ifdef _DEBUG

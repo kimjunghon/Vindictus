@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 class CBehaviorTree;
 class CNavigation;
+class CCollider;
 NS_END
 
 NS_BEGIN(Client)
@@ -13,6 +14,9 @@ class CBody;
 
 class CMonster abstract : public CPawn
 {
+protected:
+	typedef unordered_map<COLLIDER_CHANNEL, vector<CCollider*>> COLLIDER;
+
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CMonster(const CMonster& Prototype);
@@ -42,7 +46,6 @@ public:
 
 protected:
 	_uint			m_iNumAttacks = {};
-	
 	vector<_float>	m_AttackTime = {};
 	vector<_float>	m_AttackCoolTime = {};
 
@@ -61,6 +64,10 @@ protected:
 	const _vector*		m_pAnimMovement = {nullptr};
 	const _vector*		m_pAnimRotation = { nullptr };
 	_uint				m_iStateFlag = {};
+
+	//Collider
+	COLLIDER			m_Colliders;
+	HIT_TYPE			m_eHitType = { HIT_TYPE::END };
 
 protected:
 	void Update_AttackCoolTime(_float fTimeDelta);

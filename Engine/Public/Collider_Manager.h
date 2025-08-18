@@ -32,7 +32,7 @@ private:
 	void				Clear_Collider();
 	_bool				Intersect_Bounding(CCollider* pSrcCollider ,CCollider* pDstCollider);
 	void				Check_Collision(const vector<CCollider*>& SrcColliders, const vector<CCollider*>& DstColliders, CGameObject* pDstOwner);
-
+	void				OnCollision(CCollider* pSrcCollider, CCollider* pDstCollider, CGameObject* pDstOwner);
 	HRESULT				Ready_ResponseTable();
 	const CCollider*	Find_BoundingCollider(CGameObject* pOwner);
 	_bool				Has_ActionCollider(CGameObject* pOwner);

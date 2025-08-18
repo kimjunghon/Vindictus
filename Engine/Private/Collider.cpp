@@ -75,12 +75,8 @@ void CCollider::Update(_fmatrix WorldMatrix)
 	m_pBounding->Update(WorldMatrix);
 }
 
-void CCollider::OnCollision(CGameObject* pOwner, CCollider* pCollider)
+void CCollider::OnCollision(const COLLISION_DATA& Data)
 {
-	COLLISION_DATA Data = {};
-	Data.pOwner = pOwner;
-	Data.pCollider = pCollider;
-
 	if (m_CallBack)
 		m_CallBack(Data);
 }

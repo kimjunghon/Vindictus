@@ -22,6 +22,7 @@ public:
 	void				EquipHead() { m_IsEquipHead = true; }
 	void				UnEquipHead() { m_IsEquipHead = false; }
 
+private:
 	_bool				m_IsEquipHead = {};
 
 private:

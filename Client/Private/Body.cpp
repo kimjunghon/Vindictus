@@ -62,7 +62,7 @@ HRESULT CBody::Forcing_Play_Animation()
 void CBody::Free()
 {
 	__super::Free();
-
+	Safe_Release(m_pAnimMachine);
 	Safe_Release(m_pModelCom);
 	Safe_Release(m_pShaderCom);
 }

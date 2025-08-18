@@ -19,12 +19,26 @@ CPlayerPawn::CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceCont
 CPlayerPawn::CPlayerPawn(const CPlayerPawn& Prototype)
 	: CPawn { Prototype }
 	, m_pPlayerInstance { Prototype.m_pPlayerInstance}
+	, m_AttackMaping { Prototype.m_AttackMaping }
 {
 	Safe_AddRef(m_pPlayerInstance);
 }
 
+_bool CPlayerPawn::AnimIsFinished()
+{
+	return m_pPlayerBody->AnimIsFinished();
+}
+
+_bool CPlayerPawn::AnimCanChange()
+{
+	return m_pPlayerBody->AnimCanChange();
+}
+
 HRESULT CPlayerPawn::Initialize_Prototype()
 {
+	if (FAILED(Ready_AttackMapping()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -93,10 +107,15 @@ void CPlayerPawn::Late_Update(_float fTimeDelta)
 {
 	Compute_WorldMatrix();
 
-	Update_ColliderMatrix();
-
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
+
+	Update_Colliders();
+
+	if (m_pGameInstance->Get_KeyDown(DIK_1))
+	{
+
+	}
 
 #ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
@@ -140,15 +159,6 @@ void CPlayerPawn::Change_State(_uint iStateIndex)
 	m_pCurrentState->Enter(this);
 }
 
-_bool CPlayerPawn::AnimIsFinished()
-{
-	return m_pPlayerBody->AnimIsFinished();
-}
-
-_bool CPlayerPawn::AnimCanChange()
-{
-	return m_pPlayerBody->AnimCanChange();
-}
 
 void CPlayerPawn::Compute_PlayerMoveDir()
 {
@@ -264,13 +274,58 @@ void CPlayerPawn::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)
 {
 	if (CollisionData.pCollider->Get_ColliderOwner() == COLLIDER_OWNER::MONSTER)
 	{
-		m_eHitType = HIT_TYPE::FRONT;
+		if (CollisionData.IsAttack)
+		{
+			if (CollisionData.AttackData.IsDown)
+				m_eHitType = HIT_TYPE::STRONG;
+			else
+			{
+				if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD))
+				{
+
+				}
+				else
+				{
+					_vector vAttackPosition = CollisionData.AttackData.vAttackPosition;
+					_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+
+					m_eHitType = Compute_HitType(vPosition, vAttackPosition);
+				}
+			}
+		}
+
+		
 
 		Change_State(ENUM_CLASS(PLAYER_STATE::HIT));
 
 		if (FAILED(m_pPlayerBody->Forcing_Play_Animation()))
 			return;
 	}
+}
+
+HIT_TYPE CPlayerPawn::Compute_HitType(_fvector vHitPosition, _fvector vAttackPosition)
+{
+	_vector vHitDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(vAttackPosition, vHitPosition), 0.f));
+	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
+	_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
+
+	_float	fLookDot = XMVectorGetX(XMVector3Dot(vLook, vHitDir));
+	_float	fRightDot = XMVectorGetX(XMVector3Dot(vRight, vHitDir));
+
+	_float fComparisonRadian = cosf(XMConvertToRadians(70.f));
+
+	HIT_TYPE eHit_Type = {};
+
+	if (fLookDot >= fComparisonRadian)
+		eHit_Type = HIT_TYPE::FRONT;
+	else if (fLookDot <= -fComparisonRadian)
+		eHit_Type = HIT_TYPE::BACK;
+	else if (fRightDot >= 0.f)
+		eHit_Type = HIT_TYPE::RIGHT;
+	else
+		eHit_Type = HIT_TYPE::LEFT;
+
+	return eHit_Type;
 }
 
 void CPlayerPawn::Move(_float fTimeDelta)
@@ -280,26 +335,73 @@ void CPlayerPawn::Move(_float fTimeDelta)
 	m_pTransformCom->MovePositionToVector(vMovePosition, m_pNavigation);
 }
 
-void CPlayerPawn::Update_ColliderMatrix()
+void CPlayerPawn::Update_Colliders()
+{
+	Update_BoundingColliders();
+
+	Update_BodyColliders();
+
+	if (!(m_iStateFlag & ENUM_CLASS(STATE_FLAG::HIT)))
+	{
+		Update_HitColliders();
+	}
+
+	Update_AttackColliders();
+}
+
+void CPlayerPawn::Update_BoundingColliders()
 {
 	for (auto& pBoundingCollider : m_Colliders[COLLIDER_CHANNEL::BOUNDING])
+	{
 		pBoundingCollider->Update(m_pTransformCom->Get_WorldMatrix());
+		m_pGameInstance->Add_BoundingCollider(this, pBoundingCollider);
+	}
+}
 
+void CPlayerPawn::Update_BodyColliders()
+{
 	for (auto& pBodyCollider : m_Colliders[COLLIDER_CHANNEL::BODY])
+	{
 		pBodyCollider->Update(m_pTransformCom->Get_WorldMatrix());
+		m_pGameInstance->Add_ActionCollider(this, pBodyCollider);
+	}
+}
 
+void CPlayerPawn::Update_HitColliders()
+{
 	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::HIT].size(); i++)
 	{
 		m_HitColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_HitColliderSocketMatrix[i]), m_pTransformCom->Get_WorldMatrix());
 		m_Colliders[COLLIDER_CHANNEL::HIT][i]->Update(m_HitColliderCombinedMatrix[i]);
-	}
 
-	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::ATTACK].size(); i++)
-	{
-		m_AttackColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[i]), m_pTransformCom->Get_WorldMatrix());
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->Update(m_AttackColliderCombinedMatrix[i]);
+		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::HIT][i]);
 	}
 }
+
+void CPlayerPawn::Update_AttackColliders()
+{
+	auto iter = m_AttackMaping.find(m_iStateFlag);
+	if (iter == m_AttackMaping.end())
+		return;
+
+	ATTACK_MAP AttackMap = {};
+	AttackMap = iter->second;
+
+	CCollider::ATTACK_COLLISON_DATA AttackData = {};
+	AttackData.IsDown = AttackMap.IsDown;
+//	AttackData.fDamage = m_fAttackData * AttackMap.fAttackRatio;
+	AttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+
+	_uint iAttackIndex = ENUM_CLASS(AttackMap.eAttackCollider);
+
+	m_AttackColliderCombinedMatrix[iAttackIndex] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[iAttackIndex]), m_pTransformCom->Get_WorldMatrix());
+	m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Update(m_AttackColliderCombinedMatrix[iAttackIndex]);
+
+	m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]);
+
+	m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetAttackData(AttackData);
+}
+
 
 HRESULT CPlayerPawn::Init_Level(_int iCellIndex, _float3 vStartPostion)
 {
@@ -650,6 +752,35 @@ HRESULT CPlayerPawn::Add_Collider_Attack(const _wstring& strColliderTag, CBoundi
 
 	m_Colliders[COLLIDER_CHANNEL::ATTACK][iColliderIndex] = pAttackCollider;
 	m_AttackColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
+
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::Ready_AttackMapping()
+{
+	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+
+	m_AttackMaping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO1)] = { ATTACK_COLLIDER::SWORD, false};
+	m_AttackMaping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO2)] = { ATTACK_COLLIDER::SWORD, false};
+	m_AttackMaping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO3)] = { ATTACK_COLLIDER::SWORD, false};
+	m_AttackMaping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO4)] = { ATTACK_COLLIDER::SWORD, false};
+
+	iFlag = ENUM_CLASS(STATE_FLAG::SMASH);
+
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0)] =			{ ATTACK_COLLIDER::SWORD, false, 1.2f};
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END)] = { ATTACK_COLLIDER::SWORD, true, 2.f};
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH1)] =			{ ATTACK_COLLIDER::SWORD, true, 1.5};
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_0)] =			{ ATTACK_COLLIDER::SHILED, false, 1.8f };
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_1)] =			{ ATTACK_COLLIDER::SHILED, false, 1.8f };
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_2)] =			{ ATTACK_COLLIDER::SHILED, true, 2.f };
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_0)] =			{ ATTACK_COLLIDER::SHILED, false, 2.f };
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_1)] =			{ ATTACK_COLLIDER::SWORD, false, 2.f };
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_2)] =			{ ATTACK_COLLIDER::RIGHT_LEG, true, 2.5f };
+	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH4)] =			{ ATTACK_COLLIDER::LEFT_LEG, true, 3.f };
+
+	iFlag = ENUM_CLASS(STATE_FLAG::GUARD);
+	m_AttackMaping[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_ATTACK)] =	{ ATTACK_COLLIDER::SWORD, false, 1.2f};
+	m_AttackMaping[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_COUNTER)] = { ATTACK_COLLIDER::SHILED, true, 2.f };
 
 	return S_OK;
 }

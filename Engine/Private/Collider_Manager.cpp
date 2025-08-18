@@ -21,6 +21,9 @@ void CCollider_Manager::Update()
 	{
 		for (auto& DstPair : m_Boundings)
 		{
+			if (SrcPair.second == DstPair.second)
+				continue;
+
 			if (Intersect_Bounding(SrcPair.second, DstPair.second))
 			{
 				if(Has_ActionCollider(SrcPair.first) && Has_ActionCollider(DstPair.first))
@@ -41,6 +44,7 @@ HRESULT CCollider_Manager::Add_BoundingCollider(CGameObject* pOwner, CCollider* 
 		return E_FAIL;
 
 	m_Boundings.emplace(pOwner, pBounding_Collider);
+
 	Safe_AddRef(pOwner);
 	Safe_AddRef(pBounding_Collider);
 
@@ -52,9 +56,11 @@ HRESULT CCollider_Manager::Add_ActionCollider(CGameObject* pOwner, CCollider* pA
 	if (nullptr == pOwner || nullptr == pAction_Collider)
 		return E_FAIL;
 
-	m_Actions[pOwner].push_back(pAction_Collider);
+	auto iter = m_Actions.find(pOwner);
+	if(iter == m_Actions.end())
+		Safe_AddRef(pOwner);
 
-	Safe_AddRef(pOwner);
+	m_Actions[pOwner].push_back(pAction_Collider);
 	Safe_AddRef(pAction_Collider);
 
 	return S_OK;
@@ -77,12 +83,13 @@ void CCollider_Manager::Clear_Collider()
 			Safe_Release(pCollider);
 		ActionPair.second.clear();
 	}
+
 	m_Actions.clear();
 }
 
 _bool CCollider_Manager::Intersect_Bounding(CCollider* pSrcCollider, CCollider* pDstCollider)
 {
-	if (pSrcCollider == pDstCollider || pSrcCollider->Get_ColliderChannel() != COLLIDER_CHANNEL::BOUNDING || pDstCollider->Get_ColliderChannel() != COLLIDER_CHANNEL::BOUNDING)
+	if (pSrcCollider->Get_ColliderChannel() != COLLIDER_CHANNEL::BOUNDING || pDstCollider->Get_ColliderChannel() != COLLIDER_CHANNEL::BOUNDING)
 		return false;
 
 	return pSrcCollider->Intersect(pDstCollider);
@@ -102,15 +109,40 @@ void CCollider_Manager::Check_Collision(const vector<CCollider*>& SrcColliders, 
 
 			if (m_eResponseTable[ENUM_CLASS(eSrcChannel)][ENUM_CLASS(eDstChannel)] == COLLIDER_TYPE::NONE)
 				continue;
+
+			if (pSrcCollider->Get_ColliderOwner() == pDstCollider->Get_ColliderOwner())
+			{
+				// 같은 Owner 타입이면 Body Channel만만
+				if (pSrcCollider->Get_ColliderChannel() == COLLIDER_CHANNEL::BODY && pDstCollider->Get_ColliderChannel() == COLLIDER_CHANNEL::BODY)
+				{
+					if (pSrcCollider->Intersect(pDstCollider))
+						OnCollision(pSrcCollider, pDstCollider, pDstOwner);
+				}
+			}
 			else
 			{
 				if (pSrcCollider->Intersect(pDstCollider))
-				{
-					pSrcCollider->OnCollision(pDstOwner, pDstCollider);
-				}
+					OnCollision(pSrcCollider, pDstCollider, pDstOwner);
 			}
 		}
 	}
+}
+
+void CCollider_Manager::OnCollision(CCollider* pSrcCollider, CCollider* pDstCollider, CGameObject* pDstOwner)
+{
+	CCollider::COLLISION_DATA Data = {};
+	Data.pOwner = pDstOwner;
+	Data.pCollider = pDstCollider;
+	Data.IsAttack = false;
+
+	if (pSrcCollider->Get_ColliderChannel() == COLLIDER_CHANNEL::HIT)
+	{
+		Data.IsAttack = true;
+		CCollider::ATTACK_COLLISON_DATA AttackData = {};
+		AttackData = pDstCollider->GetAttackData();
+	}
+	
+	pSrcCollider->OnCollision(Data);
 }
 
 HRESULT CCollider_Manager::Ready_ResponseTable()
