@@ -46,6 +46,8 @@ public:
 	HRESULT					Equip(const _float4x4* pPawnMatrix, CModel* pParentModelCom);
 	HRESULT					UnEquip();
 
+	_bool					IsBroekn() { return m_ArmorInfo.fHealth <= 0.f; }
+	void					DecreaseDurability(_float fDecreaseAmount);
 private:
 	_bool					m_IsEquip = { false };
 	ARMOR_TYPE				m_eArmorType = { ARMOR_TYPE::END };
@@ -55,7 +57,7 @@ private:
 	CModel*					m_pModelCom[ENUM_CLASS(ARMOR_STATE::END)] = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };
 
-	vector<CBone*>			m_ParentBones;
+	vector<CBone*>			m_ParentBones[ENUM_CLASS(ARMOR_STATE::END)];
 
 private:
 	HRESULT					Ready_Components(_uint iArmorNodelPrototypeLevelIndex, const _wstring& strArmorModelPrototypeTag);

@@ -1,11 +1,7 @@
 #pragma once
-#include "Client_Defines.h"
-#include "Pawn.h"
+#include "ColliderPawn.h"
 
-NS_BEGIN(Engine)
-class CNavigation;
-class CCollider;
-NS_END
+using namespace Player;
 
 NS_BEGIN(Client)
 
@@ -16,7 +12,7 @@ class CArmor;
 class CWeapon;
 class CPlayerInstance;
 
-class CPlayerPawn final : public CPawn
+class CPlayerPawn final : public CColliderPawn
 {
 public:
 	typedef struct tagPlayerDesc : public GAMEOBJECT_DESC
@@ -29,16 +25,6 @@ private:
 	enum class HIT_COLLIDER { HEAD, UPPER, LOWER, L_ARM, R_ARM, L_LEG, R_LEG, END};
 	enum class ATTACK_COLLIDER { SWORD, SHILED, LEFT_LEG, RIGHT_LEG, END};
 
-	typedef struct tagPlayerAttackMap
-	{
-		ATTACK_COLLIDER eAttackCollider;
-		_bool			IsDown;
-		_float			fAttackRatio;
-	}ATTACK_MAP;
-	
-	typedef unordered_map<COLLIDER_CHANNEL, vector<CCollider*>> COLLIDER;
-	typedef unordered_map<_uint, ATTACK_MAP> ATTACK_MAPPING;
-
 private:
 	CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CPlayerPawn(const CPlayerPawn& Prototype);
@@ -50,7 +36,8 @@ public:
 	void			Increase_ComboCount() { m_iComboCount++; }
 	void			Run() { m_fSpeedRatio = 1.f; }
 	void			Sprint() { m_fSpeedRatio = 2.f; }
-	HIT_TYPE		Get_HitType() { return m_eHitType; }
+
+	_bool			IsGaurdHit() { return m_iStateFlag & ENUM_CLASS(HIT_FLAG::HIT_GUARD); }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -68,24 +55,16 @@ public:
 	
 private:
 	CPlayerInstance*			m_pPlayerInstance = { nullptr };
-	CNavigation*				m_pNavigation = { nullptr };
 	CPlayerBody*				m_pPlayerBody = { nullptr };
 	CCamera_Target*				m_pCamera = { nullptr };
-
-	//Collider
-	COLLIDER					m_Colliders;
-	ATTACK_MAPPING				m_AttackMaping;
-	vector<const _float4x4*>	m_HitColliderSocketMatrix;
-	vector<_matrix>				m_HitColliderCombinedMatrix;
-	vector<const _float4x4*>	m_AttackColliderSocketMatrix;
-	vector<_matrix>				m_AttackColliderCombinedMatrix;
-	HIT_TYPE					m_eHitType = { HIT_TYPE::END };
 
 	//Equip
 	_wstring					m_strEquipWeapons[ENUM_CLASS(WEAPON_TYPE::END)] = {};
 	_wstring					m_strEquipArmors[ENUM_CLASS(ARMOR_TYPE::END)] = {};
-
+	CArmor*						m_pEquipArmors[ENUM_CLASS(ARMOR_TYPE::END)] = { nullptr };
 	//State
+	PLAYER_STATUS				m_Status = {};
+
 	INPUT_MOVE_DESC				m_MoveInput = {};
 	INPUT_ACTION_DESC			m_ActionInput = {};
 	INPUT_CAMERA_DESC			m_CameraInput = {};
@@ -109,46 +88,42 @@ private:
 	const _vector*				m_pAnimRotation = {};
 
 private:
-	void		Update_Colliders();
-	void		Update_BoundingColliders();
-	void		Update_BodyColliders();
-	void		Update_HitColliders();
-	void		Update_AttackColliders();
+	virtual void	Update_HitColliders() override;
+	virtual void	Update_AttackColliders(_uint iStateFlag) override;
 
-	HRESULT		Init_Level(_int iCellIndex, _float3 vStartPostion);
-	HRESULT		Ready_Camera();
-	HRESULT		Ready_PawnObjects();
-	HRESULT		Ready_PlayerBody();
-	HRESULT		Ready_Weapons();
-	HRESULT		Ready_Armors();
-	HRESULT		Ready_States();
+	HRESULT			Init_Level(_int iCellIndex, _float3 vStartPostion);
+	HRESULT			Ready_Camera();
+	HRESULT			Ready_PawnObjects();
+	HRESULT			Ready_PlayerBody();
+	HRESULT			Ready_Weapons();
+	HRESULT			Ready_Armors();
+	HRESULT			Ready_States();
 
-	HRESULT		Ready_Collider();
-	HRESULT		Ready_Collider_Bounding();
-	HRESULT		Ready_Collider_Body();
-	HRESULT		Ready_Collider_Hit();
-	HRESULT		Add_Collider_Hit(const _wstring& strColliderTag, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix);
-	HRESULT		Ready_Collider_Attack();
-	HRESULT		Add_Collider_Attack(const _wstring& strColliderTag,CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix);
-	HRESULT		Ready_AttackMapping();
+	HRESULT			Ready_Collider();
+	HRESULT			Ready_Collider_Bounding();
+	HRESULT			Ready_Collider_Body();
+	HRESULT			Ready_Collider_Hit();
+	HRESULT			Ready_Collider_Attack();
+	HRESULT			Ready_AttackMapping();
 
 
-	void		Compute_WorldMatrix();
-	void		Bind_InputData(_float fTimeDelta);
-	void		Move(_float fTimeDelta);
+	void			Compute_WorldMatrix();
+	void			Bind_InputData(_float fTimeDelta);
+	void			Move(_float fTimeDelta);
 
-	HRESULT		EquipWeapon(CWeapon* pWeapon);
-	HRESULT		UnEquipWeapon(_uint iWeaponTypeIndex);
+	HRESULT			EquipWeapon(CWeapon* pWeapon);
+	HRESULT			UnEquipWeapon(_uint iWeaponTypeIndex);
 
-	HRESULT		EquipArmor(CArmor* pArmor);
-	HRESULT		UnEquipArmor(_uint iArmorTypeIndex);
+	HRESULT			EquipArmor(CArmor* pArmor);
+	HRESULT			UnEquipArmor(_uint iArmorTypeIndex);
 
-	void		Event_ChangeWeapon(const EVENT_CHANGE_WEAPON& Event);
-	void		Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event);
+	void			Event_ChangeWeapon(const EVENT_CHANGE_WEAPON& Event);
+	void			Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event);
 
-	void		OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData);
-	HIT_TYPE	Compute_HitType(_fvector vHitPosition, _fvector vAttackPosition);
-
+	void			OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData);
+	HIT_TYPE		HitType_Guard(_fvector vPosition, _fvector vAttackPosition);
+	void			Bind_HitCollisionCallback(HIT_COLLIDER eHitCollider, ARMOR_TYPE eArmor_Type);
+	void			DecreaseArmorDurability(_uint iArmorIndex, const CCollider::COLLISION_DATA& CollisionData);
 public:
 	static CPlayerPawn*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

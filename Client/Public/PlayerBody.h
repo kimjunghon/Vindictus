@@ -19,11 +19,10 @@ public:
 	virtual void		Late_Update(_float fTimeDelta) override;
 	virtual HRESULT		Render() override;
 
-	void				EquipHead() { m_IsEquipHead = true; }
-	void				UnEquipHead() { m_IsEquipHead = false; }
-
+	void				IsHair(_bool IsHair) { m_IsHair = IsHair; }
+	
 private:
-	_bool				m_IsEquipHead = {};
+	_bool				m_IsHair = {true};
 
 private:
 	HRESULT Ready_Components();

@@ -20,6 +20,12 @@ public:
 		CBounding::BOUNDING_DESC*	BoundingDesc;
 	}COLLIDER_DESC;
 
+	typedef struct tagBlockCollisionData
+	{
+		_float fDistance = 0.f;
+		_float3 vNormal = _float3(0.f, 0.f, 0.f);
+	}BLOCK_COLLISION_DATA;
+
 	typedef struct tagAttackCollisionData
 	{
 		_bool			IsDown = false;
@@ -29,13 +35,11 @@ public:
 
 	typedef struct tagCollisionData
 	{
-		CGameObject*			pOwner;
 		CCollider*				pCollider;
+		BLOCK_COLLISION_DATA	BlockData = {};
 		_bool					IsAttack = false;
-		ATTACK_COLLISON_DATA	AttackData;
+		ATTACK_COLLISON_DATA	AttackData = {};
 	}COLLISION_DATA;
-
-
 
 private:
 	typedef function<void(const COLLISION_DATA&)> Collision_CallBack;
@@ -51,6 +55,8 @@ public:
 	void							SetCollisionCallBack(Collision_CallBack CallBack) { m_CallBack = CallBack; }
 	void							SetAttackData(const ATTACK_COLLISON_DATA& AttackData) { m_AttackData = AttackData; }
 	const ATTACK_COLLISON_DATA&		GetAttackData() { return m_AttackData; }
+	void							SetEnable(_bool IsEnable) { m_IsEnable = IsEnable; }
+	_bool							IsEnable() { return m_IsEnable; }
 public:
 	virtual HRESULT Initialize_Prototype(COLLIDER eType);
 	virtual HRESULT Initialize(void* pArg) override;
@@ -58,12 +64,13 @@ public:
 	void			OnCollision(const COLLISION_DATA& Data);
 
 public:
-	_bool			Intersect(CCollider* pOtherCollider);
+	_bool			Intersect(CCollider* pOtherCollider, _float* pDistance = nullptr, _float3* pNormal = nullptr);
 #ifdef _DEBUG
 	HRESULT			Render();
 #endif
 
 private:
+	_bool					m_IsEnable = { false };
 	COLLIDER				m_eType = { COLLIDER::END };
 	COLLIDER_OWNER			m_eOwner = { COLLIDER_OWNER::END };
 	COLLIDER_CHANNEL		m_eChannel = { COLLIDER_CHANNEL::END };

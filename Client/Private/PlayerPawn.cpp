@@ -10,16 +10,15 @@
 #include "Weapon.h"
 
 CPlayerPawn::CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CPawn { pDevice, pDeviceContext }
+	: CColliderPawn{ pDevice, pDeviceContext }
 	, m_pPlayerInstance{ CPlayerInstance::GetInstance() }
 {
 	Safe_AddRef(m_pPlayerInstance);
 }
 
 CPlayerPawn::CPlayerPawn(const CPlayerPawn& Prototype)
-	: CPawn { Prototype }
+	: CColliderPawn{ Prototype }
 	, m_pPlayerInstance { Prototype.m_pPlayerInstance}
-	, m_AttackMaping { Prototype.m_AttackMaping }
 {
 	Safe_AddRef(m_pPlayerInstance);
 }
@@ -89,6 +88,8 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 
 void CPlayerPawn::Priority_Update(_float fTimeDelta)
 {
+	m_vPrevPosition = m_pTransformCom->Get_State(STATE::POSITION);
+
 	Bind_InputData(fTimeDelta);
 
 	for (auto& Pair : m_PawnObjects)
@@ -110,7 +111,7 @@ void CPlayerPawn::Late_Update(_float fTimeDelta)
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
 
-	Update_Colliders();
+	__super::Update_Colliders(m_iStateFlag);
 
 	if (m_pGameInstance->Get_KeyDown(DIK_1))
 	{
@@ -127,18 +128,18 @@ HRESULT CPlayerPawn::Render()
 {
 
 #ifdef _DEBUG
-	//for (auto& Pair : m_Colliders)
-	//{
-	//	for (auto& pCollider : Pair.second)
-	//	{
-	//		pCollider->Render();
-	//	}
-	//}
-	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::ATTACK].size(); i++)
+	for (auto& Pair : m_Colliders)
 	{
-		m_AttackColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[i]), m_pTransformCom->Get_WorldMatrix());
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->Render();
+		for (auto& pCollider : Pair.second)
+		{
+			pCollider->Render();
+		}
 	}
+	//for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::ATTACK].size(); i++)
+	//{
+	//	m_AttackColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[i]), m_pTransformCom->Get_WorldMatrix());
+	//	m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->Render();
+	//}
 #endif
 	return S_OK;
 }
@@ -166,7 +167,6 @@ void CPlayerPawn::Compute_PlayerMoveDir()
 
 	_float fYaw = atan2f(XMVectorGetX(m_vPlayerMoveDir), XMVectorGetZ(m_vPlayerMoveDir));
 	m_vPlayerRoationQuat = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw);
-
 }
 
 HRESULT CPlayerPawn::EquipWeapon(CWeapon* pWeapon)
@@ -217,17 +217,19 @@ HRESULT CPlayerPawn::EquipArmor(CArmor* pArmor)
 	ARMOR_TYPE eArmorType = pArmor->Get_ArmorType();
 
 	if (eArmorType == ARMOR_TYPE::HEAD)
-		m_pPlayerBody->EquipHead();
+		m_pPlayerBody->IsHair(false);
 
 	if (m_strEquipArmors[ENUM_CLASS(eArmorType)].size() > 0)
 		UnEquipArmor(ENUM_CLASS(eArmorType));
 
 	m_strEquipArmors[ENUM_CLASS(eArmorType)] = strArmorName;
-	
+
+	m_pEquipArmors[ENUM_CLASS(eArmorType)] = pArmor;
+	Safe_AddRef(pArmor);
+
 	pArmor->Equip(m_pTransformCom->Get_WorldMatrixPtr(), m_pPlayerBody->Get_ParentModelPtr());
 
 	Add_PawnObject(strArmorName, pArmor);
-
 	Safe_AddRef(pArmor);
 
 	return S_OK;
@@ -239,11 +241,14 @@ HRESULT CPlayerPawn::UnEquipArmor(_uint iArmorTypeIndex)
 		return S_OK;
 
 	if (iArmorTypeIndex == ENUM_CLASS(ARMOR_TYPE::HEAD))
-		m_pPlayerBody->UnEquipHead();
+		m_pPlayerBody->IsHair(true);
 
 	if (FAILED(Remove_PawnObject(m_strEquipArmors[iArmorTypeIndex])))
 		return E_FAIL;
 
+	Safe_Release(m_pEquipArmors[iArmorTypeIndex]);
+	m_pEquipArmors[iArmorTypeIndex] = nullptr;
+	
 	m_strEquipArmors[iArmorTypeIndex].clear();
 
 	return S_OK;
@@ -270,143 +275,146 @@ void CPlayerPawn::Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event)
 		UnEquipArmor(Event.iArmorTypeIndex);
 }
 
+
 void CPlayerPawn::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)
 {
-	if (CollisionData.pCollider->Get_ColliderOwner() == COLLIDER_OWNER::MONSTER)
-	{
-		if (CollisionData.IsAttack)
-		{
-			if (CollisionData.AttackData.IsDown)
-				m_eHitType = HIT_TYPE::STRONG;
-			else
-			{
-				if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD))
-				{
+	if (false == CollisionData.IsAttack)
+		return;
 
-				}
-				else
-				{
-					_vector vAttackPosition = CollisionData.AttackData.vAttackPosition;
-					_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
-
-					m_eHitType = Compute_HitType(vPosition, vAttackPosition);
-				}
-			}
-		}
-
-		
-
-		Change_State(ENUM_CLASS(PLAYER_STATE::HIT));
-
-		if (FAILED(m_pPlayerBody->Forcing_Play_Animation()))
-			return;
-	}
-}
-
-HIT_TYPE CPlayerPawn::Compute_HitType(_fvector vHitPosition, _fvector vAttackPosition)
-{
-	_vector vHitDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(vAttackPosition, vHitPosition), 0.f));
-	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
-	_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
-
-	_float	fLookDot = XMVectorGetX(XMVector3Dot(vLook, vHitDir));
-	_float	fRightDot = XMVectorGetX(XMVector3Dot(vRight, vHitDir));
-
-	_float fComparisonRadian = cosf(XMConvertToRadians(70.f));
-
-	HIT_TYPE eHit_Type = {};
-
-	if (fLookDot >= fComparisonRadian)
-		eHit_Type = HIT_TYPE::FRONT;
-	else if (fLookDot <= -fComparisonRadian)
-		eHit_Type = HIT_TYPE::BACK;
-	else if (fRightDot >= 0.f)
-		eHit_Type = HIT_TYPE::RIGHT;
+	if (CollisionData.AttackData.IsDown)
+		m_eHitType = HIT_TYPE::STRONG;
 	else
-		eHit_Type = HIT_TYPE::LEFT;
+	{
+		_vector vAttackPosition = CollisionData.AttackData.vAttackPosition;
+		_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
 
-	return eHit_Type;
+		m_eHitType = (m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD)) ? HitType_Guard(vPosition, vAttackPosition) : Compute_HitType(vPosition, vAttackPosition);
+	}
+	
+	for (auto& pHitCollider : m_Colliders[COLLIDER_CHANNEL::HIT])
+	{
+		pHitCollider->SetEnable(false);
+	}
+
+	Change_State(ENUM_CLASS(PLAYER_STATE::HIT));
+	m_pCurrentState->Bind_StateFlag(m_iStateFlag);
+
+	if (FAILED(m_pPlayerBody->Forcing_Play_Animation()))
+		return;
 }
+
+HIT_TYPE CPlayerPawn::HitType_Guard(_fvector vPosition, _fvector vAttackPosition)
+{
+	_vector vDir = XMVectorSubtract(vAttackPosition, vPosition);
+
+	_float fYaw = atan2f(XMVectorGetX(vDir), XMVectorGetZ(vDir));
+	_vector vRotationQuat = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw);
+
+
+	m_vPrevPlayerRotationQuat = vRotationQuat;
+	m_vPlayerRoationQuat = vRotationQuat;
+
+	m_pTransformCom->RotateQuaternion(vRotationQuat);
+
+	return HIT_TYPE::GAURD;
+}
+
+
+void CPlayerPawn::Bind_HitCollisionCallback(HIT_COLLIDER eHitCollider, ARMOR_TYPE eArmor_Type)
+{
+	m_Colliders[COLLIDER_CHANNEL::HIT][ENUM_CLASS(eHitCollider)]->SetCollisionCallBack([this, eArmor_Type](const CCollider::COLLISION_DATA& Data) {
+		if (!(m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD)))
+			this->DecreaseArmorDurability(ENUM_CLASS(eArmor_Type), Data);
+		this->OnCollisionHit(Data);
+		});
+}
+
+void CPlayerPawn::DecreaseArmorDurability(_uint iArmorIndex, const CCollider::COLLISION_DATA& CollisionData)
+{
+	_uint iIndex = iArmorIndex;
+	
+	_float fDamage = CollisionData.AttackData.fDamage;// - m_Status.fDefense;
+
+	if (nullptr != m_pEquipArmors[iIndex] && false == m_pEquipArmors[iIndex]->IsBroekn())
+	{
+		m_pEquipArmors[iIndex]->DecreaseDurability(fDamage);
+		return;
+	}
+
+	vector<_uint> OtherIndices;
+
+	for (_uint i = 0; i < ENUM_CLASS(ARMOR_TYPE::END); i++)
+	{
+		if (i == iIndex)
+			continue;
+
+		if (nullptr != m_pEquipArmors[i] && false == m_pEquipArmors[i]->IsBroekn())
+			OtherIndices.push_back(i);
+	}
+
+	if (OtherIndices.empty())
+		return;
+
+	_uint iRandomIndex = OtherIndices[rand() % OtherIndices.size()];
+
+	DecreaseArmorDurability(iRandomIndex, CollisionData);
+}
+
 
 void CPlayerPawn::Move(_float fTimeDelta)
 {
 	_vector vMovePosition = XMVectorScale(m_vPlayerMoveDir, m_fSpeed * m_fSpeedRatio * fTimeDelta);
 	
-	m_pTransformCom->MovePositionToVector(vMovePosition, m_pNavigation);
-}
-
-void CPlayerPawn::Update_Colliders()
-{
-	Update_BoundingColliders();
-
-	Update_BodyColliders();
-
-	if (!(m_iStateFlag & ENUM_CLASS(STATE_FLAG::HIT)))
-	{
-		Update_HitColliders();
-	}
-
-	Update_AttackColliders();
-}
-
-void CPlayerPawn::Update_BoundingColliders()
-{
-	for (auto& pBoundingCollider : m_Colliders[COLLIDER_CHANNEL::BOUNDING])
-	{
-		pBoundingCollider->Update(m_pTransformCom->Get_WorldMatrix());
-		m_pGameInstance->Add_BoundingCollider(this, pBoundingCollider);
-	}
-}
-
-void CPlayerPawn::Update_BodyColliders()
-{
-	for (auto& pBodyCollider : m_Colliders[COLLIDER_CHANNEL::BODY])
-	{
-		pBodyCollider->Update(m_pTransformCom->Get_WorldMatrix());
-		m_pGameInstance->Add_ActionCollider(this, pBodyCollider);
-	}
+	m_pTransformCom->MovePositionToVector(vMovePosition, m_pNavigationCom);
 }
 
 void CPlayerPawn::Update_HitColliders()
 {
+	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::HIT))
+		return;
+
 	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::HIT].size(); i++)
 	{
 		m_HitColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_HitColliderSocketMatrix[i]), m_pTransformCom->Get_WorldMatrix());
 		m_Colliders[COLLIDER_CHANNEL::HIT][i]->Update(m_HitColliderCombinedMatrix[i]);
 
+		m_Colliders[COLLIDER_CHANNEL::HIT][i]->SetEnable(true);
 		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::HIT][i]);
 	}
 }
 
-void CPlayerPawn::Update_AttackColliders()
+void CPlayerPawn::Update_AttackColliders(_uint iStateFlag)
 {
-	auto iter = m_AttackMaping.find(m_iStateFlag);
-	if (iter == m_AttackMaping.end())
+	auto iter = m_AttackMapping.find(iStateFlag);
+	if (iter == m_AttackMapping.end())
 		return;
 
-	ATTACK_MAP AttackMap = {};
-	AttackMap = iter->second;
+	for (auto& AttackMap : iter->second)
+	{
+		if (false == m_pPlayerBody->IsAnimationInRage(AttackMap.vAttackRange))
+			continue;
 
-	CCollider::ATTACK_COLLISON_DATA AttackData = {};
-	AttackData.IsDown = AttackMap.IsDown;
-//	AttackData.fDamage = m_fAttackData * AttackMap.fAttackRatio;
-	AttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+		CCollider::ATTACK_COLLISON_DATA AttackData = {};
+		AttackData.IsDown = AttackMap.IsDown;
+		//	AttackData.fDamage = m_fAttackData * AttackMap.fAttackRatio;
+		AttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
 
-	_uint iAttackIndex = ENUM_CLASS(AttackMap.eAttackCollider);
+		_uint iAttackIndex = AttackMap.iAttackColliderIndex;
 
-	m_AttackColliderCombinedMatrix[iAttackIndex] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[iAttackIndex]), m_pTransformCom->Get_WorldMatrix());
-	m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Update(m_AttackColliderCombinedMatrix[iAttackIndex]);
+		m_AttackColliderCombinedMatrix[iAttackIndex] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[iAttackIndex]), m_pTransformCom->Get_WorldMatrix());
+		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Update(m_AttackColliderCombinedMatrix[iAttackIndex]);
 
-	m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]);
+		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetEnable(true);
+		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]);
 
-	m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetAttackData(AttackData);
+		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetAttackData(AttackData);
+	}
 }
-
 
 HRESULT CPlayerPawn::Init_Level(_int iCellIndex, _float3 vStartPostion)
 {
-	m_pNavigation = m_pGameInstance->Clone_CurrentNavigation(iCellIndex);
-	if (nullptr == m_pNavigation)
+	m_pNavigationCom = m_pGameInstance->Clone_CurrentNavigation(iCellIndex);
+	if (nullptr == m_pNavigationCom)
 		return E_FAIL;
 
 	_vector vPosition = XMVectorSetW(XMLoadFloat3(&vStartPostion), 1.f);
@@ -468,7 +476,7 @@ HRESULT CPlayerPawn::Ready_PlayerBody()
 	PlayerBodyDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	PlayerBodyDesc.pStateFlag = &m_iStateFlag;
 
-	if (FAILED(__super::Add_PawnObject(TEXT("Player_Body"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Player_Body"), &PlayerBodyDesc)))
+	if (FAILED(CPawn::Add_PawnObject(TEXT("Player_Body"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Player_Body"), &PlayerBodyDesc)))
 		return E_FAIL;
 
 	m_pPlayerBody = static_cast<CPlayerBody*>(Find_PawnObject(TEXT("Player_Body")));
@@ -533,6 +541,8 @@ HRESULT CPlayerPawn::Ready_States()
 	m_States[ENUM_CLASS(PLAYER_STATE::GUARD)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::GUARD));
 	m_States[ENUM_CLASS(PLAYER_STATE::HEAVYSTAND)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::HEAVYSTAND));
 	m_States[ENUM_CLASS(PLAYER_STATE::ROLL)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::ROLL));
+	m_States[ENUM_CLASS(PLAYER_STATE::GUARD_COUNTER)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::GUARD_COUNTER));
+	m_States[ENUM_CLASS(PLAYER_STATE::HIT)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::HIT));
 
 	m_pCurrentState = m_States[ENUM_CLASS(PLAYER_STATE::IDLE)];
 
@@ -597,6 +607,10 @@ HRESULT CPlayerPawn::Ready_Collider_Body()
 		return E_FAIL;
 
 	m_Colliders[COLLIDER_CHANNEL::BODY].push_back(pBodyCollider);
+	
+	pBodyCollider->SetCollisionCallBack([this](const CCollider::COLLISION_DATA& Data) {
+		this->OnCollisionBlock(Data); }
+	);
 
 	return S_OK;
 }
@@ -613,80 +627,70 @@ HRESULT CPlayerPawn::Ready_Collider_Hit()
 	OBBDesc.vExtents = _float3(4.f, 7.f, 4.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_Head"), &OBBDesc, ENUM_CLASS(HIT_COLLIDER::HEAD), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Head1"))))
+	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Head"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::HEAD), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Head1"))))
 		return E_FAIL;
+
+	Bind_HitCollisionCallback(HIT_COLLIDER::HEAD, ARMOR_TYPE::HEAD);
 
 	/* Com_Collider_Hit_Upper */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(6.f, 10.f, 6.f);
 	OBBDesc.vCenter = _float3(3.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_Upper"), &OBBDesc, ENUM_CLASS(HIT_COLLIDER::UPPER), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Spine1"))))
+	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Upper"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::UPPER), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Spine1"))))
 		return E_FAIL;
+
+	Bind_HitCollisionCallback(HIT_COLLIDER::UPPER, ARMOR_TYPE::UPPER);
 
 	/* Com_Collider_Hit_Lower */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(45.f));
 	OBBDesc.vExtents = _float3(6.f, 10.f, 6.f);
 	OBBDesc.vCenter = _float3(-4.f, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_Lower"), &OBBDesc, ENUM_CLASS(HIT_COLLIDER::LOWER), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Pelvis"))))
+	
+	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Lower"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::LOWER), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Pelvis"))))
 		return E_FAIL;
+
+	Bind_HitCollisionCallback(HIT_COLLIDER::LOWER, ARMOR_TYPE::LOWER);
 
 	/* Com_Collider_Hit_RightArm */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(3.f, 8.f, 3.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_RightArm"), &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_ARM), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_ForeTwist1"))))
+	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_RightArm"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_ARM), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_ForeTwist1"))))
 		return E_FAIL;
+
+	Bind_HitCollisionCallback(HIT_COLLIDER::R_ARM, ARMOR_TYPE::HAND);
 
 	/* Com_Collider_Hit_LeftArm */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(3.f, 8.f, 3.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_LeftArm"), &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_ARM), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_ForeTwist1"))))
+	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_LeftArm"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_ARM), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_ForeTwist1"))))
 		return E_FAIL;
+
+	Bind_HitCollisionCallback(HIT_COLLIDER::L_ARM, ARMOR_TYPE::HAND);
 
 	/* Com_Collider_Hit_LeftLeg */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(3.f, 11.f, 3.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_LeftLeg"), &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Calf"))))
+	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_LeftLeg"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Calf"))))
 		return E_FAIL;
+
+	Bind_HitCollisionCallback(HIT_COLLIDER::L_LEG, ARMOR_TYPE::FOOT);
 
 	/* Com_Collider_Hit_RightLeg */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(3.f, 11.f, 3.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_RightLeg"), &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
+	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_RightLeg"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
 		return E_FAIL;
 
-	return S_OK;
-}
-
-
-HRESULT CPlayerPawn::Add_Collider_Hit(const _wstring& strColliderTag, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix)
-{
-	if (iColliderIndex >= ENUM_CLASS(HIT_COLLIDER::END) ||
-		nullptr == pSocketCombinedMatrix)
-		return E_FAIL;
-	
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.eChannel = COLLIDER_CHANNEL::HIT;
-	ColliderDesc.eOwner = COLLIDER_OWNER::PLAYER;
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pHitCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pHitCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_Colliders[COLLIDER_CHANNEL::HIT][iColliderIndex] = pHitCollider;
-	m_HitColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
+	Bind_HitCollisionCallback(HIT_COLLIDER::R_LEG, ARMOR_TYPE::FOOT);
 
 	return S_OK;
 }
@@ -703,7 +707,7 @@ HRESULT CPlayerPawn::Ready_Collider_Attack()
 	OBBDesc.vExtents = _float3(10.f, 18.f, 10.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Attack(TEXT("Com_Collider_Attack_Sword"), & OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::SWORD), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH"))))
+	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Sword"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::SWORD), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH"))))
 		return E_FAIL;
 
 	/* Com_Collider_Attack_Shield */
@@ -711,7 +715,7 @@ HRESULT CPlayerPawn::Ready_Collider_Attack()
 	OBBDesc.vExtents = _float3(15.f, 10.f, 15.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Attack(TEXT("Com_Collider_Attack_Shield"), &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::SHILED), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_LF"))))
+	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Shield"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::SHILED), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_LF"))))
 		return E_FAIL;
 
 	/* Com_Collider_Attack_Left_Leg */
@@ -719,7 +723,7 @@ HRESULT CPlayerPawn::Ready_Collider_Attack()
 	OBBDesc.vExtents = _float3(15.f, 20.f, 15.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y - 5.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Attack(TEXT("Com_Collider_Attack_Left_Leg"), &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Calf"))))
+	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Left_Leg"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Calf"))))
 		return E_FAIL;
 
 	/* Com_Collider_Attack_Right_Leg */
@@ -727,31 +731,8 @@ HRESULT CPlayerPawn::Ready_Collider_Attack()
 	OBBDesc.vExtents = _float3(15.f, 20.f, 15.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y - 5.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Attack(TEXT("Com_Collider_Attack_Right_Leg"), &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
+	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Right_Leg"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
 		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CPlayerPawn::Add_Collider_Attack(const _wstring& strColliderTag, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix)
-{
-	if (iColliderIndex >= ENUM_CLASS(ATTACK_COLLIDER::END) ||
-		nullptr == pSocketCombinedMatrix)
-		return E_FAIL;
-
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.eChannel = COLLIDER_CHANNEL::ATTACK;
-	ColliderDesc.eOwner = COLLIDER_OWNER::PLAYER;
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pAttackCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pAttackCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_Colliders[COLLIDER_CHANNEL::ATTACK][iColliderIndex] = pAttackCollider;
-	m_AttackColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
 
 	return S_OK;
 }
@@ -760,28 +741,29 @@ HRESULT CPlayerPawn::Ready_AttackMapping()
 {
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
-	m_AttackMaping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO1)] = { ATTACK_COLLIDER::SWORD, false};
-	m_AttackMaping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO2)] = { ATTACK_COLLIDER::SWORD, false};
-	m_AttackMaping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO3)] = { ATTACK_COLLIDER::SWORD, false};
-	m_AttackMaping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO4)] = { ATTACK_COLLIDER::SWORD, false};
+	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), false, 1.f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), false, 1.f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO3)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), false, 1.f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO4)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), false, 1.f, _float2(0.1f, 0.4f) });
 
 	iFlag = ENUM_CLASS(STATE_FLAG::SMASH);
 
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0)] =			{ ATTACK_COLLIDER::SWORD, false, 1.2f};
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END)] = { ATTACK_COLLIDER::SWORD, true, 2.f};
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH1)] =			{ ATTACK_COLLIDER::SWORD, true, 1.5};
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_0)] =			{ ATTACK_COLLIDER::SHILED, false, 1.8f };
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_1)] =			{ ATTACK_COLLIDER::SHILED, false, 1.8f };
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_2)] =			{ ATTACK_COLLIDER::SHILED, true, 2.f };
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_0)] =			{ ATTACK_COLLIDER::SHILED, false, 2.f };
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_1)] =			{ ATTACK_COLLIDER::SWORD, false, 2.f };
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_2)] =			{ ATTACK_COLLIDER::RIGHT_LEG, true, 2.5f };
-	m_AttackMaping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH4)] =			{ ATTACK_COLLIDER::LEFT_LEG, true, 3.f };
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), false, 1.2f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), true, 2.f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), true, 1.5, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_0)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), false, 1.8f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), false, 1.8f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), true, 2.f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_0)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), false, 2.f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), false, 2.f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), true, 2.5f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH4)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), true, 3.f, _float2(0.1f, 0.4f) });
+	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH_GUARD_COUNTER)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), true, 2.f, _float2(0.1f, 0.4f) });
 
 	iFlag = ENUM_CLASS(STATE_FLAG::GUARD);
-	m_AttackMaping[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_ATTACK)] =	{ ATTACK_COLLIDER::SWORD, false, 1.2f};
-	m_AttackMaping[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_COUNTER)] = { ATTACK_COLLIDER::SHILED, true, 2.f };
 
+	m_AttackMapping[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_ATTACK)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), false, 1.2f, _float2(0.1f, 0.4f) });
+	
 	return S_OK;
 }
 
@@ -809,10 +791,10 @@ void CPlayerPawn::Compute_WorldMatrix()
 
 	_matrix PositionMatrix = XMMatrixTranslationFromVector(vAnimPosition);
 	
-	m_pTransformCom->MovePositionToMatrix(PositionMatrix, m_pNavigation);
+	m_pTransformCom->MovePositionToMatrix(PositionMatrix, m_pNavigationCom);
 
 	m_pTransformCom->Set_State(STATE::POSITION,
-		m_pNavigation->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
+		m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
 }
 
 void CPlayerPawn::Bind_InputData(_float fTimeDelta)
@@ -871,14 +853,7 @@ void CPlayerPawn::Free()
 	Safe_Release(m_pCamera);
 
 	Safe_Release(m_pPlayerInstance);
-	Safe_Release(m_pNavigation);
 
-	for (auto& Pair : m_Colliders)
-	{
-		for (auto& pCollider : Pair.second)
-		{
-			Safe_Release(pCollider);
-		}
-	}
-	m_Colliders.clear();
+	for (_uint i = 0; i < ENUM_CLASS(ARMOR_TYPE::END); i++)
+		Safe_Release(m_pEquipArmors[i]);
 }

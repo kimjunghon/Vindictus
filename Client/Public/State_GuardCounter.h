@@ -3,11 +3,12 @@
 #include "PlayerState.h"
 
 NS_BEGIN(Client)
-class CState_Guard final : public CPlayerState
+
+class CState_GuardCounter final : public CPlayerState
 {
 private:
-	CState_Guard();
-	virtual ~CState_Guard() = default;
+	CState_GuardCounter();
+	virtual ~CState_GuardCounter() = default;
 
 public:
 	virtual HRESULT Initialize() override;
@@ -16,13 +17,9 @@ public:
 	virtual void	Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta);
 	virtual void	Exit(CPlayerPawn* pPlayerPawn) override;
 
-private:
-	_bool			m_bGuardEnd = {};
-	_bool			m_bGuardBegin = {};
-
 public:
-	static CState_Guard*	Create();
-	virtual void			Free() override;
+	static CState_GuardCounter* Create();
+	virtual void				Free() override;
 };
 
 NS_END

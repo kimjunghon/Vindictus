@@ -19,7 +19,7 @@ protected:
 public:
 	virtual HRESULT Initialize();
 	virtual void	Update(_fmatrix WorldMatrix) {}
-	virtual _bool	Intersect(COLLIDER eType, CBounding* pTarget) PURE;
+	virtual _bool	Intersect(COLLIDER eType, CBounding* pTarget, _float* pDistance = nullptr, _float3* pNormal = nullptr) PURE;
 
 #ifdef _DEBUG
 public:
@@ -27,6 +27,7 @@ public:
 #endif
 
 protected:
+	_float3					m_vNormal = {};
 	ID3D11Device*			m_pDevice = { nullptr };
 	ID3D11DeviceContext*	m_pDeviceContext = { nullptr };
 

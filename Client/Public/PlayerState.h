@@ -26,7 +26,7 @@ public:
 	virtual void	Exit(CPlayerPawn* pPlayerPawn);
 
 protected:
-	_uint m_iStateFlag = {};
+	_uint			m_iStateFlag = {};
 
 protected:
 	void			Change_OtherState(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput);

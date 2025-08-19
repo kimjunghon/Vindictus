@@ -17,9 +17,18 @@ HRESULT CState_Guard::Initialize()
 void CState_Guard::Enter(CPlayerPawn* pPlayerPawn)
 {
 	m_bGuardEnd = false;
-	m_bGuardBegin = true;
+	
 
-	ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_BEGIN));
+	if (pPlayerPawn->IsGaurdHit())
+	{
+		m_bGuardBegin = false;
+		ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_DURING));
+	}
+	else
+	{
+		m_bGuardBegin = true;
+		ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_BEGIN));
+	}
 }
 
 void CState_Guard::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput)

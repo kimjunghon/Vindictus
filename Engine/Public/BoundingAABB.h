@@ -21,7 +21,7 @@ public:
 public:
 	HRESULT			Initialize(const BOUNDING_DESC* pDesc);
 	virtual void	Update(_fmatrix WorldMatrix) override;
-	virtual _bool	Intersect(COLLIDER eType, CBounding* pTarget) override;
+	virtual _bool	Intersect(COLLIDER eType, CBounding* pTarget, _float* pDistance = nullptr, _float3* pNormal = nullptr) override;
 
 #ifdef _DEBUG
 public:

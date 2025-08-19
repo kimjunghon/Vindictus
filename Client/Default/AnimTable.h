@@ -49,7 +49,8 @@ namespace Client
 			SMASH3_0 = 1 << 15,
 			SMASH3_1 = 1 << 16,
 			SMASH3_2 = 1 << 17,
-			SMASH4 = 1 << 18
+			SMASH4 = 1 << 18,
+			SMASH_GUARD_COUNTER = 1 << 19,
 		};
 
 		//////////////GUARD//////////////
@@ -57,11 +58,9 @@ namespace Client
 			GUARD_BEGIN = 1 << 8,
 			GUARD_DURING = 1 << 9,
 			GUARD_END = 1 << 10,
-			GUARD_HIT = 1 << 11,
-			GUARD_BREAK = 1 << 12,
-			GUARD_ATTACK = 1 << 13,
-			GUARD_COUNTER = 1 << 14,
-			GUARD_WALK = 1 << 15
+			GUARD_BREAK = 1 << 11,
+			GUARD_ATTACK = 1 << 12,
+			GUARD_WALK = 1 << 13
 
 		};
 
@@ -70,8 +69,7 @@ namespace Client
 			HEAVYSTAND_BEGIN = 1 << 8,
 			HEAVYSTAND_DURING = 1 << 9,
 			HEAVYSTAND_END = 1 << 10,
-			HEAVYSTAND_HIT = 1 << 11,
-			HEAVYSTAND_BREAK = 1 << 12
+			HEAVYSTAND_BREAK = 1 << 11
 		};
 
 		//////////////ROLL//////////////
@@ -89,7 +87,9 @@ namespace Client
 			HIT_RIGHT = 1 << 10,
 			HIT_LEFT = 1 << 11,
 			HIT_STRONG = 1 << 12,
-			HIT_DOWN = 1 << 13
+			HIT_DOWN = 1 << 13,
+			HIT_GUARD= 1 << 14,
+			HIT_HEAVYSTAND = 1 << 15
 		};
 	}
 

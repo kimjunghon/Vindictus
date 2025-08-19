@@ -25,6 +25,7 @@ protected:
 	virtual ~CBody() = default;
 
 public:
+	_bool				IsAnimationInRage(_float2 vRange) { return m_pModelCom->IsAnimationInRange(vRange); }
 	_bool				AnimIsFinished() { return m_pModelCom->CurrentAnim_Finished(); }
 	_bool				AnimCanChange() { return m_pModelCom->CanChangeAnimation(); }
 	const _vector*		Get_AnimMovementPtr() const { return m_pModelCom->Get_AnimMovementPtr(); }

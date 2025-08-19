@@ -81,12 +81,12 @@ void CCollider::OnCollision(const COLLISION_DATA& Data)
 		m_CallBack(Data);
 }
 
-_bool CCollider::Intersect(CCollider* pOtherCollider)
+_bool CCollider::Intersect(CCollider* pOtherCollider, _float* pDistance, _float3* pNormal)
 {
 #ifdef _DEBUG
-	return m_IsColl = m_pBounding->Intersect(pOtherCollider->m_eType, pOtherCollider->m_pBounding);
+	return m_IsColl = m_pBounding->Intersect(pOtherCollider->m_eType, pOtherCollider->m_pBounding, pDistance, pNormal);
 #else
-	return m_pBounding->Intersect(pOtherCollider->m_eType, pOtherCollider->m_pBounding);
+	return m_pBounding->Intersect(pOtherCollider->m_eType, pOtherCollider->m_pBounding, pNormal);
 #endif
 }
 

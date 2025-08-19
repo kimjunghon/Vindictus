@@ -1,6 +1,5 @@
 #pragma once
-#include "Client_Defines.h"
-#include "Pawn.h"
+#include "ColliderPawn.h"
 
 NS_BEGIN(Engine)
 class CBehaviorTree;
@@ -12,11 +11,8 @@ NS_BEGIN(Client)
 
 class CBody;
 
-class CMonster abstract : public CPawn
+class CMonster abstract : public CColliderPawn
 {
-protected:
-	typedef unordered_map<COLLIDER_CHANNEL, vector<CCollider*>> COLLIDER;
-
 protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CMonster(const CMonster& Prototype);
@@ -36,7 +32,6 @@ public:
 
 	//State
 public:
-	virtual BT_STATE		IsSpawn() PURE;
 	virtual BT_STATE		CanAttack();
 	virtual BT_STATE		CanOtherAction();
 	virtual BT_STATE		CanAttackRange();
@@ -45,6 +40,7 @@ public:
 	virtual BT_STATE		Patrol() PURE;
 
 protected:
+	_bool			m_AttackComplete = { false };
 	_uint			m_iNumAttacks = {};
 	vector<_float>	m_AttackTime = {};
 	vector<_float>	m_AttackCoolTime = {};
@@ -59,18 +55,19 @@ protected:
 
 protected:
 	CBehaviorTree*		m_pAI = { nullptr };
-	CNavigation*		m_pNavigationCom = { nullptr };
 	CBody*				m_pBody = { nullptr };
 	const _vector*		m_pAnimMovement = {nullptr};
 	const _vector*		m_pAnimRotation = { nullptr };
 	_uint				m_iStateFlag = {};
-
-	//Collider
-	COLLIDER			m_Colliders;
-	HIT_TYPE			m_eHitType = { HIT_TYPE::END };
-
+	
 protected:
-	void Update_AttackCoolTime(_float fTimeDelta);
+	virtual void	Update_AttackColliders(_uint iStateFlag) override;
+
+	void			Bind_HitCollisionCallback(_uint iHitCollisionIndex);
+	void			Bind_AttackCollisionCallback(_uint iAttackCollisionIndex);
+
+	void			OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData);
+	void			Update_AttackCoolTime(_float fTimeDelta);
 
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;

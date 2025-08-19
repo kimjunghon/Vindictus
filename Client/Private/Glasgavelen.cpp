@@ -58,11 +58,6 @@ HRESULT CGlasgavelen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	return S_OK;
 }
 
-BT_STATE CGlasgavelen::IsSpawn()
-{
-	return BT_STATE();
-}
-
 BT_STATE CGlasgavelen::Attack()
 {
 	return BT_STATE();

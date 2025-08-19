@@ -18,6 +18,8 @@ namespace Client
 	//Typedef
 	typedef pair<ITEM_TYPE, CGameObject*> ITEM;
 	using Shared_ITEM = shared_ptr<ITEM>;
+
+	typedef unordered_map<_uint, vector<ATTACK_MAP>> ATTACK_MAPPING;
 }
 
 extern HWND g_hWnd;

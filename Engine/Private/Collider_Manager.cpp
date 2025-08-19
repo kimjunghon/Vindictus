@@ -1,7 +1,6 @@
 #include "EnginePch.h"
 #include "Collider_Manager.h"
 #include "GameObject.h"
-#include "Collider.h"
 
 CCollider_Manager::CCollider_Manager()
 {
@@ -27,7 +26,7 @@ void CCollider_Manager::Update()
 			if (Intersect_Bounding(SrcPair.second, DstPair.second))
 			{
 				if(Has_ActionCollider(SrcPair.first) && Has_ActionCollider(DstPair.first))
-					Check_Collision(m_Actions[SrcPair.first], m_Actions[DstPair.first], DstPair.first);
+					Check_Collision(m_Actions[SrcPair.first],m_Actions[DstPair.first]);
 			}
 		}
 	}
@@ -95,12 +94,15 @@ _bool CCollider_Manager::Intersect_Bounding(CCollider* pSrcCollider, CCollider* 
 	return pSrcCollider->Intersect(pDstCollider);
 }
 
-void CCollider_Manager::Check_Collision(const vector<CCollider*>& SrcColliders, const vector<CCollider*>& DstColliders, CGameObject* pDstOwner)
+void CCollider_Manager::Check_Collision(const vector<CCollider*>& SrcColliders, const vector<CCollider*>& DstColliders)
 {
 	for (auto& pSrcCollider : SrcColliders)
 	{
 		for (auto& pDstCollider : DstColliders)
 		{
+			if (false == pSrcCollider->IsEnable() || false == pDstCollider->IsEnable())
+				continue;
+
 			COLLIDER_CHANNEL eSrcChannel = {};
 			COLLIDER_CHANNEL eDstChannel = {};
 
@@ -112,37 +114,45 @@ void CCollider_Manager::Check_Collision(const vector<CCollider*>& SrcColliders, 
 
 			if (pSrcCollider->Get_ColliderOwner() == pDstCollider->Get_ColliderOwner())
 			{
-				// 같은 Owner 타입이면 Body Channel만만
-				if (pSrcCollider->Get_ColliderChannel() == COLLIDER_CHANNEL::BODY && pDstCollider->Get_ColliderChannel() == COLLIDER_CHANNEL::BODY)
-				{
-					if (pSrcCollider->Intersect(pDstCollider))
-						OnCollision(pSrcCollider, pDstCollider, pDstOwner);
-				}
+				// 같은 Owner 타입이면 BLOCK 처리만
+				if (m_eResponseTable[ENUM_CLASS(eSrcChannel)][ENUM_CLASS(eDstChannel)] != COLLIDER_TYPE::BLOCK)
+					continue;
 			}
-			else
+
+			_float3 vNormal = {};
+			_float fDistance = {};
+			_float3 vInverseNormal = {};
+
+			if (pSrcCollider->Intersect(pDstCollider, &fDistance, &vNormal))
 			{
-				if (pSrcCollider->Intersect(pDstCollider))
-					OnCollision(pSrcCollider, pDstCollider, pDstOwner);
+				XMStoreFloat3(&vInverseNormal, XMLoadFloat3(&vNormal) * -1.f);
+
+				CCollider::BLOCK_COLLISION_DATA BlockData = {};
+				BlockData.fDistance = fDistance;
+				BlockData.vNormal = vInverseNormal;
+				OnCollision(pSrcCollider, pDstCollider, BlockData);
+				BlockData.vNormal = vNormal;
+				OnCollision(pDstCollider, pSrcCollider, BlockData);
 			}
+		
 		}
 	}
 }
 
-void CCollider_Manager::OnCollision(CCollider* pSrcCollider, CCollider* pDstCollider, CGameObject* pDstOwner)
+void CCollider_Manager::OnCollision(CCollider* pSrcCollider, CCollider* pDstColliderm, CCollider::BLOCK_COLLISION_DATA BlockData)
 {
 	CCollider::COLLISION_DATA Data = {};
-	Data.pOwner = pDstOwner;
-	Data.pCollider = pDstCollider;
+	Data.pCollider = pSrcCollider;
 	Data.IsAttack = false;
+	Data.BlockData = BlockData;
 
-	if (pSrcCollider->Get_ColliderChannel() == COLLIDER_CHANNEL::HIT)
+	if (pDstColliderm->Get_ColliderChannel() == COLLIDER_CHANNEL::HIT)
 	{
 		Data.IsAttack = true;
-		CCollider::ATTACK_COLLISON_DATA AttackData = {};
-		AttackData = pDstCollider->GetAttackData();
+		Data.AttackData = pSrcCollider->GetAttackData();
 	}
 	
-	pSrcCollider->OnCollision(Data);
+	pDstColliderm->OnCollision(Data);
 }
 
 HRESULT CCollider_Manager::Ready_ResponseTable()

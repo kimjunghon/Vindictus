@@ -28,7 +28,7 @@ HRESULT CPlayerBody::Initialize(void* pArg)
 	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
 
 	m_pGameInstance->Subscribe<EVENT_BROKEN_HEAD>(ENUM_CLASS(EVENT_TYPE::NONSTATIC), [&](const EVENT_BROKEN_HEAD& Event) {
-		this->UnEquipHead(); });
+		this->IsHair(Event.IsBroken); });
 
 	return S_OK;
 }
@@ -59,9 +59,8 @@ HRESULT CPlayerBody::Render()
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
-		if (m_IsEquipHead && i == 5)
+		if (false == m_IsHair && i == 5)
 			continue;
-
 
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;

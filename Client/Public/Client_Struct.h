@@ -22,4 +22,11 @@ namespace Client
 		XMFLOAT3		vPosition;
 	}MONSTER_SPAWN_DATA;
 
+	typedef struct tagAttackMap
+	{
+		_uint			iAttackColliderIndex;
+		_bool			IsDown;
+		_float			fAttackRatio;
+		_float2			vAttackRange;
+	}ATTACK_MAP;
 }

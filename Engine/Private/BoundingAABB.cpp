@@ -29,7 +29,7 @@ void CBoundingAABB::Update(_fmatrix WorldMatrix)
     m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
 }
 
-_bool CBoundingAABB::Intersect(COLLIDER eType, CBounding* pTarget)
+_bool CBoundingAABB::Intersect(COLLIDER eType, CBounding* pTarget, _float* pDistance, _float3* pNormal)
 {
     _bool		isColl = { false };
 

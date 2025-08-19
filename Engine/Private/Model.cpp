@@ -559,6 +559,14 @@ HRESULT CModel::AnimationToBinary(ofstream& File)
     return S_OK;
 }
 
+_bool CModel::IsAnimationInRange(_float2 vRange)
+{
+    if (nullptr == m_pCurrentAnimation)
+        return false;
+
+    return m_pCurrentAnimation->CurrentAnim_InRangeOfRatio(vRange.x, vRange.y);
+}
+
 _bool CModel::CanChangeAnimation()
 {
     if (nullptr == m_pCurrentAnimation)

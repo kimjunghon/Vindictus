@@ -36,7 +36,9 @@ namespace Client
 	}EVENT_UI_CHANGE;
 
 	typedef struct tagEventBrokenHead final : public CEvent
-	{}EVENT_BROKEN_HEAD;
+	{
+		_bool IsBroken;
+	}EVENT_BROKEN_HEAD;
 
 	typedef struct tagEventChangeWeapon final : public CEvent
 	{

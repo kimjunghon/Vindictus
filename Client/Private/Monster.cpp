@@ -4,12 +4,12 @@
 #include "BehaviorTree.h"
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CPawn { pDevice, pDeviceContext }
+	: CColliderPawn{ pDevice, pDeviceContext }
 {
 }
 
 CMonster::CMonster(const CMonster& Prototype)
-	: CPawn { Prototype }
+	: CColliderPawn{ Prototype }
 	, m_iNumAttacks { Prototype.m_iNumAttacks }
 	, m_AttackCoolTime{ Prototype.m_AttackCoolTime }
 	, m_AttackTime{ Prototype.m_AttackTime }
@@ -96,10 +96,64 @@ BT_STATE CMonster::Patrol()
 	return BT_STATE();
 }
 
+void CMonster::Update_AttackColliders(_uint iStateFlag)
+{
+	if (m_AttackComplete)
+		return;
+
+	auto iter = m_AttackMapping.find(iStateFlag);
+	if (iter == m_AttackMapping.end())
+		return;
+
+	for (auto& AttackMap : iter->second)
+	{
+		if (false == m_pBody->IsAnimationInRage(AttackMap.vAttackRange))
+			continue;
+
+		CCollider::ATTACK_COLLISON_DATA AttackData = {};
+		AttackData.IsDown = AttackMap.IsDown;
+		AttackData.fDamage = 10.f;
+		//	AttackData.fDamage = m_fAttackData * AttackMap.fAttackRatio;
+		AttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+
+		_uint iAttackIndex = AttackMap.iAttackColliderIndex;
+
+		m_AttackColliderCombinedMatrix[iAttackIndex] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[iAttackIndex]), m_pTransformCom->Get_WorldMatrix());
+		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Update(m_AttackColliderCombinedMatrix[iAttackIndex]);
+
+		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetEnable(true);
+		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]);
+
+		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetAttackData(AttackData);
+	}
+}
+
+void CMonster::Bind_HitCollisionCallback(_uint iHitCollisionIndex)
+{
+}
+
+void CMonster::Bind_AttackCollisionCallback(_uint iAttackCollisionIndex)
+{
+	if (iAttackCollisionIndex >= m_Colliders[COLLIDER_CHANNEL::ATTACK].size())
+		return;
+
+	m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackCollisionIndex]->SetCollisionCallBack([this](const CCollider::COLLISION_DATA& Data) {
+		this->OnCollisionAttack(Data);
+		});
+}
+
+void CMonster::OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData)
+{
+	m_AttackComplete = true;
+}
+
 void CMonster::Update_AttackCoolTime(_float fTimeDelta)
 {
 	for (auto& AttackTime : m_AttackTime)
 		AttackTime += fTimeDelta;
+
+	if (m_AttackComplete && m_pBody->AnimIsFinished())
+		m_AttackComplete = false;
 }
 
 void CMonster::Free()
@@ -107,6 +161,4 @@ void CMonster::Free()
 	__super::Free();
 
 	Safe_Release(m_pAI);
-	Safe_Release(m_pNavigationCom);
-
 }

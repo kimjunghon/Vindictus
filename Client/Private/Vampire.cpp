@@ -54,6 +54,8 @@ HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
 
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
 
+	m_pBody->Forcing_Play_Animation();
+
 	m_pNavigationCom = m_pGameInstance->Clone_CurrentNavigation(SpawnData.iCellIndex);
 
 	_vector vPosition = XMVectorSetW(XMLoadFloat3(&SpawnData.vPosition), 1.f);
@@ -61,14 +63,6 @@ HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 
 	return S_OK;
-}
-
-BT_STATE CVampire::IsSpawn()
-{
-	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::SPAWN) && false == m_pBody->AnimIsFinished())
-		return BT_STATE::SUCCESS;
-
-	return BT_STATE::FAILED;
 }
 
 BT_STATE CVampire::Attack()

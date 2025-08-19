@@ -18,7 +18,13 @@ public:
 	virtual void	Exit(CPlayerPawn* pPlayerPawn) override;
 
 private:
+	_float			m_fHitTime = {};
+	_float			m_fCanCounterTime = {};
+private:
 	void			Change_HitFlag(HIT_TYPE eHitType);
+	void			InputData_Hit(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput);
+	void			InputData_GaurdHit(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput);
+	void			InputData_HeavyStandHit(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput);
 
 public:
 	static CState_Hit* Create();

@@ -100,11 +100,6 @@ HRESULT CQueen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	return S_OK;
 }
 
-BT_STATE CQueen::IsSpawn()
-{
-	return BT_STATE();
-}
-
 BT_STATE CQueen::Attack()
 {
 	_uint iAttackFlag = ENUM_CLASS(ATTACK_FLAG::DOUBLE) << m_iCurrentAttack;

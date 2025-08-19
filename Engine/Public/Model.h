@@ -43,7 +43,7 @@ public:
 public:
 	const MODEL_BOUNDING	Get_ModelBounding() const { return m_Bounding; }
 	
-
+	_bool					IsAnimationInRange(_float2 vRange);
 	_bool					CanChangeAnimation();
 	_bool					CurrentAnim_Finished() { return m_IsFinished; }
 
