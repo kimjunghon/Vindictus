@@ -1,5 +1,4 @@
 #pragma once
-#include "Client_Defines.h"
 #include "PlayerState.h"
 
 NS_BEGIN(Client)

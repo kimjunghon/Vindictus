@@ -61,6 +61,8 @@ void CPlayerAnimMachine::Initialize_SMASH()
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH3_1)] =			{ "Smash_03_01", false, _float2{0.4f, 1.f}  , 2.f};
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH3_2)] =			{ "Smash_03_02", false, _float2{0.6f, 1.f}  , 2.f};
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH4)] =			{ "Smash_04", false, _float2{0.5f, 1.f} , 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH_GUARD_COUNTER)] = { "Guard_Counter", false, _float2{0.4f, 1.f} , 2.f };
+	
 }
 
 void CPlayerAnimMachine::Initialize_GUARD()
@@ -70,10 +72,8 @@ void CPlayerAnimMachine::Initialize_GUARD()
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_BEGIN)] =		{ "Guard_Begin", false, _float2{0.4f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_DURING)] =		{ "Guard_During", true, _float2{0.f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_END)] =		{ "Guard_End", false, _float2{0.4f, 1.f}, 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_HIT)] =		{ "Guard_Hit", false, _float2{0.f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_BREAK)] =		{ "Guard_Break", false, _float2{0.8f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_ATTACK)] =		{ "Guard_Attack", false, _float2{0.4f, 1.f}, 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_COUNTER)] =	{ "Guard_Counter", false, _float2{0.4f, 1.f} , 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_WALK)] =		{ "Guard_Walk", true, _float2{0.f, 1.f}, 2.f };
 }
 
@@ -84,7 +84,6 @@ void CPlayerAnimMachine::Initialize_HEAVYSTAND()
 	m_AnimDatas[iFlag | ENUM_CLASS(HEAVYSTAND_FLAG::HEAVYSTAND_BEGIN)] =	{ "HeavyStand_Begin", false, _float2{0.4f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(HEAVYSTAND_FLAG::HEAVYSTAND_DURING)] =	{ "HeavyStand_During", true, _float2{0.f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(HEAVYSTAND_FLAG::HEAVYSTAND_END)] =		{ "HeavyStand_End", false, _float2{0.4f, 1.f}, 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(HEAVYSTAND_FLAG::HEAVYSTAND_HIT)] =		{ "HeavyStand_Hit", false, _float2{0.4f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(HEAVYSTAND_FLAG::HEAVYSTAND_BREAK)] =	{ "HeavyStand_Break", false, _float2{0.4f, 1.f} , 2.f };
 }
 
@@ -102,12 +101,28 @@ void CPlayerAnimMachine::Initialize_HIT()
 {
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
-	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_FRONT)] =	{ "Hit_Front", false, _float2{1.f, 1.f}, 2.f };
-	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_BACK)] =	{ "Hit_Back", false, _float2{1.f, 1.f}, 2.f };
-	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_RIGHT)] =	{ "Hit_Right", false, _float2{1.f, 1.f}, 2.f };
-	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_LEFT)] =	{ "Hit_Left", false, _float2{1.f, 1.f}, 2.f };
-	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_STRONG)] =	{ "Hit_Strong", false, _float2{1.f, 1.f}, 2.f };
-	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::HIT_DOWN)] =	{ "Hit_Down", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::FRONT)] =				{ "Hit_Front", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::BACK)] =				{ "Hit_Back", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::RIGHT)] =				{ "Hit_Right", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag| ENUM_CLASS(HIT_FLAG::LEFT)] =				{ "Hit_Left", false, _float2{1.f, 1.f}, 2.f };
+
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::MIDDLE_FRONT)] =		{ "Hit_Middle_Front", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::MIDDLE_FRONT_UP)] =	{ "Hit_Middle_Front_Up", false, _float2{0.6f, 1.f}, 2.f };
+
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::MIDDLE_BACK)] =		{ "Hit_Middle_Back", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::MIDDLE_BACK_UP)] =		{ "Hit_Middle_Back_Up", false, _float2{0.6f, 1.f}, 2.f };
+
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_FRONT)] =		{ "Hit_Strong_Front", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_FRONT_UP)] = { "Hit_Strong_Front_Up", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_FRONT_ROLLUP)] ={ "Hit_Strong_Front_RollUp", false, _float2{1.f, 1.f}, 2.f };
+
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_BACK)] =		{ "Hit_Strong_Back", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_BACK_UP)] =		{ "Hit_Strong_Back_Up", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_BACK_ROLLUP)] = { "Hit_Strong_Back_RollUp", false, _float2{1.f, 1.f}, 2.f };
+
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::GUARD)] =				{ "Guard_Hit", false, _float2{0.2f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::HEAVYSTAND)] =			{ "HeavyStand_Hit", false, _float2{0.4f, 1.f}, 2.f };
+
 }
 
 CPlayerAnimMachine* CPlayerAnimMachine::Create()

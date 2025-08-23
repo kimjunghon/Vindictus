@@ -130,6 +130,7 @@ void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones
 		{
 			m_vChangePrevPosition = XMVectorSetX(m_vChangePrevPosition, 0.f);
 			m_vChangePrevPosition = XMVectorSetY(m_vChangePrevPosition, 0.f);
+			m_vChangePrevRotation = XMLoadFloat4(&m_KeyFrames[0].vRotation);
 		}
 	}
 

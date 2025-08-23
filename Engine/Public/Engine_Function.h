@@ -51,6 +51,29 @@ namespace Engine
 			dwRefCnt = pInstance->AddRef();
 		return dwRefCnt;
 	}
+
+	template<typename T>
+	struct PairHash
+	{
+		size_t operator()(const pair<T, T>& Pair) const noexcept
+		{
+			T Min = Pair.first > Pair.second ? Pair.second : Pair.first;
+			T Max = Pair.first < Pair.second ? Pair.second : Pair.first;
+
+			return hash<T>{}(Min) ^ (hash<T>{}(Max) << 1);
+		}
+	};
+
+	template<typename T>
+	struct PairEqual
+	{
+		_bool operator()(const pair<T, T>& PairA, const pair<T, T>& PairB) const noexcept
+		{
+			return (PairA.first == PairB.first && PairA.second == PairB.second) ||
+				(PairA.first == PairB.second && PairA.second == PairB.first);
+		}
+	};
+
 }
 
 #endif // Engine_Function_h__

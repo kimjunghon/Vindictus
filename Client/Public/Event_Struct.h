@@ -1,6 +1,11 @@
 #pragma once
 
 #include "Event.h"
+#include "Client_Enum.h"
+
+NS_BEGIN(Engine)
+class CGameObject;
+NS_END
 
 namespace Client
 {
@@ -31,6 +36,71 @@ namespace Client
 	}EVENT_UI_CHANGE;
 
 	typedef struct tagEventBrokenHead final : public CEvent
-	{}EVENT_BROKEN_HEAD;
+	{
+		_bool IsBroken;
+	}EVENT_BROKEN_HEAD;
 
+	typedef struct tagEventChangeWeapon final : public CEvent
+	{
+		_uint		iWeaponTypeIndex;
+	}EVENT_CHANGE_WEAPON;
+
+	typedef struct tagEventChangeArmor final : public CEvent
+	{
+		_uint		iArmorTypeIndex;
+	}EVENT_CHANGE_ARMOR;
+	
+	typedef struct tagEventAddItem final : public CEvent
+	{
+		_uint iInventoryIndex;
+	}EVENT_ADD_ITEM;
+
+	typedef struct tagEventPickStorage final : public CEvent
+	{
+		_uint iInventoryIndex;
+	}EVENT_PICK_STORAGE;
+
+	typedef struct tagEventPickEquipment final : public CEvent
+	{
+		ITEM_TYPE eItemType;
+		WEAPON_TYPE eWeaponType;
+		ARMOR_TYPE eArmorType;
+	}EVENT_PICK_EQUIPMENT;
+
+	typedef struct tagEventUpdateInventory final : public CEvent
+	{
+		_uint iNumIndices;
+		_uint* pIndices = { nullptr };
+	}EVENT_UPDATE_INVENTORY;
+
+	typedef struct tagEventPickItem final : public CEvent
+	{
+		_bool IsPick;
+		_uint iInventoryIndex;
+	}EVENT_PICK_ITEM;
+
+	typedef struct tagEventPickEquipItem final : public CEvent
+	{
+		_bool IsPick;
+		ITEM_TYPE eItemType;
+		WEAPON_TYPE eWeaponType;
+		ARMOR_TYPE eArmorType;
+	}EVENT_PICK_EQUIP_ITEM;
+
+
+	typedef struct tagEventNonePick final : public CEvent
+	{
+	}EVENT_NONE_PICK;
+
+	typedef struct tagEventEquipStorage final : public CEvent
+	{
+		_uint iInventoryIndex;
+	}EVENT_EQUIP_STORAGE;
+
+	typedef struct tagEventUnEquipEquipment final : public CEvent
+	{
+		ITEM_TYPE eItemType;
+		WEAPON_TYPE eWeaponType;
+		ARMOR_TYPE eArmorType;
+	}EVENT_UNEQUIP_EQUIPMENT;
 }

@@ -13,13 +13,13 @@ CMesh::CMesh(const CMesh& Prototype)
 	: CVIBuffer { Prototype }
 	, m_iMaterialIndex { Prototype.m_iMaterialIndex }
 #ifdef _DEBUG
-	, m_Vertices { Prototype.m_Vertices}
+	, m_Vertices{ Prototype.m_Vertices }
 	, m_Indices {Prototype.m_Indices }
 #endif
 {
 }
 
-HRESULT CMesh::Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Initialize_Prototype_Assimp(MODEL_TYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
 	strcpy_s(m_szName, pAIMesh->mName.data);
 
@@ -31,7 +31,7 @@ HRESULT CMesh::Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMes
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	
-	HRESULT hr = MODELTYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Assimp(pAIMesh, PreTransformMatrix) : Ready_Vertices_For_Anim_Assimp(pAIMesh, Bones);
+	HRESULT hr = MODEL_TYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Assimp(pAIMesh, PreTransformMatrix) : Ready_Vertices_For_Anim_Assimp(pAIMesh, Bones);
 
 	if (FAILED(hr))
 		return E_FAIL;
@@ -68,7 +68,7 @@ HRESULT CMesh::Initialize_Prototype_Assimp(MODELTYPE eType, const aiMesh* pAIMes
 	return S_OK;
 }
 
-HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Initialize_Prototype_Binary(MODEL_TYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding)
 {
 	MESH_INFO tMeshInfo = {};
 	size_t iMeshNameLenghth = {};
@@ -85,7 +85,7 @@ HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, cons
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	HRESULT hr = MODELTYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Binary(File, PreTransformMatrix) : Ready_Vertices_For_Anim_Binary(File, Bones);
+	HRESULT hr = MODEL_TYPE::NONANIM == eType ? Ready_Vertices_For_NonAnim_Binary(File, PreTransformMatrix, ModelBounding) : Ready_Vertices_For_Anim_Binary(File, Bones, ModelBounding);
 
 	if (FAILED(hr))
 		return E_FAIL;
@@ -110,7 +110,7 @@ HRESULT CMesh::Initialize_Prototype_Binary(MODELTYPE eType, ifstream& File, cons
 	}
 
 #ifdef _DEBUG
-	if(eType == MODELTYPE::NONANIM)
+	if(eType == MODEL_TYPE::NONANIM)
 	{
 		m_Indices.resize(m_iNumIndices);
 		memcpy(m_Indices.data(), pIndices, sizeof(_uint) * m_iNumIndices);
@@ -144,6 +144,17 @@ HRESULT CMesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, c
 	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
 }
 
+HRESULT CMesh::Bind_PoseBoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones)
+{
+	for (_uint i = 0; i < m_iNumBones; i++)
+	{
+		XMStoreFloat4x4(&m_BoneMatrices[i], XMMatrixMultiply(XMLoadFloat4x4(&m_OffsetMatrices[i]), Bones[m_BoneIndices[i]]->Get_PoseCombinedTransformationMatrix()));
+	}
+
+	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
+}
+
+#ifdef _DEBUG
 _bool CMesh::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist)
 {
 	_uint iIndex = {};
@@ -177,6 +188,7 @@ _bool CMesh::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float
 
 	return false;
 }
+#endif
 
 HRESULT CMesh::Ready_Vertices_For_NonAnim_Assimp(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
 {
@@ -327,7 +339,7 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Assimp(const aiMesh* pAIMesh, const vecto
 	return S_OK;
 }
 
-HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTransformMatrix)
+HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding)
 {
 	m_iVertexStride = sizeof(VTXMESH);
 
@@ -350,6 +362,40 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTra
 
 	}
 
+	_float fMinX = ModelBounding.vMinPosition.x;
+	_float fMinY = ModelBounding.vMinPosition.y;
+	_float fMinZ = ModelBounding.vMinPosition.z;
+
+	_float fMaxX = ModelBounding.vMaxPosition.x;
+	_float fMaxY = ModelBounding.vMaxPosition.y;
+	_float fMaxZ = ModelBounding.vMaxPosition.z;
+
+	for(_uint i = 0; i< m_iNumVertices; i++)
+	{
+
+		if (fMinX > pVertices[i].vPosition.x)
+			fMinX = pVertices[i].vPosition.x;
+
+		if (fMinY > pVertices[i].vPosition.y)
+			fMinY = pVertices[i].vPosition.y;
+
+		if (fMinZ > pVertices[i].vPosition.z)
+			fMinZ = pVertices[i].vPosition.z;
+
+		if (fMaxX < pVertices[i].vPosition.x)
+			fMaxX = pVertices[i].vPosition.x;
+
+		if (fMaxY < pVertices[i].vPosition.y)
+			fMaxY = pVertices[i].vPosition.y;
+
+		if (fMaxZ < pVertices[i].vPosition.z)
+			fMaxZ = pVertices[i].vPosition.z;
+	}
+
+	ModelBounding.vMinPosition = _float3(fMinX, fMinY, fMinZ);
+	ModelBounding.vMaxPosition = _float3(fMaxX, fMaxY, fMaxZ);
+
+
 #ifdef _DEBUG
 	m_Vertices.resize(m_iNumVertices);
 	memcpy(m_Vertices.data(), pVertices, sizeof(VTXMESH) * m_iNumVertices);
@@ -366,7 +412,7 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim_Binary(ifstream& File, _fmatrix PreTra
 	return S_OK;
 }
 
-HRESULT CMesh::Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone*>& Bones)
+HRESULT CMesh::Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone*>& Bones, MODEL_BOUNDING& ModelBounding)
 {
 	File.read(reinterpret_cast<_char*>(&m_iNumBones), sizeof(_uint));
 
@@ -436,6 +482,39 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone
 	
 	File.read(reinterpret_cast<_char*>(pVertices), sizeof(VTXANIMMESH) * m_iNumVertices);
 
+	_float fMinX = ModelBounding.vMinPosition.x;
+	_float fMinY = ModelBounding.vMinPosition.y;
+	_float fMinZ = ModelBounding.vMinPosition.z;
+
+	_float fMaxX = ModelBounding.vMaxPosition.x;
+	_float fMaxY = ModelBounding.vMaxPosition.y;
+	_float fMaxZ = ModelBounding.vMaxPosition.z;
+
+	for (_uint i = 0; i < m_iNumVertices; i++)
+	{
+
+		if (fMinX > pVertices[i].vPosition.x)
+			fMinX = pVertices[i].vPosition.x;
+
+		if (fMinY > pVertices[i].vPosition.y)
+			fMinY = pVertices[i].vPosition.y;
+
+		if (fMinZ > pVertices[i].vPosition.z)
+			fMinZ = pVertices[i].vPosition.z;
+
+		if (fMaxX < pVertices[i].vPosition.x)
+			fMaxX = pVertices[i].vPosition.x;
+
+		if (fMaxY < pVertices[i].vPosition.y)
+			fMaxY = pVertices[i].vPosition.y;
+
+		if (fMaxZ < pVertices[i].vPosition.z)
+			fMaxZ = pVertices[i].vPosition.z;
+	}
+
+	ModelBounding.vMinPosition = _float3(fMinX, fMinY, fMinZ);
+	ModelBounding.vMaxPosition = _float3(fMaxX, fMaxY, fMaxZ);
+
 	D3D11_SUBRESOURCE_DATA VBInitialData{};
 	VBInitialData.pSysMem = pVertices;
 
@@ -447,7 +526,7 @@ HRESULT CMesh::Ready_Vertices_For_Anim_Binary(ifstream& File, const vector<CBone
 	return S_OK;
 }
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eType, const aiMesh* pAIMesh, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
 	CMesh* pInstance = new CMesh(pDevice, pDeviceContext);
 	if (FAILED(pInstance->Initialize_Prototype_Assimp(eType, pAIMesh, Bones, PreTransformMatrix)))
@@ -459,10 +538,10 @@ CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext,
 }
 
 
-CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
+CMesh* CMesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eType, ifstream& File, const vector<CBone*>& Bones, _fmatrix PreTransformMatrix, MODEL_BOUNDING& ModelBounding)
 {
 	CMesh* pInstance = new CMesh(pDevice, pDeviceContext);
-	if (FAILED(pInstance->Initialize_Prototype_Binary(eType, File, Bones, PreTransformMatrix)))
+	if (FAILED(pInstance->Initialize_Prototype_Binary(eType, File, Bones, PreTransformMatrix, ModelBounding)))
 	{
 		MSG_BOX(TEXT("Failed Created : CMesh"));
 		Safe_Release(pInstance);
@@ -484,4 +563,5 @@ CComponent* CMesh::Clone(void* pArg)
 void CMesh::Free()
 {
 	__super::Free();
+
 }

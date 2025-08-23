@@ -17,7 +17,7 @@ protected:
 public:
 	virtual void	Initialize();
 	HRESULT			Set_Animation(CModel* pModelCom, _uint iState);
-
+	HRESULT			Forcing_Set_Animation(CModel* pModelCom, _uint iState);
 protected:
 	unordered_map<_uint, ANIM_DATA> m_AnimDatas;
 

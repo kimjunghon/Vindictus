@@ -50,7 +50,7 @@ void CLoadingScreen::Late_Update(_float fTimeDelta)
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
 		return;
 
-	_uint iTextureFlag = (*m_iUIState);
+	_uint iTextureFlag = (*m_pUIState);
 	iTextureFlag ^= ENUM_CLASS(STATE_FLAG::LOADING);
 	m_iTextureIndex = ComputeBitIndex(iTextureFlag);
 }
@@ -88,7 +88,7 @@ HRESULT CLoadingScreen::Ready_Children()
 	Children_Desc.fSizeX = m_fSizeX - 100.f;
 	Children_Desc.fSizeY = 10.f;
 	Children_Desc.fOffsetX = 0.f;
-	Children_Desc.fOffsetY = 260.f;
+	Children_Desc.fOffsetY = 300.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingBar"), &Children_Desc)))

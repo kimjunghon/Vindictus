@@ -11,6 +11,7 @@ NS_END
 NS_BEGIN(Client)
 class CStateFactory;
 class CPlayerInstance;
+class CMonsterInstance;
 
 class CMainApp final : public CBase
 {
@@ -35,13 +36,18 @@ private:
 
 	CStateFactory*			m_pStateFactory = {nullptr};
 	CPlayerInstance*		m_pPlayerInstance = { nullptr };
+	CMonsterInstance*		m_pMonsterInstance = { nullptr };
+
 private:
 	void	Event_LevelChange(const EVENT_LEVEL_CHANGE& Event);
 	CLevel* Create_NewLevel(_uint iChangeLevel);
 
+	HRESULT	Ready_DefaultColliderChannel();
+
 	HRESULT Ready_Prototype_ForStatic();
 	HRESULT Ready_Prototype_ForStatic_Texture();
 	HRESULT Ready_Prototype_ForStatic_UI();
+	HRESULT Ready_Prototype_ForStatic_Player();
 	HRESULT Ready_UI_Container();
 	HRESULT Ready_Controller();
 	HRESULT Ready_Navigations();

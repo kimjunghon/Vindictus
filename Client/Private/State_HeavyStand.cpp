@@ -70,5 +70,5 @@ namespace {
 			CStateFactory::GetInstance()->Register(ENUM_CLASS(PLAYER_STATE::HEAVYSTAND), []()->CPlayerState* { return CState_HeavyStand::Create(); });
 		};
 	};
-	static StateHeavyStandRegister RegisterMove;
+	static StateHeavyStandRegister Register;
 }

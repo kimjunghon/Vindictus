@@ -84,7 +84,7 @@ HRESULT CController_Manager::CameraInput(INPUT_CAMERA_DESC* pOut)
 
 HRESULT CController_Manager::UI_Input(INPUT_UI_DESC* pOut)
 {
-	return m_pCurrentController[ENUM_CLASS(CONTROLLER_CHANNEL::MAIN)]->UI_Input(pOut);
+	return m_pCurrentController[ENUM_CLASS(CONTROLLER_CHANNEL::UI)]->UI_Input(pOut);
 }
 
 CController_Manager* CController_Manager::Create()

@@ -24,6 +24,11 @@
 #include "OptionController.h"
 #include "StateBar.h"
 #include "UI_Container.h"
+#include "Mouse.h"
+#include "Inventory.h"
+#include "Storage.h"
+#include "Equipment.h"
+#include "Slot.h"
 
 //Controller
 #include "Controller_KeyBoard.h"
@@ -32,13 +37,25 @@
 //STATE FACTORY
 #include "StateFactory.h"
 
-//PlayerInstance
-#include "PlayerInstance.h"
+//Player
+#include "Camera_Target.h"
+#include "PlayerPawn.h"
+#include "PlayerBody.h"
+#include "Armor.h"
+#include "Weapon.h"
+
+//Map
+#include "Map.h"
+#include "MapObject.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
+	, m_pPlayerInstance { CPlayerInstance::GetInstance()}
+	, m_pMonsterInstance { CMonsterInstance::GetInstance()}
 {
 	Safe_AddRef(m_pGameInstance);
+	Safe_AddRef(m_pPlayerInstance);
+	Safe_AddRef(m_pMonsterInstance);
 }
 
 HRESULT CMainApp::Initialize()
@@ -54,7 +71,18 @@ HRESULT CMainApp::Initialize()
 	
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pDeviceContext)))
 		return E_FAIL;
-	
+
+	m_pStateFactory = CStateFactory::GetInstance();
+
+	if (FAILED(m_pPlayerInstance->Initialize(g_iInventoryCount)))
+		return E_FAIL;
+
+	if (FAILED(m_pMonsterInstance->Initialize()))
+		return E_FAIL;
+
+	if (FAILED(Ready_DefaultColliderChannel()))
+		return E_FAIL;
+
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
 	
@@ -64,13 +92,15 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Navigations()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::LOGO)))
+	if (FAILED(Ready_Controller()))
+		return E_FAIL;
+
+	if (FAILED(Start_Level(LEVEL::TOWN)))
 		return E_FAIL;
 	
-	m_pStateFactory = CStateFactory::GetInstance();
-	m_pPlayerInstance = CPlayerInstance::GetInstance();
 
-	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
+
+	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
 	return S_OK;
@@ -83,10 +113,12 @@ void CMainApp::Post_Update()
 		if (FAILED(m_pGameInstance->Clear_Resources()))
 			MSG_BOX(TEXT("Failed Clear Resrouces"));
 
+		m_pMonsterInstance->ClearLevel();
+
 		EVENT_UI_LEVEL_CHANGE Event_UIChange;
 		Event_UIChange.iChange_Level = m_iChange_Level;
 		Event_UIChange.bIsLoading = m_bIsLoading;
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event_UIChange);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event_UIChange);
 
 		CLevel* pNextLevel = Create_NewLevel(m_iChange_Level);
 
@@ -179,6 +211,15 @@ CLevel* CMainApp::Create_NewLevel(_uint iChangeLevel)
 	return pNewLevel;
 }
 
+HRESULT CMainApp::Ready_DefaultColliderChannel()
+{
+	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), COLLIDER_TYPE::OVERLAP);
+	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_CHANNEL::BODY), COLLIDER_TYPE::BLOCK);
+	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_CHANNEL::HIT), COLLIDER_TYPE::OVERLAP);
+
+	return S_OK;
+}
+
 HRESULT CMainApp::Ready_Prototype_ForStatic()
 {
 #pragma region SHADER
@@ -201,6 +242,21 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
+
+	/* Prototype_Component_Collider_AABB */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+		CCollider::Create(m_pDevice, m_pDeviceContext, COLLIDER::AABB))))
+		return E_FAIL;
+
+	/* Prototype_Component_Collider_OBB */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		CCollider::Create(m_pDevice, m_pDeviceContext, COLLIDER::OBB))))
+		return E_FAIL;
+
+	/* Prototype_Component_Collider_Sphere */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
+		CCollider::Create(m_pDevice, m_pDeviceContext, COLLIDER::SPHERE))))
+		return E_FAIL;
 #pragma endregion
 
 #pragma region VIBUFFER
@@ -215,10 +271,28 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 #pragma endregion
 
+	/* Prototype_GameObject_Camera_Target */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Target"),
+		CCamera_Target::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_MapObject */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Map"),
+		CMap::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_MapObject */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_MapObject"),
+		CMapObject::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 	if (FAILED(Ready_Prototype_ForStatic_UI()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_ForStatic_Texture()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Prototype_ForStatic_Player()))
 		return E_FAIL;
 
 	return S_OK;
@@ -226,6 +300,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 {	
+	//test
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Test"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Test.png"), 1))))
+		return E_FAIL;
+
+
 #pragma region LOADING_UI
 	/* Ready_Prototype_Component_Texture_LoadingScreen */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen"),
@@ -321,10 +401,26 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Option_Button.png"), 1))))
 		return E_FAIL;
 
-	/* Prototype_Component_Texture_GamePlay_Inventory */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Inventory"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Inventory.png"), 1))))
+	/* Prototype_Component_Texture_GamePlay_Mouse */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Cursor"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Cursor%d.png"), 2))))
 		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Inventroy_Background */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Inventroy_Background"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Inventory_Back.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Storage */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Storage"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Storage.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Equipment */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Equipment"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Equipment.png"), 1))))
+		return E_FAIL;
+
 #pragma endregion
 
 	return S_OK;
@@ -364,6 +460,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 		CLoadingPoint::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_UIObject_Mouse */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Mouse"),
+		CMouse::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_UIContainer */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_UIContainer"),
 		CUI_Container::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
@@ -397,6 +499,26 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_OptionController"),
 		COptionController::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
+
+	/* Prototype_UIObject_Inventory */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Inventory"),
+		CInventory::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_Storage */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Storage"),
+		CStorage::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_Equipment */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Equipment"),
+		CEquipment::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_Slot */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Slot"),
+		CSlot::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 #pragma endregion
 
 #pragma endregion
@@ -404,10 +526,43 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 	return S_OK;
 }
 
+HRESULT CMainApp::Ready_Prototype_ForStatic_Player()
+{
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
+	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
+
+	/* Prototype_Component_Model_Player */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Player"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/Piona.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Player_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Player_Body"),
+		CPlayerBody::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_PlayerPawn */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
+		CPlayerPawn::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon"),
+		CWeapon::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"),
+		CArmor::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CMainApp::Ready_UI_Container()
 {
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_UIContainer"),
-		ENUM_CLASS(LAYERTYPE::STATIC), TEXT("Layer_UI_Container"))))
+		ENUM_CLASS(LAYER_TYPE::STATIC), TEXT("Layer_UI_Container"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -421,22 +576,28 @@ HRESULT CMainApp::Ready_Controller()
 	if (FAILED(m_pGameInstance->Change_Controller(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), TEXT("Controller_KeyBoard"))))
 		return E_FAIL;
 	
+	if (FAILED(m_pGameInstance->Add_Controller_ToManager(TEXT("Controller_UI"), CController_UI::Create())))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Change_Controller(ENUM_CLASS(CONTROLLER_CHANNEL::UI), TEXT("Controller_UI"))))
+		return E_FAIL;
+
 	return S_OK;
 	
 }
 
 HRESULT CMainApp::Ready_Navigations()
 {
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::TOWN), TEXT("../Bin/Resources/Navigation/Town_Navigation.dat"))))
+	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::TOWN), TEXT("../Bin/Resources/Map/Town_Navigation.dat"))))
+		return E_FAIL;
+	//
+	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::FILED), TEXT("../Bin/Resources/Map/Field_Navigation.dat"))))
 	//	return E_FAIL;
 	//
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::FILED), TEXT("../Bin/Resources/Navigation/Field_Navigation.dat"))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::QUEEN), TEXT("../Bin/Resources/Map/QueenMap_Navigation.dat"))))
+		return E_FAIL;
 	//
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::QUEEN), TEXT("../Bin/Resources/Navigation/Queen_Navigation.dat"))))
-	//	return E_FAIL;
-	//
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("../Bin/Resources/Navigation/Glasgavelen_Navigation.dat"))))
+	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("../Bin/Resources/Map/Glasgavelen_Navigation.dat"))))
 	//	return E_FAIL;
 
 	return S_OK;
@@ -465,11 +626,15 @@ void CMainApp::Free()
 	__super::Free();
 
 	Safe_Release(m_pStateFactory);
-	Safe_Release(m_pPlayerInstance);
-
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pDeviceContext);
 
 	m_pGameInstance->Release_Engine();
 	Safe_Release(m_pGameInstance);
+
+	m_pPlayerInstance->Release_PlayerInstance();
+	Safe_Release(m_pPlayerInstance);
+
+	m_pMonsterInstance->Release_MonsterInstance();
+	Safe_Release(m_pMonsterInstance);
 }

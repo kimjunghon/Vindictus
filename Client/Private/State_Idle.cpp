@@ -76,5 +76,5 @@ struct StateIdleRegister {
     };
 
 };
-static StateIdleRegister RegisterIdle;
+static StateIdleRegister Register;
 }

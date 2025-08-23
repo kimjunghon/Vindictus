@@ -20,7 +20,6 @@ private:
 	HRESULT Ready_Right();
 	HRESULT Ready_UI(const _wstring& strLayerTag);
 	HRESULT Ready_Player(const _wstring& strLayerTag);
-	HRESULT Ready_Controller();
 
 	HRESULT Ready_GameObject(const _wstring& strLayerTag);
 	HRESULT Ready_MapObject(const _wstring& strLayerTag);

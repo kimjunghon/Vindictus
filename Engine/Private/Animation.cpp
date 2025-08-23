@@ -1,6 +1,7 @@
 #include "EnginePch.h"
 #include "Animation.h"
 #include "Channel.h"
+#include "Bone.h"
 
 CAnimation::CAnimation()
 {
@@ -63,7 +64,7 @@ HRESULT CAnimation::Initialize(ifstream& File, const vector<class CBone*>& Bones
 	return S_OK;
 }
 
-void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _vector& vPrevRootPostion)
+void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _bool* IsAnimStart)
 {
 	if (m_bAnimChange)
 	{
@@ -99,7 +100,7 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 			}
 			else
 			{
-				vPrevRootPostion = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+				*IsAnimStart = true;
 				m_fCurrentTrackPosition = 0.f;
 			}
 		}
@@ -112,6 +113,11 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 _bool CAnimation::CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio)
 {
 	return (m_fCurrentTrackPosition / m_fDuration) >= fBeginRatio && (m_fCurrentTrackPosition / m_fDuration) <= fEndRatio;
+}
+
+_bool CAnimation::CurrentAnim_InRangeOfTrackPositon(_float fBeginTrackPosition, _float fEndTrackPosition)
+{
+	return m_fCurrentTrackPosition >= fBeginTrackPosition && m_fCurrentTrackPosition <= fEndTrackPosition;
 }
 
 void CAnimation::Enter(_bool IsChange)

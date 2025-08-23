@@ -29,7 +29,10 @@ HRESULT CVampireAI::Ready_Nodes()
         
         pSelectorNode->Add_Child(pActionSelectorNode);
 
-        pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledVampire->CanOtherAction(); }));
+            pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledVampire->Is_Dead(); }));
+            pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledVampire->Is_Hit(); }));
+
+            pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledVampire->CanOtherAction(); }));
 
             CBT_SequenceNode* pAttackSequenceNode = CBT_SequenceNode::Create();
 

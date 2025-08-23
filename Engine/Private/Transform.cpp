@@ -1,10 +1,32 @@
 #include "EnginePch.h"
 #include "Transform.h"
 #include "Shader.h"
+#include "Navigation.h"
 
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CComponent {pDevice, pDeviceContext}
 {
+}
+
+_vector CTransform::Get_RotateQuat()
+{
+	_vector vRight = XMVector3Normalize(Get_State(STATE::RIGHT));
+	_vector vUp = XMVector3Normalize(Get_State(STATE::UP));
+	_vector vLook = XMVector3Normalize(Get_State(STATE::LOOK));
+
+	_matrix RotationMatrix = XMMatrixIdentity();
+	RotationMatrix.r[0] = vRight;
+	RotationMatrix.r[1] = vUp;
+	RotationMatrix.r[2] = vLook;
+
+	return XMQuaternionRotationMatrix(RotationMatrix);
+}
+
+_vector CTransform::Get_LookQuaternion()
+{
+	_vector vLook = XMVector3Normalize(XMVectorSetY(Get_State(STATE::LOOK),0.f));
+
+	return XMQuaternionRotationMatrix(XMMatrixInverse(nullptr, XMMatrixLookToLH(XMVectorZero(), vLook, XMVectorSet(0.f, 1.f, 0.f,0.f))));
 }
 
 HRESULT CTransform::Initialize_Prototype()
@@ -30,6 +52,72 @@ HRESULT CTransform::Initialize(void* pArg)
 HRESULT CTransform::Bind_Shader_WorldMatrix(CShader* pShader, const _char* pConstantWorldMatrixName)
 {
 	return pShader->Bind_Matrix(pConstantWorldMatrixName, &m_WorldMatrix);
+}
+
+void CTransform::MovePositionToVector(_fvector vMovePosition, CNavigation* pNavigation)
+{
+	_vector vPosition = Get_State(STATE::POSITION);
+	
+	_vector vNextPosition = XMVectorAdd(vPosition, vMovePosition);
+
+	_float3* pNormal = nullptr;
+	
+	_bool IsMove = pNavigation->isMove(vNextPosition, &pNormal);
+
+	if (IsMove)
+		Set_State(STATE::POSITION, vNextPosition);
+	else
+	{
+		if(nullptr != pNormal)	
+		{
+			_vector vMoveDir = XMVectorSubtract(vNextPosition, vPosition);
+			Sliding(vMoveDir, XMLoadFloat3(pNormal), pNavigation);
+		}
+	}
+}
+
+void CTransform::MovePositionToMatrix(_fmatrix PositionMatrix, CNavigation* pNavigation)
+{
+	_matrix WorldMatrix = Get_WorldMatrix();
+
+	_matrix NextWorldMatrix = PositionMatrix * WorldMatrix;
+
+	_float3* pNormal = nullptr;
+
+	_bool IsMove = pNavigation->isMove(NextWorldMatrix, &pNormal);
+
+	if (IsMove)
+		Set_WorldMatrix(NextWorldMatrix);
+	else
+	{
+		if (nullptr != pNormal)
+		{
+			_vector vNextPosition = NextWorldMatrix.r[3];
+			_vector vPosition = WorldMatrix.r[3];
+
+			_vector vMoveDir = XMVectorSubtract(vNextPosition, vPosition);
+			Sliding(vMoveDir, XMLoadFloat3(pNormal), pNavigation);
+		}
+	}
+}
+
+void CTransform::Sliding(_fvector vDir, _fvector vNormal, CNavigation* pNavigation)
+{
+	_vector vBlockNormal = XMVector3Normalize(vNormal);
+
+	if (XMVectorGetX(XMVector3Length(vBlockNormal)) == 0.f)
+		return;
+
+	_vector vSlideDir = vDir - XMVector3Dot(vDir, vBlockNormal) * vBlockNormal;
+
+	_vector vPosition = Get_State(STATE::POSITION);
+
+	_vector vNextPosition = XMVectorAdd(vPosition, vSlideDir);
+
+	_bool IsMove = pNavigation->isMove(vNextPosition);
+
+	if (IsMove)
+		Set_State(STATE::POSITION, vNextPosition);
 }
 
 void CTransform::Scale(_float3 vScale)
@@ -104,6 +192,19 @@ void CTransform::RotateQuaternion(_fvector Quaternion)
 	_vector vRight = XMVectorScale(XMVectorSet(1.f, 0.f, 0.f, 0.f), vScaled.x);
 	_vector vUp = XMVectorScale(XMVectorSet(0.f, 1.f, 0.f, 0.f), vScaled.y);
 	_vector vLook = XMVectorScale(XMVectorSet(0.f, 0.f, 1.f, 0.f), vScaled.z);
+
+	_matrix RotationMatrix = XMMatrixRotationQuaternion(Quaternion);
+
+	Set_State(STATE::RIGHT, XMVector4Transform(vRight, RotationMatrix));
+	Set_State(STATE::UP, XMVector4Transform(vUp, RotationMatrix));
+	Set_State(STATE::LOOK, XMVector4Transform(vLook, RotationMatrix));
+}
+
+void CTransform::TurnQuaternion(_fvector Quaternion)
+{
+	_vector vRight = Get_State(STATE::RIGHT);
+	_vector vUp = Get_State(STATE::UP);
+	_vector vLook = Get_State(STATE::LOOK);
 
 	_matrix RotationMatrix = XMMatrixRotationQuaternion(Quaternion);
 

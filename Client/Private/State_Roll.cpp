@@ -70,5 +70,5 @@ namespace {
 			CStateFactory::GetInstance()->Register(ENUM_CLASS(PLAYER_STATE::ROLL), []()->CPlayerState* { return CState_Roll::Create(); });
 		};
 	};
-	static StateRollRegister RegisterMove;
+	static StateRollRegister Register;
 }

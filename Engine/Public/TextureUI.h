@@ -8,8 +8,10 @@ class ENGINE_DLL CTextureUI abstract : public CUIObject
 public:
 	typedef struct tagTextureUIDesc : public UIOBJECT_DESC
 	{
-		_uint iTexturePrototypeLevelIndex{};
-		_wstring strTexturePrototypeTag;
+		_uint		iTexturePrototypeLevelIndex{};
+		_wstring	strTexturePrototypeTag;
+		_bool		IsBlend = { false };
+		_float		fAlpha = { 1.f };
 	}TEXTURE_UI_DESC;
 
 protected:
@@ -27,6 +29,8 @@ public:
 
 protected:
 	class CTexture* m_pTextureCom = { nullptr };
+	_bool			m_IsBlend = {};
+	_float			m_fAlpha = {};
 
 protected:
 	HRESULT Ready_TextueCom(_uint iTexturePrototypeLevelIndex, const _wstring& strTexturePrototypeTag);

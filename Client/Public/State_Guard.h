@@ -1,5 +1,4 @@
 #pragma once
-#include "Client_Defines.h"
 #include "PlayerState.h"
 
 NS_BEGIN(Client)
@@ -19,6 +18,7 @@ public:
 private:
 	_bool			m_bGuardEnd = {};
 	_bool			m_bGuardBegin = {};
+
 public:
 	static CState_Guard*	Create();
 	virtual void			Free() override;

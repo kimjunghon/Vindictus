@@ -11,7 +11,6 @@
 #include "GameObject_Manager.h"
 #include "GameObject.h"
 #include "Renderer.h"
-#include "DynamicAABBTree.h"
 #include "Octree.h"
 #include "EventBus.h"
 #include "Light_Manager.h"
@@ -19,6 +18,7 @@
 #include "Camera_Manager.h"
 #include "Controller_Manager.h"
 #include "Navigation_Manager.h"
+#include "Collider_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -67,7 +67,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pObject_Manager)
         return E_FAIL;
 
-    m_pEventBus = CEventBus::Create(EngineDesc.iNumLevels);
+    m_pEventBus = CEventBus::Create();
     if (nullptr == m_pEventBus)
         return E_FAIL;
 
@@ -91,11 +91,17 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pNavigation_Manager)
         return E_FAIL;
 
+    m_pCollider_Manager = CCollider_Manager::Create();
+    if (nullptr == m_pCollider_Manager)
+        return E_FAIL;
+
     return S_OK;
 }
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+    m_pObject_Manager->Post_Update(fTimeDelta);
+
     m_pInput_Device->Update();
     m_pController_Manager->Update(fTimeDelta);
 
@@ -107,13 +113,15 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
     m_pObject_Manager->Update(fTimeDelta);
     m_pObject_Manager->Late_Update(fTimeDelta);
 
+    m_pCollider_Manager->Update();
+
     m_pLevel_Manager->Update(fTimeDelta);
 }
 
 HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 {
     m_pPrototype_Manager->Clear(iClearLevelID);
-    m_pEventBus->Clear(iClearLevelID);
+    m_pEventBus->Clear();
     m_pObject_Manager->Clear();
     m_pCamera_Manager->Clear();
     m_pLight_Manager->Clear();
@@ -264,6 +272,10 @@ HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iPrototypeLevelIndex, const 
 {
     return m_pObject_Manager->Add_GameObject_ToLayer(iLayerIndex, strLayerTag, iPrototypeLevelIndex, strPrototypeTag, pArg);
 }
+HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, CGameObject* pGameObject)
+{
+    return m_pObject_Manager->Add_GameObject_ToLayer(iLayerIndex, strLayerTag, pGameObject);
+}
 CComponent* CGameInstance::Get_Component(_uint iLayerIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex)
 {
     return m_pObject_Manager->Get_Component(iLayerIndex, strLayerTag, strComponentTag, iIndex);
@@ -287,13 +299,6 @@ HRESULT CGameInstance::Add_Objects(CCollisionObject* pGameObject, const Bounding
 }
 #pragma endregion
 
-#pragma region DYNAMICAABB_TREE
-HRESULT CGameInstance::Add_Node(CGameObject* pGameObject, const BoundingBox& ObjectBoundingBox)
-{
-    return m_pDynamicAABBTree->Add_Node(pGameObject, ObjectBoundingBox);
-}
-#pragma endregion 
-
 #pragma region RENDERER
 HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRenderObject)
 {
@@ -314,9 +319,9 @@ HRESULT CGameInstance::Add_Light(const _wstring& strLightTag, const LIGHT_DESC& 
 #pragma endregion
 
 #pragma region EVENTBUS
-void CGameInstance::Publish(_uint iEventLevelIndex, const CEvent& Event)
+void CGameInstance::Publish(_uint iEventTypeIndex, const CEvent& Event)
 {
-    m_pEventBus->Publish(iEventLevelIndex, Event);
+    m_pEventBus->Publish(iEventTypeIndex, Event);
 }
 #pragma endregion
 
@@ -411,6 +416,22 @@ CNavigation* CGameInstance::Clone_CurrentNavigation(_int iCellIndex)
 {
     return m_pNavigation_Manager->Clone_CurrentNavigation(iCellIndex);
 }
+
+#pragma endregion
+
+#pragma region COLLIDER
+HRESULT CGameInstance::Add_Channel(_uint iSrcChannel, _uint iDstChannel, COLLIDER_TYPE eType)
+{
+    return m_pCollider_Manager->Add_Channel(iSrcChannel, iDstChannel, eType);
+}
+HRESULT CGameInstance::Add_BoundingCollider(CGameObject* pOwner, CCollider* pBounding_Collider)
+{
+    return m_pCollider_Manager->Add_BoundingCollider(pOwner, pBounding_Collider);
+}
+HRESULT CGameInstance::Add_ActionCollider(CGameObject* pOwner, CCollider* pAction_Collider)
+{
+    return m_pCollider_Manager->Add_ActionCollider(pOwner, pAction_Collider);
+}
 #pragma endregion
 
 void CGameInstance::Release_Engine()
@@ -431,6 +452,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pCamera_Manager);
     Safe_Release(m_pController_Manager);
     Safe_Release(m_pNavigation_Manager);
+    Safe_Release(m_pCollider_Manager);
 }
 
 void CGameInstance::Free()

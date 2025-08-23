@@ -16,31 +16,36 @@ private:
 
 public:
 	template<typename EVENT>
-	void Subscribe(_uint iEventLevelIndex, function<void(const EVENT&)> Subscriber)
+	void Subscribe(_uint iEventTypeIndex, function<void(const EVENT&)> Subscriber)
 	{
+		if (iEventTypeIndex >= ENUM_CLASS(EVENT_TYPE::END))
+		{
+			MSG_BOX(TEXT("Failed Subscribe Event"));
+			return;
+		}
+
 		auto wrapper = [Subscriber](const CEvent& Event) {
 			Subscriber(static_cast<const EVENT&>(Event)); };
 		
-		m_Subscribers[iEventLevelIndex][typeid(EVENT).hash_code()].push_back(wrapper);
+		m_Subscribers[iEventTypeIndex][typeid(EVENT).hash_code()].push_back(wrapper);
 	}
 
-	void Publish(_uint iEventLevelIndex, const CEvent& Event)
+	void Publish(_uint iEventTypeIndex, const CEvent& Event)
 	{
-		auto& Vector = m_Subscribers[iEventLevelIndex][typeid(Event).hash_code()];
+		auto& Vector = m_Subscribers[iEventTypeIndex][typeid(Event).hash_code()];
 		for (auto& Callback : Vector)
 			Callback(Event);
 	}
 
 public:
-	HRESULT Initialize(_uint iNumLevels);
-	void	Clear(_uint iClearLevel);
+	HRESULT Initialize();
+	void	Clear();
 
 private:
-	_uint					m_iNumLevels = {};
 	SUBSCRIBERS*			m_Subscribers = { nullptr };
 
 public:
-	static CEventBus*	Create(_uint iNumLevels);
+	static CEventBus*	Create();
 	virtual void		Free() override;
 };
 

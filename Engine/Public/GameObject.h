@@ -19,8 +19,8 @@ protected:
 	virtual ~CGameObject() = default;
 
 public:
-	class CComponent* Get_Component(const _wstring& strComponentTag);
-
+	class CComponent*	Get_Component(const _wstring& strComponentTag);
+	_bool				Is_Active() { return m_IsActive; }
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);
@@ -31,11 +31,12 @@ public:
 
 
 protected:
-	ID3D11Device*								m_pDevice = { nullptr };
-	ID3D11DeviceContext*						m_pDeviceContext = { nullptr };
-	class CGameInstance*						m_pGameInstance = { nullptr };
-	CTransform*									m_pTransformCom = { nullptr };
-	COMPONENTS									m_Components;
+	_bool							m_IsActive = { true };
+	ID3D11Device*					m_pDevice = { nullptr };
+	ID3D11DeviceContext*			m_pDeviceContext = { nullptr };
+	class CGameInstance*			m_pGameInstance = { nullptr };
+	CTransform*						m_pTransformCom = { nullptr };
+	COMPONENTS						m_Components;
 
 protected:
 	HRESULT Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag,

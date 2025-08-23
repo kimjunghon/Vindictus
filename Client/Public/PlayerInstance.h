@@ -2,12 +2,19 @@
 #include "Client_Defines.h"
 #include "Base.h"
 
+NS_BEGIN(Engine)
+class CGameInstance;
+class CGameObject;
+NS_END
+
 NS_BEGIN(Client)
 
+class CEquipment_Manager;
+class CStorage_Manager;
 class CWeapon;
 class CArmor;
 
-class CPlayerInstance : public CBase
+class CPlayerInstance final : public CBase
 {
 	DECLARE_SINGLETON(CPlayerInstance)
 
@@ -16,26 +23,42 @@ private:
 	virtual ~CPlayerInstance() = default;
 
 public:
-	HRESULT			EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon);
-	HRESULT			EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmor);
+	HRESULT					Initialize(_uint iInventorySlotCount);
 
-	HRESULT			UnEquipWeapon(_uint iWeaponTypeIndex);
-	HRESULT			UnEquipArmor(_uint iArmorTypeIndex);
+#pragma region EQUIPMENT_MANAGER
+public:
+	HRESULT					EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon, _int iItemInventoryIndex);
+	HRESULT					EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmor, _int iItemInventoryIndex);
+	HRESULT					UnEquipWeapon(_uint iWeaponTypeIndex, _int iItemInventoryIndex = -1);
+	HRESULT					UnEquipArmor(_uint iArmorTypeIndex, _int iItemInventoryIndex= -1);
+	CWeapon*				UpdatePlayerEquipWeapon(_uint iWeaponTypeIndex) const;
+	CArmor*					UpdatePlayerEquipArmor(_uint iArmorTypeIndex) const;
+#pragma endregion
 
-	HRESULT			SavePlayerStatus(const PLAYER_STATUS& PlayerStatus);
+#pragma region STORAGE_MANAGER
+public:
+	Shared_ITEM				GetInventory(_uint iInventoryIndex);
 
-	CWeapon*		BindPlayerEquipWeapon(_uint iWeaponTypeIndex);
-	CArmor*			BindPlayerEquipArmor(_uint iArmorTypeIndex);
-	PLAYER_STATUS	BindPlayerStatus();
+	HRESULT					Add_Item(ITEM_TYPE eItemType, CGameObject* pItem, _int iEmptyInventoryIndex = -1);
+	HRESULT					Swap_Item(_uint iMouseItemIndex, _uint iInventoryIndex);
+	HRESULT					Remove_Item(_uint iInventoryIndex);
+	_bool					IsInventoryFull();
+#pragma endregion
+
+public:
+	PLAYER_STATUS			UpdatePlayerStatus() const;
+	HRESULT					SavePlayerStatus(const PLAYER_STATUS& PlayerStatus);
 
 private:
-	CWeapon*		m_pPlayerEquipWeapon[ENUM_CLASS(WEAPON_TYPE::END)] = { nullptr };
-	CArmor*			m_pPlayerEquipArmor[ENUM_CLASS(ARMOR_TYPE::END)] = { nullptr };
-	
-	PLAYER_STATUS	m_PlayerStatus = {};
-	
+	CGameInstance*			m_pGameInstance = { nullptr };
+	CEquipment_Manager*		m_pEquipment_Manager = { nullptr };
+	CStorage_Manager*		m_pStorage_Manager = { nullptr };
+
+	PLAYER_STATUS			m_PlayerStatus = {};
+
 public:
-	virtual void Free() override;
+	void			Release_PlayerInstance();
+	virtual void	Free() override;
 };
 
 NS_END

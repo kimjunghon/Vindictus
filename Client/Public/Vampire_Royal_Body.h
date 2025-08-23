@@ -3,8 +3,6 @@
 
 NS_BEGIN(Client)
 
-class CAnimMachine;
-
 class CVampire_Royal_Body final : public CBody
 {
 private:
@@ -20,8 +18,6 @@ public:
 	virtual void		Late_Update(_float fTimeDelta) override;
 	virtual HRESULT		Render() override;
 
-private:
-	CAnimMachine* m_pAnimMachine = { nullptr };
 
 private:
 	HRESULT Ready_Components();

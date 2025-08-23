@@ -19,12 +19,21 @@ HRESULT CQueen_Body::Initialize_Prototype()
 
 HRESULT CQueen_Body::Initialize(void* pArg)
 {
+	if (nullptr == pArg)
+		return E_FAIL;
+
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
+	QUEEN_BODY_DESC* pDesc = static_cast<QUEEN_BODY_DESC*>(pArg);
+
+	m_pIsBrokenLeg= pDesc->IsBrokenLeg;
+
+	m_iMeshLegIndex = 2;
+	
 	m_pTransformCom->RotateQuaternion(XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(90.f), 0.f));
 
 	return S_OK;
@@ -58,6 +67,10 @@ HRESULT CQueen_Body::Render()
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
+		if (IsBroken(i))	
+			continue;
+		
+
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
 
@@ -73,9 +86,18 @@ HRESULT CQueen_Body::Render()
 	return S_OK;
 }
 
+
+_bool CQueen_Body::IsBroken(_uint iMeshIndex)
+{
+	if (*m_pIsBrokenLeg)
+		return iMeshIndex == m_iMeshLegIndex;
+
+	return false;
+}
+
 HRESULT CQueen_Body::Ready_Components()
 {
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Queen_Body"),
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Queen_Body"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 

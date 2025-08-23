@@ -1,10 +1,7 @@
 #pragma once
-#include "Client_Defines.h"
-#include "Pawn.h"
+#include "ColliderPawn.h"
 
-NS_BEGIN(Engine)
-class CNavigation;
-NS_END
+using namespace Player;
 
 NS_BEGIN(Client)
 
@@ -15,12 +12,34 @@ class CArmor;
 class CWeapon;
 class CPlayerInstance;
 
-class CPlayerPawn final : public CPawn
+class CPlayerPawn final : public CColliderPawn
 {
+public:
+	typedef struct tagPlayerDesc : public GAMEOBJECT_DESC
+	{
+		_float3 vPosition;
+		_int iCellIndex;
+	}PLAYER_DESC;
+
+private:
+	enum class PLAYER_HIT_TYPE { FRONT, BACK, RIGHT, LEFT, };
+	
+	enum class HIT_COLLIDER { HEAD, UPPER, LOWER, L_ARM, R_ARM, L_LEG, R_LEG, END};
+	enum class ATTACK_COLLIDER { SWORD, SHILED, LEFT_LEG, RIGHT_LEG, END};
+
 private:
 	CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CPlayerPawn(const CPlayerPawn& Prototype);
 	virtual ~CPlayerPawn() = default;
+
+public:
+	_uint			Get_ComboCount() { return m_iComboCount; }
+	void			Reset_ComboCount() { m_iComboCount = 0; }
+	void			Increase_ComboCount() { m_iComboCount++; }
+	void			Run() { m_fSpeedRatio = 1.f; }
+	void			Sprint() { m_fSpeedRatio = 2.f; }
+	HIT_DIR			Get_HirDir() { return m_eHitDir; }
+	_bool			IsGaurdHit() { return m_iStateFlag & ENUM_CLASS(HIT_FLAG::GUARD); }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -31,65 +50,86 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	void			Change_State(_uint iStateIndex);
-	_uint			Get_ComboCount() { return m_iComboCount; }
-	void			Reset_ComboCount() { m_iComboCount = 0; }
-	void			Increase_ComboCount() { m_iComboCount++; }
 	_bool			AnimIsFinished();
 	_bool			AnimCanChange();
+	void			Change_State(_uint iStateIndex);
 	void			Compute_PlayerMoveDir();
+	
+private:
+	CPlayerInstance*			m_pPlayerInstance = { nullptr };
+	CPlayerBody*				m_pPlayerBody = { nullptr };
+	CCamera_Target*				m_pCamera = { nullptr };
 
-	void			Run() { m_fSpeedRatio = 1.f; }
-	void			Sprint() { m_fSpeedRatio = 2.f; }
+	//Equip
+	_wstring					m_strEquipWeapons[ENUM_CLASS(WEAPON_TYPE::END)] = {};
+	_wstring					m_strEquipArmors[ENUM_CLASS(ARMOR_TYPE::END)] = {};
+	CArmor*						m_pEquipArmors[ENUM_CLASS(ARMOR_TYPE::END)] = { nullptr };
+	//State
+	PLAYER_STATUS				m_Status = {};
+
+	INPUT_MOVE_DESC				m_MoveInput = {};
+	INPUT_ACTION_DESC			m_ActionInput = {};
+	INPUT_CAMERA_DESC			m_CameraInput = {};
+
+	vector<CPlayerState*>		m_States;
+	CPlayerState*				m_pCurrentState = { nullptr };
+	
+	HIT_DIR						m_eHitDir = { HIT_DIR::END };
+
+	_uint						m_iStateFlag = {};
+	_uint						m_iComboCount = {};
+
+	_float						m_fSpeed = {};
+	_float						m_fSpeedRatio = {};
+
+	//Player Look
+	_vector						m_vPlayerRotationQuat = {};
+	_vector						m_vPrevPlayerRotationQuat = {};
+	_vector						m_vPlayerMoveDir = {};
+
+	//Root Motion
+	const _vector*				m_pAnimMovement = {};
+	const _vector*				m_pAnimRotation = {};
+
+private:
+	virtual void	Update_AttackColliders(_fmatrix UpdateWorldMatrix,_uint iStateFlag) override;
+
+	HRESULT			Init_Level(_int iCellIndex, _float3 vStartPostion);
+	HRESULT			Ready_Camera();
+	HRESULT			Ready_PawnObjects();
+	HRESULT			Ready_PlayerBody();
+	HRESULT			Ready_Weapons();
+	HRESULT			Ready_Armors();
+	HRESULT			Ready_States();
+
+	HRESULT			Ready_Collider();
+	HRESULT			Ready_Collider_Bounding();
+	HRESULT			Ready_Collider_Body();
+	HRESULT			Ready_Collider_Hit();
+	HRESULT			Ready_Collider_Attack();
+	HRESULT			Ready_AttackMapping();
+
+
+	void			Compute_WorldMatrix();
+	void			Bind_InputData(_float fTimeDelta);
+	void			Move(_float fTimeDelta);
 
 	HRESULT			EquipWeapon(CWeapon* pWeapon);
-	HRESULT			UnEquipWeapon(WEAPON_TYPE eWeaponType);
+	HRESULT			UnEquipWeapon(_uint iWeaponTypeIndex);
 
 	HRESULT			EquipArmor(CArmor* pArmor);
-	HRESULT			UnEquipArmor(ARMOR_TYPE eArmorType);
+	HRESULT			UnEquipArmor(_uint iArmorTypeIndex);
 
-private:
-	CPlayerInstance*		m_pPlayerInstance = { nullptr };
+	void			Event_ChangeWeapon(const EVENT_CHANGE_WEAPON& Event);
+	void			Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event);
 
-	CPlayerBody*			m_pPlayerBody = { nullptr };
-	CCamera_Target*			m_pCamera = { nullptr };
+	void			OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_DATA& CollisionData);
+	void			Change_HitState(ATTACK_TYPE eAttackType, _fvector vPosition, _fvector vAttackPosition);
+	void			Update_HitColliderEnable();
 
-	_wstring				m_strEquipWeapons[ENUM_CLASS(WEAPON_TYPE::END)] = {};
-	_wstring				m_strEquipArmors[ENUM_CLASS(ARMOR_TYPE::END)] = {};
+	HRESULT			Bind_HitCollisionCallback(HIT_COLLIDER eHitCollider, ARMOR_TYPE eArmor_Type);
 
-	INPUT_MOVE_DESC			m_MoveInput = {};
-	INPUT_ACTION_DESC		m_ActionInput = {};
-	INPUT_CAMERA_DESC		m_CameraInput = {};
-	
-	vector<CPlayerState*>	m_States;
-	CPlayerState*			m_pCurrentState = { nullptr };
-
-	_float					m_fSpeed = {};
-	_float					m_fSpeedRatio = {};
-
-	_uint					m_iStateFlag = {};
-	_uint					m_iComboCount = {};
-	_vector					m_vPlayerMoveDir = {};
-	
-	_vector					m_vPlayerRoationQuat = {};
-	_vector					m_vPrevPlayerRotationQuat = {};
-	
-	const _vector*			m_pAnimMovement = {};
-	const _vector*			m_pAnimRotation = {};
-
-private:
-	HRESULT Ready_Components();
-	HRESULT Ready_Camera();
-	HRESULT Ready_PawnObjects();
-	HRESULT Ready_PlayerBody();
-	HRESULT Ready_Weapons();
-	HRESULT Ready_Armors();
-	HRESULT Ready_States();
-
-	void	Compute_WorldMatrix();
-	void	Bind_InputData(_float fTimeDelta);
-	void	Move(_float fTimeDelta);
-
+	void			DecreaseArmorDurability(_uint iArmorIndex, _float fDamage);
 public:
 	static CPlayerPawn*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

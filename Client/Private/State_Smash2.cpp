@@ -102,5 +102,5 @@ namespace {
 		};
 
 	};
-	static StateSmash2Register RegisterIdle;
+	static StateSmash2Register Register;
 }

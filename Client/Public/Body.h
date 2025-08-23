@@ -9,6 +9,8 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CAnimMachine;
+
 class CBody abstract : public CPawnObject
 {
 public:
@@ -23,12 +25,15 @@ protected:
 	virtual ~CBody() = default;
 
 public:
+	_bool				IsAnimationInRangeTrackPosition(_float2 vRange) { return m_pModelCom->IsAnimationInRangeTrackPosition(vRange); }
 	_bool				AnimIsFinished() { return m_pModelCom->CurrentAnim_Finished(); }
 	_bool				AnimCanChange() { return m_pModelCom->CanChangeAnimation(); }
-	const _vector*		Get_AnimMovementPtr() { return m_pModelCom->Get_AnimMovementPtr(); }
-	const _vector*		Get_AnimRotationPtr() { return m_pModelCom->Get_AnimRotationPtr(); }
-	const _float4x4*	SocketCombinedMatrixPtr(const string& strSocektBoneName) { return m_pModelCom->Find_SocketBoneCombinedMatrix(strSocektBoneName); }
-	CModel*				Get_ParentModelPtr() { return m_pModelCom; }
+	const _vector*		Get_AnimMovementPtr() const { return m_pModelCom->Get_AnimMovementPtr(); }
+	const _vector*		Get_AnimRotationPtr() const { return m_pModelCom->Get_AnimRotationPtr(); }
+	const _float4x4*	SocketCombinedMatrixPtr(const string& strSocektBoneName) const { return m_pModelCom->Find_SocketBoneCombinedMatrix(strSocektBoneName); }
+	CModel*				Get_ParentModelPtr() const { return m_pModelCom; }
+	_float				Get_CurrentAnimSpeed() { return m_pModelCom->Get_CurrentAnimSpeed(); }
+	virtual const _matrix Get_BodyCombinedMatrix() const { return XMMatrixIdentity(); }
 
 public:
 	virtual HRESULT		Initialize_Prototype() override;
@@ -38,10 +43,13 @@ public:
 	virtual void		Late_Update(_float fTimeDelta) override;
 	virtual HRESULT		Render() override;
 
+	HRESULT				Forcing_Play_Animation();
+
 protected:
-	CModel*		m_pModelCom = { nullptr };
-	CShader*	m_pShaderCom = { nullptr };
-	_uint*		m_pStateFlag = {};
+	CAnimMachine*	m_pAnimMachine = { nullptr };
+	CModel*			m_pModelCom = { nullptr };
+	CShader*		m_pShaderCom = { nullptr };
+	_uint*			m_pStateFlag = {};
 
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;

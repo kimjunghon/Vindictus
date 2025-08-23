@@ -19,13 +19,15 @@ HRESULT CCell::Initialize(const _float3* pPoints, _int iIndex)
     _vector		vLine = {};
 
     vLine = XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELL_POINT::B)]) - XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELL_POINT::A)]);
-    m_vNormals[ENUM_CLASS(LINE::AB)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
-
+    m_vOutNormals[ENUM_CLASS(LINE::AB)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
+    XMStoreFloat3(&m_vInNormals[ENUM_CLASS(LINE::AB)], XMVectorScale(XMLoadFloat3(&m_vOutNormals[ENUM_CLASS(LINE::AB)]), -1.f));
     vLine = XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELL_POINT::C)]) - XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELL_POINT::B)]);
-    m_vNormals[ENUM_CLASS(LINE::BC)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
+    m_vOutNormals[ENUM_CLASS(LINE::BC)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
+    XMStoreFloat3(&m_vInNormals[ENUM_CLASS(LINE::BC)], XMVectorScale(XMLoadFloat3(&m_vOutNormals[ENUM_CLASS(LINE::BC)]), -1.f));
 
     vLine = XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELL_POINT::A)]) - XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELL_POINT::C)]);
-    m_vNormals[ENUM_CLASS(LINE::CA)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
+    m_vOutNormals[ENUM_CLASS(LINE::CA)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
+    XMStoreFloat3(&m_vInNormals[ENUM_CLASS(LINE::CA)], XMVectorScale(XMLoadFloat3(&m_vOutNormals[ENUM_CLASS(LINE::CA)]), -1.f));
 
 
 #ifdef _DEBUG
@@ -37,16 +39,19 @@ HRESULT CCell::Initialize(const _float3* pPoints, _int iIndex)
     return S_OK;
 }
 
-_bool CCell::IsInCell(_fvector vPosition, _int* pNeighborIndex)
+_bool CCell::IsInCell(_fvector vPosition, _int* pNeighborIndex, _float3** ppInNormal)
 {
     for (_uint i = 0; i < ENUM_CLASS(LINE::END); ++i)
     {
         _vector	vDir = XMVector3Normalize(vPosition - XMVectorSetW(XMLoadFloat3(&m_vPoints[i]), 1.f));
-        _vector vNormal = XMVector3Normalize(XMLoadFloat3(&m_vNormals[i]));
+        _vector vOutNormal = XMVector3Normalize(XMLoadFloat3(&m_vOutNormals[i]));
 
-        if (0 < XMVectorGetX(XMVector3Dot(vDir, vNormal)))
+        if (0 < XMVectorGetX(XMVector3Dot(vDir, vOutNormal)))
         {
             *pNeighborIndex = m_iNeighborIndices[i];
+
+            if(nullptr != ppInNormal)  
+                *ppInNormal = &m_vInNormals[i];
 
             return false;
         }

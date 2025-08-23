@@ -17,7 +17,6 @@ HRESULT CState_Smash4::Initialize()
 void CState_Smash4::Enter(CPlayerPawn* pPlayerPawn)
 {
 	ChangeActionFlag(ENUM_CLASS(SMASH_FLAG::SMASH4));
-
 }
 
 void CState_Smash4::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput)
@@ -59,5 +58,5 @@ namespace {
 		};
 
 	};
-	static StateSmash4Register RegisterIdle;
+	static StateSmash4Register Register;
 }

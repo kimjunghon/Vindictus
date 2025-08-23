@@ -44,7 +44,7 @@ HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
 
 		File.read(reinterpret_cast<_char*>(&vPoints), sizeof(_float3) * ENUM_CLASS(CELL_POINT::END));
 	
-		CCell* pCell = CCell::Create(m_pDevice, m_pDeviceContext, vPoints, m_Cells.size());
+		CCell* pCell = CCell::Create(m_pDevice, m_pDeviceContext, vPoints, static_cast<_uint>(m_Cells.size()));
 		if (nullptr == pCell)
 			return E_FAIL;
 
@@ -79,13 +79,13 @@ void CNavigation::Update(_fmatrix WorldMatrix)
 	XMStoreFloat4x4(&m_WorldMatrix, WorldMatrix);
 }
 
-_bool CNavigation::isMove(_fvector vPosition)
+_bool CNavigation::isMove(_fvector vPosition, _float3** ppInNormal)
 {
 	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
 
 	_int		iNeighborIndex = { -1 };
 
-	if (true == m_Cells[m_iCurrentCellIndex]->IsInCell(vLocalPos, &iNeighborIndex))
+	if (true == m_Cells[m_iCurrentCellIndex]->IsInCell(vLocalPos, &iNeighborIndex, ppInNormal))
 		return true;
 	else
 	{
@@ -96,7 +96,39 @@ _bool CNavigation::isMove(_fvector vPosition)
 				if (-1 == iNeighborIndex)
 					return false;
 
-				if (true == m_Cells[iNeighborIndex]->IsInCell(vLocalPos, &iNeighborIndex))
+				if (true == m_Cells[iNeighborIndex]->IsInCell(vLocalPos, &iNeighborIndex, ppInNormal))
+					break;
+			}
+
+			m_iCurrentCellIndex = iNeighborIndex;
+
+			return true;
+		}
+		else
+			return false;
+	}
+}
+
+_bool CNavigation::isMove(_fmatrix WorldMatrix, _float3** ppInNormal)
+{
+	_vector vPosition = WorldMatrix.r[3];
+
+	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+
+	_int		iNeighborIndex = { -1 };
+
+	if (true == m_Cells[m_iCurrentCellIndex]->IsInCell(vLocalPos, &iNeighborIndex, ppInNormal))
+		return true;
+	else
+	{
+		if (-1 != iNeighborIndex)
+		{
+			while (true)
+			{
+				if (-1 == iNeighborIndex)
+					return false;
+
+				if (true == m_Cells[iNeighborIndex]->IsInCell(vLocalPos, &iNeighborIndex, ppInNormal))
 					break;
 			}
 

@@ -30,6 +30,9 @@ HRESULT CTextureUI::Initialize(void* pArg)
 	if (FAILED(Ready_TextueCom(pDesc->iTexturePrototypeLevelIndex, pDesc->strTexturePrototypeTag)))
 		return E_FAIL;
 
+	m_IsBlend = pDesc->IsBlend;
+	m_fAlpha = pDesc->fAlpha;
+
 	return S_OK;
 }
 

@@ -13,9 +13,6 @@
     <Filter Include="97.ShaderFiles">
       <UniqueIdentifier>{5191c7ce-16b1-4664-9c92-827c72f29e2e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.PlayerInstance">
-      <UniqueIdentifier>{45a16465-b941-427e-9267-f77f110f5b9a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02.Levels">
       <UniqueIdentifier>{47241e83-a0f6-4b8c-a78f-19fce34818f4}</UniqueIdentifier>
     </Filter>
@@ -91,51 +88,6 @@
     <Filter Include="03.GameObject\Pawns\BodyBase">
       <UniqueIdentifier>{15d1217b-6f9a-4078-99f1-29c0665ce198}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster">
-      <UniqueIdentifier>{8ecc1fa5-89a1-44dc-bdc3-a07b71bdf744}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Glasgavelen">
-      <UniqueIdentifier>{fba34bb4-ef2a-44c1-bc55-3092f9f5b863}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Glasgavelen\Weapon">
-      <UniqueIdentifier>{05a18f33-96e4-4ee3-927d-238270bd23bb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Glasgavelen\Body">
-      <UniqueIdentifier>{eb60fe9f-be20-4352-bc1d-ef2edb3f1c12}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Vampire">
-      <UniqueIdentifier>{7828b2ce-d475-41a9-a04a-e91696ed03ce}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Vampire\AI">
-      <UniqueIdentifier>{14b90a9b-9c67-4765-8af6-a10d29731678}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Basic">
-      <UniqueIdentifier>{ec67b74a-ce37-499f-97f5-a2eefe8da597}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body">
-      <UniqueIdentifier>{60a78b80-9acf-47b3-bfcb-7f722d16dba2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Elder">
-      <UniqueIdentifier>{1c7c6a9f-8c16-4cc1-b3e0-9a091652fa5d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body">
-      <UniqueIdentifier>{670d2eb9-f412-41e8-814d-191ae15a99f0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Royal">
-      <UniqueIdentifier>{7493406b-6a72-4cb7-9bcc-90c992bcec89}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body">
-      <UniqueIdentifier>{f2b3461c-1419-4c5c-aa4b-0433d422a754}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Queen">
-      <UniqueIdentifier>{9561be97-2964-441c-806c-d65c609a75aa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Queen\Body">
-      <UniqueIdentifier>{e11c14fd-fb35-48fc-9d31-c46c69323abb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Monster\Queen\AI">
-      <UniqueIdentifier>{8be7c1ef-abfe-46be-9133-c76b0309897a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.GameObject\Pawns\AnimMachine">
       <UniqueIdentifier>{cd175e51-17a2-47e5-8529-4a632529b651}</UniqueIdentifier>
     </Filter>
@@ -147,75 +99,6 @@
     </Filter>
     <Filter Include="03.GameObject\Pawns\AnimMachine\QueenAnimMachine">
       <UniqueIdentifier>{2d70b516-1a5e-445f-b0d9-dd1656657bcd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player">
-      <UniqueIdentifier>{e76ae3c2-b617-455a-9f85-87db20d7fe33}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState">
-      <UniqueIdentifier>{9c5ababc-c939-4237-8bf0-78ed58b5efe5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Idle">
-      <UniqueIdentifier>{4ada9e0c-e083-4662-831d-2b5c6f7df67c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Move">
-      <UniqueIdentifier>{7f0d4b68-c147-4e32-9aad-93d86d133fe6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action">
-      <UniqueIdentifier>{074df14b-8afe-4ba1-a37c-75b49080f444}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Attack">
-      <UniqueIdentifier>{8d39bad7-709e-4384-ba4f-6ea63b1f5f12}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash">
-      <UniqueIdentifier>{5148baf3-bed3-4bca-aff5-ef973cb04bd6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0">
-      <UniqueIdentifier>{10e44a59-e3bf-43c5-98af-f38950efcf03}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1">
-      <UniqueIdentifier>{900ea364-329a-4dcf-9d5e-519d02914d18}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2">
-      <UniqueIdentifier>{70693b5b-b082-4c1d-ae48-74d11c02e8b9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3">
-      <UniqueIdentifier>{217a5d9e-29e0-4de5-b03d-753042d9a9db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4">
-      <UniqueIdentifier>{fbcf3960-2f16-49bb-921f-6d8abcfd8c79}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Roll">
-      <UniqueIdentifier>{2765dfee-9bfc-4383-ab17-1b42a6701ce1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\Guard">
-      <UniqueIdentifier>{b49bc489-9688-46f2-9bb8-aa5fdcfb07ee}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand">
-      <UniqueIdentifier>{eee2bfe9-de81-43da-ba21-65cdea455db1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerState\Factory">
-      <UniqueIdentifier>{335beab5-b4db-450a-90f7-61654d3a5d04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\PlayerBody">
-      <UniqueIdentifier>{5325e74b-3782-48d9-a55e-3ddd265ebfdc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Armor">
-      <UniqueIdentifier>{09e49895-4a60-4d26-9390-7e100e3dc131}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps">
-      <UniqueIdentifier>{2ca07e59-9edc-42f6-af4c-ed7ef0be0179}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps\Town">
-      <UniqueIdentifier>{55f6936f-6f3c-4f40-bcfa-00ea2662f107}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps\MapObject">
-      <UniqueIdentifier>{639bf950-2ac8-4e65-bfca-1855b29a1905}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps\Queen">
-      <UniqueIdentifier>{684360aa-4bb9-4215-a437-f1b4c0a1b090}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="03.GameObject\Maps\Glasgavelen">
-      <UniqueIdentifier>{33099991-7e63-40bb-b4fa-f387464048dd}</UniqueIdentifier>
     </Filter>
     <Filter Include="03.GameObject\Camera">
       <UniqueIdentifier>{53286279-d3dd-4d8f-9894-7222e7a9c1c8}</UniqueIdentifier>
@@ -235,20 +118,188 @@
     <Filter Include="04.Controller\UI">
       <UniqueIdentifier>{d8dd0ca2-6487-4e68-b02e-097fe2c84746}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon">
+    <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy">
+      <UniqueIdentifier>{db52d8e0-565a-4e24-b4a3-81f9bbe811c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy\Equipment">
+      <UniqueIdentifier>{8c237587-b7fb-42c6-9864-37d919be9155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy\Storage">
+      <UniqueIdentifier>{16ab35c8-9b48-4a15-ba6b-12bba384e984}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Equipment">
+      <UniqueIdentifier>{79feeda7-8804-4340-8ba5-400a80af0a5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Equipment\Armor">
+      <UniqueIdentifier>{09e49895-4a60-4d26-9390-7e100e3dc131}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Equipment\Weapon">
       <UniqueIdentifier>{02a5ea1d-58fc-4cb8-912d-1a4ff712897f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon\Sword">
+    <Filter Include="03.GameObject\Equipment\Weapon\Sword">
       <UniqueIdentifier>{bb5b346c-11b1-41ae-bd18-cd2d7523df64}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon\Sword\BastardSword">
+    <Filter Include="03.GameObject\Equipment\Weapon\Sword\BastardSword">
       <UniqueIdentifier>{29d67f86-ad4b-482e-b7f3-994660d2360d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon\Shield">
+    <Filter Include="03.GameObject\Equipment\Weapon\Shield">
       <UniqueIdentifier>{a64da96d-c1a5-4d30-87b3-0e5b06c7c906}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\Player\Weapon\Shield\RoundShield">
+    <Filter Include="03.GameObject\Equipment\Weapon\Shield\RoundShield">
       <UniqueIdentifier>{15fe760a-64dc-436a-9670-8ada20414c0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Mouse">
+      <UniqueIdentifier>{e4680a30-a4a9-43ad-b61f-9a34ab727da2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Inventroy\Slot">
+      <UniqueIdentifier>{0fff30b0-f1fd-46a5-ae21-4db296e07821}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance">
+      <UniqueIdentifier>{45a16465-b941-427e-9267-f77f110f5b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Player">
+      <UniqueIdentifier>{4e5a0e78-895a-4a43-9b42-c385d7530386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Monster">
+      <UniqueIdentifier>{805079d1-d68c-4e0c-b909-03890185eafd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Monster\Pool_Manager">
+      <UniqueIdentifier>{ed93d96e-5f5b-416a-abd9-639c9af76c1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Player\Equip_Manager">
+      <UniqueIdentifier>{d42ce48f-7b21-450f-86a8-21cdf72a3a9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Player\Storage_Manager">
+      <UniqueIdentifier>{65ef9f0d-30ca-41e8-a776-0625986f80ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Monster\Spawn_Manager">
+      <UniqueIdentifier>{238be20a-b21b-489b-b8e1-6febf3104d12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Map">
+      <UniqueIdentifier>{2ca07e59-9edc-42f6-af4c-ed7ef0be0179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Map\MapObject">
+      <UniqueIdentifier>{639bf950-2ac8-4e65-bfca-1855b29a1905}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn">
+      <UniqueIdentifier>{e0922e67-35b9-48d0-a0fb-3b3986a38d0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player">
+      <UniqueIdentifier>{e76ae3c2-b617-455a-9f85-87db20d7fe33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState">
+      <UniqueIdentifier>{9c5ababc-c939-4237-8bf0-78ed58b5efe5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Idle">
+      <UniqueIdentifier>{4ada9e0c-e083-4662-831d-2b5c6f7df67c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Move">
+      <UniqueIdentifier>{7f0d4b68-c147-4e32-9aad-93d86d133fe6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action">
+      <UniqueIdentifier>{074df14b-8afe-4ba1-a37c-75b49080f444}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Attack">
+      <UniqueIdentifier>{8d39bad7-709e-4384-ba4f-6ea63b1f5f12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash">
+      <UniqueIdentifier>{5148baf3-bed3-4bca-aff5-ef973cb04bd6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash0">
+      <UniqueIdentifier>{10e44a59-e3bf-43c5-98af-f38950efcf03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash1">
+      <UniqueIdentifier>{900ea364-329a-4dcf-9d5e-519d02914d18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash2">
+      <UniqueIdentifier>{70693b5b-b082-4c1d-ae48-74d11c02e8b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash3">
+      <UniqueIdentifier>{217a5d9e-29e0-4de5-b03d-753042d9a9db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash4">
+      <UniqueIdentifier>{fbcf3960-2f16-49bb-921f-6d8abcfd8c79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Guard_Counter">
+      <UniqueIdentifier>{5d7b8a86-cf67-4677-9278-b3431ef054b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Roll">
+      <UniqueIdentifier>{2765dfee-9bfc-4383-ab17-1b42a6701ce1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Guard">
+      <UniqueIdentifier>{b49bc489-9688-46f2-9bb8-aa5fdcfb07ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\HeavyStand">
+      <UniqueIdentifier>{eee2bfe9-de81-43da-ba21-65cdea455db1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\Factory">
+      <UniqueIdentifier>{335beab5-b4db-450a-90f7-61654d3a5d04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit">
+      <UniqueIdentifier>{d2026323-4d76-4a8b-a02b-33b38e69047f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerBody">
+      <UniqueIdentifier>{5325e74b-3782-48d9-a55e-3ddd265ebfdc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster">
+      <UniqueIdentifier>{8ecc1fa5-89a1-44dc-bdc3-a07b71bdf744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen">
+      <UniqueIdentifier>{fba34bb4-ef2a-44c1-bc55-3092f9f5b863}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\Weapon">
+      <UniqueIdentifier>{05a18f33-96e4-4ee3-927d-238270bd23bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\Body">
+      <UniqueIdentifier>{eb60fe9f-be20-4352-bc1d-ef2edb3f1c12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Vampire">
+      <UniqueIdentifier>{7828b2ce-d475-41a9-a04a-e91696ed03ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Vampire\AI">
+      <UniqueIdentifier>{14b90a9b-9c67-4765-8af6-a10d29731678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Basic">
+      <UniqueIdentifier>{ec67b74a-ce37-499f-97f5-a2eefe8da597}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Basic\Body">
+      <UniqueIdentifier>{60a78b80-9acf-47b3-bfcb-7f722d16dba2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Elder">
+      <UniqueIdentifier>{1c7c6a9f-8c16-4cc1-b3e0-9a091652fa5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Elder\Body">
+      <UniqueIdentifier>{670d2eb9-f412-41e8-814d-191ae15a99f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Royal">
+      <UniqueIdentifier>{7493406b-6a72-4cb7-9bcc-90c992bcec89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Royal\Body">
+      <UniqueIdentifier>{f2b3461c-1419-4c5c-aa4b-0433d422a754}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Queen">
+      <UniqueIdentifier>{9561be97-2964-441c-806c-d65c609a75aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Queen\Body">
+      <UniqueIdentifier>{e11c14fd-fb35-48fc-9d31-c46c69323abb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Queen\AI">
+      <UniqueIdentifier>{8be7c1ef-abfe-46be-9133-c76b0309897a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Light">
+      <UniqueIdentifier>{bb4b3a78-550d-409b-b95e-53571668206e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Middle">
+      <UniqueIdentifier>{678f51b9-7057-47f3-89a0-b68b6b8aa14e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Strong">
+      <UniqueIdentifier>{133721da-6171-4cfa-9487-1f8fe65335e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Gaurd">
+      <UniqueIdentifier>{a4601fd7-2257-440d-aa1a-9a050bde2d9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_HeavyStand">
+      <UniqueIdentifier>{38e79119-d9b2-4d3c-958a-257f026e4aec}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -331,34 +382,34 @@
       <Filter>03.GameObject\UIObject\Static\Bar</Filter>
     </ClInclude>
     <ClInclude Include="..\public\MapObject.h">
-      <Filter>03.GameObject\Maps\MapObject</Filter>
+      <Filter>03.GameObject\Map\MapObject</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerState.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Idle.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Idle</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Idle</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Move.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Move</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Move</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Attack.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Attack</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Guard.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Guard</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Guard</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Roll.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Roll</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Roll</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerPawn.h">
-      <Filter>03.GameObject\Pawns\Player</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerBody.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerBody</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerBody</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StateFactory.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\Factory</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\Factory</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PlayerAnimMachine.h">
       <Filter>03.GameObject\Pawns\AnimMachine\PlayerAnimMachine</Filter>
@@ -367,58 +418,58 @@
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash0.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash0</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash2.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash2</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash1.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash1</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash4.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash4</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_Smash3.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash3</Filter>
     </ClInclude>
     <ClInclude Include="..\public\State_HeavyStand.h">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\HeavyStand</Filter>
     </ClInclude>
     <ClInclude Include="..\public\BastardSword.h">
-      <Filter>03.GameObject\Pawns\Player\Weapon\Sword\BastardSword</Filter>
+      <Filter>03.GameObject\Equipment\Weapon\Sword\BastardSword</Filter>
     </ClInclude>
     <ClInclude Include="..\public\RoundShield.h">
-      <Filter>03.GameObject\Pawns\Player\Weapon\Shield\RoundShield</Filter>
+      <Filter>03.GameObject\Equipment\Weapon\Shield\RoundShield</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Armor.h">
-      <Filter>03.GameObject\Pawns\Player\Armor</Filter>
+      <Filter>03.GameObject\Equipment\Armor</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Client_Struct.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GlasgavelenBody.h">
-      <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Glasgavelen.h">
-      <Filter>03.GameObject\Pawns\Monster\Glasgavelen</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen</Filter>
     </ClInclude>
     <ClInclude Include="..\public\GlasgavelenSword.h">
-      <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Weapon</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="..\public\VampireAI.h">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\AI</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\AI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Monster.h">
-      <Filter>03.GameObject\Pawns\Monster</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire.h">
-      <Filter>03.GameObject\Pawns\Monster\Vampire</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire_Basic.h">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Basic</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Basic</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire_Basic_Body.h">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Basic\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Body.h">
       <Filter>03.GameObject\Pawns\BodyBase</Filter>
@@ -430,34 +481,31 @@
       <Filter>03.GameObject\Pawns\AnimMachine\Vampire_AnimMachine</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Vampire_Elder.h">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Elder</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Elder</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Vampire_Elder_Body.h">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Elder\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Vampire_Royal.h">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Royal</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Royal</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Vampire_Royal_Body.h">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Royal\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Queen.h">
-      <Filter>03.GameObject\Pawns\Monster\Queen</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Queen</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Queen_Body.h">
-      <Filter>03.GameObject\Pawns\Monster\Queen\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Queen\Body</Filter>
     </ClInclude>
     <ClInclude Include="..\public\QueenAI.h">
-      <Filter>03.GameObject\Pawns\Monster\Queen\AI</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Queen\AI</Filter>
     </ClInclude>
     <ClInclude Include="..\public\QueenAnimMachine.h">
       <Filter>03.GameObject\Pawns\AnimMachine\QueenAnimMachine</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Town.h">
-      <Filter>03.GameObject\Maps\Town</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Map.h">
-      <Filter>03.GameObject\Maps</Filter>
+      <Filter>03.GameObject\Map</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Level_Town.h">
       <Filter>02.Levels\GamePlay\Level_Town</Filter>
@@ -489,11 +537,62 @@
     <ClInclude Include="..\public\Controller_UI.h">
       <Filter>04.Controller\UI</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\PlayerInstance.h">
-      <Filter>01.PlayerInstance</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Weapon.h">
-      <Filter>03.GameObject\Pawns\Player\Weapon</Filter>
+      <Filter>03.GameObject\Equipment\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Storage.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Storage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Mouse.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Equipment.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Equipment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Inventory.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Slot.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Slot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PlayerInstance.h">
+      <Filter>01.Instance\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\MonsterInstance.h">
+      <Filter>01.Instance\Monster</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Storage_Manager.h">
+      <Filter>01.Instance\Player\Storage_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Equipment_Manager.h">
+      <Filter>01.Instance\Player\Equip_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pooling_Manager.h">
+      <Filter>01.Instance\Monster\Pool_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Spawn_Manager.h">
+      <Filter>01.Instance\Monster\Spawn_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ColliderPawn.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_GuardCounter.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Guard_Counter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Hit_Light.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Light</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Hit_Strong.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Strong</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Hit_Middle.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Middle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Hit_Guard.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Gaurd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Hit_HeavyStand.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_HeavyStand</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -568,34 +667,34 @@
       <Filter>03.GameObject\UIObject\Static\Bar</Filter>
     </ClCompile>
     <ClCompile Include="..\private\MapObject.cpp">
-      <Filter>03.GameObject\Maps\MapObject</Filter>
+      <Filter>03.GameObject\Map\MapObject</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerState.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Idle.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Idle</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Idle</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Move.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Move</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Move</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Attack.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Attack</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Guard.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Guard</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Guard</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Roll.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Roll</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Roll</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerPawn.cpp">
-      <Filter>03.GameObject\Pawns\Player</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerBody.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerBody</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerBody</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StateFactory.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\Factory</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\Factory</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PlayerAnimMachine.cpp">
       <Filter>03.GameObject\Pawns\AnimMachine\PlayerAnimMachine</Filter>
@@ -604,55 +703,55 @@
       <Filter>03.GameObject\UIObject\GamePlay\Option</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash0.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash0</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash0</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash2.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash2</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash2</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash1.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash1</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash1</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash4.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash4</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash4</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_Smash3.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\Smash\Smash3</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Smash3</Filter>
     </ClCompile>
     <ClCompile Include="..\private\State_HeavyStand.cpp">
-      <Filter>03.GameObject\Pawns\Player\PlayerState\State_Action\HeavyStand</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\HeavyStand</Filter>
     </ClCompile>
     <ClCompile Include="..\private\BastardSword.cpp">
-      <Filter>03.GameObject\Pawns\Player\Weapon\Sword\BastardSword</Filter>
+      <Filter>03.GameObject\Equipment\Weapon\Sword\BastardSword</Filter>
     </ClCompile>
     <ClCompile Include="..\private\RoundShield.cpp">
-      <Filter>03.GameObject\Pawns\Player\Weapon\Shield\RoundShield</Filter>
+      <Filter>03.GameObject\Equipment\Weapon\Shield\RoundShield</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Armor.cpp">
-      <Filter>03.GameObject\Pawns\Player\Armor</Filter>
+      <Filter>03.GameObject\Equipment\Armor</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GlasgavelenBody.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Glasgavelen.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Glasgavelen</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen</Filter>
     </ClCompile>
     <ClCompile Include="..\private\GlasgavelenSword.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Glasgavelen\Weapon</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\private\VampireAI.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\AI</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\AI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Monster.cpp">
-      <Filter>03.GameObject\Pawns\Monster</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Vampire</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire_Basic.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Basic</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Basic</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire_Basic_Body.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Basic\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Basic\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Body.cpp">
       <Filter>03.GameObject\Pawns\BodyBase</Filter>
@@ -664,34 +763,31 @@
       <Filter>03.GameObject\Pawns\AnimMachine\Vampire_AnimMachine</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Vampire_Elder.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Elder</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Elder</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Vampire_Elder_Body .cpp">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Elder\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Elder\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Vampire_Royal.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Royal</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Royal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Vampire_Royal_Body.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Vampire\Vampire_Royal\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Vampire\Vampire_Royal\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Queen.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Queen</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Queen</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Queen_Body.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Queen\Body</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Queen\Body</Filter>
     </ClCompile>
     <ClCompile Include="..\private\QueenAI.cpp">
-      <Filter>03.GameObject\Pawns\Monster\Queen\AI</Filter>
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Queen\AI</Filter>
     </ClCompile>
     <ClCompile Include="..\private\QueenAnimMachine.cpp">
       <Filter>03.GameObject\Pawns\AnimMachine\QueenAnimMachine</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Town.cpp">
-      <Filter>03.GameObject\Maps\Town</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Map.cpp">
-      <Filter>03.GameObject\Maps</Filter>
+      <Filter>03.GameObject\Map</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Level_Town.cpp">
       <Filter>02.Levels\GamePlay\Level_Town</Filter>
@@ -720,11 +816,62 @@
     <ClCompile Include="..\private\Controller_UI.cpp">
       <Filter>04.Controller\UI</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\PlayerInstance.cpp">
-      <Filter>01.PlayerInstance</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Weapon.cpp">
-      <Filter>03.GameObject\Pawns\Player\Weapon</Filter>
+      <Filter>03.GameObject\Equipment\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Storage.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Storage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Mouse.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Equipment.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Equipment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Inventory.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Slot.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Inventroy\Slot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PlayerInstance.cpp">
+      <Filter>01.Instance\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\MonsterInstance.cpp">
+      <Filter>01.Instance\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Storage_Manager.cpp">
+      <Filter>01.Instance\Player\Storage_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Equipment_Manager.cpp">
+      <Filter>01.Instance\Player\Equip_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pooling_Manager.cpp">
+      <Filter>01.Instance\Monster\Pool_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Spawn_Manager.cpp">
+      <Filter>01.Instance\Monster\Spawn_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ColliderPawn.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_GuardCounter.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Action\Smash\Guard_Counter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Hit_Light.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Hit_Strong.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Strong</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Hit_Middle.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Middle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Hit_Guard.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_Gaurd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Hit_HeavyStand.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Player\PlayerState\State_Hit\State_Hit_HeavyStand</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

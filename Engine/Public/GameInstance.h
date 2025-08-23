@@ -75,6 +75,7 @@ public:
 #pragma region OBJECT_MANAGER
 public:
 	HRESULT Add_GameObject_ToLayer(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, _uint iLayerIndex, const _wstring& strLayerTag, void* pArg = nullptr);
+	HRESULT Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, CGameObject* pGameObject);
 	class CComponent* Get_Component(_uint iLayerIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
 #pragma endregion
 
@@ -102,10 +103,10 @@ public:
 #pragma region EVENTBUS
 public:
 	template <typename EVENT>
-	void Subscribe(_uint iEventLevelIndex, function<void(const EVENT&)> Subscriber) {
-		m_pEventBus->Subscribe(iEventLevelIndex, Subscriber); }
+	void Subscribe(_uint iEventTypeIndex, function<void(const EVENT&)> Subscriber) {
+		m_pEventBus->Subscribe(iEventTypeIndex, Subscriber); }
 
-	void Publish(_uint iEventLevelIndex, const CEvent& Event);
+	void Publish(_uint iEventTypeIndex, const CEvent& Event);
 #pragma endregion
 
 #pragma region CAMERA_MANAGER
@@ -143,6 +144,17 @@ public:
 	class CNavigation*	Clone_CurrentNavigation(_int iCellIndex);
 #pragma endregion
 
+#pragma region COLLIDER
+	HRESULT				Add_Channel(_uint iSrcChannel, _uint iDstChannel, COLLIDER_TYPE eType);
+	HRESULT				Add_BoundingCollider(CGameObject* pOwner, CCollider* pBounding_Collider);
+	HRESULT				Add_ActionCollider(CGameObject* pOwner, CCollider* pAction_Collider);
+#pragma endregion
+
+#pragma region MOUSE_POINT
+	void				Set_MousePoint(POINT ptMouse) { m_ptMousePoint = ptMouse; }
+	POINT				Get_MousePoint() { return m_ptMousePoint; }
+#pragma endregion
+
 private:
 	class CGraphic_Device*		m_pGraphic_Device = { nullptr };
 	class CInput_Device*		m_pInput_Device = { nullptr };
@@ -156,11 +168,13 @@ private:
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
 
 	class COctree*				m_pOctree = { nullptr };
-	class CDynamicAABBTree*		m_pDynamicAABBTree = { nullptr };
 	CEventBus*					m_pEventBus = { nullptr };
 	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
 	class CController_Manager*	m_pController_Manager = { nullptr };
 	class CNavigation_Manager*	m_pNavigation_Manager = { nullptr };
+	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
+
+	POINT						m_ptMousePoint = {};
 public:
 	void Release_Engine();
 	virtual void Free() override;

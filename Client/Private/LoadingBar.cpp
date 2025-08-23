@@ -1,14 +1,15 @@
 #include "ClientPch.h"
 #include "LoadingBar.h"
 #include "Bar.h"
+#include "LoadingPoint.h"
 
 CLoadingBar::CLoadingBar(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CUI_Slot{pDevice, pDeviceContext}
+	: CUI_Panel{pDevice, pDeviceContext}
 {
 }
 
 CLoadingBar::CLoadingBar(const CLoadingBar& Prototype)
-	: CUI_Slot{ Prototype }
+	: CUI_Panel{ Prototype }
 	, m_eType { Prototype.m_eType }
 	, m_fRatio { Prototype.m_fRatio }
 	, m_fBarRatio { Prototype.m_fBarRatio }
@@ -19,9 +20,6 @@ CLoadingBar::CLoadingBar(const CLoadingBar& Prototype)
 
 HRESULT CLoadingBar::Initialize_Prototype()
 {
-	if (FAILED(CUI_Slot::Initialize_Prototype(ENUM_CLASS(LOADING_SLOT::END))))
-		return E_FAIL;
-
 	m_eType = PROGRESS_TYPE::LOADING;
 
 	m_fRatio = 0.f;
@@ -40,10 +38,7 @@ HRESULT CLoadingBar::Initialize(void* pArg)
 	if (FAILED(Ready_Children()))
 		return E_FAIL;
 
-	m_pBar = static_cast<CBar*>(m_Children[ENUM_CLASS(LOADING_SLOT::BAR)]);
-	Safe_AddRef(m_pBar);
-
-	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
+	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
 		this->Event_ProgressBar(Event); });
 	return S_OK;
 }
@@ -83,14 +78,16 @@ HRESULT CLoadingBar::Ready_Children()
 	Children_Desc.iDepth = m_iDepth;
 	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_LoadingBar_Back");
+	Children_Desc.IsBlend = false;
+	Children_Desc.fAlpha = 1.f;
 
-	if (FAILED(CUI_Slot::Add_Child(ENUM_CLASS(LOADING_SLOT::BACKGROUND), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
 		return E_FAIL;
 
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_LoadingBar");
 
-	if (FAILED(CUI_Slot::Add_Child(ENUM_CLASS(LOADING_SLOT::BAR), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"), &Children_Desc)))
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"), &Children_Desc, reinterpret_cast<CUIObject**>(&m_pBar))))
 		return E_FAIL;
 
 	Children_Desc.fSizeX = 30.f;
@@ -98,7 +95,7 @@ HRESULT CLoadingBar::Ready_Children()
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_LoadingBar_Point");
 
-	if(FAILED(CUI_Slot::Add_Child(ENUM_CLASS(LOADING_SLOT::POINT), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingPoint"), &Children_Desc)))
+	if(FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_LoadingPoint"), &Children_Desc, reinterpret_cast<CUIObject**>(&m_pLoadingPoint))))
 		return E_FAIL;
 
 	return S_OK;
@@ -123,7 +120,7 @@ void CLoadingBar::Update_BarRatio(_float fTimeDelta)
 	if (m_fBarRatio >= 1.f)
 	{
 		EVENT_LOADING_COMPLETE Event;
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::LOADING), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
 		m_fBarRatio = 0.f;
 	}
 }
@@ -132,8 +129,8 @@ void CLoadingBar::Update_PointOffset(_float fTimeDelta)
 {
 	m_fPointX = m_fSizeX * 0.5f - (m_fSizeX * m_fBarRatio);
 
-	m_Children[ENUM_CLASS(LOADING_SLOT::POINT)]->Set_Offset(-m_fPointX, 0.f);
-	m_Children[ENUM_CLASS(LOADING_SLOT::POINT)]->Set_Position(m_fX, m_fY);
+	m_pLoadingPoint->Set_Offset(-m_fPointX, 0.f);
+	m_pLoadingPoint->Set_Position(m_fX, m_fY);
 }
 
 CLoadingBar* CLoadingBar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
@@ -167,4 +164,5 @@ void CLoadingBar::Free()
 	__super::Free();
 
 	Safe_Release(m_pBar);
+	Safe_Release(m_pLoadingPoint);
 }

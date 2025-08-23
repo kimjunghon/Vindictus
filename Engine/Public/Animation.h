@@ -16,11 +16,12 @@ private:
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
 	HRESULT Initialize(ifstream& File, const vector<class CBone*>& Bones);
-	void	Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _vector& vPrevRootPostion);
+	void	Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _bool* IsAnimStart);
 	_bool	IsAnimChanging() { return m_bAnimChange; }
+	_float	Get_AnimSpeed() { return m_fDuration / m_fTickPerSecond; }
 public:
 	_bool	CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio);
-
+	_bool	CurrentAnim_InRangeOfTrackPositon(_float fBeginTrackPosition, _float fEndTrackPosition);
 	void	Enter(_bool IsChange);
 
 private:
@@ -32,6 +33,7 @@ private:
 	_bool				m_bAnimChange = {};
 	_bool				m_bAnimChangeFirstCall = {};
 	_float				m_fAnimChangeDelay = {};
+	_vector				m_fStartRootPosition = {};
 
 	vector<CChannel*>	m_Channels;
 	vector<_uint>		m_CurrentKeyFrameIndices;

@@ -3,12 +3,12 @@
 #include "Bar.h"
 
 CStateBar::CStateBar(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CUI_Slot{ pDevice, pDeviceContext }
+	: CUI_Panel{ pDevice, pDeviceContext }
 {
 }
 
 CStateBar::CStateBar(const CStateBar& Prototype)
-	: CUI_Slot{ Prototype }
+	: CUI_Panel{ Prototype }
 	, m_fRatio{ Prototype.m_fRatio }
 	, m_fBarRatio{ Prototype.m_fBarRatio }
 	, m_fLerpBarRatio { Prototype.m_fLerpBarRatio }
@@ -18,9 +18,6 @@ CStateBar::CStateBar(const CStateBar& Prototype)
 
 HRESULT CStateBar::Initialize_Prototype()
 {
-	if (FAILED(CUI_Slot::Initialize_Prototype(ENUM_CLASS(STATE_SLOT::END))))
-		return E_FAIL;
-
 	m_fRatio = 1.f;
 	m_fBarRatio = 1.f;
 	m_fLerpBarRatio = 1.f;
@@ -45,13 +42,8 @@ HRESULT CStateBar::Initialize(void* pArg)
 	if (FAILED(Ready_Children()))
 		return E_FAIL;
 
-	m_pBar = static_cast<CBar*>(m_Children[ENUM_CLASS(STATE_SLOT::BAR)]);
-	Safe_AddRef(m_pBar);
 
-	m_pLerpBar = static_cast<CBar*>(m_Children[ENUM_CLASS(STATE_SLOT::LERP_BAR)]);
-	Safe_AddRef(m_pLerpBar);
-
-	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(LEVEL::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
+	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
 		this->Event_ProgressBar(Event); });
 
 	return S_OK;
@@ -113,17 +105,18 @@ HRESULT CStateBar::Ready_Children()
 	Children_Desc.fOffsetX = 0.f;
 	Children_Desc.fOffsetY = 0.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
-
 	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_") + m_strType;
+	Children_Desc.IsBlend = false;
+	Children_Desc.fAlpha = 1.f;
 
-	if (FAILED(CUI_Slot::Add_Child(ENUM_CLASS(STATE_SLOT::BAR), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"), &Children_Desc)))
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"), &Children_Desc, reinterpret_cast<CUIObject**>(&m_pBar))))
 		return E_FAIL;
 
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_Lerp_") + m_strType;
 
-	if (FAILED(CUI_Slot::Add_Child(ENUM_CLASS(STATE_SLOT::LERP_BAR), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"), &Children_Desc)))
+	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Bar"), &Children_Desc, reinterpret_cast<CUIObject**>(&m_pLerpBar))))
 		return E_FAIL;
 	
 	Children_Desc.fX += 4.f;
@@ -132,7 +125,7 @@ HRESULT CStateBar::Ready_Children()
 	Children_Desc.iDepth = m_iDepth;
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_Back_") + m_strType;
 
-	if(FAILED(CUI_Slot::Add_Child(ENUM_CLASS(STATE_SLOT::BACKGROUND), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
+	if(FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
 		return E_FAIL;
 
 	return S_OK;

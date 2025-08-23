@@ -1,55 +1,87 @@
 #include "ClientPch.h"
 #include "PlayerInstance.h"
+#include "Equipment_Manager.h"
+#include "Storage_Manager.h"
 
 IMPLEMENT_SINGLETON(CPlayerInstance)
 
 CPlayerInstance::CPlayerInstance()
+	: m_pGameInstance { CGameInstance::GetInstance()}
 {
+	Safe_AddRef(m_pGameInstance);
 }
 
-HRESULT CPlayerInstance::EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon)
+HRESULT CPlayerInstance::Initialize(_uint iInventorySlotCount)
 {
-	if (iWeaponTypeIndex >= ENUM_CLASS(WEAPON_TYPE::END))
+	m_pEquipment_Manager = CEquipment_Manager::Create();
+	if (nullptr == m_pEquipment_Manager)
 		return E_FAIL;
 
-	m_pPlayerEquipWeapon[iWeaponTypeIndex] = pEquipWeapon;
-	Safe_AddRef(m_pPlayerEquipWeapon[iWeaponTypeIndex]);
+	m_pStorage_Manager = CStorage_Manager::Create(iInventorySlotCount);
+	if (nullptr == m_pStorage_Manager)
+		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CPlayerInstance::EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmor)
+#pragma region EQUIPMENT_MANAGER
+HRESULT CPlayerInstance::EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipWeapon, _int iItemInventoryIndex)
 {
-	if (iArmorTypeIndex >= ENUM_CLASS(ARMOR_TYPE::END))
-		return E_FAIL;
-
-	m_pPlayerEquipArmor[iArmorTypeIndex] = pEquipArmor;
-	Safe_AddRef(m_pPlayerEquipArmor[iArmorTypeIndex]);
-
-	return S_OK;
+	return m_pEquipment_Manager->EquipWeapon(iWeaponTypeIndex, pEquipWeapon, iItemInventoryIndex);
 }
 
-HRESULT CPlayerInstance::UnEquipWeapon(_uint iWeaponTypeIndex)
+HRESULT CPlayerInstance::EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmor, _int iItemInventoryIndex)
 {
-	if (iWeaponTypeIndex >= ENUM_CLASS(WEAPON_TYPE::END))
-		return E_FAIL;
-
-	Safe_Release(m_pPlayerEquipWeapon[iWeaponTypeIndex]);
-	m_pPlayerEquipWeapon[iWeaponTypeIndex] = nullptr;
-
-	return S_OK;
+	return m_pEquipment_Manager->EquipArmor(iArmorTypeIndex, pEquipArmor, iItemInventoryIndex);
 }
 
-HRESULT CPlayerInstance::UnEquipArmor(_uint iArmorTypeIndex)
+HRESULT CPlayerInstance::UnEquipWeapon(_uint iWeaponTypeIndex, _int iItemInventoryIndex)
 {
-	if (iArmorTypeIndex >= ENUM_CLASS(ARMOR_TYPE::END))
-		return E_FAIL;
-
-	Safe_Release(m_pPlayerEquipArmor[iArmorTypeIndex]);
-	m_pPlayerEquipArmor[iArmorTypeIndex] = nullptr;
-
-	return S_OK;
+	return m_pEquipment_Manager->UnEquipWeapon(iWeaponTypeIndex, iItemInventoryIndex);
 }
+
+HRESULT CPlayerInstance::UnEquipArmor(_uint iArmorTypeIndex, _int iItemInventoryIndex)
+{
+	return m_pEquipment_Manager->UnEquipArmor(iArmorTypeIndex, iItemInventoryIndex);
+}
+
+CWeapon* CPlayerInstance::UpdatePlayerEquipWeapon(_uint iWeaponTypeIndex) const
+{
+	return m_pEquipment_Manager->UpdatePlayerEquipWeapon(iWeaponTypeIndex);
+}
+
+CArmor* CPlayerInstance::UpdatePlayerEquipArmor(_uint iArmorTypeIndex) const
+{
+	return m_pEquipment_Manager->UpdatePlayerEquipArmor(iArmorTypeIndex);
+}
+#pragma endregion
+
+#pragma region STORAGE_MANAGER
+Shared_ITEM CPlayerInstance::GetInventory(_uint iInventoryIndex)
+{
+	return m_pStorage_Manager->GetInventory(iInventoryIndex);
+}
+
+HRESULT CPlayerInstance::Add_Item(ITEM_TYPE eItemType, CGameObject* pItem, _int iEmptyInventoryIndex)
+{
+	return m_pStorage_Manager->Add_Item(eItemType, pItem, iEmptyInventoryIndex);
+}
+
+HRESULT CPlayerInstance::Swap_Item(_uint iMouseItemIndex, _uint iInventoryIndex)
+{
+	return m_pStorage_Manager->Swap_Item(iMouseItemIndex, iInventoryIndex);
+}
+
+HRESULT CPlayerInstance::Remove_Item(_uint iInventoryIndex)
+{
+	return m_pStorage_Manager->Remove_Item(iInventoryIndex);
+}
+
+_bool CPlayerInstance::IsInventoryFull()
+{
+	return m_pStorage_Manager->IsInventoryFull();
+}
+#pragma endregion
 
 HRESULT CPlayerInstance::SavePlayerStatus(const PLAYER_STATUS& PlayerStatus)
 {
@@ -58,34 +90,25 @@ HRESULT CPlayerInstance::SavePlayerStatus(const PLAYER_STATUS& PlayerStatus)
 	return S_OK;
 }
 
-CWeapon* CPlayerInstance::BindPlayerEquipWeapon(_uint iWeaponTypeIndex)
-{
-	if (iWeaponTypeIndex >= ENUM_CLASS(WEAPON_TYPE::END))
-		return nullptr;
 
-	return m_pPlayerEquipWeapon[iWeaponTypeIndex];
-}
-
-CArmor* CPlayerInstance::BindPlayerEquipArmor(_uint iArmorTypeIndex)
-{
-	if (iArmorTypeIndex >= ENUM_CLASS(ARMOR_TYPE::END))
-		return nullptr;
-
-	return m_pPlayerEquipArmor[iArmorTypeIndex];
-}
-
-PLAYER_STATUS CPlayerInstance::BindPlayerStatus()
+PLAYER_STATUS CPlayerInstance::UpdatePlayerStatus() const
 {
 	return m_PlayerStatus;
+}
+
+void CPlayerInstance::Release_PlayerInstance()
+{
+	Release();
+
+	Safe_Release(m_pGameInstance);
+
+	Safe_Release(m_pEquipment_Manager);
+	
+	Safe_Release(m_pStorage_Manager);
 }
 
 void CPlayerInstance::Free()
 {
 	__super::Free();
 
-	for (_uint i = 0; i < ENUM_CLASS(WEAPON_TYPE::END); i++)
-		Safe_Release(m_pPlayerEquipWeapon[i]);
-	
-	for (_uint j = 0; j < ENUM_CLASS(ARMOR_TYPE::END); j++)
-		Safe_Release(m_pPlayerEquipArmor[j]);
 }

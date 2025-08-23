@@ -119,5 +119,5 @@ namespace {
 		};
 
 	};
-	static StateAttackRegister RegisterIdle;
+	static StateAttackRegister Register;
 }

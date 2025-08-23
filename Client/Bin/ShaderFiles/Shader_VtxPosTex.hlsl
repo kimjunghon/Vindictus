@@ -3,6 +3,7 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float g_fStartX, g_fSizeX, g_fProgressBarRatio;
 float g_fWinSizeX = 1280.f;
 float g_fWinSizeY = 720.f;
+float g_Alpha = 1.f;
 
 texture2D g_Texture;
 
@@ -64,13 +65,31 @@ PS_OUT PS_MAIN(PS_DEFAULT_IN In)
     
     Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
     
-    if(Out.vColor.a <= 0.3f)
+    if(Out.vColor.a <= 0.5f)
         discard;
     
     return Out;
 }
 
+
 // Default Pass End ------------------------------------------------------------------------------------------------
+
+// Blend Pass Start ------------------------------------------------------------------------------------------------
+PS_OUT PS_BLEND(PS_DEFAULT_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (Out.vColor.a <= 0.5f)
+        discard;
+    
+    Out.vColor.a = g_Alpha;
+    
+    return Out;
+}
+
+// Blend Pass End --------------------------------------------------------------------------------------------------
 
 // ProgressBar Pass Start ------------------------------------------------------------------------------------------
 
@@ -161,6 +180,12 @@ technique11 DefaultTechnique
     {
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass AlphaBlendPass
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_BLEND();
     }
 
     pass ProgressBarPass

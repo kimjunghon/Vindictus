@@ -94,5 +94,5 @@ struct StateMoveRegister {
 
 
 };
-static StateMoveRegister RegisterMove;
+static StateMoveRegister Register;
 }

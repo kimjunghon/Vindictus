@@ -24,7 +24,8 @@ public:
 	virtual void	Update(_fmatrix WorldMatrix);
 
 public:
-	_bool			isMove(_fvector vPosition);
+	_bool			isMove(_fvector vPosition, _float3** ppInNormal = nullptr);
+	_bool			isMove(_fmatrix WorldMatrix, _float3** ppInNormal = nullptr);
 	_vector			Compute_OnCell(_fvector vPosition);
 
 #ifdef _DEBUG

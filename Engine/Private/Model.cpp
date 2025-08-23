@@ -22,6 +22,8 @@ CModel::CModel(const CModel& Prototype)
     , m_iNumAnimation { Prototype.m_iNumAnimation }
     , m_iRootBoneIndex{ Prototype.m_iRootBoneIndex }
     , m_eModelType { Prototype.m_eModelType }
+    , m_Bounding { Prototype.m_Bounding }
+    , m_OffsetMatrix { Prototype.m_OffsetMatrix }
 {
     for (auto& pPrototypeBone : Prototype.m_Bones)
         m_Bones.push_back(pPrototypeBone->Clone());
@@ -36,8 +38,17 @@ CModel::CModel(const CModel& Prototype)
         m_Animations.emplace(Pair.first, Pair.second->Clone());
 }
 
+_float CModel::Get_CurrentAnimSpeed()
+{
+    if (nullptr == m_pCurrentAnimation)
+        return 0.f;
 
-HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
+    _float fSpeed = m_pCurrentAnimation->Get_AnimSpeed() * m_CurrentAnimData.fAnimSpeed;
+
+    return fSpeed;
+}
+
+HRESULT CModel::Initialize_Prototype(MODEL_TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
     XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
 
@@ -50,7 +61,7 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
 
         _uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
-        if (MODELTYPE::NONANIM == m_eModelType)
+        if (MODEL_TYPE::NONANIM == m_eModelType)
             iFlag |= aiProcess_PreTransformVertices;
 
         m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
@@ -84,11 +95,14 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
 
         File.read(reinterpret_cast<_char*>(&tModelInfo), sizeof(MODEL_INFO));
 
-        m_eModelType = static_cast<MODELTYPE>(tModelInfo.iModelType);
+        m_eModelType = static_cast<MODEL_TYPE>(tModelInfo.iModelType);
         m_iNumMeshes = tModelInfo.iNumMeshes;
         m_iNumMaterials = tModelInfo.iNumMaterials;
 
         
+        m_Bounding.vMinPosition = _float3(FLT_MAX, FLT_MAX, FLT_MAX);
+        m_Bounding.vMaxPosition = _float3(FLT_MAX * -1.f, FLT_MAX * -1.f, FLT_MAX * -1.f);
+
         if (FAILED(Ready_Bones(File, -1)))
             return E_FAIL;
 
@@ -102,9 +116,16 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, const _char* pModelFi
             return E_FAIL;
 
         File.close();
+
+        _float fCenterX = (m_Bounding.vMinPosition.x + m_Bounding.vMaxPosition.x) * 0.5f;
+        _float fCenterY = (m_Bounding.vMinPosition.y + m_Bounding.vMaxPosition.y) * 0.5f;
+        _float fCenterZ = (m_Bounding.vMinPosition.z + m_Bounding.vMaxPosition.z) * 0.5f;
+        
+        XMStoreFloat4x4(&m_OffsetMatrix, XMMatrixTranslation(fCenterX * -1.f, fCenterY * -1.f, fCenterZ * -1.f));
     }
     else
         return E_FAIL;
+
 
 	return S_OK;
 }
@@ -160,11 +181,49 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
     return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, Bones);
 }
 
+HRESULT CModel::Bind_PoseBoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex)
+{
+    if (iMeshIndex >= m_iNumMeshes)
+        return E_FAIL;
+
+    return m_Meshes[iMeshIndex]->Bind_PoseBoneMatrices(pShader, pConstantName, m_Bones);
+}
+
+HRESULT CModel::Update_PoseCombinedTransformationMatrix()
+{
+    for (_uint i = 0; i < m_Bones.size(); i++)
+    {
+        m_Bones[i]->Update_PoseCombinedTransformationMatrix(m_PreTransformMatrix, m_Bones, m_OffsetMatrix);
+    }
+    return S_OK;
+}
+
 HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 {
     if (m_CurrentAnimData.strAnimKey == AnimData.strAnimKey)
         return E_FAIL;
 
+    CAnimation* pAnimation = Find_Animation(AnimData.strAnimKey);
+    if (nullptr == pAnimation)
+        return E_FAIL;
+
+    m_pCurrentAnimation = pAnimation;
+    _bool IsAnimChange = false;
+
+    if (false == m_IsFinished)
+        IsAnimChange = true;
+
+    m_pCurrentAnimation->Enter(IsAnimChange);
+
+    m_IsAnimStart = true;
+
+    m_CurrentAnimData = AnimData;
+
+    return S_OK;
+}
+
+HRESULT CModel::Forcing_Set_Animation(const ANIM_DATA& AnimData)
+{
     CAnimation* pAnimation = Find_Animation(AnimData.strAnimKey);
     if (nullptr == pAnimation)
         return E_FAIL;
@@ -177,8 +236,8 @@ HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 
     _bool IsAnimChange = false;
 
-    if (false == m_IsFinished)
-        IsAnimChange = true;
+    /*if (false == m_IsFinished)
+        IsAnimChange = true;*/
 
     m_pCurrentAnimation->Enter(IsAnimChange);
 
@@ -195,7 +254,7 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     {
         m_IsFinished = false;
 
-        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed, m_vPrevRootPosition);
+        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed, &m_IsAnimStart);
     }
 
     for(_uint i =0; i< m_Bones.size(); i++)
@@ -291,7 +350,7 @@ HRESULT CModel::MeshesToBinary(ofstream& File)
         File.write(reinterpret_cast<_char*>(&iMeshNameLength), sizeof(size_t));
         File.write(pAIMesh->mName.data, sizeof(_char) * iMeshNameLength);
 
-        if(m_eModelType == MODELTYPE::NONANIM)
+        if(m_eModelType == MODEL_TYPE::NONANIM)
         {
             VTXMESH* pVertices = new VTXMESH[pAIMesh->mNumVertices];
 
@@ -311,7 +370,7 @@ HRESULT CModel::MeshesToBinary(ofstream& File)
 
             Safe_Delete_Array(pVertices);
         }
-        else if(m_eModelType == MODELTYPE::ANIM)
+        else if(m_eModelType == MODEL_TYPE::ANIM)
         {   
             VTXANIMMESH* pVertices = new VTXANIMMESH[pAIMesh->mNumVertices];
             ZeroMemory(pVertices, sizeof(VTXANIMMESH) * pAIMesh->mNumVertices);
@@ -530,6 +589,14 @@ HRESULT CModel::AnimationToBinary(ofstream& File)
     return S_OK;
 }
 
+_bool CModel::IsAnimationInRangeTrackPosition(_float2 vRangeTrackPosition)
+{
+    if (nullptr == m_pCurrentAnimation)
+        return false;
+
+    return m_pCurrentAnimation->CurrentAnim_InRangeOfTrackPositon(vRangeTrackPosition.x, vRangeTrackPosition.y);
+}
+
 _bool CModel::CanChangeAnimation()
 {
     if (nullptr == m_pCurrentAnimation)
@@ -559,7 +626,7 @@ void CModel::RootMotion()
  
     m_vPrevRootPosition = vPosition;
     m_vPrevRootRotation = vRotation;
- 
+
     if(m_RootMotionOption.PositionX)
         vPosition = XMVectorSetX(vPosition, 0.f);
     if (m_RootMotionOption.PositionY)
@@ -569,9 +636,9 @@ void CModel::RootMotion()
     if (m_RootMotionOption.Rotation)
     {
         _matrix RotationMatrix = XMMatrixRotationQuaternion(vRotation);
-        _vector vLook = XMVector3Normalize(RotationMatrix.r[2]);
-        _float fYaw = atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook));
-        _vector vRotationInverse = XMQuaternionInverse(XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw));
+        _vector vLook = XMVector3Normalize(XMVectorSetY(RotationMatrix.r[2], 0.f));
+        _vector vRotationInverse = XMQuaternionRotationMatrix(XMMatrixLookAtLH(XMVectorZero(), vLook, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+        
         vRotation = XMQuaternionMultiply(vRotation, vRotationInverse);
     }
 
@@ -594,9 +661,10 @@ const _float4x4* CModel::Find_SocketBoneCombinedMatrix(const string& strSocketBo
     return (*iter)->Get_CombinedTransformationMatrixPtr();
 }
 
+#ifdef _DEBUG
 _bool CModel::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist)
 {
-    if (m_eModelType != MODELTYPE::NONANIM)
+    if (m_eModelType != MODEL_TYPE::NONANIM)
         return false;
 
 
@@ -622,6 +690,7 @@ _bool CModel::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _floa
 
     return false;
 }
+#endif
 
 HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
 {
@@ -652,7 +721,7 @@ HRESULT CModel::Ready_Meshes(ifstream& File)
 {
     for (_uint i = 0; i < m_iNumMeshes; i++)
     {
-        CMesh* pMesh = CMesh::Create(m_pDevice, m_pDeviceContext, m_eModelType ,File, m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+        CMesh* pMesh = CMesh::Create(m_pDevice, m_pDeviceContext, m_eModelType ,File, m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix), m_Bounding);
         if (nullptr == pMesh)
             return E_FAIL;
 
@@ -777,7 +846,7 @@ HRESULT CModel::Ready_Animation()
     return S_OK;
 }
 
-CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODELTYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
+CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, MODEL_TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
     CModel* pInstance = new CModel(pDevice, pDeviceContext);
 

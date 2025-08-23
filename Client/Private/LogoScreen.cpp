@@ -36,20 +36,17 @@ HRESULT CLogoScreen::Initialize(void* pArg)
 
 void CLogoScreen::Priority_Update(_float fTimeDelta)
 {
-	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
-		__super::Children_Priority_Update(fTimeDelta);
+	__super::Children_Priority_Update(fTimeDelta);
 }
 
 void CLogoScreen::Update(_float fTimeDelta)
 {
-	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
-		__super::Children_Update(fTimeDelta);
+	__super::Children_Update(fTimeDelta);
 }
 
 void CLogoScreen::Late_Update(_float fTimeDelta)
 {
-	if (*m_iUIState | ENUM_CLASS(STATE_FLAG::LOGO))
-		__super::Children_Late_Update(fTimeDelta);
+	__super::Children_Late_Update(fTimeDelta);
 }
 
 HRESULT CLogoScreen::Render()
@@ -70,6 +67,8 @@ HRESULT CLogoScreen::Ready_Children()
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
 	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_SkyBox");
+	Children_Desc.IsBlend = false;
+	Children_Desc.fAlpha = 1.f;
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Children_Desc)))
 		return E_FAIL;
@@ -112,7 +111,7 @@ HRESULT CLogoScreen::Ready_Button()
 		EVENT_LEVEL_CHANGE Event;
 		Event.iChange_Level = ENUM_CLASS(LEVEL::GAMEPLAY);
 		Event.bIsLoading = false;
-		m_pGameInstance->Publish(ENUM_CLASS(LEVEL::STATIC), Event);
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))

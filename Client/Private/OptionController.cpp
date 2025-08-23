@@ -34,19 +34,19 @@ HRESULT COptionController::Initialize(void* pArg)
 
 void COptionController::Priority_Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
 		__super::Children_Priority_Update(fTimeDelta);
 }
 
 void COptionController::Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
 		__super::Children_Update(fTimeDelta);
 }
 
 void COptionController::Late_Update(_float fTimeDelta)
 {
-	if (*m_iUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
+	if (*m_pUIState & ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER))
 		__super::Children_Late_Update(fTimeDelta);
 }
 
@@ -68,6 +68,8 @@ HRESULT COptionController::Ready_Children()
 	Background_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Background_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_Option_Background");
 	Background_Desc.iDepth = ENUM_CLASS(UI_DEPTH::SECOND);
+	Background_Desc.IsBlend = false;
+	Background_Desc.fAlpha = 1.f;
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Panel"), &Background_Desc)))
 		return E_FAIL;
@@ -82,6 +84,8 @@ HRESULT COptionController::Ready_Children()
 	Button_Desc.iDepth = ENUM_CLASS(UI_DEPTH::THIRD);
 	Button_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_Keyboard");
+	Button_Desc.IsBlend = false;
+	Button_Desc.fAlpha = 1.f;
 
 	Button_Desc.Callback = [this]() {
 		m_strChangeControllerTag = TEXT("Controller_KeyBoard");
@@ -109,7 +113,7 @@ HRESULT COptionController::Ready_Children()
 		m_pGameInstance->Change_Controller(ENUM_CLASS(CONTROLLER_CHANNEL::MAIN), m_strChangeControllerTag);
 		m_strChangeControllerTag = {};
 
-		*m_iUIState = ENUM_CLASS(UI_LEVEL::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::OPTION);
+		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::OPTION);
 		};
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))

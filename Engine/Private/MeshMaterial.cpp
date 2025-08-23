@@ -146,8 +146,9 @@ HRESULT CMeshMaterial::Initialize_Binary(const _char* pModelFilePath, ifstream& 
 			_char TextureFileName[MAX_PATH] = {};
 			File.read(TextureFileName, sizeof(_char) * iFileNameLength);
 
+			_char szName[MAX_PATH] = {};
 			_char szExt[MAX_PATH] = {};
-			_splitpath_s(TextureFileName, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
+			_splitpath_s(TextureFileName, nullptr, 0, nullptr, 0, szName, MAX_PATH, szExt, MAX_PATH);
 
 			const _char* pCutPoint = strstr(pModelFilePath, "Models");
 			size_t PostLength = strlen(pModelFilePath)- strlen(pCutPoint);
@@ -156,6 +157,7 @@ HRESULT CMeshMaterial::Initialize_Binary(const _char* pModelFilePath, ifstream& 
 
 			strncpy_s(szDrivePath, pModelFilePath, PostLength);
 
+			//FBX Texture 경로
 			_char szFullFilePath[MAX_PATH] = {};
 
 			sprintf_s(szFullFilePath, "%s%s%s", szDrivePath, "Models/Textures/", TextureFileName);
@@ -163,24 +165,35 @@ HRESULT CMeshMaterial::Initialize_Binary(const _char* pModelFilePath, ifstream& 
 			_tchar szWideFullFilePath[MAX_PATH] = {};
 
 			MultiByteToWideChar(CP_UTF8, 0, szFullFilePath, static_cast<_int>(strlen(szFullFilePath)), szWideFullFilePath, MAX_PATH);
+			
+			//DDS Textrue 경로
+			_char szFullDDSFilePath[MAX_PATH] = {};
+			sprintf_s(szFullDDSFilePath, "%s%s%s%s", szDrivePath, "Models/Textures/", szName, ".dds");
+
+			_tchar szWideFullDDSFilePath[MAX_PATH] = {};
+
+			MultiByteToWideChar(CP_UTF8, 0, szFullDDSFilePath, static_cast<_int>(strlen(szFullDDSFilePath)), szWideFullDDSFilePath, MAX_PATH);
 
 			ID3D11ShaderResourceView* pSRV = { nullptr };
 
 			HRESULT     hr = {};
 
-			if (false == strcmp(szExt, ".dds"))
+			if(FAILED(CreateDDSTextureFromFile(m_pDevice, szWideFullDDSFilePath, nullptr, &pSRV)))
 			{
-				hr = CreateDDSTextureFromFile(m_pDevice, szWideFullFilePath, nullptr, &pSRV);
-			}
-			else if (false == strcmp(szExt, ".tga"))
-				return E_FAIL;
-			else
-			{
-				hr = CreateWICTextureFromFile(m_pDevice, szWideFullFilePath, nullptr, &pSRV);
-			}
+				if (false == strcmp(szExt, ".dds"))
+				{
+					hr = CreateDDSTextureFromFile(m_pDevice, szWideFullFilePath, nullptr, &pSRV);
+				}
+				else if (false == strcmp(szExt, ".tga"))
+					return E_FAIL;
+				else
+				{
+					hr = CreateWICTextureFromFile(m_pDevice, szWideFullFilePath, nullptr, &pSRV);
+				}
 
-			if (FAILED(hr))
-				continue;
+				if (FAILED(hr))
+					continue;
+			}
 
 			m_SRVs[i].push_back(pSRV);
 		}

@@ -17,6 +17,8 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 
 	m_iParentBoneIndex = iParentBoneIndex;
 
+	m_PoseTransformationMatrix = m_TransformationMatrix;
+
 	return S_OK;
 }
 
@@ -30,6 +32,8 @@ HRESULT CBone::Initialize(ifstream& File, _int iParentBoneIndex)
 
 	m_iParentBoneIndex = iParentBoneIndex;
 
+	m_PoseTransformationMatrix = m_TransformationMatrix;
+
 	return S_OK;
 }
 
@@ -39,6 +43,19 @@ void CBone::Update_CombinedTransformationMatrix(const _float4x4& PreTransformati
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixMultiply(XMLoadFloat4x4(&PreTransformationMatrix), XMLoadFloat4x4(&m_TransformationMatrix)));
 	else
 		XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixMultiply(XMLoadFloat4x4(&m_TransformationMatrix), Bones[m_iParentBoneIndex]->Get_CombinedTransformationMatrix()));
+}
+
+void CBone::Update_PoseCombinedTransformationMatrix(const _float4x4& PreTransformationMatrix, const vector<CBone*>& Bones, const _float4x4& OffsetMatrix)
+{
+	if (m_iParentBoneIndex == -1)
+		XMStoreFloat4x4(&m_PoseCombinedTransformationMatrix, XMMatrixMultiply(XMLoadFloat4x4(&PreTransformationMatrix), XMLoadFloat4x4(&m_PoseTransformationMatrix)));
+	else
+	{
+		if(m_iParentBoneIndex == 2)
+			XMStoreFloat4x4(&m_PoseCombinedTransformationMatrix, XMMatrixMultiply(XMMatrixMultiply(XMLoadFloat4x4(&OffsetMatrix), XMLoadFloat4x4(&m_PoseTransformationMatrix)), Bones[m_iParentBoneIndex]->Get_PoseCombinedTransformationMatrix()));
+		else
+			XMStoreFloat4x4(&m_PoseCombinedTransformationMatrix, XMMatrixMultiply(XMLoadFloat4x4(&m_PoseTransformationMatrix),Bones[m_iParentBoneIndex]->Get_PoseCombinedTransformationMatrix()));
+	}
 }
 
 CBone* CBone::Create(const aiNode* pAINode, _int iParentBoneIndex)

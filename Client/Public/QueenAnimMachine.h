@@ -20,7 +20,7 @@ public:
 	void			Initialize_ATTACK();
 	void			Initialize_BURROW();
 	void			Initialize_HIT();
-
+	void			Initialize_Dead();
 public:
 	static CQueenAnimMachine*	Create();
 	virtual void				Free() override;

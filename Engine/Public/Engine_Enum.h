@@ -9,7 +9,11 @@ namespace Engine
 	enum class D3DTS { VIEW, PROJ, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
-	enum class LAYERTYPE { STATIC, NONSTATIC, END};
+
+	enum class LAYER_TYPE { STATIC, NONSTATIC, END};
+
+	enum class EVENT_TYPE { STATIC, NONSTATIC, END };
+
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, END };
 	enum class OBJECTGROUP { STATIC, DYNAMIC};
 	enum class WINMODE { FULL, WIN, END };
@@ -22,14 +26,18 @@ namespace Engine
 	enum class CONTROLLER_CHANNEL { MAIN, UI, END};
 	enum class UI_DEPTH { FIRST = 2, SECOND, THIRD, FORTH, FIFTH};
 
-	enum class SHADER_VTXPOSTEX { DEFAULT, PROGRESSBAR, LOADINGPOINT};
+	enum class SHADER_VTXPOSTEX { DEFAULT, ALPHABLEND, PROGRESSBAR, LOADINGPOINT};
 
-	enum class MODELTYPE { ANIM, NONANIM, INFILE };
+	enum class MODEL_TYPE { ANIM, NONANIM, INFILE };
 
 	enum class BT_STATE { RUN, SUCCESS, FAILED };
 
 	enum class CELL_POINT { A, B, C, END };
 	enum class LINE { AB, BC, CA, END};
+
+	enum class COLLIDER { AABB, OBB, SPHERE, END };
+	enum class COLLIDER_STATE { BEGIN, DURING, END, NONE};
+	enum class COLLIDER_TYPE { BLOCK, OVERLAP, NONE, END };
 }
 
 #endif // Engine_Enum_h__

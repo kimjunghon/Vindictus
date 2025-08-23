@@ -21,9 +21,6 @@ HRESULT CPawn::Initialize_Prototype()
 
 HRESULT CPawn::Initialize(void* pArg)
 {
-	if (nullptr == pArg)
-		return E_FAIL;
-
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
@@ -73,9 +70,12 @@ HRESULT CPawn::Add_PawnObject(const _wstring& strPawnObjectTag, CPawnObject* pPa
 
 HRESULT CPawn::Remove_PawnObject(const _wstring& strPawnObjectTag)
 {
-	if (nullptr == Find_PawnObject(strPawnObjectTag))
+	CPawnObject* pPawnObject = Find_PawnObject(strPawnObjectTag);
+	
+	if (nullptr == pPawnObject)
 		return E_FAIL;
-
+	
+	Safe_Release(pPawnObject);
 	m_PawnObjects.erase(strPawnObjectTag);
 
 	return S_OK;

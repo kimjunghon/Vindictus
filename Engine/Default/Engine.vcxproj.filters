@@ -55,9 +55,6 @@
     <Filter Include="01.Utility\03.GameObject\Manager\Octree">
       <UniqueIdentifier>{c7b6fef4-1cf8-4262-acda-2b1748f8245a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\03.GameObject\Manager\DynamicAABB">
-      <UniqueIdentifier>{6b8f07f9-9ab4-450a-86e8-0165329b6d22}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\03.GameObject\CollisionObject">
       <UniqueIdentifier>{fda5b3f7-8a42-4f1a-bb8c-936e4fa4ac42}</UniqueIdentifier>
     </Filter>
@@ -151,9 +148,6 @@
     <Filter Include="01.Utility\04.Component\Models\Animation\Channel">
       <UniqueIdentifier>{900a0d21-5ecc-4372-98cf-bef9b073f4f9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\04.Component\Models\EquipModel">
-      <UniqueIdentifier>{61e4c4ed-a9e9-44c0-9f48-eb3698ef317a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\04.Component\Models\Model">
       <UniqueIdentifier>{2a0f8936-b037-4542-9f45-9e1713569a31}</UniqueIdentifier>
     </Filter>
@@ -195,6 +189,24 @@
     </Filter>
     <Filter Include="01.Utility\04.Component\Navigation\Manager">
       <UniqueIdentifier>{1aabab80-2841-46d3-817c-df274a1eb4af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Collider">
+      <UniqueIdentifier>{36115a4e-e422-4382-960f-bfaf88e2b56e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Collider\Boundings">
+      <UniqueIdentifier>{db80f903-b10b-4587-bc94-2cdfffd79923}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Collider\Boundings\AABB">
+      <UniqueIdentifier>{e2adcb68-537e-4aeb-9be7-de881d54922b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Collider\Boundings\OBB">
+      <UniqueIdentifier>{bf4d0f84-43f5-4ef8-81da-2c24b3880f08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Collider\Boundings\Sphere">
+      <UniqueIdentifier>{ce59c710-062b-45af-9344-4564f3f5c001}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04.Component\Collider\Manager">
+      <UniqueIdentifier>{6c9565c3-8c08-4b18-b35c-3b23b426d6d3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -254,9 +266,6 @@
     </ClInclude>
     <ClInclude Include="..\public\UIObject.h">
       <Filter>01.Utility\03.GameObject\UIObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\public\DynamicAABBTree.h">
-      <Filter>01.Utility\03.GameObject\Manager\DynamicAABB</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\CollisionObject.h">
       <Filter>01.Utility\03.GameObject\CollisionObject</Filter>
@@ -396,6 +405,27 @@
     <ClInclude Include="..\public\Navigation_Manager.h">
       <Filter>01.Utility\04.Component\Navigation\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Collider.h">
+      <Filter>01.Utility\04.Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Bounding.h">
+      <Filter>01.Utility\04.Component\Collider\Boundings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BoundingAABB.h">
+      <Filter>01.Utility\04.Component\Collider\Boundings\AABB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BoundingOBB.h">
+      <Filter>01.Utility\04.Component\Collider\Boundings\OBB</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BoundingSphere.h">
+      <Filter>01.Utility\04.Component\Collider\Boundings\Sphere</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\DebugDraw.h">
+      <Filter>01.Utility\04.Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Collider_Manager.h">
+      <Filter>01.Utility\04.Component\Collider\Manager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -437,9 +467,6 @@
     <ClCompile Include="..\private\UIObject.cpp">
       <Filter>01.Utility\03.GameObject\UIObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\DynamicAABBTree.cpp">
-      <Filter>01.Utility\03.GameObject\Manager\DynamicAABB</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\CollisionObject.cpp">
       <Filter>01.Utility\03.GameObject\CollisionObject</Filter>
     </ClCompile>
@@ -463,9 +490,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Controller.cpp">
       <Filter>01.Utility\06.Controller</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\VindictusBack\Vindictus\Engine\Private\Light.cpp">
-      <Filter>01.Utility\96.Light</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\EnginePch.cpp">
       <Filter>99.Defines</Filter>
@@ -571,6 +595,30 @@
     </ClCompile>
     <ClCompile Include="..\private\Navigation_Manager.cpp">
       <Filter>01.Utility\04.Component\Navigation\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light.cpp">
+      <Filter>01.Utility\96.Light</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Collider.cpp">
+      <Filter>01.Utility\04.Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Bounding.cpp">
+      <Filter>01.Utility\04.Component\Collider\Boundings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BoundingAABB.cpp">
+      <Filter>01.Utility\04.Component\Collider\Boundings\AABB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BoundingOBB.cpp">
+      <Filter>01.Utility\04.Component\Collider\Boundings\OBB</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BoundingSphere.cpp">
+      <Filter>01.Utility\04.Component\Collider\Boundings\Sphere</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\DebugDraw.cpp">
+      <Filter>01.Utility\04.Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Collider_Manager.cpp">
+      <Filter>01.Utility\04.Component\Collider\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -40,7 +40,7 @@ void CButton::Priority_Update(_float fTimeDelta)
 
 void CButton::Update(_float fTimeDelta)
 {
-    if (GetKeyState(VK_LBUTTON) & 0x8000 && CUIObject::IsPick(g_hWnd))
+    if (m_pGameInstance->Get_MouseState(MOUSEKEYSTATE::LB) && CUIObject::IsPick(g_hWnd))
     {
         if(m_Callback)
             m_Callback();
@@ -52,6 +52,7 @@ void CButton::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
+
     __super::Late_Update(fTimeDelta);
 }
 
@@ -71,11 +72,21 @@ HRESULT CButton::Render()
     if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::DEFAULT));
+    if (m_IsBlend)
+    {
+        m_pGameInstance->BSSetState(ENUM_CLASS(D3DBS::ALPHABLEND));
+        m_pShaderCom->Bind_RawValue("g_Alpha", &m_fAlpha, sizeof(_float));
+        m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::ALPHABLEND));
+    }
+    else
+        m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::DEFAULT));
 
     m_pVIBufferCom->Bind_Resources();
 
     m_pVIBufferCom->Render();
+
+    if (m_IsBlend)
+        m_pGameInstance->BSSetState(ENUM_CLASS(D3DBS::DEFAULT));
 
     return S_OK;
 }

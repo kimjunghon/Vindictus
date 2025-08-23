@@ -111,8 +111,8 @@ HRESULT CTown::Ready_MapObjects()
 
 HRESULT CTown::Ready_Components()
 {
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Navigation_Town"),
-		TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), nullptr)))
+	m_pNavigationCom = m_pGameInstance->Clone_CurrentNavigation(-1);
+	if (nullptr == m_pNavigationCom)
 		return E_FAIL;
 
     return S_OK;

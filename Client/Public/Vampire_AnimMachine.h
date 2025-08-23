@@ -18,6 +18,7 @@ public:
 	void			Initialize_MOVE();
 	void			Initialize_ATTACK();
 	void			Initialize_HIT();
+	void			Initialize_Dead();
 
 public:
 	static CVampire_AnimMachine*	Create();
