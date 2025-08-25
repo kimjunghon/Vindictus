@@ -385,6 +385,33 @@
     <Filter Include="03.GameObject\Pawns\State\MonsterState\Queen\Dead">
       <UniqueIdentifier>{1ec9d5eb-8b4c-44df-9b8b-d870543495e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen">
+      <UniqueIdentifier>{83d5323d-1948-4075-b7fa-88d240fc422a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Spawn">
+      <UniqueIdentifier>{1df97a21-3fb0-47a2-81e3-4ae35cbec5e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Idle">
+      <UniqueIdentifier>{544fe0f0-698e-498c-8511-105af7f981af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Move">
+      <UniqueIdentifier>{516e0ca3-ec13-44b6-bdc9-316cd3b424c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Turn">
+      <UniqueIdentifier>{3e33254c-da1c-44a9-8446-98c948e023d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack">
+      <UniqueIdentifier>{16b4f369-cd52-483f-8eff-9d36b4fe09fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hang">
+      <UniqueIdentifier>{07fac053-f1f9-4a4c-b495-786b62c5526a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Rage_Desend">
+      <UniqueIdentifier>{6145279d-f827-4485-8f31-1135de3f0da9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Grap">
+      <UniqueIdentifier>{559044e4-d4f9-4d7d-82f0-2eae6042f376}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -753,6 +780,15 @@
     <ClInclude Include="..\public\QS_Turn.h">
       <Filter>03.GameObject\Pawns\State\MonsterState\Queen\Turn</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\GS_Spawn.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Spawn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Turn.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Turn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Attack.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1106,6 +1142,15 @@
     </ClCompile>
     <ClCompile Include="..\private\QS_Turn.cpp">
       <Filter>03.GameObject\Pawns\State\MonsterState\Queen\Turn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Spawn.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Spawn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Turn.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Turn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Attack.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

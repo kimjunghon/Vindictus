@@ -4,6 +4,8 @@
 
 NS_BEGIN(Client)
 
+class CAnimMachine;
+
 class CGlasgavelenBody final : public CBody
 {
 private:
@@ -24,8 +26,9 @@ public:
 
 private:
 	CModel* m_pCurrentModelCom = {};
-
 	CModel* m_pBrokenModelCom = {};
+
+	CAnimMachine* m_pAnimMachine = { nullptr };
 
 private:
 	HRESULT Ready_Components();

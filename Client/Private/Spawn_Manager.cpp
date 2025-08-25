@@ -89,7 +89,7 @@ HRESULT CSpawn_Manager::BeginRoomSpawn(_uint iRoomIndex)
 
 	m_iMaxWave = m_pCurrentRoomData->SpawnDatas.size();
 
-	m_pMonsterInstance->Request_SpawnMonster(m_pCurrentRoomData->SpawnDatas[3][0]);
+	m_pMonsterInstance->Request_SpawnMonster(m_pCurrentRoomData->SpawnDatas[0][0]);
 
 	/*
 	for (auto& SpawnData : m_pCurrentRoomData->SpawnDatas[m_pCurrentRoomData->iCurrentSpawnIndex])

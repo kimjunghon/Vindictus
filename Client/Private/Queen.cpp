@@ -100,7 +100,11 @@ void CQueen::Update(_float fTimeDelta)
 	m_pAI->Update();
 
 	m_pCurrentState->Update(this, fTimeDelta);
+
 	Bind_StateFlag();
+
+	if (false == m_IsActive)
+		return;
 
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Update(fTimeDelta);
@@ -164,6 +168,8 @@ HRESULT CQueen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 BT_STATE CQueen::Attack()
 {
 	ChangeState(ENUM_CLASS(QUEEN_STATE::ATTACK));
+	
+	m_AttackTime[m_iCurrentAttack] = 0.f;
 
 	return BT_STATE::SUCCESS;
 }

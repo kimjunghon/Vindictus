@@ -34,6 +34,14 @@ private:
 
 private:
 	HRESULT Ready_PawnObjects();
+	HRESULT	Ready_AI();
+	HRESULT	Ready_GavelenStates();
+
+	HRESULT	Ready_Collider();
+	HRESULT	Ready_Collider_Bounding();
+	HRESULT	Ready_Collider_Body_Hit();
+	HRESULT	Ready_Collider_Attack();
+	HRESULT	Ready_AttackMapping();
 
 public:
 	static CGlasgavelen*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

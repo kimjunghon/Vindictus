@@ -97,7 +97,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::TOWN)))
+	if (FAILED(Start_Level(LEVEL::GLASGAVELEN)))
 		return E_FAIL;
 	
 

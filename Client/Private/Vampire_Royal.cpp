@@ -73,6 +73,9 @@ void CVampire_Royal::Update(_float fTimeDelta)
 
 	Bind_StateFlag();
 
+	if (false == m_IsActive)
+		return;
+
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Update(fTimeDelta);
 }

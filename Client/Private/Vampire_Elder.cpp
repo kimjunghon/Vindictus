@@ -73,6 +73,9 @@ void CVampire_Elder::Update(_float fTimeDelta)
 
 	Bind_StateFlag();
 
+	if (false == m_IsActive)
+		return;
+
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Update(fTimeDelta);
 }
@@ -108,14 +111,14 @@ HRESULT CVampire_Elder::Render()
 }
 
 
-BT_STATE CVampire_Elder::Attack()
-{
-	ChangeState(ENUM_CLASS(VAMPIRE_STATE::ATTACK));
-
-	m_AttackTime[m_iCurrentAttack] = 0.f;
-
-	return BT_STATE::SUCCESS;
-}
+//BT_STATE CVampire_Elder::Attack()
+//{
+//	ChangeState(ENUM_CLASS(VAMPIRE_STATE::ATTACK));
+//
+//	m_AttackTime[m_iCurrentAttack] = 0.f;
+//
+//	return BT_STATE::SUCCESS;
+//}
 
 HRESULT CVampire_Elder::Ready_PawnObject()
 {

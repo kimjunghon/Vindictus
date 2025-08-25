@@ -27,7 +27,6 @@ void CVS_DeadStrong::Update(CMonster* pMonster, _float fTimeDelta)
 {
 	if (pMonster->AnimIsFinished())
 		pMonster->Dead();
-
 }
 
 void CVS_DeadStrong::Exit(CMonster* pMonster)

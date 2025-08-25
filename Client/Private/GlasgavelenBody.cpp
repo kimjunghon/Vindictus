@@ -1,5 +1,6 @@
 #include "ClientPch.h"
 #include "GlasgavelenBody.h"
+#include "GavelenAnimMachine.h"
 
 CGlasgavelenBody::CGlasgavelenBody(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CBody { pDevice, pDeviceContext }
@@ -34,13 +35,8 @@ void CGlasgavelenBody::Priority_Update(_float fTimeDelta)
 
 void CGlasgavelenBody::Update(_float fTimeDelta)
 {
-	ANIM_DATA data = {};
-	data.strAnimKey = "Idle";
-	data.IsLoop = true;
-	data.vRange = _float2(1.f, 1.f);
-	data.fAnimSpeed = 2.f;
+	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
 
-	m_pModelCom->Set_Animation(data);
 	m_pModelCom->Play_Animation(fTimeDelta);
 }
 
@@ -87,6 +83,10 @@ HRESULT CGlasgavelenBody::Ready_Components()
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
+
+	m_pAnimMachine = CGavelenAnimMachine::Create();
+	if (nullptr == m_pAnimMachine)
 		return E_FAIL;
 
 	return S_OK;
@@ -148,6 +148,7 @@ void CGlasgavelenBody::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pModelCom);
+	Safe_Release(m_pAnimMachine);
+	Safe_Release(m_pBrokenModelCom);
 	Safe_Release(m_pShaderCom);
 }

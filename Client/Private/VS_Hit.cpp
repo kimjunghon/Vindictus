@@ -17,7 +17,7 @@ void CVS_Hit::Enter(CMonster* pMonster)
 {
 	_uint iDir = ENUM_CLASS(pMonster->Compute_TargetDir(m_fCheckDegree));
 
-	_uint iHitFlag = ENUM_CLASS(DIR::FRONT) << iDir;
+	_uint iHitFlag = ENUM_CLASS(HIT_FLAG::FRONT) << iDir;
 
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iHitFlag;
 }

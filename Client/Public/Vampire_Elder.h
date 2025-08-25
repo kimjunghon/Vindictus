@@ -23,7 +23,7 @@ public:
 	virtual HRESULT Render() override;
 
 public:
-	virtual BT_STATE	Attack() override;
+//	virtual BT_STATE	Attack() override;
 
 	HRESULT				Ready_PawnObject();
 	HRESULT				Ready_Collider();

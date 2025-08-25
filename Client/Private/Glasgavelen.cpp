@@ -116,6 +116,41 @@ HRESULT CGlasgavelen::Ready_PawnObjects()
 	return S_OK;
 }
 
+HRESULT CGlasgavelen::Ready_AI()
+{
+	return E_NOTIMPL;
+}
+
+HRESULT CGlasgavelen::Ready_GavelenStates()
+{
+	return E_NOTIMPL;
+}
+
+HRESULT CGlasgavelen::Ready_Collider()
+{
+	return E_NOTIMPL;
+}
+
+HRESULT CGlasgavelen::Ready_Collider_Bounding()
+{
+	return E_NOTIMPL;
+}
+
+HRESULT CGlasgavelen::Ready_Collider_Body_Hit()
+{
+	return E_NOTIMPL;
+}
+
+HRESULT CGlasgavelen::Ready_Collider_Attack()
+{
+	return E_NOTIMPL;
+}
+
+HRESULT CGlasgavelen::Ready_AttackMapping()
+{
+	return E_NOTIMPL;
+}
+
 CGlasgavelen* CGlasgavelen::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 {
 	CGlasgavelen* pInstance = new CGlasgavelen(pDevice, pDeviceContext);

@@ -36,8 +36,8 @@ protected:
 	HRESULT				Ready_AI();
 	void				Compute_AnimPosition();
 	void				OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData);
-	void				ChangeHitState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _fvector vAttackPosition);
-	void				ChangeDeadState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _fvector vAttackPosition);
+	void				ChangeHitState(ATTACK_TYPE eAttackType);
+	void				ChangeDeadState(ATTACK_TYPE eAttackType);
 
 public:
 	virtual CGameObject* Clone(void* pArg) PURE;

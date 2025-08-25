@@ -188,7 +188,6 @@ BT_STATE CMonster::CanAttack()
 
 BT_STATE CMonster::CanOtherAction()
 {
-//	if (m_pBody->AnimCanChange() || m_pBody->AnimIsFinished())
 	if(CanChangeState())
 		return BT_STATE::FAILED;
 

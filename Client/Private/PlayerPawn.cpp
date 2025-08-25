@@ -104,6 +104,9 @@ void CPlayerPawn::Update(_float fTimeDelta)
 {
 	m_pCurrentState->Update(this, fTimeDelta);
 
+	if (false == m_IsActive)
+		return;
+
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Update(fTimeDelta);
 }

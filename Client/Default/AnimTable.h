@@ -230,16 +230,19 @@ namespace Client
 
 		enum class IDLE_FLAG {
 			IDLE = 1 << 8,
-			THREAT = 1 << 9
+			THREAT = 1 << 9,
+			LOW_HEALTH = 1 << 10
 		};
 
 		enum class MOVE_FLAG {
-
+			RUN = 1 << 8,
+			TURN_LEFT = 1<<9,
+			TURN_RIGHT = 1<< 10
 		};
 
 		enum class ATTACK_FLAG {
-			DOUBLE = 1 << 8,
-			DESEND = 1 << 9,
+			DESEND = 1 << 8,
+			DOUBLE = 1 << 9,
 			LEFT = 1 << 10,
 			RIGHT = 1 << 11,
 
@@ -247,9 +250,15 @@ namespace Client
 		};
 
 		enum class RAGE_FLAG {
-			ATTACK = 1 << 8,
-			DESEND_BEGIN = 1 << 9,
-			DESEND_END = 1 << 10,
+			DESEND_BEGIN = 1 << 8,
+			ATTACK = 1 << 9,
+			DOUBLE = 1 << 10,
+			LEFT = 1 << 11,
+			RIGHT = 1 << 12,
+
+			DESEND_END = 1 << 13,
+			
+			BLAZE = 1 << 30
 		};
 
 		enum class GRAP_FLAG {
@@ -271,7 +280,8 @@ namespace Client
 			LEFT = 1 << 11,
 			DOWN_BEGIN = 1 << 12,
 			DOWN_DURING = 1 << 13,
-			DOWN_END = 1 << 14
+			DOWN_END = 1 << 14,
+			WINGBREAK = 1 << 15
 		};
 
 	}

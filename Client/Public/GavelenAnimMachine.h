@@ -1,7 +1,7 @@
 #pragma once
 #include "AnimMachine.h"
 
-using namespace Glas;
+using namespace Glasgavelen;
 
 NS_BEGIN(Client)
 
@@ -17,11 +17,14 @@ public:
 	void			Initialize_IDLE();
 	void			Initialize_MOVE();
 	void			Initialize_ATTACK();
+	void			Initialize_RAGE();
+	void			Initialize_GRAP();
+	void			Initialize_HANG();
 	void			Initialize_HIT();
 	void			Initialize_Dead();
 
 public:
-	static CGavelenAnimMachine* Create();
+	static CGavelenAnimMachine*		Create();
 	virtual void					Free() override;
 };
 

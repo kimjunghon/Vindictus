@@ -169,9 +169,9 @@ void CVampire::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)
 	m_Status.fHealth -= AttackData->fDamage;
 
 	if (m_Status.fHealth <= 0.f)
-		ChangeDeadState(eAttackType, vPosition, vAttackPosition);
+		ChangeDeadState(eAttackType);
 	else
-		ChangeHitState(eAttackType, vPosition, vAttackPosition);
+		ChangeHitState(eAttackType);
 
 	Bind_StateFlag();
 
@@ -179,7 +179,7 @@ void CVampire::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)
 		return;
 }
 
-void CVampire::ChangeHitState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _fvector vAttackPosition)
+void CVampire::ChangeHitState(ATTACK_TYPE eAttackType)
 {
 	switch (eAttackType)
 	{
@@ -197,7 +197,7 @@ void CVampire::ChangeHitState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _f
 	}
 }
 
-void CVampire::ChangeDeadState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _fvector vAttackPosition)
+void CVampire::ChangeDeadState(ATTACK_TYPE eAttackType)
 {
 	DisableAllColliderChannel();
 

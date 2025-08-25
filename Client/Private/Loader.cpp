@@ -449,6 +449,11 @@ HRESULT CLoader::Loading_For_Gavelen_Level()
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen.dat", PreTransformMatrix))))
 		return E_FAIL;
 
+	/* Prototype_Component_Model_GlasgavelenBroken */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Glasgavelen_Broken"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/GlasgavelenBroken.dat", PreTransformMatrix))))
+		return E_FAIL;
+
 	/* Prototype_Component_Model_GavelneSword */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_GavelneSword"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen_Sword.dat", PreTransformMatrix))))
