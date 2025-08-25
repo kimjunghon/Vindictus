@@ -79,6 +79,7 @@ void CPrototype_Manager::Clear(_uint iClearLevel)
 
 CBase* CPrototype_Manager::Find_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag)
 {
+
 	auto iter = m_pPrototypes[iPrototypeLevelIndex].find(strPrototypeTag);
 
 	if (iter == m_pPrototypes[iPrototypeLevelIndex].end())

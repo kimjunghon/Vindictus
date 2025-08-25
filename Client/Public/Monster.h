@@ -9,6 +9,7 @@ NS_END
 
 NS_BEGIN(Client)
 class CMonsterInstance;
+class CMonsterState;
 class CBody;
 
 class CMonster abstract : public CColliderPawn
@@ -17,6 +18,16 @@ protected:
 	CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CMonster(const CMonster& Prototype);
 	virtual ~CMonster() = default;
+
+public:
+	_uint			Get_AttackIndex() { return m_iCurrentAttack; }
+	_float			Get_MinDistance() { return m_fMinDistance; }
+	_float			Get_AttackRange() { return m_fAttackRange; }
+	void			Dead() { m_IsActive = false;}
+	_bool			IsAnimationInRangeTrackPosition(_float2 vRange);
+	_bool			IsReadyAttack(_uint iStateFlag);
+	_float			Get_TargetDistance();
+	DIR 			Compute_TargetDir(_float fDegree);
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -28,11 +39,16 @@ public:
 
 public:
 	virtual HRESULT	Spawn(MONSTER_SPAWN_DATA SpawnData) PURE;
-
+	_bool			IsNear(_float fNearDistance);
+	void			LookAtTarget();
+	void			MoveToTarget(_float fRatio);
 	//State
 public:
 	_bool				AnimIsFinished();
 	_bool				AnimCanChange();
+
+	_bool				CanChangeState();
+	HRESULT				ChangeState(_uint iStateIndex);
 
 	virtual BT_STATE	CanAttack();
 	virtual BT_STATE	CanOtherAction();
@@ -64,12 +80,14 @@ protected:
 	const _vector*				m_pAnimMovement = {nullptr};
 	const _vector*				m_pAnimRotation = { nullptr };
 
+	vector<CMonsterState*>		m_States;
+	CMonsterState*				m_pCurrentState = { nullptr };
+
 	_uint						m_iStateFlag = {};
 	size_t						m_iHitAttackID = {};
 
 protected:
-	_float			Get_TargetDistance();
-	void			LookAtTarget();
+	void			Bind_StateFlag();
 	virtual void	Update_AttackColliders(_fmatrix UpdateWorldMatrix,_uint iStateFlag) override;
 	void			OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData);
 	virtual void	Update_AttackCoolTime(_float fTimeDelta);

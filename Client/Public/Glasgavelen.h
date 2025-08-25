@@ -3,6 +3,7 @@
 
 NS_BEGIN(Client)
 
+class CGlasgavelenSword;
 class CBody;
 
 class CGlasgavelen final : public CMonster
@@ -27,6 +28,9 @@ public:
 	virtual BT_STATE		Attack() override;
 	virtual BT_STATE		Chase() override;
 	virtual BT_STATE		Patrol() override;
+
+private:
+	CGlasgavelenSword* m_pSword = { nullptr };
 
 private:
 	HRESULT Ready_PawnObjects();

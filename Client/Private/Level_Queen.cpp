@@ -5,8 +5,6 @@
 #include "PlayerPawn.h"
 #include "MonsterInstance.h"
 
-
-
 CLevel_Queen::CLevel_Queen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
 	, m_pMonsterInstance { CMonsterInstance::GetInstance()}
@@ -33,7 +31,7 @@ HRESULT CLevel_Queen::Initialize()
 
 void CLevel_Queen::Update(_float fTimeDelta)
 {
-	if (m_pGameInstance->Get_KeyDown(DIK_RETURN))
+	if (m_pGameInstance->Get_KeyDown(DIK_F1))
 	{
 		m_pMonsterInstance->BeginRoomSpawn(0);
 	}
@@ -41,6 +39,14 @@ void CLevel_Queen::Update(_float fTimeDelta)
 	if (m_pGameInstance->Get_KeyDown(DIK_I))
 	{
 		m_pMonsterInstance->WaveEnd();
+	}
+
+	if (m_pGameInstance->Get_KeyDown(DIK_RETURN))
+	{
+		EVENT_LEVEL_CHANGE Event;
+		Event.iChange_Level = ENUM_CLASS(LEVEL::GLASGAVELEN);
+		Event.bIsLoading = false;
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 	}
 }
 
@@ -169,6 +175,7 @@ HRESULT CLevel_Queen::Ready_Map(const _wstring& strLayerTag)
 {
 	CMap::MAP_DESC MapDesc = {};
 	MapDesc.strMapFilePath = "../Bin/Resources/Map/QueenMap.dat";
+	MapDesc.eLevel = LEVEL::QUEEN;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Map"),
 		ENUM_CLASS(LAYER_TYPE::NONSTATIC), strLayerTag, &MapDesc)))

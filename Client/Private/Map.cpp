@@ -27,7 +27,7 @@ HRESULT CMap::Initialize(void* pArg)
 
 	MAP_DESC* pDesc = static_cast<MAP_DESC*>(pArg);
 
-	if (FAILED(Ready_MapObjects(pDesc->strMapFilePath)))
+	if (FAILED(Ready_MapObjects(pDesc->strMapFilePath, pDesc->eLevel)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
@@ -70,8 +70,9 @@ HRESULT CMap::Render()
 	return S_OK;
 }
 
-HRESULT CMap::Ready_MapObjects(string strMapFilePath)
+HRESULT CMap::Ready_MapObjects(string strMapFilePath, LEVEL eLevel)
 {
+
 
 	ifstream File(strMapFilePath, ios::binary);
 	if (!File.is_open())
@@ -103,7 +104,7 @@ HRESULT CMap::Ready_MapObjects(string strMapFilePath)
 		MultiByteToWideChar(CP_UTF8, 0, szPrototypeTag, static_cast<_int>(strlen(szPrototypeTag)), szWidePrototypeTag, MAX_PATH);
 
 		CMapObject::MAP_OBJECT_DESC MapObjectDesc = {};
-		MapObjectDesc.iModelLevel = ENUM_CLASS(LEVEL::TOWN);
+		MapObjectDesc.iModelLevel = ENUM_CLASS(eLevel);
 		MapObjectDesc.strModelTag = szWidePrototypeTag;
 		MapObjectDesc.WorldMatrix = WorldMatrx;
 

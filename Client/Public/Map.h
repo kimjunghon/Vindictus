@@ -16,6 +16,7 @@ public:
 	typedef struct tagMapDesc : public GAMEOBJECT_DESC
 	{
 		string strMapFilePath;
+		LEVEL eLevel;
 	}MAP_DESC;
 
 private:
@@ -36,7 +37,7 @@ private:
 	vector<CMapObject*> m_MapObjects;
 
 private:
-	HRESULT Ready_MapObjects(string strMapFilePath);
+	HRESULT Ready_MapObjects(string strMapFilePath, LEVEL eLevel);
 	HRESULT Ready_Components();
 
 public:

@@ -19,6 +19,14 @@ public:
 	virtual void		Late_Update(_float fTimeDelta) override;
 	virtual HRESULT		Render() override;
 
+public:
+
+
+private:
+	CModel* m_pCurrentModelCom = {};
+
+	CModel* m_pBrokenModelCom = {};
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();

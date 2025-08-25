@@ -34,6 +34,7 @@ void CMonsterInstance::ClearLevel()
 
 HRESULT CMonsterInstance::Ready_Spawn_Data(const Value& RoomSpawnDatas)
 {
+
 	return m_pSpawn_Manager->Ready_SpawnDatas(RoomSpawnDatas);
 }
 

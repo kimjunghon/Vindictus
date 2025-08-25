@@ -24,6 +24,7 @@ public:
 
 public:
 	virtual BT_STATE	Attack() override;
+
 	HRESULT				Ready_PawnObject();
 	HRESULT				Ready_Collider();
 	HRESULT				Ready_Collider_Bounding();

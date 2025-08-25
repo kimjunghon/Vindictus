@@ -36,6 +36,7 @@ private:
 	_bool					m_bIsLoading = { false };
 
 	CStateFactory*			m_pStateFactory = {nullptr};
+	CMonsterStateFactory*	m_pMonsterStateFactory = { nullptr };
 	CPlayerInstance*		m_pPlayerInstance = { nullptr };
 	CMonsterInstance*		m_pMonsterInstance = { nullptr };
 

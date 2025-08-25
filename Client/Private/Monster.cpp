@@ -2,6 +2,7 @@
 #include "Monster.h"
 #include "Body.h"
 #include "BehaviorTree.h"
+#include "MonsterState.h"
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CColliderPawn{ pDevice, pDeviceContext }
@@ -25,6 +26,12 @@ CMonster::CMonster(const CMonster& Prototype)
 	Safe_AddRef(m_pMonsterInstance);
 }
 
+void CMonster::Bind_StateFlag()
+{
+	if(m_pCurrentState)
+		m_pCurrentState->Bind_StateFlag(m_iStateFlag);
+}
+
 _float CMonster::Get_TargetDistance()
 {
 	if (nullptr == m_pTargetTransform)
@@ -38,6 +45,14 @@ _float CMonster::Get_TargetDistance()
 	return fDistance;
 }
 
+DIR  CMonster::Compute_TargetDir(_float fDegree)
+{
+	if (nullptr == m_pTargetTransform)
+		return DIR::END;
+
+	return	Compute_HitDir(m_pTransformCom->Get_State(STATE::POSITION), m_pTargetTransform->Get_State(STATE::POSITION), fDegree);
+}
+
 void CMonster::LookAtTarget()
 {
 	if (nullptr == m_pTargetTransform)
@@ -47,6 +62,35 @@ void CMonster::LookAtTarget()
 	vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
 
 	m_pTransformCom->LookAt(vTargetPos);
+}
+
+void CMonster::MoveToTarget(_float fRatio)
+{
+	_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
+	_vector vDir = XMVectorSetY(XMVectorSubtract(vTargetPos, m_pTransformCom->Get_State(STATE::POSITION)), 0.f);
+
+	m_pTransformCom->LookAt(vTargetPos);
+
+	_vector vPosition = XMVectorScale(vDir, fRatio);
+
+	m_pTransformCom->MovePositionToVector(vPosition, m_pNavigationCom);
+}
+
+_bool CMonster::IsAnimationInRangeTrackPosition(_float2 vRange)
+{
+	return m_pBody->IsAnimationInRangeTrackPosition(vRange);
+}
+
+_bool CMonster::IsReadyAttack(_uint iStateFlag)
+{
+	if (m_AttackMapping[iStateFlag].empty())
+		return false;
+
+	_float2 vRange = m_AttackMapping[iStateFlag].front().vAttackRange;
+
+	_float2 vReadyRange = _float2(0.f, vRange.x);
+
+	return IsAnimationInRangeTrackPosition(vReadyRange);
 }
 
 HRESULT CMonster::Initialize_Prototype()
@@ -83,6 +127,16 @@ HRESULT CMonster::Render()
 	return S_OK;
 }
 
+_bool CMonster::IsNear(_float fNearDistance)
+{
+	_float fDistance = Get_TargetDistance();
+
+	if (abs(fDistance) <= fNearDistance)
+		return true;
+	
+	return false;
+}
+
 _bool CMonster::AnimIsFinished()
 {
 	return m_pBody->AnimIsFinished();
@@ -91,6 +145,29 @@ _bool CMonster::AnimIsFinished()
 _bool CMonster::AnimCanChange()
 {
 	return m_pBody->AnimCanChange();
+}
+
+_bool CMonster::CanChangeState()
+{
+	if (nullptr == m_pCurrentState)
+		return true;
+
+	return m_pCurrentState->CanStateChange(this);
+}
+
+HRESULT CMonster::ChangeState(_uint iStateIndex)
+{
+	if (nullptr == m_States[iStateIndex])
+		return E_FAIL;
+
+	if (m_pCurrentState)
+		m_pCurrentState->Exit(this);
+
+	m_pCurrentState = m_States[iStateIndex];
+
+	m_pCurrentState->Enter(this);
+
+	return S_OK;
 }
 
 BT_STATE CMonster::CanAttack()
@@ -111,7 +188,8 @@ BT_STATE CMonster::CanAttack()
 
 BT_STATE CMonster::CanOtherAction()
 {
-	if (m_pBody->AnimCanChange() || m_pBody->AnimIsFinished())
+//	if (m_pBody->AnimCanChange() || m_pBody->AnimIsFinished())
+	if(CanChangeState())
 		return BT_STATE::FAILED;
 
 	return BT_STATE::RUN;
@@ -119,23 +197,10 @@ BT_STATE CMonster::CanOtherAction()
 
 BT_STATE CMonster::CanAttackRange()
 {
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSetY(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION)), 0.f)));
-
-	if (abs(fDistance) <= m_fAttackRange)
+	if(IsNear(m_fAttackRange))
 		return BT_STATE::SUCCESS;
 
 	return BT_STATE::FAILED;
-}
-
-
-BT_STATE CMonster::Chase()
-{
-	return BT_STATE();
-}
-
-BT_STATE CMonster::Patrol()
-{
-	return BT_STATE();
 }
 
 void CMonster::Update_AttackColliders(_fmatrix UpdateWorldMatrix, _uint iStateFlag)
@@ -192,6 +257,9 @@ void CMonster::Update_AttackCoolTime(_float fTimeDelta)
 void CMonster::Free()
 {
 	__super::Free();
+
+	for (auto& pState : m_States)
+		Safe_Release(pState);
 
 	Safe_Release(m_pAI);
 	Safe_Release(m_pMonsterInstance);

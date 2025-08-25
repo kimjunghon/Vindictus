@@ -78,6 +78,7 @@ HRESULT CLoader::Loading()
 		hr = Loading_For_Queen_Level();
 		break;
 	case LEVEL::GLASGAVELEN:
+		hr = Loading_For_Gavelen_Level();
 		break;
 	}
 
@@ -301,6 +302,9 @@ HRESULT CLoader::Loading_For_Queen_Level()
 	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
 
 
+	if (FAILED(Loading_For_MapModel(LEVEL::QUEEN, "../Bin/Resources/Map/QueenMap.dat")))
+		return E_FAIL;
+
 #pragma region MODEL
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
@@ -327,8 +331,7 @@ HRESULT CLoader::Loading_For_Queen_Level()
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Queen.dat", PreTransformMatrix))))
 		return E_FAIL;
 
-	if (FAILED(Loading_For_MapModel(LEVEL::TOWN, "../Bin/Resources/Map/QueenMap.dat")))
-		return E_FAIL;
+
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -392,6 +395,106 @@ HRESULT CLoader::Loading_For_Queen_Level()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Queen_Body"),
 		CQueen_Body::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
+
+	Event.fRatio += 0.2f;
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
+#pragma region GAMEOBJECT
+
+#pragma endregion
+
+
+	lstrcpy(m_szLoadingText, TEXT("로딩이 완료되었습니다."));
+	Event.fRatio = 1.f;
+
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
+	m_isFinished = true;
+
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Gavelen_Level()
+{
+	EVENT_PROGRESSBAR Event;
+	Event.eType = PROGRESS_TYPE::LOADING;
+	Event.fRatio = m_fLoadingRatio;
+
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
+	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
+	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
+
+	Event.fRatio += 0.2f;
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
+#pragma region TEXTURE
+
+#pragma endregion
+
+	//////////////////////////////////////////////////////////////MODEL//////////////////////////////////////////////////////////////
+
+	lstrcpy(m_szLoadingText, TEXT("모델을 로딩중입니다."));
+
+
+#pragma region MODEL
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
+	_matrix		RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
+
+	/* Prototype_Component_Model_Glasgavelen */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Glasgavelen"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_GavelneSword */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_GavelneSword"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen_Sword.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	if (FAILED(Loading_For_MapModel(LEVEL::GLASGAVELEN, "../Bin/Resources/Map/GavelenMap.dat")))
+		return E_FAIL;
+
+	Event.fRatio += 0.2f;
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
+#pragma endregion
+
+
+	//////////////////////////////////////////////////////////////SHADER//////////////////////////////////////////////////////////////
+
+	lstrcpy(m_szLoadingText, TEXT("쉐이더를 로딩중입니다."));
+	Event.fRatio += 0.2f;
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
+#pragma region SHADER
+#pragma endregion
+
+	//////////////////////////////////////////////////////////////NAVIGATION//////////////////////////////////////////////////////////////
+
+	lstrcpy(m_szLoadingText, TEXT("네비게이션을 로딩중입니다."));
+
+	//////////////////////////////////////////////////////////////GAMEOBJECT//////////////////////////////////////////////////////////////
+
+	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
+
+	/* Prototype_GameObject_Vampire_Basic */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen"),
+		CGlasgavelen::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Basic_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen_Body"),
+		CGlasgavelenBody::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Vampire_Elder */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen_Sword"),
+		CGlasgavelenSword::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);

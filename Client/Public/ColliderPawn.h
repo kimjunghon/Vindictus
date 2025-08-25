@@ -63,9 +63,9 @@ protected:
 
 	HRESULT			Bind_Collision_Callback(COLLIDER_CHANNEL eChannel, _uint iColliderIndex, COLLIDER_STATE eState, CCollider::Collision_CallBack Callback);
 
-	HIT_DIR			Compute_HitDir(_fvector vHitPosition, _fvector vAttackPosition, _float fDegree);
-	HIT_DIR			Compute_HitDir_Look(_fvector vHitPosition, _fvector vAttackPosition);
-	HIT_DIR			Compute_HitDir_Side(_fvector vHitPosition, _fvector vAttackPosition);
+	DIR				Compute_HitDir(_fvector vHitPosition, _fvector vAttackPosition, _float fDegree);
+	DIR				Compute_HitDir_Look(_fvector vHitPosition, _fvector vAttackPosition);
+	DIR				Compute_HitDir_Side(_fvector vHitPosition, _fvector vAttackPosition);
 
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;

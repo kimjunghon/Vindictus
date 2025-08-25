@@ -2,6 +2,7 @@
 #include "Vampire_Elder.h"
 #include "Body.h"
 #include "VampireAI.h"
+#include "MonsterState.h"
 
 CVampire_Elder::CVampire_Elder(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CVampire { pDevice, pDeviceContext }
@@ -42,7 +43,8 @@ HRESULT CVampire_Elder::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
+	if (FAILED(Ready_VampireState(MONSTER_TYPE::VAMPIRE_ELDER)))
+		return E_FAIL;
 
 	if (FAILED(Ready_PawnObject()))
 		return E_FAIL;
@@ -67,15 +69,9 @@ void CVampire_Elder::Update(_float fTimeDelta)
 
 	m_pAI->Update();
 
-	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::MOVE) || m_iStateFlag & ENUM_CLASS(STATE_FLAG::ATTACK))
-	{
-		LookAtTarget();
+	m_pCurrentState->Update(this, fTimeDelta);
 
-		//_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
-		//vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
-
-		//m_pTransformCom->LookAt(vTargetPos);
-	}
+	Bind_StateFlag();
 
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Update(fTimeDelta);
@@ -114,12 +110,7 @@ HRESULT CVampire_Elder::Render()
 
 BT_STATE CVampire_Elder::Attack()
 {
-	_float fDistance = Get_TargetDistance();// XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
-
-	if (abs(fDistance) <= m_fMinDistance)
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | ENUM_CLASS(ATTACK_FLAG::MELEE);
-	else
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | ENUM_CLASS(ATTACK_FLAG::RANGE);
+	ChangeState(ENUM_CLASS(VAMPIRE_STATE::ATTACK));
 
 	m_AttackTime[m_iCurrentAttack] = 0.f;
 

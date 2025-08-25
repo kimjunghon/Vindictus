@@ -55,6 +55,20 @@ HRESULT CGlasgavelen::Render()
 
 HRESULT CGlasgavelen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 {
+	m_IsActive = true;
+
+	//m_iStateFlag = ENUM_CLASS(STATE_FLAG::CUTSEAN);
+	//
+	//m_pBody->Forcing_Play_Animation();
+
+	m_pNavigationCom = m_pGameInstance->Clone_CurrentNavigation(SpawnData.iCellIndex);
+
+	_vector vPosition = XMVectorSetW(XMLoadFloat3(&SpawnData.vPosition), 1.f);
+
+	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+
+	EnableAllColliderChannel();
+
 	return S_OK;
 }
 
@@ -79,24 +93,24 @@ HRESULT CGlasgavelen::Ready_PawnObjects()
 	BodyObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	BodyObjectDesc.pStateFlag = &m_iStateFlag;
 
-	if (FAILED(__super::Add_PawnObject(TEXT("GlasgavelenBody"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Glasgavelen_Body"), &BodyObjectDesc)))
+	if (FAILED(__super::Add_PawnObject(TEXT("GlasgavelenBody"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen_Body"), &BodyObjectDesc)))
 		return E_FAIL;
 
 	CPawnObject::PAWNOBJECT_DESC PawnObjectDesc = {};
 	PawnObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
-	if (FAILED(__super::Add_PawnObject(TEXT("GlasgavelenSword"), ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Glasgavelen_Sword"), &PawnObjectDesc)))
+	if (FAILED(__super::Add_PawnObject(TEXT("GlasgavelenSword"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen_Sword"), &PawnObjectDesc)))
 		return E_FAIL;
 
 	m_pBody = static_cast<CBody*>(Find_PawnObject(TEXT("GlasgavelenBody")));
 	if (nullptr == m_pBody)
 		return E_FAIL;
 
-	CGlasgavelenSword* pSword = static_cast<CGlasgavelenSword*>(Find_PawnObject(TEXT("GlasgavelenSword")));
-	if (nullptr == pSword)
+	m_pSword = static_cast<CGlasgavelenSword*>(Find_PawnObject(TEXT("GlasgavelenSword")));
+	if (nullptr == m_pSword)
 		return E_FAIL;
 
-	if(FAILED(pSword->Bind_ParentBones(m_pBody->Get_ParentModelPtr())))
+	if(FAILED(m_pSword->Bind_ParentBones(m_pBody->Get_ParentModelPtr())))
 		return E_FAIL;
 
 	return S_OK;

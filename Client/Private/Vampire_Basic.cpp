@@ -3,6 +3,7 @@
 #include "PawnObject.h"
 #include "Body.h"
 #include "VampireAI.h"
+#include "MonsterState.h"
 
 CVampire_Basic::CVampire_Basic(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
     : CVampire { pDevice, pDeviceContext }
@@ -43,7 +44,8 @@ HRESULT CVampire_Basic::Initialize(void* pArg)
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
-    m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
+    if (FAILED(Ready_VampireState(MONSTER_TYPE::VAMPIRE_BASIC)))
+        return E_FAIL;
 
     if (FAILED(Ready_PawnObject()))
         return E_FAIL;
@@ -68,15 +70,9 @@ void CVampire_Basic::Update(_float fTimeDelta)
 
     m_pAI->Update();
 
-    if(m_iStateFlag & ENUM_CLASS(STATE_FLAG::MOVE))
-    {
-        LookAtTarget();
+    m_pCurrentState->Update(this, fTimeDelta);
 
-        //_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
-        //vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
-
-        //m_pTransformCom->LookAt(vTargetPos);
-    }
+    Bind_StateFlag();
 
     for (auto& Pair : m_PawnObjects)
         Pair.second->Update(fTimeDelta);
@@ -107,11 +103,6 @@ HRESULT CVampire_Basic::Render()
     		pCollider->Render();
     	}
     }
-    //for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::ATTACK].size(); i++)
-    //{
-    //    m_AttackColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[i]), m_pTransformCom->Get_WorldMatrix());
-    //    m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->Render();
-    //}
 #endif
     return S_OK;
 }

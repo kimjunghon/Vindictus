@@ -18,9 +18,12 @@ void CState_Hit_Light::Enter(CPlayerPawn* pPlayerPawn)
 {
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
-    HIT_DIR eHitDir = pPlayerPawn->Get_HirDir();
+    _uint iHitDir = ENUM_CLASS(pPlayerPawn->Get_HirDir());
 
-    Change_HitFlag(eHitDir);
+    _uint iHitFlag = ENUM_CLASS(HIT_FLAG::FRONT) << iHitDir;
+
+    m_iStateFlag |= iHitFlag;
+//    Change_HitFlag(eHitDir);
 }
 
 void CState_Hit_Light::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput)
@@ -37,20 +40,20 @@ void CState_Hit_Light::Exit(CPlayerPawn* pPlayerPawn)
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 }
 
-void CState_Hit_Light::Change_HitFlag(HIT_DIR eHitDir)
+void CState_Hit_Light::Change_HitFlag(DIR eHitDir)
 {
     switch (eHitDir)
     {
-    case HIT_DIR::FRONT:
+    case DIR::FRONT:
         m_iStateFlag |= ENUM_CLASS(HIT_FLAG::FRONT);
         break;
-    case HIT_DIR::BACK:
+    case DIR::BACK:
         m_iStateFlag |= ENUM_CLASS(HIT_FLAG::BACK);
         break;
-    case HIT_DIR::RIGHT:
+    case DIR::RIGHT:
         m_iStateFlag |= ENUM_CLASS(HIT_FLAG::RIGHT);
         break;
-    case HIT_DIR::LEFT:
+    case DIR::LEFT:
         m_iStateFlag |= ENUM_CLASS(HIT_FLAG::LEFT);
         break;
     }

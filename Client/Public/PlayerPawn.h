@@ -38,7 +38,7 @@ public:
 	void			Increase_ComboCount() { m_iComboCount++; }
 	void			Run() { m_fSpeedRatio = 1.f; }
 	void			Sprint() { m_fSpeedRatio = 2.f; }
-	HIT_DIR			Get_HirDir() { return m_eHitDir; }
+	DIR				Get_HirDir() { return m_eHitDir; }
 	_bool			IsGaurdHit() { return m_iStateFlag & ENUM_CLASS(HIT_FLAG::GUARD); }
 
 public:
@@ -74,7 +74,7 @@ private:
 	vector<CPlayerState*>		m_States;
 	CPlayerState*				m_pCurrentState = { nullptr };
 	
-	HIT_DIR						m_eHitDir = { HIT_DIR::END };
+	DIR							m_eHitDir = { DIR::END };
 
 	_uint						m_iStateFlag = {};
 	_uint						m_iComboCount = {};

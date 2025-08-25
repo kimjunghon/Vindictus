@@ -18,7 +18,7 @@ void CState_Hit_Middle::Enter(CPlayerPawn * pPlayerPawn)
 {
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
-    HIT_DIR eHitDir = pPlayerPawn->Get_HirDir();
+    DIR eHitDir = pPlayerPawn->Get_HirDir();
 
     Change_HitFlag(eHitDir);
 }
@@ -42,17 +42,17 @@ void CState_Hit_Middle::Exit(CPlayerPawn* pPlayerPawn)
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 }
 
-void CState_Hit_Middle::Change_HitFlag(HIT_DIR eHitDir)
+void CState_Hit_Middle::Change_HitFlag(DIR eHitDir)
 {
     switch (eHitDir)
     {
-    case HIT_DIR::FRONT:
+    case DIR::FRONT:
     {
         m_iStateFlag |= ENUM_CLASS(HIT_FLAG::MIDDLE_FRONT);
         m_iDirFlag = ENUM_CLASS(HIT_FLAG::MIDDLE_FRONT);
         break;
     }
-    case HIT_DIR::BACK:
+    case DIR::BACK:
     {
         m_iStateFlag |= ENUM_CLASS(HIT_FLAG::MIDDLE_BACK);
         m_iDirFlag = ENUM_CLASS(HIT_FLAG::MIDDLE_BACK);

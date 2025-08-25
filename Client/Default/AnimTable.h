@@ -208,4 +208,71 @@ namespace Client
 		};
 
 	}
+
+	namespace Glasgavelen
+	{
+		enum class STATE_FLAG {
+			SPAWN = 1 << 0,
+			IDLE = 1 << 1,
+			MOVE = 1 << 2,
+			ATTACK = 1 << 3,
+			RAGE = 1 << 4,
+			GRAP = 1 << 5,
+			HANG = 1 << 6,
+			HIT = 1 << 7,
+			DEAD = 1 << 31
+		};
+
+		enum class SPAWN_FLAG {
+			STAY = 1 << 8,
+			START = 1 << 9
+		};
+
+		enum class IDLE_FLAG {
+			IDLE = 1 << 8,
+			THREAT = 1 << 9
+		};
+
+		enum class MOVE_FLAG {
+
+		};
+
+		enum class ATTACK_FLAG {
+			DOUBLE = 1 << 8,
+			DESEND = 1 << 9,
+			LEFT = 1 << 10,
+			RIGHT = 1 << 11,
+
+			BLAZE = 1<< 30
+		};
+
+		enum class RAGE_FLAG {
+			ATTACK = 1 << 8,
+			DESEND_BEGIN = 1 << 9,
+			DESEND_END = 1 << 10,
+		};
+
+		enum class GRAP_FLAG {
+			TRY = 1 << 8,
+			SUCCESS = 1 << 9,
+			FAIL = 1 << 10
+		};
+
+		enum class HANG_FLAG {
+			BEGIN = 1 << 8,
+			DURING = 1 << 9,
+			END = 1 << 10
+		};
+
+		enum class HIT_FLAG {
+			FRONT = 1 <<8,
+			BACK = 1 << 9,
+			RIGHT = 1 << 10,
+			LEFT = 1 << 11,
+			DOWN_BEGIN = 1 << 12,
+			DOWN_DURING = 1 << 13,
+			DOWN_END = 1 << 14
+		};
+
+	}
 }

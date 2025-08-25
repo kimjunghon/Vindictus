@@ -252,7 +252,7 @@ HRESULT CColliderPawn::Bind_Collision_Callback(COLLIDER_CHANNEL eChannel, _uint 
 	return S_OK;
 }
 
-HIT_DIR CColliderPawn::Compute_HitDir(_fvector vHitPosition, _fvector vAttackPosition, _float fDegree)
+DIR CColliderPawn::Compute_HitDir(_fvector vHitPosition, _fvector vAttackPosition, _float fDegree)
 {
 	_vector vHitDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(vAttackPosition, vHitPosition), 0.f));
 	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
@@ -263,38 +263,38 @@ HIT_DIR CColliderPawn::Compute_HitDir(_fvector vHitPosition, _fvector vAttackPos
 
 	_float fComparisonRadian = cosf(XMConvertToRadians(fDegree));
 
-	HIT_DIR eHit_Dir = {};
+	DIR eHit_Dir = {};
 
 	if (fLookDot >= fComparisonRadian)
-		eHit_Dir = HIT_DIR::FRONT;
+		eHit_Dir = DIR::FRONT;
 	else if (fLookDot <= (fComparisonRadian * -1.f))
-		eHit_Dir = HIT_DIR::BACK;
+		eHit_Dir = DIR::BACK;
 	else if (fRightDot >= 0.f)
-		eHit_Dir = HIT_DIR::RIGHT;
+		eHit_Dir = DIR::RIGHT;
 	else
-		eHit_Dir = HIT_DIR::LEFT;
+		eHit_Dir = DIR::LEFT;
 
 	return eHit_Dir;
 }
 
-HIT_DIR CColliderPawn::Compute_HitDir_Look(_fvector vHitPosition, _fvector vAttackPosition)
+DIR CColliderPawn::Compute_HitDir_Look(_fvector vHitPosition, _fvector vAttackPosition)
 {
 	_vector vHitDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(vAttackPosition, vHitPosition), 0.f));
 	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f));
 
 	_float	fLookDot = XMVectorGetX(XMVector3Dot(vLook, vHitDir));
 
-	HIT_DIR eHit_Dir = {};
+	DIR eHit_Dir = {};
 
 	if (fLookDot >= 0.f)
-		eHit_Dir = HIT_DIR::FRONT;
+		eHit_Dir = DIR::FRONT;
 	else if (fLookDot < 0.f)
-		eHit_Dir = HIT_DIR::BACK;
+		eHit_Dir = DIR::BACK;
 
 	return eHit_Dir;
 }
 
-HIT_DIR CColliderPawn::Compute_HitDir_Side(_fvector vHitPosition, _fvector vAttackPosition)
+DIR CColliderPawn::Compute_HitDir_Side(_fvector vHitPosition, _fvector vAttackPosition)
 {
 	_vector vTargetDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(vAttackPosition, vHitPosition), 0.f));
 	_vector vLook = XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f);
@@ -302,12 +302,12 @@ HIT_DIR CColliderPawn::Compute_HitDir_Side(_fvector vHitPosition, _fvector vAtta
 
 	_float fRightDot = XMVectorGetX(XMVector3Dot(vRight, vTargetDir));
 
-	HIT_DIR eHit_Dir = {};
+	DIR eHit_Dir = {};
 
 	if (fRightDot >= 0.f)
-		eHit_Dir = HIT_DIR::RIGHT;
+		eHit_Dir = DIR::RIGHT;
 	else if (fRightDot < 0.f)
-		eHit_Dir = HIT_DIR::LEFT;
+		eHit_Dir = DIR::LEFT;
 
 	return eHit_Dir;
 }

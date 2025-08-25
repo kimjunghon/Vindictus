@@ -20,7 +20,7 @@ private:
 	_uint			m_iDirFlag = {};
 
 private:
-	void			Change_HitFlag(HIT_DIR eHitDir);
+	void			Change_HitFlag(DIR eHitDir);
 
 public:
 	static CState_Hit_Strong*	Create();

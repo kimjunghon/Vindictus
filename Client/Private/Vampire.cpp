@@ -3,6 +3,7 @@
 #include "VampireAI.h"
 #include "Navigation.h"
 #include "Body.h"
+#include "MonsterStateFactory.h"
 
 CVampire::CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -11,15 +12,12 @@ CVampire::CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 
 CVampire::CVampire(const CVampire& Prototype)
 	: CMonster { Prototype }
-	, m_iStrongFlag { Prototype.m_iStrongFlag }
 {
 }
 
 HRESULT CVampire::Initialize_Prototype()
 {
-	m_iStrongFlag = ENUM_CLASS(HIT_FLAG::STRONG_BEGIN) | ENUM_CLASS(HIT_FLAG::STRONG_DURING) | ENUM_CLASS(HIT_FLAG::STRONG_END);
-
-	m_Status.fFullHealth = 100.f;
+	m_Status.fFullHealth = 200.f;
 	m_Status.fHealth = 100.f;
 	
 	return S_OK;
@@ -59,7 +57,9 @@ HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
 {
 	m_IsActive = true;
 
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
+	ChangeState(ENUM_CLASS(VAMPIRE_STATE::SPAWN));
+
+	Bind_StateFlag();
 
 	m_pBody->Forcing_Play_Animation();
 
@@ -74,46 +74,9 @@ HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	return S_OK;
 }
 
-BT_STATE CVampire::Is_Dead()
-{
-	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::DEAD))
-	{
-		if (m_pBody->AnimIsFinished())
-		{
-			m_IsActive = false;
-		}
-		return BT_STATE::SUCCESS;
-	}
-	return BT_STATE::FAILED;
-}
-
-BT_STATE CVampire::Is_Hit()
-{
-	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::HIT))
-	{
-		if(m_pBody->AnimIsFinished())
-		{
-			_uint iStrongFlag = {};
-			iStrongFlag = m_iStateFlag & m_iStrongFlag;
-			if (iStrongFlag)
-			{
-				m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iStrongFlag << 1;
-			}
-			else
-			{
-				m_iHitAttackID = 0;
-				return BT_STATE::FAILED;
-			}
-		}
-		return BT_STATE::SUCCESS;
-	}
-
-	return BT_STATE::FAILED;
-}
-
 BT_STATE CVampire::Attack()
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+	ChangeState(ENUM_CLASS(VAMPIRE_STATE::ATTACK));
 
 	m_AttackTime[m_iCurrentAttack] = 0.f;
 
@@ -124,10 +87,9 @@ BT_STATE CVampire::Chase()
 {
 	_float fDistance = Get_TargetDistance();
 
-	if (abs(fDistance) >= m_fChaseRange)
+	if (false == IsNear(m_fChaseRange))
 	{
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::FRONT);
-
+		ChangeState(ENUM_CLASS(VAMPIRE_STATE::MOVE));
 		return BT_STATE::SUCCESS;
 	}
 
@@ -136,12 +98,7 @@ BT_STATE CVampire::Chase()
 
 BT_STATE CVampire::Patrol()
 {
-	_float fDistance = Get_TargetDistance();// XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
-
-	if (abs(fDistance) <= m_fMinDistance)
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::BACK);
-	else
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | (rand() % 2 == 0 ? ENUM_CLASS(MOVE_FLAG::LEFT) : ENUM_CLASS(MOVE_FLAG::RIGHT));
+	ChangeState(ENUM_CLASS(VAMPIRE_STATE::PATROL));
 
 	return BT_STATE::SUCCESS;
 }
@@ -152,6 +109,32 @@ HRESULT CVampire::Ready_AI()
 
 	if (nullptr == m_pAI)
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CVampire::Ready_VampireState(MONSTER_TYPE eType)
+{
+	m_States.resize(ENUM_CLASS(VAMPIRE_STATE::END), nullptr);
+
+	CMonsterStateFactory* pStateFactory = CMonsterStateFactory::GetInstance();
+
+	_uint iAttackStateType = {};
+
+	iAttackStateType = eType == MONSTER_TYPE::VAMPIRE_ELDER ? ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE_ELDER) : ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE);
+
+	m_States[ENUM_CLASS(VAMPIRE_STATE::ATTACK)] = pStateFactory->Create(iAttackStateType, ENUM_CLASS(VAMPIRE_STATE::ATTACK));
+
+	m_States[ENUM_CLASS(VAMPIRE_STATE::SPAWN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE), ENUM_CLASS(VAMPIRE_STATE::SPAWN));
+	m_States[ENUM_CLASS(VAMPIRE_STATE::IDLE)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE), ENUM_CLASS(VAMPIRE_STATE::IDLE));
+	m_States[ENUM_CLASS(VAMPIRE_STATE::MOVE)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE), ENUM_CLASS(VAMPIRE_STATE::MOVE));
+	m_States[ENUM_CLASS(VAMPIRE_STATE::PATROL)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE), ENUM_CLASS(VAMPIRE_STATE::PATROL));
+	m_States[ENUM_CLASS(VAMPIRE_STATE::HIT)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE), ENUM_CLASS(VAMPIRE_STATE::HIT));
+	m_States[ENUM_CLASS(VAMPIRE_STATE::HIT_STRONG)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE), ENUM_CLASS(VAMPIRE_STATE::HIT_STRONG));
+	m_States[ENUM_CLASS(VAMPIRE_STATE::DEAD)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE), ENUM_CLASS(VAMPIRE_STATE::DEAD));
+	m_States[ENUM_CLASS(VAMPIRE_STATE::DEAD_STRONG)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::VAMPIRE), ENUM_CLASS(VAMPIRE_STATE::DEAD_STRONG));
+
+	m_pCurrentState = m_States[ENUM_CLASS(VAMPIRE_STATE::SPAWN)];
 
 	return S_OK;
 }
@@ -178,7 +161,6 @@ void CVampire::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)
 		return;
 
 	m_iHitAttackID = AttackData->iAttackID;
-
 	
 	ATTACK_TYPE eAttackType = AttackData->eAttackType;
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
@@ -191,33 +173,25 @@ void CVampire::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)
 	else
 		ChangeHitState(eAttackType, vPosition, vAttackPosition);
 
+	Bind_StateFlag();
+
 	if (FAILED(m_pBody->Forcing_Play_Animation()))
 		return;
 }
 
 void CVampire::ChangeHitState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _fvector vAttackPosition)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
-
 	switch (eAttackType)
 	{
 	case ATTACK_TYPE::LIGHT:
 	case ATTACK_TYPE::MIDDLE:
 	{
-		_float fDegree = 60.f;
-
-		HIT_DIR eHitDir = Compute_HitDir(vHitPosition, vAttackPosition, fDegree);
-		_uint iDirFlag = ENUM_CLASS(HIT_FLAG::FRONT) << ENUM_CLASS(eHitDir);
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iDirFlag;
+		ChangeState(ENUM_CLASS(VAMPIRE_STATE::HIT));
 		break;
 	}
 	case ATTACK_TYPE::STRONG:
 	{
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | ENUM_CLASS(HIT_FLAG::STRONG_BEGIN);
-		_vector vTargetPos = vAttackPosition;
-		vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
-
-		m_pTransformCom->LookAt(vTargetPos);
+		ChangeState(ENUM_CLASS(VAMPIRE_STATE::HIT_STRONG));
 		break;
 	}
 	}
@@ -225,8 +199,6 @@ void CVampire::ChangeHitState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _f
 
 void CVampire::ChangeDeadState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _fvector vAttackPosition)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD);
-
 	DisableAllColliderChannel();
 
 	switch (eAttackType)
@@ -234,17 +206,12 @@ void CVampire::ChangeDeadState(ATTACK_TYPE eAttackType, _fvector vHitPosition, _
 	case ATTACK_TYPE::LIGHT:
 	case ATTACK_TYPE::MIDDLE:
 	{
-		m_iStateFlag |= ENUM_CLASS(DEAD_FLAG::DEFAULT);
+		ChangeState(ENUM_CLASS(VAMPIRE_STATE::DEAD));
 		break;
 	}
 	case ATTACK_TYPE::STRONG:
 	{
-		_vector vTargetPos = vAttackPosition;
-		vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
-
-		m_pTransformCom->LookAt(vTargetPos);
-
-		m_iStateFlag |= ENUM_CLASS(DEAD_FLAG::STRONG);
+		ChangeState(ENUM_CLASS(VAMPIRE_STATE::DEAD_STRONG));
 		break;
 	}
 	}

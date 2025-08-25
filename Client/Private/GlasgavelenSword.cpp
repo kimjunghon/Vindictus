@@ -68,7 +68,7 @@ HRESULT CGlasgavelenSword::Render()
 
 HRESULT CGlasgavelenSword::Ready_Components()
 {
-	if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_GavelneSword"),
+	if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_GavelneSword"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
@@ -110,6 +110,14 @@ HRESULT CGlasgavelenSword::Bind_ShaderResources()
 
 HRESULT CGlasgavelenSword::Bind_ParentBones(CModel* pParentModelCom)
 {
+	if (false == m_ParentBones.empty())
+	{
+		for (auto& pBone : m_ParentBones)
+			Safe_Release(pBone);
+
+		m_ParentBones.clear();
+	}
+
 	vector<CBone*> SwordBones = m_pModelCom->Get_Bones();
 	vector<CBone*> ParentBones = pParentModelCom->Get_Bones();
 

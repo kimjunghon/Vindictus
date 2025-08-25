@@ -36,6 +36,7 @@
 
 //STATE FACTORY
 #include "StateFactory.h"
+#include "MonsterStateFactory.h"
 
 //Player
 #include "Camera_Target.h"
@@ -73,6 +74,7 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 
 	m_pStateFactory = CStateFactory::GetInstance();
+	m_pMonsterStateFactory = CMonsterStateFactory::GetInstance();
 
 	if (FAILED(m_pPlayerInstance->Initialize(g_iInventoryCount)))
 		return E_FAIL;
@@ -596,9 +598,9 @@ HRESULT CMainApp::Ready_Navigations()
 	//
 	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::QUEEN), TEXT("../Bin/Resources/Map/QueenMap_Navigation.dat"))))
 		return E_FAIL;
-	//
-	//if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("../Bin/Resources/Map/Glasgavelen_Navigation.dat"))))
-	//	return E_FAIL;
+	
+	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("../Bin/Resources/Map/GavelenMap_Navigation.dat"))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -624,8 +626,9 @@ CMainApp* CMainApp::Create()
 void CMainApp::Free()
 {
 	__super::Free();
-
+	
 	Safe_Release(m_pStateFactory);
+	Safe_Release(m_pMonsterStateFactory);
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pDeviceContext);
 

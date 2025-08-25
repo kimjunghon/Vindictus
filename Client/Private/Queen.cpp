@@ -3,6 +3,8 @@
 #include "Body.h"
 #include "QueenAI.h"
 #include "Queen_Body.h"
+#include "MonsterStateFactory.h"
+#include "MonsterState.h"
 
 CQueen::CQueen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -14,8 +16,6 @@ CQueen::CQueen(const CQueen& Prototype)
 	, m_fNearAttackCoolTime { Prototype.m_fNearAttackCoolTime }
 	, m_QueenStatus { Prototype.m_QueenStatus }
 	, m_iDownFlag { Prototype.m_iDownFlag }
-	, m_vJumpReadyTime{ Prototype.m_vJumpReadyTime }
-	, m_vJumpMoveTime { Prototype.m_vJumpMoveTime }
 	, m_fBurrowTime { Prototype.m_fBurrowTime }
 	, m_fBurrowCoolTime { Prototype.m_fBurrowCoolTime }
 {
@@ -49,9 +49,6 @@ HRESULT CQueen::Initialize_Prototype()
 
 	m_fBurrowTime = 200.f;
 	m_fBurrowCoolTime = 200.f;
-
-	m_vJumpReadyTime = _float2(0.f, 84.f);
-	m_vJumpMoveTime = _float2(85.f, 135.f);
 	
 	m_Status.fFullHealth = 500.f;
 	m_Status.fHealth = m_Status.fFullHealth;
@@ -78,6 +75,9 @@ HRESULT CQueen::Initialize(void* pArg)
 	if (FAILED(Ready_AI()))
 		return E_FAIL;
 
+	if (FAILED(Ready_QueenStates()))
+		return E_FAIL;
+
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
 
@@ -99,7 +99,8 @@ void CQueen::Update(_float fTimeDelta)
 
 	m_pAI->Update();
 
-	Jump(fTimeDelta);
+	m_pCurrentState->Update(this, fTimeDelta);
+	Bind_StateFlag();
 
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Update(fTimeDelta);
@@ -143,7 +144,9 @@ HRESULT CQueen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 {
 	m_IsActive = true;
 
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::CUTSEAN);
+	ChangeState(ENUM_CLASS(QUEEN_STATE::SPAWN));
+
+	Bind_StateFlag();
 
 	m_pBody->Forcing_Play_Animation();
 
@@ -160,24 +163,16 @@ HRESULT CQueen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 
 BT_STATE CQueen::Attack()
 {
-	_uint iAttackFlag = ENUM_CLASS(ATTACK_FLAG::SWOOP) << m_iCurrentAttack;
-
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | iAttackFlag;
-
-	m_AttackTime[m_iCurrentAttack] = 0.f;
+	ChangeState(ENUM_CLASS(QUEEN_STATE::ATTACK));
 
 	return BT_STATE::SUCCESS;
 }
 
 BT_STATE CQueen::Chase()
 {
-	_float fDistance = Get_TargetDistance(); //XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
-
-	if (abs(fDistance) >= m_fChaseRange)
+	if(false == IsNear(m_fChaseRange))
 	{
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::RUN);
-
-		LookAtTarget();
+		ChangeState(ENUM_CLASS(QUEEN_STATE::MOVE));
 
 		return BT_STATE::SUCCESS;
 	}
@@ -200,80 +195,16 @@ BT_STATE CQueen::CanBurrow()
 
 BT_STATE CQueen::Burrow()
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::BEGIN);
-
-	for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
-		m_IsBurrowAction[i] = true;
+	ChangeState(ENUM_CLASS(QUEEN_STATE::BURROW));
 
 	m_fBurrowTime = 0.f;
 
 	return BT_STATE::SUCCESS;
 }
 
-BT_STATE CQueen::BurrowAttack()
-{
-	vector<_uint> CanAttackIndex;
-
-	for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
-	{
-		if (m_IsBurrowAction[i])
-			CanAttackIndex.push_back(i);
-	}
-
-	if (CanAttackIndex.empty())
-		return BT_STATE::FAILED;
-
-	LookAtTarget();
-
-	_uint iFlag = ENUM_CLASS(STATE_FLAG::BURROW);
-	_uint iActionFlag = ENUM_CLASS(BURROW_FLAG::MOVE);
-
-	_uint iRandomIndex = CanAttackIndex[rand() % CanAttackIndex.size()];
-
-	m_IsBurrowAction[iRandomIndex] = false;
-
-	m_iStateFlag = iFlag | (iActionFlag << iRandomIndex);
-
-	return BT_STATE::SUCCESS;
-}
-
-BT_STATE CQueen::BurrowMove()
-{
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::STAY);
-
-	MoveTarget(0.05f);
-
-	return BT_STATE::SUCCESS;
-}
-
-BT_STATE CQueen::BurrowEnd()
-{
-	for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
-	{
-		if (m_IsBurrowAction[i])
-			return BT_STATE::FAILED;
-	}
-
-	MoveTarget(0.7f);
-
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::END);
-
-	return BT_STATE::SUCCESS;
-}
-
-BT_STATE CQueen::IsBurrow()
-{
-	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::BURROW) && !(m_iStateFlag & ENUM_CLASS(BURROW_FLAG::END)))
-		return BT_STATE::SUCCESS;
-
-	return BT_STATE::FAILED;
-}
-
 BT_STATE CQueen::CanNearAttack()
 {
-	_float fDistance = Get_TargetDistance(); // XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
-
-	if (fabs(fDistance) <= m_fMinDistance &&
+	if (IsNear(m_fMinDistance) &&
 		m_fNearAttackTime >= m_fNearAttackCoolTime)
 	{
 		return BT_STATE::SUCCESS;
@@ -284,29 +215,8 @@ BT_STATE CQueen::CanNearAttack()
 
 BT_STATE CQueen::NearAttack()
 {
-	//_vector vTargetDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION)), 0.f));
-	//_vector vLook = XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f);
-	//_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
-	//
-	//_float fLookDot = XMVectorGetX(XMVector3Dot(vLook, vTargetDir));
-	//_float fRightDot = XMVectorGetX(XMVector3Dot(vRight, vTargetDir));
-	//
-	//_float fComparisonRadian = cosf(XMConvertToRadians(45.f));
+	ChangeState(ENUM_CLASS(QUEEN_STATE::ATTACK_NEAR));
 
-	HIT_DIR eDir = Compute_HitDir(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION), 45.f);
-
-	_uint iAttackFlag = ENUM_CLASS(ATTACK_FLAG::MELLE) << ENUM_CLASS(eDir);
-
-	//if (fLookDot >= fComparisonRadian)
-	//	iAttackFlag = ENUM_CLASS(ATTACK_FLAG::MELLE);
-	//else if (fLookDot <= -fComparisonRadian)
-	//	iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TAIL);
-	//else if (fRightDot >= 0.f)
-	//	iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT);
-	//else
-	//	iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TURN_LEFT);
-		
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | iAttackFlag;
 	m_fNearAttackTime = 0.f;
 
 	return BT_STATE::SUCCESS;
@@ -339,11 +249,11 @@ BT_STATE CQueen::IsStun()
 
 BT_STATE CQueen::IsLook()
 {
-	_float fDegree = 30.f;
+	_float fDegree = 40.f;
 
-	HIT_DIR eLookDir = Compute_HitDir(m_pTransformCom->Get_State(STATE::POSITION), m_pTargetTransform->Get_State(STATE::POSITION), fDegree);
+	DIR eLookDir = Compute_TargetDir(fDegree);
 
-	if (eLookDir == HIT_DIR::FRONT)
+	if (eLookDir == DIR::FRONT)
 		return BT_STATE::FAILED;
 
 	return BT_STATE::SUCCESS;
@@ -351,35 +261,14 @@ BT_STATE CQueen::IsLook()
 
 BT_STATE CQueen::Turn()
 {
-	_vector vTargetDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION)), 0.f));
-	_vector vLook = XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f);
-	_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
-
-	_float fLookDot = XMVectorGetX(XMVector3Dot(vLook, vTargetDir));
-	_float fRightDot = XMVectorGetX(XMVector3Dot(vRight, vTargetDir));
-
-	_float fRotateFastRadian = cosf(XMConvertToRadians(30.f)) * -1.f;
-
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
-
-	_uint iTurnFlag = {};
-
-	if (fRightDot >= 0.f)
-		iTurnFlag = ENUM_CLASS(MOVE_FLAG::TURN_RIGHT);
-	else
-		iTurnFlag = ENUM_CLASS(MOVE_FLAG::TURN_LEFT);
-
-	if (fLookDot <= fRotateFastRadian)
-		iTurnFlag = iTurnFlag << 2;
-
-	m_iStateFlag |= iTurnFlag;
+	ChangeState(ENUM_CLASS(QUEEN_STATE::TURN));
 
 	return BT_STATE::SUCCESS;
 }
 
 BT_STATE CQueen::Idle()
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::THREAT);
+	ChangeState(ENUM_CLASS(QUEEN_STATE::IDLE));
 
 	return BT_STATE::SUCCESS;
 }
@@ -402,11 +291,11 @@ void CQueen::Update_AttackCoolTime(_float fTimeDelta)
 	for (auto& AttackTime : m_AttackTime)
 		AttackTime += fTimeDelta;
 
-	if (m_AttackComplete && m_pBody->AnimIsFinished())
-		m_AttackComplete = false;
-
 	if (m_IsBurrow && !(m_iStateFlag & ENUM_CLASS(STATE_FLAG::BURROW)))
 		m_fBurrowTime += fTimeDelta;
+
+	if (m_AttackComplete && m_pBody->AnimIsFinished())
+		m_AttackComplete = false;
 }
 
 void CQueen::MoveTarget(_float fRatio)
@@ -419,25 +308,6 @@ void CQueen::MoveTarget(_float fRatio)
 	_vector vPosition = XMVectorScale(vDir, fRatio);
 
 	m_pTransformCom->MovePositionToVector(vPosition, m_pNavigationCom);
-}
-
-void CQueen::Jump(_float fTimeDelta)
-{
-	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::ATTACK) &&
-		m_iStateFlag & ENUM_CLASS(ATTACK_FLAG::JUMP))
-	{
-		if (m_pBody->IsAnimationInRangeTrackPosition(m_vJumpReadyTime))
-		{
-			_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
-			m_vJumpDir = XMVectorSetY(XMVectorSubtract(vTargetPos, m_pTransformCom->Get_State(STATE::POSITION)), 0.f);
-			m_pTransformCom->LookAt(vTargetPos);
-		}
-		else if(m_pBody->IsAnimationInRangeTrackPosition(m_vJumpMoveTime))
-		{
-			_vector vPosition = XMVectorScale(m_vJumpDir, fTimeDelta);
-			m_pTransformCom->MovePositionToVector(vPosition, m_pNavigationCom);
-		}
-	}
 }
 
 HRESULT CQueen::Add_Collider_Body(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix)
@@ -486,6 +356,30 @@ HRESULT CQueen::Ready_AI()
 	m_pAI = CQueenAI::Create(this);
 	if (nullptr == m_pAI)
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CQueen::Ready_QueenStates()
+{
+	m_States.resize(ENUM_CLASS(QUEEN_STATE::END), nullptr);
+
+	CMonsterStateFactory* pStateFactory = CMonsterStateFactory::GetInstance();
+
+
+	m_States[ENUM_CLASS(QUEEN_STATE::SPAWN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::SPAWN));
+	m_States[ENUM_CLASS(QUEEN_STATE::IDLE)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::IDLE));
+	m_States[ENUM_CLASS(QUEEN_STATE::MOVE)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::MOVE));
+	m_States[ENUM_CLASS(QUEEN_STATE::TURN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::TURN));
+	m_States[ENUM_CLASS(QUEEN_STATE::ATTACK)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::ATTACK));
+	m_States[ENUM_CLASS(QUEEN_STATE::ATTACK_NEAR)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::ATTACK_NEAR));
+	m_States[ENUM_CLASS(QUEEN_STATE::JUMP)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::JUMP));
+	m_States[ENUM_CLASS(QUEEN_STATE::BURROW)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::BURROW));
+	m_States[ENUM_CLASS(QUEEN_STATE::HIT)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::HIT));
+	m_States[ENUM_CLASS(QUEEN_STATE::DOWN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::DOWN));
+	m_States[ENUM_CLASS(QUEEN_STATE::DEAD)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::DEAD));
+
+	m_pCurrentState = m_States[ENUM_CLASS(QUEEN_STATE::SPAWN)];
 
 	return S_OK;
 }
@@ -683,27 +577,6 @@ HRESULT CQueen::Ready_AttackMapping()
 	return S_OK;
 }
 
-void CQueen::Update_LookDir()
-{
-	//_vector vLookDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION)),0.f));
-
-	//_vector vTargetQuat = XMQuaternionRotationMatrix(XMMatrixInverse(nullptr, XMMatrixLookToLH(XMVectorZero(), vLookDir, XMVectorSet(0.f, 1.f, 0.f, 0.f))));
-
-	//_vector vCurrentRotationQuat = m_pTransformCom->Get_LookQuaternion();
-
-	//if (XMQuaternionEqual(vCurrentRotationQuat, vTargetQuat))
-	//{
-	//	m_vRotateQuat = XMQuaternionIdentity();
-	//	return;
-	//}
-
-	//_float fDot = XMVectorGetX(XMQuaternionDot(vCurrentRotationQuat, vTargetQuat));
-
-	//if (fDot < 0.f)
-	//	vTargetQuat = XMVectorNegate(vTargetQuat);
-
-	//m_vRotateQuat = XMQuaternionMultiply(vTargetQuat, XMQuaternionInverse(vCurrentRotationQuat));
-}
 
 void CQueen::Compute_WorldMatrix()
 {
@@ -716,18 +589,6 @@ void CQueen::Compute_WorldMatrix()
 	vAnimRotation = XMQuaternionRotationMatrix(XMMatrixInverse(nullptr, XMMatrixLookAtLH(XMVectorZero(), vLook, XMVectorSet(0.f, 1.f, 0.f, 0.f))));
 	
 	_vector vTotalRotation = XMQuaternionIdentity();
-	//_vector vRotation = XMQuaternionIdentity();
-
-	//if (m_IsRotate)
-	//{
-	//	if(false == XMQuaternionEqual(m_vRotateQuat ,m_vPrevRotateQuat))
-	//	{
-	//		vTotalRotation = XMQuaternionSlerp(XMQuaternionIdentity(), m_vRotateQuat, 0.05f * m_fRotateSpeed);
-	//		m_vPrevRotateQuat = XMQuaternionMultiply(vTotalRotation, m_vPrevRotateQuat);
-	//	}
-	//}
-	//else
-//		vTotalRotation = XMQuaternionMultiply(vAnimRotation, vRotation);
 
 	vTotalRotation = vAnimRotation;
 
@@ -756,12 +617,7 @@ void CQueen::OnCollisionHit(_uint HitColliderIndex, const CCollider::COLLISION_D
 	m_Status.fHealth -= AttackData->fDamage;
 
 	if (m_Status.fHealth <= (m_Status.fFullHealth) && false == m_IsBurrow)
-	{
-		for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
-			m_IsBurrowAction[i] = true;
-
 		m_IsBurrow = true;
-	}
 
 	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::BURROW))
 		return;
@@ -775,15 +631,14 @@ void CQueen::OnCollisionHit(_uint HitColliderIndex, const CCollider::COLLISION_D
 
 	if (m_QueenStatus.fCurrentDamage >= m_QueenStatus.fStunDamage)
 	{
-		ChangeHitState(m_pTransformCom->Get_State(STATE::POSITION), AttackData->vAttackPosition);
+		m_QueenStatus.fCurrentDamage = 0.f;
+
+		ChangeState(ENUM_CLASS(QUEEN_STATE::HIT));
+
+		Bind_StateFlag();
 
 		m_pBody->Forcing_Play_Animation();
 	}
-}
-
-void CQueen::DecreaseHealth(_float fDamage)
-{
-
 }
 
 void CQueen::DecreaseDurabillity(_uint HitColliderIndex, _float fDamage)
@@ -812,7 +667,8 @@ void CQueen::DecreaseDurabillity(_uint HitColliderIndex, _float fDamage)
 	if (m_QueenStatus.fLegDurabillity <= 0.f && false == m_QueenStatus.IsBrokenLeg)
 	{
 		m_QueenStatus.IsBrokenLeg = true;
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | ENUM_CLASS(HIT_FLAG::DOWN_BEGIN);
+		ChangeState(ENUM_CLASS(QUEEN_STATE::DOWN));
+		Bind_StateFlag();
 		m_pBody->Forcing_Play_Animation();
 	}
 
@@ -824,19 +680,6 @@ void CQueen::Check_Near(_float fTimeDelta)
 
 	if (fabs(fDistance) <= m_fMinDistance)
 		m_fNearAttackTime += fTimeDelta;
-}
-
-void CQueen::ChangeHitState(_fvector vHitPosition, _fvector vAttackPosition)
-{
-	m_QueenStatus.fCurrentDamage = 0.f;
-
-	_float fDegree = 30.f;
-
-	HIT_DIR eHitDir = Compute_HitDir(vHitPosition, vAttackPosition, fDegree);
-
-	_uint iDirFlag = ENUM_CLASS(HIT_FLAG::FRONT) << ENUM_CLASS(eHitDir);
-
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iDirFlag;
 }
 
 CQueen* CQueen::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

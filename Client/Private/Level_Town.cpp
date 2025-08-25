@@ -202,6 +202,7 @@ HRESULT CLevel_Town::Ready_Map(const _wstring& strLayerTag)
 {
 	CMap::MAP_DESC MapDesc = {};
 	MapDesc.strMapFilePath = "../Bin/Resources/Map/Town.dat";
+	MapDesc.eLevel = LEVEL::TOWN;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Map"),
 		ENUM_CLASS(LAYER_TYPE::NONSTATIC), strLayerTag, &MapDesc)))

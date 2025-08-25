@@ -28,14 +28,8 @@ HRESULT CQueenAI::Ready_Nodes()
 
 		CBT_SelectorNode* pActionSelectorNode = CBT_SelectorNode::Create();
 
-		BT_STATE				IsStun();
-		BT_STATE				Stun();
-
 		pSelectorNode->Add_Child(pActionSelectorNode);
 				
-				//Stun
-				pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->IsStun(); }));
-
 				// CanOtherAction
 				pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->CanOtherAction(); }));
 
@@ -46,31 +40,6 @@ HRESULT CQueenAI::Ready_Nodes()
 				pBurrowStartSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE {return m_pControlledQueen->Burrow(); }));
 
 				pActionSelectorNode->Add_Child(pBurrowStartSequenceNode);
-
-				CBT_SequenceNode* pBurrowActionSequenceNode = CBT_SequenceNode::Create();
-				
-				
-				pBurrowActionSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE {return m_pControlledQueen->IsBurrow(); }));
-
-				CBT_SelectorNode* pBurrowActionSelectionNode = CBT_SelectorNode::Create();
-
-					pBurrowActionSelectionNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->BurrowEnd(); }));
-
-					
-					CBT_SequenceNode* pBurrowAttackSequenceNode = CBT_SequenceNode::Create();
-
-					pBurrowAttackSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->CanAttackRange(); }));
-					pBurrowAttackSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->BurrowAttack(); }));
-					
-				
-				pBurrowActionSelectionNode->Add_Child(pBurrowAttackSequenceNode);
-				
-				pBurrowActionSelectionNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE {return m_pControlledQueen->BurrowMove(); }));
-
-				pBurrowActionSequenceNode->Add_Child(pBurrowActionSelectionNode);
-				
-				pActionSelectorNode->Add_Child(pBurrowActionSequenceNode);
-
 
 				// Look
 				CBT_SequenceNode* pTurnSequnceNode = CBT_SequenceNode::Create();
@@ -99,6 +68,7 @@ HRESULT CQueenAI::Ready_Nodes()
 			pAttackSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->CanAttack(); }));
 			pAttackSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->CanAttackRange(); }));
 			pAttackSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->Attack(); }));
+			
 			//Selector Ãß°¡
 			pActionSelectorNode->Add_Child(pAttackSequenceNode);
 

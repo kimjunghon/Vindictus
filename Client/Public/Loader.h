@@ -42,6 +42,7 @@ private:
 	HRESULT Loading_For_Logo_Level();
 	HRESULT Loading_For_Town_Level();
 	HRESULT Loading_For_Queen_Level();
+	HRESULT Loading_For_Gavelen_Level();
 
 	HRESULT Loading_For_MapModel(LEVEL eLevel, const _char* pMapFilePath);
 
