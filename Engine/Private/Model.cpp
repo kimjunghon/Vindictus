@@ -200,7 +200,7 @@ HRESULT CModel::Update_PoseCombinedTransformationMatrix()
 
 HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
 {
-    if (m_CurrentAnimData.strAnimKey == AnimData.strAnimKey)
+    if (m_CurrentAnimData.strAnimKey == AnimData.strAnimKey && false == m_IsFinished)
         return E_FAIL;
 
     CAnimation* pAnimation = Find_Animation(AnimData.strAnimKey);
@@ -210,7 +210,7 @@ HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
     m_pCurrentAnimation = pAnimation;
     _bool IsAnimChange = false;
 
-    if (false == m_IsFinished)
+    //if (false == m_IsFinished)
         IsAnimChange = true;
 
     m_pCurrentAnimation->Enter(IsAnimChange);

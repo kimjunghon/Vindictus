@@ -1,7 +1,6 @@
 #include "ClientPch.h"
 #include "StateFactory.h"
 
-
 IMPLEMENT_SINGLETON(CStateFactory)
 
 CStateFactory::CStateFactory()

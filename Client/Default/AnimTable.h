@@ -180,11 +180,11 @@ namespace Client
 			JUMP = 1 << 10,
 			LEFTLEG = 1 << 11,
 			RIGHTLEG = 1 << 12,
-			MELLE = 1 << 13,
 
+			MELLE = 1 << 13,
 			TAIL = 1 << 14,
-			TURN_LEFT = 1 << 15,
-			TURN_RIGHT = 1 << 16,
+			TURN_RIGHT = 1 << 15,
+			TURN_LEFT = 1 << 16,
 //			POSION = 1 << 10,
 		};
 

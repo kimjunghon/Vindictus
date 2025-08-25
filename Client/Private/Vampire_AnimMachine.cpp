@@ -47,8 +47,9 @@ void CVampire_AnimMachine::Initialize_ATTACK()
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
 	m_AnimDatas[iFlag] = { "Attack", false, _float2(1.f, 1.f), 2.f };
-
-	// Elder 전용
+//	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::MELEE)] = { "Attack", false, _float2(1.f, 1.f), 2.f };
+	
+// Elder 전용
 	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::MELEE)] = { "Attack_Close", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::RANGE)] = { "Attack_FireBall", false, _float2(1.f, 1.f), 2.f };
 }

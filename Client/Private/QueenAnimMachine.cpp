@@ -68,7 +68,7 @@ void CQueenAnimMachine::Initialize_BURROW()
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::BURROW);
 
 	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::BEGIN)] = { "Burrow_Begin", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::STAY)] = { "Burrow_Stay", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::STAY)] = { "Burrow_Stay", true, _float2(0.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)] = { "Burrow_Move", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)] = { "Burrow_Attack01", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK2)] = { "Burrow_Attack02", false, _float2(1.f, 1.f), 2.f };

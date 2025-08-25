@@ -69,10 +69,12 @@ void CVampire_Royal::Update(_float fTimeDelta)
 
 	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::MOVE) || m_iStateFlag & ENUM_CLASS(STATE_FLAG::ATTACK))
 	{
-		_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
-		vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
+		LookAtTarget();
 
-		m_pTransformCom->LookAt(vTargetPos);
+		//_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
+		//vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
+
+		//m_pTransformCom->LookAt(vTargetPos);
 	}
 
 	for (auto& Pair : m_PawnObjects)

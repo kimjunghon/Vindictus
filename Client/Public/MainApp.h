@@ -10,6 +10,7 @@ NS_END
 
 NS_BEGIN(Client)
 class CStateFactory;
+class CMonsterStateFactory;
 class CPlayerInstance;
 class CMonsterInstance;
 

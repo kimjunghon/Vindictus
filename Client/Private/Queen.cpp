@@ -36,7 +36,7 @@ HRESULT CQueen::Initialize_Prototype()
 
 	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::SWOOP)] = 40.f;
 	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::DOUBLE)] = 30.f;
-	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::JUMP)] = 1.f;
+	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::JUMP)] = 25.f;
 	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::LEFTHAND)] = 15.f;
 	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::RIGHTHAND)] = 15.f;
 	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::MELEE)] = 15.f;
@@ -47,9 +47,8 @@ HRESULT CQueen::Initialize_Prototype()
 	m_fChaseRange = 60.f;
 	m_fMinDistance = 80.f;
 
-	//Test
-	m_fBurrowTime = 150.f;
-	m_fBurrowCoolTime = 150.f;
+	m_fBurrowTime = 200.f;
+	m_fBurrowCoolTime = 200.f;
 
 	m_vJumpReadyTime = _float2(0.f, 84.f);
 	m_vJumpMoveTime = _float2(85.f, 135.f);
@@ -172,16 +171,13 @@ BT_STATE CQueen::Attack()
 
 BT_STATE CQueen::Chase()
 {
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
+	_float fDistance = Get_TargetDistance(); //XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
 
 	if (abs(fDistance) >= m_fChaseRange)
 	{
 		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::RUN);
 
-		_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
-		vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
-
-		m_pTransformCom->LookAt(vTargetPos);
+		LookAtTarget();
 
 		return BT_STATE::SUCCESS;
 	}
@@ -196,29 +192,22 @@ BT_STATE CQueen::Patrol()
 
 BT_STATE CQueen::CanBurrow()
 {
-	if (m_IsBurrow && m_fBurrowCoolTime <= m_fBurrowTime)
-	{
+	if (m_IsBurrow && m_fBurrowTime >= m_fBurrowCoolTime)
 		return BT_STATE::SUCCESS;
-	}
 
 	return BT_STATE::FAILED;
 }
 
 BT_STATE CQueen::Burrow()
 {
-	if(!(m_iStateFlag & ENUM_CLASS(STATE_FLAG::BURROW)))
-	{
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::BEGIN);
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::BEGIN);
 
-		for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
-			m_IsBurrowAction[i] = true;
+	for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
+		m_IsBurrowAction[i] = true;
 
-		m_fBurrowTime = 0.f;
+	m_fBurrowTime = 0.f;
 
-		return BT_STATE::SUCCESS;
-	}
-
-	return BT_STATE::FAILED;
+	return BT_STATE::SUCCESS;
 }
 
 BT_STATE CQueen::BurrowAttack()
@@ -231,13 +220,17 @@ BT_STATE CQueen::BurrowAttack()
 			CanAttackIndex.push_back(i);
 	}
 
-	_uint iFlag = ENUM_CLASS(STATE_FLAG::BURROW);
-	_uint iActionFlag = ENUM_CLASS(BURROW_FLAG::MOVE);
-
 	if (CanAttackIndex.empty())
 		return BT_STATE::FAILED;
 
+	LookAtTarget();
+
+	_uint iFlag = ENUM_CLASS(STATE_FLAG::BURROW);
+	_uint iActionFlag = ENUM_CLASS(BURROW_FLAG::MOVE);
+
 	_uint iRandomIndex = CanAttackIndex[rand() % CanAttackIndex.size()];
+
+	m_IsBurrowAction[iRandomIndex] = false;
 
 	m_iStateFlag = iFlag | (iActionFlag << iRandomIndex);
 
@@ -247,38 +240,38 @@ BT_STATE CQueen::BurrowAttack()
 BT_STATE CQueen::BurrowMove()
 {
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::STAY);
-	
-	_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
 
-	m_pTransformCom->LookAt(vTargetPos);
-	m_pTransformCom->Set_State(STATE::POSITION, vTargetPos);
+	MoveTarget(0.05f);
+
+	return BT_STATE::SUCCESS;
+}
+
+BT_STATE CQueen::BurrowEnd()
+{
+	for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
+	{
+		if (m_IsBurrowAction[i])
+			return BT_STATE::FAILED;
+	}
+
+	MoveTarget(0.7f);
+
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::END);
 
 	return BT_STATE::SUCCESS;
 }
 
 BT_STATE CQueen::IsBurrow()
 {
-	for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
-	{
-		if (m_IsBurrowAction[i])
-			return BT_STATE::SUCCESS;
-	}
-
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::END);
-
-	for (_uint i = 0; i < ENUM_CLASS(BURROW_ATTACK::END); i++)
-	{
-		m_IsBurrowAction[i] = false;
-	}
+	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::BURROW) && !(m_iStateFlag & ENUM_CLASS(BURROW_FLAG::END)))
+		return BT_STATE::SUCCESS;
 
 	return BT_STATE::FAILED;
 }
 
-
-
 BT_STATE CQueen::CanNearAttack()
 {
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
+	_float fDistance = Get_TargetDistance(); // XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
 
 	if (fabs(fDistance) <= m_fMinDistance &&
 		m_fNearAttackTime >= m_fNearAttackCoolTime)
@@ -291,25 +284,27 @@ BT_STATE CQueen::CanNearAttack()
 
 BT_STATE CQueen::NearAttack()
 {
-	_vector vTargetDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION)), 0.f));
-	_vector vLook = XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f);
-	_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
-	
-	_float fLookDot = XMVectorGetX(XMVector3Dot(vLook, vTargetDir));
-	_float fRightDot = XMVectorGetX(XMVector3Dot(vRight, vTargetDir));
-	
-	_float fComparisonRadian = cosf(XMConvertToRadians(45.f));
+	//_vector vTargetDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION)), 0.f));
+	//_vector vLook = XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f);
+	//_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
+	//
+	//_float fLookDot = XMVectorGetX(XMVector3Dot(vLook, vTargetDir));
+	//_float fRightDot = XMVectorGetX(XMVector3Dot(vRight, vTargetDir));
+	//
+	//_float fComparisonRadian = cosf(XMConvertToRadians(45.f));
 
-	_uint iAttackFlag = {};
+	HIT_DIR eDir = Compute_HitDir(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION), 45.f);
 
-	if (fLookDot >= fComparisonRadian)
-		iAttackFlag = ENUM_CLASS(ATTACK_FLAG::MELLE);
-	else if (fLookDot <= -fComparisonRadian)
-		iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TAIL);
-	else if (fRightDot >= 0.f)
-		iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT);
-	else
-		iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TURN_LEFT);
+	_uint iAttackFlag = ENUM_CLASS(ATTACK_FLAG::MELLE) << ENUM_CLASS(eDir);
+
+	//if (fLookDot >= fComparisonRadian)
+	//	iAttackFlag = ENUM_CLASS(ATTACK_FLAG::MELLE);
+	//else if (fLookDot <= -fComparisonRadian)
+	//	iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TAIL);
+	//else if (fRightDot >= 0.f)
+	//	iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT);
+	//else
+	//	iAttackFlag = ENUM_CLASS(ATTACK_FLAG::TURN_LEFT);
 		
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | iAttackFlag;
 	m_fNearAttackTime = 0.f;
@@ -414,6 +409,18 @@ void CQueen::Update_AttackCoolTime(_float fTimeDelta)
 		m_fBurrowTime += fTimeDelta;
 }
 
+void CQueen::MoveTarget(_float fRatio)
+{
+	_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
+	_vector vDir = XMVectorSetY(XMVectorSubtract(vTargetPos, m_pTransformCom->Get_State(STATE::POSITION)), 0.f);
+	
+	m_pTransformCom->LookAt(vTargetPos);
+
+	_vector vPosition = XMVectorScale(vDir, fRatio);
+
+	m_pTransformCom->MovePositionToVector(vPosition, m_pNavigationCom);
+}
+
 void CQueen::Jump(_float fTimeDelta)
 {
 	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::ATTACK) &&
@@ -422,9 +429,7 @@ void CQueen::Jump(_float fTimeDelta)
 		if (m_pBody->IsAnimationInRangeTrackPosition(m_vJumpReadyTime))
 		{
 			_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
-
-			m_vJumpDir = XMVectorSetY(XMVectorSubtract(vTargetPos, m_pTransformCom->Get_State(STATE::POSITION)),0.f);
-
+			m_vJumpDir = XMVectorSetY(XMVectorSubtract(vTargetPos, m_pTransformCom->Get_State(STATE::POSITION)), 0.f);
 			m_pTransformCom->LookAt(vTargetPos);
 		}
 		else if(m_pBody->IsAnimationInRangeTrackPosition(m_vJumpMoveTime))

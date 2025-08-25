@@ -25,6 +25,30 @@ CMonster::CMonster(const CMonster& Prototype)
 	Safe_AddRef(m_pMonsterInstance);
 }
 
+_float CMonster::Get_TargetDistance()
+{
+	if (nullptr == m_pTargetTransform)
+		return 0.f;
+
+	_vector vTargetPos = XMVectorSetY(m_pTargetTransform->Get_State(STATE::POSITION), 0.f);
+	_vector vPosition = XMVectorSetY(m_pTransformCom->Get_State(STATE::POSITION), 0.f);
+
+	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(vTargetPos, vPosition)));
+	
+	return fDistance;
+}
+
+void CMonster::LookAtTarget()
+{
+	if (nullptr == m_pTargetTransform)
+		return;
+
+	_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
+	vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)));
+
+	m_pTransformCom->LookAt(vTargetPos);
+}
+
 HRESULT CMonster::Initialize_Prototype()
 {
 	return S_OK;
@@ -57,6 +81,16 @@ void CMonster::Late_Update(_float fTimeDelta)
 HRESULT CMonster::Render()
 {
 	return S_OK;
+}
+
+_bool CMonster::AnimIsFinished()
+{
+	return m_pBody->AnimIsFinished();
+}
+
+_bool CMonster::AnimCanChange()
+{
+	return m_pBody->AnimCanChange();
 }
 
 BT_STATE CMonster::CanAttack()

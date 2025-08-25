@@ -122,7 +122,7 @@ BT_STATE CVampire::Attack()
 
 BT_STATE CVampire::Chase()
 {
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
+	_float fDistance = Get_TargetDistance();
 
 	if (abs(fDistance) >= m_fChaseRange)
 	{
@@ -136,7 +136,7 @@ BT_STATE CVampire::Chase()
 
 BT_STATE CVampire::Patrol()
 {
-	_float fDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
+	_float fDistance = Get_TargetDistance();// XMVectorGetX(XMVector3Length(XMVectorSubtract(m_pTargetTransform->Get_State(STATE::POSITION), m_pTransformCom->Get_State(STATE::POSITION))));
 
 	if (abs(fDistance) <= m_fMinDistance)
 		m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::BACK);

@@ -65,6 +65,8 @@ protected:
 
 	HIT_DIR			Compute_HitDir(_fvector vHitPosition, _fvector vAttackPosition, _float fDegree);
 	HIT_DIR			Compute_HitDir_Look(_fvector vHitPosition, _fvector vAttackPosition);
+	HIT_DIR			Compute_HitDir_Side(_fvector vHitPosition, _fvector vAttackPosition);
+
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;
 	virtual void			Free() override;

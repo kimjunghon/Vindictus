@@ -39,11 +39,12 @@ public:
 	
 	BT_STATE				CanBurrow();
 	BT_STATE				IsBurrow();
+
 	BT_STATE				Burrow();
 
 	BT_STATE				BurrowAttack();
 	BT_STATE				BurrowMove();
-
+	BT_STATE				BurrowEnd();
 
 	BT_STATE				CanNearAttack();
 	BT_STATE				NearAttack();
@@ -77,6 +78,7 @@ private:
 private:
 	virtual void	Update_BodyColliders(_fmatrix UpdateWorldMatrix) override;
 	virtual void	Update_AttackCoolTime(_float fTimeDelta) override;
+	void			MoveTarget(_float fRatio);
 	void			Jump(_float fTimeDelta);
 
 	virtual HRESULT	Add_Collider_Body(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix);

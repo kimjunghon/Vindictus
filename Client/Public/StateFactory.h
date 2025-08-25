@@ -22,8 +22,8 @@ public:
 	CPlayerState*	Create(const _uint iState) { return m_CreateMap[iState](); }
 
 private:
-	STATECREATE m_CreateFunc;
-	unordered_map<_uint, STATECREATE> m_CreateMap;
+	STATECREATE							m_CreateFunc;
+	unordered_map<_uint, STATECREATE>	m_CreateMap;
 
 public:
 	virtual void Free() override;

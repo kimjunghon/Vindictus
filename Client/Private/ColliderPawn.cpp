@@ -294,6 +294,24 @@ HIT_DIR CColliderPawn::Compute_HitDir_Look(_fvector vHitPosition, _fvector vAtta
 	return eHit_Dir;
 }
 
+HIT_DIR CColliderPawn::Compute_HitDir_Side(_fvector vHitPosition, _fvector vAttackPosition)
+{
+	_vector vTargetDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(vAttackPosition, vHitPosition), 0.f));
+	_vector vLook = XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK), 0.f);
+	_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
+
+	_float fRightDot = XMVectorGetX(XMVector3Dot(vRight, vTargetDir));
+
+	HIT_DIR eHit_Dir = {};
+
+	if (fRightDot >= 0.f)
+		eHit_Dir = HIT_DIR::RIGHT;
+	else if (fRightDot < 0.f)
+		eHit_Dir = HIT_DIR::LEFT;
+
+	return eHit_Dir;
+}
+
 void CColliderPawn::Free()
 {
 	__super::Free();

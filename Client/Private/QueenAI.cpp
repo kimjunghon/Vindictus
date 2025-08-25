@@ -47,13 +47,16 @@ HRESULT CQueenAI::Ready_Nodes()
 
 				pActionSelectorNode->Add_Child(pBurrowStartSequenceNode);
 
-
 				CBT_SequenceNode* pBurrowActionSequenceNode = CBT_SequenceNode::Create();
-
+				
+				
 				pBurrowActionSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE {return m_pControlledQueen->IsBurrow(); }));
 
 				CBT_SelectorNode* pBurrowActionSelectionNode = CBT_SelectorNode::Create();
 
+					pBurrowActionSelectionNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->BurrowEnd(); }));
+
+					
 					CBT_SequenceNode* pBurrowAttackSequenceNode = CBT_SequenceNode::Create();
 
 					pBurrowAttackSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledQueen->CanAttackRange(); }));
