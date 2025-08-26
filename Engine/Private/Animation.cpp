@@ -110,14 +110,19 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 	}
 }
 
-_bool CAnimation::CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio)
+_bool CAnimation::Anim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio)
 {
 	return (m_fCurrentTrackPosition / m_fDuration) >= fBeginRatio && (m_fCurrentTrackPosition / m_fDuration) <= fEndRatio;
 }
 
-_bool CAnimation::CurrentAnim_InRangeOfTrackPositon(_float fBeginTrackPosition, _float fEndTrackPosition)
+_bool CAnimation::Anim_InRangeOfTrackPositon(_float fBeginTrackPosition, _float fEndTrackPosition)
 {
 	return m_fCurrentTrackPosition >= fBeginTrackPosition && m_fCurrentTrackPosition <= fEndTrackPosition;
+}
+
+_bool CAnimation::Anim_PassToTrackPosition(_float fTrackPosition)
+{
+	return m_fCurrentTrackPosition >= fTrackPosition;
 }
 
 void CAnimation::Enter(_bool IsChange)

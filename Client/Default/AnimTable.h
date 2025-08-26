@@ -242,23 +242,26 @@ namespace Client
 
 		enum class ATTACK_FLAG {
 			DESEND = 1 << 8,
-			DOUBLE = 1 << 9,
-			LEFT = 1 << 10,
-			RIGHT = 1 << 11,
+			BLAZE = 1 << 9,
+			DOUBLE = 1 << 10,
+			GRAP = 1 << 11,
+			HANG = 1 << 12,
+			LEFT = 1 << 13,
+			RIGHT = 1 << 14,
 
-			BLAZE = 1<< 30
 		};
 
 		enum class RAGE_FLAG {
 			DESEND_BEGIN = 1 << 8,
 			ATTACK = 1 << 9,
 			DOUBLE = 1 << 10,
-			LEFT = 1 << 11,
-			RIGHT = 1 << 12,
+			BLAZE = 1 << 11,
+			GRAP = 1 << 12,
+			HANG = 1 << 13,
+			LEFT = 1 << 14,
+			RIGHT = 1 << 15,
 
-			DESEND_END = 1 << 13,
-			
-			BLAZE = 1 << 30
+			DESEND_END = 1 << 16,
 		};
 
 		enum class GRAP_FLAG {

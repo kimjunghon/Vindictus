@@ -9,11 +9,26 @@ CGlasgavelenBody::CGlasgavelenBody(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 CGlasgavelenBody::CGlasgavelenBody(const CGlasgavelenBody& Prototype)
 	: CBody { Prototype }
+	, m_DefaultOption { Prototype.m_DefaultOption }
+	, m_RotationOption { Prototype.m_RotationOption }
 {
 }
 
 HRESULT CGlasgavelenBody::Initialize_Prototype()
 {
+	m_DefaultOption.PositionX = true;
+	m_DefaultOption.PositionY = false;
+	m_DefaultOption.PositionZ = true;
+	m_DefaultOption.Rotation = false;
+	m_DefaultOption.RotationOnlyZ = false;
+
+	m_RotationOption.PositionX = true;
+	m_RotationOption.PositionY = false;
+	m_RotationOption.PositionZ = true;
+	m_RotationOption.Rotation = true;
+	m_RotationOption.RotationOnlyZ = true;
+
+
 	return S_OK;
 }
 
@@ -35,9 +50,13 @@ void CGlasgavelenBody::Priority_Update(_float fTimeDelta)
 
 void CGlasgavelenBody::Update(_float fTimeDelta)
 {
-	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
-
-	m_pModelCom->Play_Animation(fTimeDelta);
+	if (m_IsBrokenWing)
+		Update_BrokenWing(fTimeDelta);
+	else
+	{
+		m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
+		m_pModelCom->Play_Animation(fTimeDelta);
+	}
 }
 
 void CGlasgavelenBody::Late_Update(_float fTimeDelta)
@@ -63,11 +82,29 @@ HRESULT CGlasgavelenBody::Render()
 
 		m_pShaderCom->Begin(0);
 
-
 		m_pModelCom->Render(i);
 	}
 
 	return S_OK;
+}
+
+void CGlasgavelenBody::Change_BrokenModel()
+{
+	CModel* pTemp = m_pModelCom;
+
+	m_pModelCom = m_pBrokenModelCom;
+	m_pBrokenModelCom = pTemp;
+
+	m_IsBrokenWing = false;
+}
+
+void CGlasgavelenBody::Update_BrokenWing(_float fTimeDelta)
+{
+	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
+	m_pAnimMachine->Set_Animation(m_pBrokenModelCom, *m_pStateFlag);
+
+	m_pModelCom->Play_Animation(fTimeDelta);
+	m_pBrokenModelCom->Play_Animation(fTimeDelta);
 }
 
 HRESULT CGlasgavelenBody::Ready_Components()
@@ -80,6 +117,8 @@ HRESULT CGlasgavelenBody::Ready_Components()
 		TEXT("Com_Broken_Model"), reinterpret_cast<CComponent**>(&m_pBrokenModelCom))))
 		return E_FAIL;
 
+	m_pModelCom->Set_RootMotionOption(m_DefaultOption);
+	m_pBrokenModelCom->Set_RootMotionOption(m_DefaultOption);
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
@@ -118,7 +157,6 @@ HRESULT CGlasgavelenBody::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
 		return E_FAIL;
 
-
 	return S_OK;
 }
 
@@ -148,7 +186,5 @@ void CGlasgavelenBody::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pAnimMachine);
 	Safe_Release(m_pBrokenModelCom);
-	Safe_Release(m_pShaderCom);
 }

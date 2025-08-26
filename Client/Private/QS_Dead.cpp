@@ -13,6 +13,7 @@ _bool CQS_Dead::CanStateChange(CMonster* pMonster)
 
 HRESULT CQS_Dead::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD);
 	return S_OK;
 }
 
@@ -29,6 +30,7 @@ void CQS_Dead::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CQS_Dead::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD);
 }
 
 CQS_Dead* CQS_Dead::Create()

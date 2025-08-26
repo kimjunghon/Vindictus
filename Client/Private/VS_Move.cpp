@@ -8,12 +8,14 @@ CVS_Move::CVS_Move()
 
 HRESULT CVS_Move::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
+
 	return S_OK;
 }
 
 void CVS_Move::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::FRONT);
+	ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::FRONT));
 }
 
 void CVS_Move::Update(CMonster* pMonster, _float fTimeDelta)
@@ -23,6 +25,7 @@ void CVS_Move::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CVS_Move::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
 }
 
 CVS_Move* CVS_Move::Create()

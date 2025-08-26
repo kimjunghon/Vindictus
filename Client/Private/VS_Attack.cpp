@@ -8,6 +8,8 @@ CVS_Attack::CVS_Attack()
 
 HRESULT CVS_Attack::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+
 	return S_OK;
 }
 
@@ -24,6 +26,7 @@ void CVS_Attack::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CVS_Attack::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 }
 
 CVS_Attack* CVS_Attack::Create()

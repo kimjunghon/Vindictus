@@ -7,6 +7,8 @@ CVS_Spawn::CVS_Spawn()
 
 HRESULT CVS_Spawn::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
+
 	return S_OK;
 }
 
@@ -21,6 +23,7 @@ void CVS_Spawn::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CVS_Spawn::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
 }
 
 CVS_Spawn* CVS_Spawn::Create()

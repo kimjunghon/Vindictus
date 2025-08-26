@@ -8,6 +8,8 @@ CVS_Hit::CVS_Hit()
 
 HRESULT CVS_Hit::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
+
 	m_fCheckDegree = 45.f;
 
 	return S_OK;
@@ -19,7 +21,7 @@ void CVS_Hit::Enter(CMonster* pMonster)
 
 	_uint iHitFlag = ENUM_CLASS(HIT_FLAG::FRONT) << iDir;
 
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iHitFlag;
+	ChangeActionFlag(iHitFlag);
 }
 
 void CVS_Hit::Update(CMonster* pMonster, _float fTimeDelta)
@@ -28,6 +30,7 @@ void CVS_Hit::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CVS_Hit::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 }
 
 CVS_Hit* CVS_Hit::Create()

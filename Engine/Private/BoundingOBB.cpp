@@ -34,8 +34,6 @@ void CBoundingOBB::Update(_fmatrix WorldMatrix, _bool IsRotate)
 	}
 
 	m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
-	//m_pOriginalDesc->Transform(*m_pDesc, WorldMatrix);
-	
 }
 
 _bool CBoundingOBB::Intersect(COLLIDER eType, CBounding* pTarget, _float* pDisance, _float3* pNormal)
@@ -48,7 +46,6 @@ _bool CBoundingOBB::Intersect(COLLIDER eType, CBounding* pTarget, _float* pDisan
 		isColl = m_pDesc->Intersects(*static_cast<CBoundingAABB*>(pTarget)->Get_Desc());
 		break;
 	case COLLIDER::OBB:
-		//isColl = m_pDesc->Intersects(*static_cast<CBoundingOBB*>(pTarget)->Get_Desc());
 		isColl = Intersect_OBB(static_cast<CBoundingOBB*>(pTarget), pDisance, pNormal);
 		break;
 	case COLLIDER::SPHERE:

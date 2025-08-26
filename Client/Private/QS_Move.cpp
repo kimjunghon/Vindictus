@@ -8,21 +8,24 @@ CQS_Move::CQS_Move()
 
 HRESULT CQS_Move::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
+
 	return S_OK;
 }
 
 void CQS_Move::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE) | ENUM_CLASS(MOVE_FLAG::RUN);
+	ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::RUN));
 }
 
 void CQS_Move::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	pMonster->LookAtTarget();
+	pMonster->TurnToTarget(fTimeDelta);
 }
 
 void CQS_Move::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
 }
 
 CQS_Move* CQS_Move::Create()

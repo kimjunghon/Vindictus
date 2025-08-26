@@ -7,12 +7,14 @@ CGS_Spawn::CGS_Spawn()
 
 HRESULT CGS_Spawn::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
+
 	return S_OK;
 }
 
 void CGS_Spawn::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN) | ENUM_CLASS(SPAWN_FLAG::START);
+	ChangeActionFlag(ENUM_CLASS(SPAWN_FLAG::START));
 }
 
 void CGS_Spawn::Update(CMonster* pMonster, _float fTimeDelta)
@@ -21,6 +23,7 @@ void CGS_Spawn::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CGS_Spawn::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
 }
 
 CGS_Spawn* CGS_Spawn::Create()

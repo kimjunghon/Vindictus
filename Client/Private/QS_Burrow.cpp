@@ -18,7 +18,7 @@ _bool CQS_Burrow::CanStateChange(CMonster* pMonster)
 
 HRESULT CQS_Burrow::Initialize()
 {
-
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW);
     return S_OK;
 }
 
@@ -29,7 +29,7 @@ void CQS_Burrow::Enter(CMonster* pMonster)
 
 	m_eBurrowState = BURROW_STATE::BEGIN;
 
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::BEGIN);
+	ChangeActionFlag(ENUM_CLASS(BURROW_FLAG::BEGIN));
 }
 
 void CQS_Burrow::Update(CMonster* pMonster, _float fTimeDelta)
@@ -54,6 +54,7 @@ void CQS_Burrow::Update(CMonster* pMonster, _float fTimeDelta)
 void CQS_Burrow::Exit(CMonster* pMonster)
 {
 	m_eBurrowState = BURROW_STATE::BEGIN;
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW);
 }
 
 void CQS_Burrow::Update_During(CMonster* pMonster, _float fTimeDelta)
@@ -77,28 +78,27 @@ void CQS_Burrow::Attack(CMonster* pMonster, _float fTimeDelta)
 	if (CanAttackIndex.empty())
 	{
 		m_eBurrowState = BURROW_STATE::END;
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::END);
+
+		ChangeActionFlag(ENUM_CLASS(BURROW_FLAG::END));
 		pMonster->MoveToTarget(0.6f);
 		return;
 	}
 
-	_uint iFlag = ENUM_CLASS(STATE_FLAG::BURROW);
-	_uint iActionFlag = ENUM_CLASS(BURROW_FLAG::MOVE);
-
 	_uint iRandomIndex = CanAttackIndex[rand() % CanAttackIndex.size()];
+
+	_uint iActionFlag = ENUM_CLASS(BURROW_FLAG::MOVE) << iRandomIndex;
 
 	m_IsBurrowAction[iRandomIndex] = false;
 
-	m_iStateFlag = iFlag | (iActionFlag << iRandomIndex);
+	ChangeActionFlag(iActionFlag);
 
 	pMonster->LookAtTarget();
 }
 
 void CQS_Burrow::Move(CMonster* pMonster, _float fTimeDelta)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::BURROW) | ENUM_CLASS(BURROW_FLAG::STAY);
-
-	pMonster->MoveToTarget(0.05);
+	ChangeActionFlag(ENUM_CLASS(BURROW_FLAG::STAY));
+	pMonster->MoveToTarget(0.05f);
 }
 
 CQS_Burrow* CQS_Burrow::Create()

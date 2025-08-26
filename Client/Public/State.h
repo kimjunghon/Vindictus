@@ -19,6 +19,9 @@ public:
 protected:
 	_uint			m_iStateFlag = {};
 
+protected:
+	void			ChangeActionFlag(_uint iOnFlag);
+
 public:
 	virtual void	Free() override;
 };

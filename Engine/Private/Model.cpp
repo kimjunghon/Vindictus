@@ -210,7 +210,7 @@ HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
     m_pCurrentAnimation = pAnimation;
     _bool IsAnimChange = false;
 
-    //if (false == m_IsFinished)
+    if (false == m_IsFinished)
         IsAnimChange = true;
 
     m_pCurrentAnimation->Enter(IsAnimChange);
@@ -594,7 +594,12 @@ _bool CModel::IsAnimationInRangeTrackPosition(_float2 vRangeTrackPosition)
     if (nullptr == m_pCurrentAnimation)
         return false;
 
-    return m_pCurrentAnimation->CurrentAnim_InRangeOfTrackPositon(vRangeTrackPosition.x, vRangeTrackPosition.y);
+    return m_pCurrentAnimation->Anim_InRangeOfTrackPositon(vRangeTrackPosition.x, vRangeTrackPosition.y);
+}
+
+_bool CModel::IsAnimationPassToTrackPosition(_float fTrackPosition)
+{
+    return m_pCurrentAnimation->Anim_PassToTrackPosition(fTrackPosition);
 }
 
 _bool CModel::CanChangeAnimation()
@@ -602,7 +607,7 @@ _bool CModel::CanChangeAnimation()
     if (nullptr == m_pCurrentAnimation)
         return true;
 
-    return m_pCurrentAnimation->CurrentAnim_InRangeOfRatio(m_CurrentAnimData.vRange.x, m_CurrentAnimData.vRange.y);
+    return m_pCurrentAnimation->Anim_InRangeOfRatio(m_CurrentAnimData.vRange.x, m_CurrentAnimData.vRange.y);
 }
 
 void CModel::RootMotion()
@@ -619,28 +624,48 @@ void CModel::RootMotion()
         m_vPrevRootRotation = vRotation;
         m_IsAnimStart = false;
     }
- 
-    m_vAnimMovement = XMVectorSubtract(vPosition, m_vPrevRootPosition);
-    
-    m_vAnimRotation = XMQuaternionMultiply(vRotation, XMQuaternionInverse(m_vPrevRootRotation));
- 
+
+    _vector vTempPrevPosition = m_vPrevRootPosition;
+    _vector vTempPrevRotation = m_vPrevRootRotation;
+
     m_vPrevRootPosition = vPosition;
     m_vPrevRootRotation = vRotation;
+    
+    m_vAnimMovement = XMVectorZero();
+
+    m_vAnimRotation = XMQuaternionIdentity();
 
     if(m_RootMotionOption.PositionX)
+    {
+        m_vAnimMovement = XMVectorSetX(m_vAnimMovement, XMVectorGetX(XMVectorSubtract(vPosition, vTempPrevPosition)));
         vPosition = XMVectorSetX(vPosition, 0.f);
+    }
     if (m_RootMotionOption.PositionY)
+    {
+        m_vAnimMovement = XMVectorSetY(m_vAnimMovement, XMVectorGetY(XMVectorSubtract(vPosition, vTempPrevPosition)));
         vPosition = XMVectorSetY(vPosition, 0.f);
+    }
     if (m_RootMotionOption.PositionZ)
+    {
+        m_vAnimMovement = XMVectorSetZ(m_vAnimMovement, XMVectorGetZ(XMVectorSubtract(vPosition, vTempPrevPosition)));
         vPosition = XMVectorSetZ(vPosition, 0.f);
+    }
     if (m_RootMotionOption.Rotation)
     {
-        _matrix RotationMatrix = XMMatrixRotationQuaternion(vRotation);
-        _vector vLook = XMVector3Normalize(XMVectorSetY(RotationMatrix.r[2], 0.f));
-        _vector vRotationInverse = XMQuaternionRotationMatrix(XMMatrixLookAtLH(XMVectorZero(), vLook, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-        
-        vRotation = XMQuaternionMultiply(vRotation, vRotationInverse);
+        m_vAnimRotation = XMQuaternionMultiply(vRotation, XMQuaternionInverse(vTempPrevRotation));
+
+        if(m_RootMotionOption.RotationOnlyZ)
+        {
+            _matrix RotationMatrix = XMMatrixRotationQuaternion(vRotation);
+            _vector vLook = XMVector3Normalize(XMVectorSetY(RotationMatrix.r[2], 0.f));
+            _vector vRotationInverse = XMQuaternionRotationMatrix(XMMatrixLookAtLH(XMVectorZero(), vLook, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+
+            vRotation = XMQuaternionMultiply(vRotation, vRotationInverse);
+        }
+        else
+            vRotation = XMQuaternionIdentity();
     }
+
 
     _matrix CombinedTransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 

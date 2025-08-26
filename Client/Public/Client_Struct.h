@@ -21,6 +21,13 @@ namespace Client
 		bool  IsBrokenLeg;
 	}QUEEN_STATUS;
 
+	typedef struct tagGavelenStatus {
+		float fStunDamage;
+		float fCurrentDamage;
+		float fRagePercent;
+		float fWingBrokenPercent;
+	}GAVELEN_STATUS;
+
 	typedef struct tagSlotRenderDesc {
 		XMFLOAT4X4 WorldMatrix;
 		XMFLOAT4X4 ViewMatrix;

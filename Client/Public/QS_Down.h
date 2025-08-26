@@ -18,19 +18,18 @@ public:
 	virtual _bool	CanStateChange(CMonster* pMonster) override;
 
 public:
-	virtual HRESULT Initialize();
-	virtual void	Enter(CMonster* pMonster);
-	virtual void	Update(CMonster* pMonster, _float fTimeDelta);
-	virtual void	Exit(CMonster* pMonster);
+	virtual HRESULT Initialize() override;
+	virtual void	Enter(CMonster* pMonster) override;
+	virtual void	Update(CMonster* pMonster, _float fTimeDelta) override;
+	virtual void	Exit(CMonster* pMonster) override;
 
 private:
 	_uint			m_iStrongFlag = {};
 	_uint			m_iAnimPhase = {};
 
-
 public:
 	static CQS_Down*	Create();
-	virtual void			Free();
+	virtual void		Free() override;
 };
 
 NS_END

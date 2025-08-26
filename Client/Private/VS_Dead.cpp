@@ -13,12 +13,14 @@ _bool CVS_Dead::CanStateChange(CMonster* pMonster)
 
 HRESULT CVS_Dead::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD);
+
 	return S_OK;
 }
 
 void CVS_Dead::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD) | ENUM_CLASS(DEAD_FLAG::DEFAULT);
+	ChangeActionFlag(ENUM_CLASS(DEAD_FLAG::DEFAULT));
 }
 
 void CVS_Dead::Update(CMonster* pMonster, _float fTimeDelta)
@@ -29,6 +31,7 @@ void CVS_Dead::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CVS_Dead::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD);
 }
 
 CVS_Dead* CVS_Dead::Create()

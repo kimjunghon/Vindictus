@@ -7,6 +7,8 @@ CQS_Spawn::CQS_Spawn()
 
 HRESULT CQS_Spawn::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::CUTSEAN);
+
 	return S_OK;
 }
 
@@ -21,6 +23,7 @@ void CQS_Spawn::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CQS_Spawn::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::CUTSEAN);
 }
 
 CQS_Spawn* CQS_Spawn::Create()

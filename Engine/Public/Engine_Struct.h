@@ -171,6 +171,7 @@ namespace Engine
 		bool		PositionZ;
 
 		bool		Rotation;
+		bool		RotationOnlyZ;
 	}ROOTMOTION_OPTION;
 
 	typedef struct tagModelBounding

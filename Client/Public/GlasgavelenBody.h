@@ -14,6 +14,9 @@ private:
 	virtual ~CGlasgavelenBody() = default;
 
 public:
+	void				BrokenWing() { m_IsBrokenWing = true; }
+
+public:
 	virtual HRESULT		Initialize_Prototype() override;
 	virtual HRESULT		Initialize(void* pArg) override;
 	virtual void		Priority_Update(_float fTimeDelta) override;
@@ -21,16 +24,20 @@ public:
 	virtual void		Late_Update(_float fTimeDelta) override;
 	virtual HRESULT		Render() override;
 
-public:
-
-
-private:
-	CModel* m_pCurrentModelCom = {};
-	CModel* m_pBrokenModelCom = {};
-
-	CAnimMachine* m_pAnimMachine = { nullptr };
+	void				Change_BrokenModel();
 
 private:
+	ROOTMOTION_OPTION	m_DefaultOption = {};
+	ROOTMOTION_OPTION	m_RotationOption = {};
+
+	_uint				m_iRotationFlag = {};
+
+	CModel*				m_pBrokenModelCom = {};
+
+	_bool				m_IsBrokenWing = {};
+
+private:
+	void	Update_BrokenWing(_float fTimeDelta);
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
 

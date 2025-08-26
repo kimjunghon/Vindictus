@@ -82,6 +82,7 @@ HRESULT CVampire_Royal_Body::Ready_Components()
 	Option.PositionY = false;
 	Option.PositionZ = true;
 	Option.Rotation = false;
+	Option.RotationOnlyZ = false;
 
 	m_pModelCom->Set_RootMotionOption(Option);
 

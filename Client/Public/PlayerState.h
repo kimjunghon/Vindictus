@@ -27,7 +27,7 @@ public:
 protected:
 	void			Change_OtherState(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput);
 	void			Find_ActionState(CPlayerPawn* pPlayerPawn, _byte byAction);
-	void			ChangeActionFlag(_uint iOnFlag);
+
 public:
 	virtual void			Free() override;
 };

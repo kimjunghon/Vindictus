@@ -64,6 +64,28 @@ void CMonster::LookAtTarget()
 	m_pTransformCom->LookAt(vTargetPos);
 }
 
+void CMonster::TurnToTarget(_float fRatio)
+{
+	if (nullptr == m_pTargetTransform)
+		return;
+
+	_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
+	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK),0.f));
+	_vector vDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(vTargetPos, m_pTransformCom->Get_State(STATE::POSITION)), 0.f));
+
+	_float fComparisonRadian = cosf(XMConvertToRadians(15.f));
+
+	if(XMVectorGetX(XMVector3Dot(vLook, vDir)) >= fComparisonRadian)
+		m_pTransformCom->LookAt(vTargetPos);
+	else
+	{
+		_matrix RotationMatrix = XMMatrixInverse(nullptr, XMMatrixLookAtLH(XMVectorZero(), vDir, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+		_vector vRotateQuat = XMQuaternionSlerp(XMQuaternionIdentity(), XMQuaternionRotationMatrix(RotationMatrix), fRatio);
+		
+		m_pTransformCom->TurnQuaternion(vRotateQuat);
+	}
+}
+
 void CMonster::MoveToTarget(_float fRatio)
 {
 	_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
@@ -78,7 +100,18 @@ void CMonster::MoveToTarget(_float fRatio)
 
 _bool CMonster::IsAnimationInRangeTrackPosition(_float2 vRange)
 {
+	if (nullptr == m_pBody)
+		return false;
+
 	return m_pBody->IsAnimationInRangeTrackPosition(vRange);
+}
+
+_bool CMonster::IsAnimationPassToTrackPosition(_float fTrackPosition)
+{
+	if (nullptr == m_pBody)
+		return false;
+
+	return m_pBody->IsAnimationPassToTrackPosition(fTrackPosition);
 }
 
 _bool CMonster::IsReadyAttack(_uint iStateFlag)
@@ -86,11 +119,22 @@ _bool CMonster::IsReadyAttack(_uint iStateFlag)
 	if (m_AttackMapping[iStateFlag].empty())
 		return false;
 
-	_float2 vRange = m_AttackMapping[iStateFlag].front().vAttackRange;
+	_float fLastAttackTrackPosition = m_AttackMapping[iStateFlag].back().vAttackRange.y;
 
-	_float2 vReadyRange = _float2(0.f, vRange.x);
+	if (IsAnimationPassToTrackPosition(fLastAttackTrackPosition))
+		return false;
 
-	return IsAnimationInRangeTrackPosition(vReadyRange);
+	for(auto& Attack : m_AttackMapping[iStateFlag])
+	{
+		_float2 vOffset = _float2(10.f, 10.f);
+
+		_float2 vRange = _float2(Attack.vAttackRange.x - vOffset.x, Attack.vAttackRange.y + vOffset.y);
+
+		if (IsAnimationInRangeTrackPosition(vRange))
+			return false;
+	}
+
+	return true;
 }
 
 HRESULT CMonster::Initialize_Prototype()
@@ -177,8 +221,6 @@ BT_STATE CMonster::CanAttack()
 		if (m_AttackTime[i] >= m_AttackCoolTime[i])
 		{
 			m_iCurrentAttack = i;
-
-			cout << m_iCurrentAttack << endl;
 			return BT_STATE::SUCCESS;
 		}
 	}
@@ -204,9 +246,6 @@ BT_STATE CMonster::CanAttackRange()
 
 void CMonster::Update_AttackColliders(_fmatrix UpdateWorldMatrix, _uint iStateFlag)
 {
-	if (m_AttackComplete)
-		return;
-
 	auto iter = m_AttackMapping.find(iStateFlag);
 	if (iter == m_AttackMapping.end())
 		return;
@@ -241,16 +280,12 @@ void CMonster::Update_AttackColliders(_fmatrix UpdateWorldMatrix, _uint iStateFl
 
 void CMonster::OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData)
 {
-	m_AttackComplete = true;
 }
 
 void CMonster::Update_AttackCoolTime(_float fTimeDelta)
 {
 	for (auto& AttackTime : m_AttackTime)
 		AttackTime += fTimeDelta;
-
-	if (m_AttackComplete && m_pBody->AnimIsFinished())
-		m_AttackComplete = false;
 }
 
 void CMonster::Free()

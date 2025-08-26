@@ -8,18 +8,18 @@ CVS_ElderAttack::CVS_ElderAttack()
 
 HRESULT CVS_ElderAttack::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+
     return S_OK;
 }
 
 void CVS_ElderAttack::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
-	
 	_float fMinDistance = pMonster->Get_MinDistance();
 
 	_uint iAttackFlag = pMonster->IsNear(fMinDistance) ? ENUM_CLASS(ATTACK_FLAG::MELEE) : ENUM_CLASS(ATTACK_FLAG::RANGE);
 		
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | iAttackFlag;
+	ChangeActionFlag(iAttackFlag);
 }
 
 void CVS_ElderAttack::Update(CMonster* pMonster, _float fTimeDelta)
@@ -30,6 +30,7 @@ void CVS_ElderAttack::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CVS_ElderAttack::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 }
 
 CVS_ElderAttack* CVS_ElderAttack::Create()

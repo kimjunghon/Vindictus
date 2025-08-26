@@ -228,31 +228,6 @@ BT_STATE CQueen::NearAttack()
 	return BT_STATE::SUCCESS;
 }
 
-BT_STATE CQueen::IsStun()
-{
-	if(m_iStateFlag & ENUM_CLASS(STATE_FLAG::HIT))
-	{
-		if (m_pBody->AnimIsFinished())
-		{
-			_uint iStrongFlag = {};
-			iStrongFlag = m_iStateFlag & m_iDownFlag;
-
-			if (iStrongFlag)
-			{
-				m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iStrongFlag << 1;
-			}
-			else
-			{
-				m_iHitAttackID = 0;
-				return BT_STATE::FAILED;
-			}
-		}
-
-		return BT_STATE::SUCCESS;
-	}
-	return BT_STATE::FAILED;
-}
-
 BT_STATE CQueen::IsLook()
 {
 	_float fDegree = 40.f;
@@ -299,9 +274,6 @@ void CQueen::Update_AttackCoolTime(_float fTimeDelta)
 
 	if (m_IsBurrow && !(m_iStateFlag & ENUM_CLASS(STATE_FLAG::BURROW)))
 		m_fBurrowTime += fTimeDelta;
-
-	if (m_AttackComplete && m_pBody->AnimIsFinished())
-		m_AttackComplete = false;
 }
 
 void CQueen::MoveTarget(_float fRatio)
@@ -371,7 +343,6 @@ HRESULT CQueen::Ready_QueenStates()
 	m_States.resize(ENUM_CLASS(QUEEN_STATE::END), nullptr);
 
 	CMonsterStateFactory* pStateFactory = CMonsterStateFactory::GetInstance();
-
 
 	m_States[ENUM_CLASS(QUEEN_STATE::SPAWN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::SPAWN));
 	m_States[ENUM_CLASS(QUEEN_STATE::IDLE)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::IDLE));

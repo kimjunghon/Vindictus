@@ -20,8 +20,9 @@ public:
 	_bool	IsAnimChanging() { return m_bAnimChange; }
 	_float	Get_AnimSpeed() { return m_fDuration / m_fTickPerSecond; }
 public:
-	_bool	CurrentAnim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio);
-	_bool	CurrentAnim_InRangeOfTrackPositon(_float fBeginTrackPosition, _float fEndTrackPosition);
+	_bool	Anim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio);
+	_bool	Anim_InRangeOfTrackPositon(_float fBeginTrackPosition, _float fEndTrackPosition);
+	_bool	Anim_PassToTrackPosition(_float fTrackPosition);
 	void	Enter(_bool IsChange);
 
 private:

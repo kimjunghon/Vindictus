@@ -9,6 +9,7 @@ CQS_Hit::CQS_Hit()
 HRESULT CQS_Hit::Initialize()
 {
 	m_fCheckDegree = 45.f;
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
 	return S_OK;
 }
@@ -19,7 +20,7 @@ void CQS_Hit::Enter(CMonster* pMonster)
 
 	_uint iHitFlag = ENUM_CLASS(HIT_FLAG::FRONT) << iDir;
 
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iHitFlag;
+	ChangeActionFlag(iHitFlag);
 }
 
 void CQS_Hit::Update(CMonster* pMonster, _float fTimeDelta)
@@ -28,6 +29,7 @@ void CQS_Hit::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CQS_Hit::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 }
 
 CQS_Hit* CQS_Hit::Create()

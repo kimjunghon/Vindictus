@@ -82,13 +82,6 @@ void CPlayerState::Find_ActionState(CPlayerPawn* pPlayerPawn, _byte byAction)
 	}
 }
 
-void CPlayerState::ChangeActionFlag(_uint iOnFlag)
-{
-	m_iStateFlag &= ((1<<8) - 1);
-
-	m_iStateFlag |= iOnFlag;
-}
-
 void CPlayerState::Free()
 {
 	__super::Free();

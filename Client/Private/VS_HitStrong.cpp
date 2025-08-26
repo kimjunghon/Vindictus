@@ -27,7 +27,7 @@ HRESULT CVS_HitStrong::Initialize()
 
 void CVS_HitStrong::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | ENUM_CLASS(HIT_FLAG::STRONG_BEGIN);
+	ChangeActionFlag(ENUM_CLASS(HIT_FLAG::STRONG_BEGIN));
 
 	m_iAnimPhase = ENUM_CLASS(STRONG_PHASE::BEGIN);
 
@@ -41,14 +41,15 @@ void CVS_HitStrong::Update(CMonster* pMonster, _float fTimeDelta)
 		m_iAnimPhase++;
 
 		_uint iActionFlag = m_iStrongFlag << m_iAnimPhase;
-		
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iActionFlag;
+
+		ChangeActionFlag(iActionFlag);
 	}
 }
 
 void CVS_HitStrong::Exit(CMonster* pMonster)
 {
 	m_iAnimPhase = 0;
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 }
 
 CVS_HitStrong* CVS_HitStrong::Create()

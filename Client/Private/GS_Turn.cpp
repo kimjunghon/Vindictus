@@ -8,17 +8,16 @@ CGS_Turn::CGS_Turn()
 
 HRESULT CGS_Turn::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
+
     return S_OK;
 }
 
 void CGS_Turn::Enter(CMonster* pMonster)
 {
-    m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
-
     DIR eRightDir = pMonster->Compute_TargetDir(0.f);
 
-	m_iStateFlag |= GetTurnFlag(eRightDir);
-
+	ChangeActionFlag(GetTurnFlag(eRightDir));
 }
 
 void CGS_Turn::Update(CMonster* pMonster, _float fTimeDelta)
@@ -27,6 +26,7 @@ void CGS_Turn::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CGS_Turn::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
 }
 
 _uint CGS_Turn::GetTurnFlag(DIR eRightDir)

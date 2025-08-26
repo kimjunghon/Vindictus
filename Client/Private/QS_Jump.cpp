@@ -10,13 +10,14 @@ HRESULT CQS_Jump::Initialize()
 {
 	m_vJumpReadyTime = _float2(0.f, 84.f);
 	m_vJumpMoveTime = _float2(85.f, 135.f);
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
 	return S_OK;
 }
 
 void CQS_Jump::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK) | ENUM_CLASS(ATTACK_FLAG::JUMP);
+	ChangeActionFlag(ENUM_CLASS(ATTACK_FLAG::JUMP));
 }
 
 void CQS_Jump::Update(CMonster* pMonster, _float fTimeDelta)
@@ -29,6 +30,7 @@ void CQS_Jump::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CQS_Jump::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 }
 
 CQS_Jump* CQS_Jump::Create()

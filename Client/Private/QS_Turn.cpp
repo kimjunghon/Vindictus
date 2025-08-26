@@ -10,18 +10,18 @@ HRESULT CQS_Turn::Initialize()
 {
 	m_fBackDegree = 30.f;
 
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
+
 	return S_OK;
 }
 
 void CQS_Turn::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
-
 	DIR eRightDir = pMonster->Compute_TargetDir(0.f);
 
 	DIR eBackDir = pMonster->Compute_TargetDir(m_fBackDegree);
 
-	m_iStateFlag |= GetTurnFlag(eRightDir, eBackDir);
+	ChangeActionFlag(GetTurnFlag(eRightDir, eBackDir));
 }
 
 void CQS_Turn::Update(CMonster* pMonster, _float fTimeDelta)
@@ -30,6 +30,7 @@ void CQS_Turn::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CQS_Turn::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
 }
 
 _uint CQS_Turn::GetTurnFlag(DIR eRightDir, DIR eBackDir)

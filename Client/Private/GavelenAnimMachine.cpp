@@ -7,6 +7,15 @@ CGavelenAnimMachine::CGavelenAnimMachine()
 
 void CGavelenAnimMachine::Initialize()
 {
+	Initialize_SPAWN();
+	Initialize_IDLE();
+	Initialize_MOVE();
+	Initialize_ATTACK();
+	Initialize_RAGE();
+	Initialize_GRAP();
+	Initialize_HANG();
+	Initialize_HIT();
+	Initialize_Dead();
 }
 
 void CGavelenAnimMachine::Initialize_SPAWN()
@@ -15,17 +24,15 @@ void CGavelenAnimMachine::Initialize_SPAWN()
 
 	m_AnimDatas[iFlag | ENUM_CLASS(SPAWN_FLAG::STAY)] =		{ "CutSean_Idle", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(SPAWN_FLAG::START)] =	{ "CutSean", false, _float2(1.f, 1.f), 2.f };
-
 }
 
 void CGavelenAnimMachine::Initialize_IDLE()
 {
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::IDLE);
 
-	m_AnimDatas[iFlag | ENUM_CLASS(IDLE_FLAG::IDLE)] =			{ "Idle", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(IDLE_FLAG::IDLE)] =			{ "Idle", true, _float2(0.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(IDLE_FLAG::THREAT)] =		{ "Threat", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(IDLE_FLAG::LOW_HEALTH)] =	{ "Low_Health", false, _float2(1.f, 1.f), 2.f };
-
 }
 
 void CGavelenAnimMachine::Initialize_MOVE()
@@ -42,6 +49,7 @@ void CGavelenAnimMachine::Initialize_ATTACK()
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
 	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::DESEND)] =	{ "Desend", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::BLAZE)] =	{ "Blaze", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)] =	{ "Attack_Double", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::LEFT)] =	{ "Attack_Left", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::RIGHT)] =	{ "Attack_Right", false, _float2(1.f, 1.f), 2.f };
@@ -52,8 +60,9 @@ void CGavelenAnimMachine::Initialize_RAGE()
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::RAGE);
 
 	m_AnimDatas[iFlag | ENUM_CLASS(RAGE_FLAG::DESEND_BEGIN)] =	{ "Rage_Desend_Begin", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(RAGE_FLAG::ATTACK)] =		{"Rage_Attack", false, _float2(1.f, 1.f), 2.f};
+	m_AnimDatas[iFlag | ENUM_CLASS(RAGE_FLAG::ATTACK)] =		{ "Rage_Attack", false, _float2(1.f, 1.f), 2.f};
 	m_AnimDatas[iFlag | ENUM_CLASS(RAGE_FLAG::DOUBLE)] =		{ "Attack_Double", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(RAGE_FLAG::BLAZE)] =			{ "Blaze", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(RAGE_FLAG::LEFT)] =			{ "Attack_Left", false, _float2(1.f, 1.f), 3.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(RAGE_FLAG::RIGHT)] =			{ "Attack_Right", false, _float2(1.f, 1.f), 3.f };
 
@@ -72,7 +81,7 @@ void CGavelenAnimMachine::Initialize_GRAP()
 void CGavelenAnimMachine::Initialize_HANG()
 {
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::HANG);
-
+	
 	m_AnimDatas[iFlag | ENUM_CLASS(HANG_FLAG::BEGIN)] =		{ "Hang_Begin", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(HANG_FLAG::DURING)] =	{ "Hang_During", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(HANG_FLAG::END)] =		{ "Hang_End", false, _float2(1.f, 1.f), 2.f };

@@ -50,6 +50,7 @@ public:
 	_bool							IsEnable() { return m_IsEnable; }
 	void							Set_Desc(void* pDesc) { m_pDesc = pDesc; }
 	void*							Get_Desc() { return m_pDesc; }
+
 public:
 	virtual HRESULT					Initialize_Prototype(COLLIDER eType);
 	virtual HRESULT					Initialize(void* pArg) override;

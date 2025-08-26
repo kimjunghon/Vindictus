@@ -45,6 +45,7 @@ public:
 	const MODEL_BOUNDING	Get_ModelBounding() const { return m_Bounding; }
 	
 	_bool					IsAnimationInRangeTrackPosition(_float2 vRangeTrackPosition);
+	_bool					IsAnimationPassToTrackPosition(_float fTrackPosition);
 	_bool					CanChangeAnimation();
 	_bool					CurrentAnim_Finished() { return m_IsFinished; }
 

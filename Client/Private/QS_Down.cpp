@@ -27,7 +27,7 @@ HRESULT CQS_Down::Initialize()
 
 void CQS_Down::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | ENUM_CLASS(HIT_FLAG::DOWN_BEGIN);
+	ChangeActionFlag(ENUM_CLASS(HIT_FLAG::DOWN_BEGIN));
 
 	m_iAnimPhase = ENUM_CLASS(DOWN_PHASE::BEGIN);
 
@@ -42,13 +42,14 @@ void CQS_Down::Update(CMonster* pMonster, _float fTimeDelta)
 
 		_uint iActionFlag = m_iStrongFlag << m_iAnimPhase;
 		
-		m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT) | iActionFlag;
+		ChangeActionFlag(iActionFlag);
 	}
 }
 
 void CQS_Down::Exit(CMonster* pMonster)
 {
 	m_iAnimPhase = 0;
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 }
 
 CQS_Down* CQS_Down::Create()

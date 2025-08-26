@@ -13,13 +13,14 @@ _bool CVS_DeadStrong::CanStateChange(CMonster* pMonster)
 
 HRESULT CVS_DeadStrong::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD);
+
     return S_OK;
 }
 
 void CVS_DeadStrong::Enter(CMonster* pMonster)
 {
-    m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD) | ENUM_CLASS(DEAD_FLAG::STRONG);
-
+	ChangeActionFlag(ENUM_CLASS(DEAD_FLAG::STRONG));
     pMonster->LookAtTarget();
 }
 
@@ -31,6 +32,7 @@ void CVS_DeadStrong::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CVS_DeadStrong::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::DEAD);
 }
 
 CVS_DeadStrong* CVS_DeadStrong::Create()

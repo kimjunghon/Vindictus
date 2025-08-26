@@ -16,9 +16,9 @@ HRESULT CVS_Patrol::Initialize()
 void CVS_Patrol::Enter(CMonster* pMonster)
 {
 	if (pMonster->IsNear(pMonster->Get_MinDistance()))
-		m_iStateFlag |= ENUM_CLASS(MOVE_FLAG::BACK);
+		ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::BACK));
 	else
-		m_iStateFlag |= (rand() % 2 == 0 ? ENUM_CLASS(MOVE_FLAG::LEFT) : ENUM_CLASS(MOVE_FLAG::RIGHT));
+		rand() % 2 == 0 ? ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::LEFT)) : ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::RIGHT));
 }
 
 void CVS_Patrol::Update(CMonster* pMonster, _float fTimeDelta)

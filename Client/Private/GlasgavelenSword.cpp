@@ -174,7 +174,6 @@ void CGlasgavelenSword::Free()
 
 	for (auto& pBone : m_ParentBones)
 		Safe_Release(pBone);
-
 	m_ParentBones.clear();
 
 	Safe_Release(m_pModelCom);

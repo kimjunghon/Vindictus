@@ -406,11 +406,29 @@
     <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hang">
       <UniqueIdentifier>{07fac053-f1f9-4a4c-b495-786b62c5526a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Rage_Desend">
-      <UniqueIdentifier>{6145279d-f827-4485-8f31-1135de3f0da9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Grap">
       <UniqueIdentifier>{559044e4-d4f9-4d7d-82f0-2eae6042f376}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Rage">
+      <UniqueIdentifier>{bffbff87-a4cf-4642-b79c-9b49eea10667}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Rage\Rage_Desend">
+      <UniqueIdentifier>{6145279d-f827-4485-8f31-1135de3f0da9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Desend">
+      <UniqueIdentifier>{68b16501-5dd4-44ed-b21d-aac512058dbd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit">
+      <UniqueIdentifier>{3d9f2f35-6e41-403f-9144-283750dc964f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit\Down">
+      <UniqueIdentifier>{17eca5c4-b5ea-41c4-a968-40dfe19e7269}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit\WingBreak">
+      <UniqueIdentifier>{6e00753f-38d1-480d-917e-51f15bef4aa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\AI">
+      <UniqueIdentifier>{48d68f22-3e3a-4f4d-adc0-38d03fa1f9b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -789,6 +807,39 @@
     <ClInclude Include="..\public\GS_Attack.h">
       <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\GS_RageAttack.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Rage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_RageDesend.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Rage\Rage_Desend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Desend.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Desend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Grap.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Grap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Hang.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hang</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Idle.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Down.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit\Down</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Hit.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Move.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_WingBreak.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit\WingBreak</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GlasgavelenAI.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\AI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1151,6 +1202,39 @@
     </ClCompile>
     <ClCompile Include="..\private\GS_Attack.cpp">
       <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_RageAttack.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Rage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_RageDesend.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Rage\Rage_Desend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Desend.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Attack\Desend</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Grap.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Grap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Hang.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hang</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Idle.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Down.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit\Down</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Hit.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Move.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_WingBreak.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Hit\WingBreak</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GlasgavelenAI.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\AI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

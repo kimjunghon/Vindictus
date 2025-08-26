@@ -809,7 +809,7 @@ HRESULT CPlayerPawn::Ready_AttackMapping()
 
 void CPlayerPawn::Compute_WorldMatrix()
 {
-	_vector vAnimPosition = XMVectorSetY(*m_pAnimMovement,0.f);
+	_vector vAnimPosition = *m_pAnimMovement;
 	_vector vAnimRotation = *m_pAnimRotation;
 
 	_vector vRotation = {};

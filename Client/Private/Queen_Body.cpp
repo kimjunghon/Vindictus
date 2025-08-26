@@ -106,6 +106,7 @@ HRESULT CQueen_Body::Ready_Components()
 	Option.PositionY = false;
 	Option.PositionZ = true;
 	Option.Rotation = true;
+	Option.RotationOnlyZ = true;
 
 	m_pModelCom->Set_RootMotionOption(Option);
 

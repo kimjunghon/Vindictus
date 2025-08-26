@@ -8,6 +8,7 @@ CQS_Attack::CQS_Attack()
 
 HRESULT CQS_Attack::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 	return S_OK;
 }
 
@@ -19,21 +20,21 @@ void CQS_Attack::Enter(CMonster* pMonster)
 
 	_uint iAttackFlag = ENUM_CLASS(ATTACK_FLAG::SWOOP) << iAttackIndex;
 
-	m_iStateFlag |= iAttackFlag;
-
 	if (iAttackFlag & ENUM_CLASS(ATTACK_FLAG::JUMP))
 		pMonster->ChangeState(ENUM_CLASS(QUEEN_STATE::JUMP));
-
+	else
+		ChangeActionFlag(iAttackFlag);
 }
 
 void CQS_Attack::Update(CMonster* pMonster, _float fTimeDelta)
 {
 	if (pMonster->IsReadyAttack(m_iStateFlag))
-		pMonster->LookAtTarget();
+		pMonster->TurnToTarget(fTimeDelta);
 }
 
 void CQS_Attack::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 }
 
 CQS_Attack* CQS_Attack::Create()

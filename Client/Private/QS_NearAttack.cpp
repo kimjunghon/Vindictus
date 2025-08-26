@@ -10,18 +10,18 @@ HRESULT CQS_NearAttack::Initialize()
 {
     m_fCheckDegree = 45.f;
 
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+
     return S_OK;
 }
 
 void CQS_NearAttack::Enter(CMonster* pMonster)
 {
-    m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
-
     _uint iDir = ENUM_CLASS(pMonster->Compute_TargetDir(m_fCheckDegree));
 
     _uint iAttackFlag = ENUM_CLASS(ATTACK_FLAG::MELLE) << iDir;
 
-    m_iStateFlag |= iAttackFlag;
+	ChangeActionFlag(iAttackFlag);
 }
 
 void CQS_NearAttack::Update(CMonster* pMonster, _float fTimeDelta)
@@ -30,6 +30,7 @@ void CQS_NearAttack::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CQS_NearAttack::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 }
 
 CQS_NearAttack* CQS_NearAttack::Create()

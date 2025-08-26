@@ -49,15 +49,15 @@ void CQueenAnimMachine::Initialize_ATTACK()
 {
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::MELLE)] = { "Attack_Close", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::LEFTLEG)] = { "Attack_LeftHand", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::RIGHTLEG)] = { "Attack_RightHand", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)] = { "Attack_Double", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)] = { "Attack_Swoop", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)] = { "Attack_Tail", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_LEFT)] = { "Attack_TurnLeft", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT)] = { "Attack_TurnRight", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::JUMP)] = { "Attack_Jump", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::MELLE)] = { "Attack_Close", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::LEFTLEG)] = { "Attack_LeftHand", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::RIGHTLEG)] = { "Attack_RightHand", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)] = { "Attack_Double", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)] = { "Attack_Swoop", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)] = { "Attack_Tail", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_LEFT)] = { "Attack_TurnLeft", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT)] = { "Attack_TurnRight", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::JUMP)] = { "Attack_Jump", false, _float2(1.f, 1.f), 3.f };
 
 //	m_AnimDatas[iFlag | ENUM_CLASS(ATTACK_FLAG::POSION)] = { "Attack_Poison", false, _float2(1.f, 1.f), 2.f };
 
@@ -69,9 +69,9 @@ void CQueenAnimMachine::Initialize_BURROW()
 
 	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::BEGIN)] = { "Burrow_Begin", false, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::STAY)] = { "Burrow_Stay", true, _float2(0.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)] = { "Burrow_Move", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)] = { "Burrow_Attack01", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK2)] = { "Burrow_Attack02", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)] = { "Burrow_Move", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)] = { "Burrow_Attack01", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK2)] = { "Burrow_Attack02", false, _float2(1.f, 1.f), 3.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(BURROW_FLAG::END)] = { "Burrow_End", false, _float2(1.f, 1.f), 2.f };
 }
 

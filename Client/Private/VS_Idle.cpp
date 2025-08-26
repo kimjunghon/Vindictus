@@ -7,6 +7,8 @@ CVS_Idle::CVS_Idle()
 
 HRESULT CVS_Idle::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE);
+
 	return S_OK;
 }
 
@@ -21,6 +23,7 @@ void CVS_Idle::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CVS_Idle::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE);
 }
 
 CVS_Idle* CVS_Idle::Create()

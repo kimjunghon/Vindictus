@@ -25,6 +25,7 @@ public:
 	_float			Get_AttackRange() { return m_fAttackRange; }
 	void			Dead() { m_IsActive = false;}
 	_bool			IsAnimationInRangeTrackPosition(_float2 vRange);
+	_bool			IsAnimationPassToTrackPosition(_float fTrackPosition);
 	_bool			IsReadyAttack(_uint iStateFlag);
 	_float			Get_TargetDistance();
 	DIR 			Compute_TargetDir(_float fDegree);
@@ -41,6 +42,7 @@ public:
 	virtual HRESULT	Spawn(MONSTER_SPAWN_DATA SpawnData) PURE;
 	_bool			IsNear(_float fNearDistance);
 	void			LookAtTarget();
+	void			TurnToTarget(_float fRatio);
 	void			MoveToTarget(_float fRatio);
 	//State
 public:
@@ -59,7 +61,6 @@ public:
 
 protected:
 	STATUS			m_Status = {};
-	_bool			m_AttackComplete = { false };
 	_uint			m_iNumAttacks = {};
 	vector<_float>	m_AttackTime = {};
 	vector<_float>	m_AttackCoolTime = {};

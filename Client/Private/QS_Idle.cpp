@@ -7,12 +7,14 @@ CQS_Idle::CQS_Idle()
 
 HRESULT CQS_Idle::Initialize()
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE);
+
 	return S_OK;
 }
 
 void CQS_Idle::Enter(CMonster* pMonster)
 {
-	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::THREAT);
+	ChangeActionFlag(ENUM_CLASS(IDLE_FLAG::THREAT));
 }
 
 void CQS_Idle::Update(CMonster* pMonster, _float fTimeDelta)
@@ -21,6 +23,7 @@ void CQS_Idle::Update(CMonster* pMonster, _float fTimeDelta)
 
 void CQS_Idle::Exit(CMonster* pMonster)
 {
+	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE);
 }
 
 CQS_Idle* CQS_Idle::Create()
