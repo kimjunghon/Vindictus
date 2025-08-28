@@ -51,7 +51,9 @@ public:
 
 	void					Set_RootMotionOption(ROOTMOTION_OPTION RootMotionOption) { m_RootMotionOption = RootMotionOption; };
 
+	HRESULT					Add_AnimNotify(const string& strAnimationTag, _float fTrackPosition, function<void()> Callback);
 	const _float4x4*		Find_SocketBoneCombinedMatrix(const string& strSocketBoneName);
+	const _float4x4*		Find_OffsetMatrix(const string& strSocketBoneName);
 	const _vector*			Get_AnimMovementPtr() const { return &m_vAnimMovement; }
 	const _vector*			Get_AnimRotationPtr() const { return &m_vAnimRotation; }
 	vector<CBone*>&			Get_Bones() { return m_Bones; }
@@ -79,6 +81,7 @@ private:
 	_int						m_iRootBoneIndex = { -1 };
 
 private:
+	_bool						m_IsAnimChange = {};
 	CAnimation*					m_pCurrentAnimation = { nullptr };
 	string						m_strCurrentAnimName = {};
 	_uint						m_iNumAnimation = {};

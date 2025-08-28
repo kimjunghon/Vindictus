@@ -144,7 +144,6 @@ void CCollider::Check_Collision(COLLISION_DATA& Data)
 		if (false == IsColliding(Data.pCollider))
 		{
 			m_CollisionColliders.insert(Data.pCollider);
-
 			OnCollision(COLLIDER_STATE::BEGIN, Data);
 		}
 		else

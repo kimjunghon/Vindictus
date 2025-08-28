@@ -8,7 +8,7 @@ CGS_Down::CGS_Down()
 
 _bool CGS_Down::CanStateChange(CMonster* pMonster)
 {
-	if (m_iDownFlag >= ENUM_CLASS(DOWN_PHASE::END))
+	if (m_iDownPhase >= ENUM_CLASS(DOWN_PHASE::END))
 		return pMonster->AnimCanChange() || pMonster->AnimIsFinished();
 
 	return false;
@@ -19,8 +19,6 @@ HRESULT CGS_Down::Initialize()
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
 	m_iDownFlag = ENUM_CLASS(HIT_FLAG::DOWN_BEGIN);
-
-	m_vChangeModelRange = _float2(210.f, 214.f);
 
     return S_OK;
 }

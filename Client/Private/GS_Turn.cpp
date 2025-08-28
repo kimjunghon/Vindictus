@@ -9,7 +9,7 @@ CGS_Turn::CGS_Turn()
 HRESULT CGS_Turn::Initialize()
 {
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
-
+	m_vTurnRange = _float2(50.f, 82.f);
     return S_OK;
 }
 
@@ -22,6 +22,8 @@ void CGS_Turn::Enter(CMonster* pMonster)
 
 void CGS_Turn::Update(CMonster* pMonster, _float fTimeDelta)
 {
+	if(pMonster->IsAnimationInRangeTrackPosition(m_vTurnRange))
+		pMonster->TurnToTarget(fTimeDelta * 2.f);
 }
 
 void CGS_Turn::Exit(CMonster* pMonster)

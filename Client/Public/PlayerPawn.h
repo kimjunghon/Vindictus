@@ -23,7 +23,6 @@ public:
 
 private:
 	enum class PLAYER_HIT_TYPE { FRONT, BACK, RIGHT, LEFT, };
-	
 	enum class HIT_COLLIDER { HEAD, UPPER, LOWER, L_ARM, R_ARM, L_LEG, R_LEG, END};
 	enum class ATTACK_COLLIDER { SWORD, SHILED, LEFT_LEG, RIGHT_LEG, END};
 
@@ -40,6 +39,7 @@ public:
 	void			Sprint() { m_fSpeedRatio = 2.f; }
 	DIR				Get_HirDir() { return m_eHitDir; }
 	_bool			IsGaurdHit() { return m_iStateFlag & ENUM_CLASS(HIT_FLAG::GUARD); }
+	_bool			IsGrap() { return m_IsGrap; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -54,6 +54,7 @@ public:
 	_bool			AnimCanChange();
 	void			Change_State(_uint iStateIndex);
 	void			Compute_PlayerMoveDir();
+	void			Grap();
 	
 private:
 	CPlayerInstance*			m_pPlayerInstance = { nullptr };
@@ -76,6 +77,10 @@ private:
 	
 	DIR							m_eHitDir = { DIR::END };
 
+	_bool						m_IsGrap = {};
+	GRAP_DATA					m_GrapData = {};
+	_float4x4					m_GrapOffsetMatrix = {};
+	_float4x4					m_GrapMatrix = {};
 	_uint						m_iStateFlag = {};
 	_uint						m_iComboCount = {};
 
@@ -92,8 +97,6 @@ private:
 	const _vector*				m_pAnimRotation = {};
 
 private:
-	virtual void	Update_AttackColliders(_fmatrix UpdateWorldMatrix,_uint iStateFlag) override;
-
 	HRESULT			Init_Level(_int iCellIndex, _float3 vStartPostion);
 	HRESULT			Ready_Camera();
 	HRESULT			Ready_PawnObjects();
@@ -107,8 +110,10 @@ private:
 	HRESULT			Ready_Collider_Body();
 	HRESULT			Ready_Collider_Hit();
 	HRESULT			Ready_Collider_Attack();
-	HRESULT			Ready_AttackMapping();
 
+	HRESULT			Add_Collider_Grap();
+	HRESULT			Ready_AttackMapping();
+	HRESULT			Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition);
 
 	void			Compute_WorldMatrix();
 	void			Bind_InputData(_float fTimeDelta);
@@ -124,7 +129,12 @@ private:
 	void			Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event);
 
 	void			OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_DATA& CollisionData);
+	
+	void			OnCollisionGrap(const CCollider::COLLISION_DATA& CollisionData);
+	void			EndCollisionGrap(const CCollider::COLLISION_DATA& CollisionData);
+
 	void			Change_HitState(ATTACK_TYPE eAttackType, _fvector vPosition, _fvector vAttackPosition);
+
 	void			Update_HitColliderEnable();
 
 	HRESULT			Bind_HitCollisionCallback(HIT_COLLIDER eHitCollider, ARMOR_TYPE eArmor_Type);

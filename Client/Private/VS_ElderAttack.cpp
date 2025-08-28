@@ -24,8 +24,9 @@ void CVS_ElderAttack::Enter(CMonster* pMonster)
 
 void CVS_ElderAttack::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	if (pMonster->IsReadyAttack(m_iStateFlag))
+	if (pMonster->IsReadyAttack())
 		pMonster->LookAtTarget();
+//		pMonster->TurnToTarget(fTimeDelta);
 }
 
 void CVS_ElderAttack::Exit(CMonster* pMonster)

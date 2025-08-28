@@ -20,7 +20,7 @@ void CVS_Attack::Enter(CMonster* pMonster)
 
 void CVS_Attack::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	if(pMonster->IsReadyAttack(m_iStateFlag))
+	if(pMonster->IsReadyAttack())
 		pMonster->LookAtTarget();
 }
 

@@ -55,4 +55,11 @@ namespace Client
 		_float		fDamage;
 		_vector		vAttackPosition;
 	}ATTACK_DATA;
+
+	typedef struct tagGrapData
+	{
+		const _float4x4* SocketMatrixPtr;
+		const _float4x4* WorldMatrixPtr;
+		const _float4x4* OffsetMatrixPtr;
+	}GRAP_DATA;
 }

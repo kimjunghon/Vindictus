@@ -27,7 +27,7 @@ void CGS_Desend::Update(CMonster* pMonster, _float fTimeDelta)
 	if (pMonster->IsAnimationInRangeTrackPosition(m_vMoveReadyTime))
 		pMonster->TurnToTarget(fTimeDelta);
 	else if (pMonster->IsAnimationInRangeTrackPosition(m_vMoveTime))
-		pMonster->MoveToTarget(fTimeDelta);
+		pMonster->MoveToTarget(fTimeDelta * 2.f);
 }
 
 void CGS_Desend::Exit(CMonster* pMonster)

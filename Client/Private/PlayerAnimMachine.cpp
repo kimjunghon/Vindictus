@@ -123,6 +123,9 @@ void CPlayerAnimMachine::Initialize_HIT()
 	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::GUARD)] =				{ "Guard_Hit", false, _float2{0.2f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::HEAVYSTAND)] =			{ "HeavyStand_Hit", false, _float2{0.4f, 1.f}, 2.f };
 
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::GRAP)] =				{ "Grap", false, _float2{0.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::GRAP_END)] =			{ "Grap_End", false, _float2{1.f, 1.f}, 2.f };
+
 }
 
 CPlayerAnimMachine* CPlayerAnimMachine::Create()

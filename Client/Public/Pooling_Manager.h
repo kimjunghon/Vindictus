@@ -16,6 +16,10 @@ class CPooling_Manager final : public CBase
 private:
 	typedef unordered_map<MONSTER_TYPE, queue<CMonster*>>	MONSTER_POOL;
 	typedef list<pair<MONSTER_TYPE, CMonster*>>				ACTIVE_MONSTERS;
+	
+	//PROJ_TYPE
+	typedef unordered_map<_uint, queue<CGameObject*>>	PROJECTILE_POOL;
+	typedef list<pair<_uint, CGameObject*>>			ACTIVE_PROJECTILE;
 
 private:
 	CPooling_Manager();

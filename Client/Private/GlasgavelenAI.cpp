@@ -29,12 +29,19 @@ HRESULT CGlasgavelenAI::Ready_Nodes()
 
 			pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->CanOtherAction(); }));
 			
-			CBT_SelectorNode* pAttackSelectorNode = CBT_SelectorNode::Create();
 
+			CBT_SequenceNode* pLookSequenceNode = CBT_SequenceNode::Create();
+			pLookSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->IsLook(); }));
+			pLookSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->Turn(); }));
+
+			pActionSelectorNode->Add_Child(pLookSequenceNode);
+
+			CBT_SelectorNode* pAttackSelectorNode = CBT_SelectorNode::Create();
+			
 			CBT_SequenceNode* pRageSequenceNode = CBT_SequenceNode::Create();
 			
 			pRageSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->Is_Rage(); }));
-			pRageSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->CanAttack(); }));
+			pRageSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->CanRageAttack(); }));
 			pRageSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->CanAttackRange(); }));
 			pRageSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->Rage_Attack(); }));
 

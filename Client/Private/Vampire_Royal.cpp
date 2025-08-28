@@ -32,9 +32,6 @@ HRESULT CVampire_Royal::Initialize_Prototype()
 	m_fChaseRange = 50.f;
 	m_fMinDistance = 30.f;
 
-	if (FAILED(Ready_AttackMapping()))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -50,6 +47,9 @@ HRESULT CVampire_Royal::Initialize(void* pArg)
 		return E_FAIL;
 
 	if (FAILED(Ready_Collider()))
+		return E_FAIL;
+
+	if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Vampire_Royal_AnimData.json")))
 		return E_FAIL;
 
 	return S_OK;
@@ -87,7 +87,7 @@ void CVampire_Royal::Late_Update(_float fTimeDelta)
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
 
-	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix(), m_iStateFlag);
+	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix());
 
 #ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
@@ -234,15 +234,6 @@ HRESULT CVampire_Royal::Ready_Collider_Attack()
 	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::ATTACK, ENUM_CLASS(ATTACK_COLLIDER::SPEAR), COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
 		this->OnCollisionAttack(Data); })))
 		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CVampire_Royal::Ready_AttackMapping()
-{
-	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
-
-	m_AttackMapping[iFlag].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SPEAR), ATTACK_TYPE::MIDDLE, 1.f, _float2(80.f, 85.f) });
 
 	return S_OK;
 }

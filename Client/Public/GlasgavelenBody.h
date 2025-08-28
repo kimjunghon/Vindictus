@@ -16,6 +16,8 @@ private:
 public:
 	void				BrokenWing() { m_IsBrokenWing = true; }
 
+	virtual HRESULT		Add_AnimNotify(const string& strAnimName, _float fTrackPosition, function<void()> Callback) override;
+
 public:
 	virtual HRESULT		Initialize_Prototype() override;
 	virtual HRESULT		Initialize(void* pArg) override;

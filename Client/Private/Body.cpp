@@ -13,6 +13,11 @@ CBody::CBody(const CBody& Prototype)
 {
 }
 
+HRESULT CBody::Add_AnimNotify(const string& strAnimName, _float fTrackPosition, function<void()> Callback)
+{
+	return m_pModelCom->Add_AnimNotify(strAnimName, fTrackPosition, Callback);
+}
+
 HRESULT CBody::Initialize_Prototype()
 {
 	return S_OK;

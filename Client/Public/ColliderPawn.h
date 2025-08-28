@@ -37,16 +37,16 @@ protected:
 	vector<_matrix>				m_AttackColliderCombinedMatrix;
 
 	ATTACK_DATA					m_CurrentAttackData = {};
-	ATTACK_MAPPING				m_AttackMapping;
 
 	_vector						m_vPrevPosition = {};
 
 protected:
-	virtual void	Update_Colliders(_fmatrix UpdateWorldMatrix, _uint iStateFlag);
+	virtual void	Update_Colliders(_fmatrix UpdateWorldMatrix);
 	virtual void	Update_BoundingColliders(_fmatrix UpdateWorldMatrix);
 	virtual void	Update_BodyColliders(_fmatrix UpdateWorldMatrix);
 	virtual void	Update_HitColliders(_fmatrix UpdateWorldMatrix);
-	virtual void	Update_AttackColliders(_fmatrix UpdateWorldMatrix, _uint iStateFlag);
+	virtual void	Update_AttackColliders(_fmatrix UpdateWorldMatrix);
+	virtual void	Update_GrapColliders(_fmatrix UpdateWorldMatrix);
 
 	void			EnableAllColliderChannel();
 	void			EnableColliderChannel(COLLIDER_CHANNEL eChannel);

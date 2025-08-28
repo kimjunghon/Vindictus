@@ -33,9 +33,6 @@ HRESULT CVampire_Basic::Initialize_Prototype()
     m_fChaseRange = 40.f;
     m_fMinDistance = 30.f;
 
-    if (FAILED(Ready_AttackMapping()))
-        return E_FAIL;
-
     return S_OK;
 }
 
@@ -51,6 +48,9 @@ HRESULT CVampire_Basic::Initialize(void* pArg)
         return E_FAIL;
 
     if(FAILED(Ready_Collider()))
+        return E_FAIL;
+
+    if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Vampire_Basic_AnimData.json")))
         return E_FAIL;
 
     return S_OK;
@@ -85,7 +85,7 @@ void CVampire_Basic::Late_Update(_float fTimeDelta)
 {
     Compute_AnimPosition();
 
-    __super::Update_Colliders(m_pTransformCom->Get_WorldMatrix(), m_iStateFlag);
+    __super::Update_Colliders(m_pTransformCom->Get_WorldMatrix());
 
     for (auto& Pair : m_PawnObjects)
         Pair.second->Late_Update(fTimeDelta);
@@ -226,7 +226,7 @@ HRESULT CVampire_Basic::Ready_Collider_Attack()
 
     CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
     OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
-    OBBDesc.vExtents = _float3(30.f, 20.f, 30.f);
+    OBBDesc.vExtents = _float3(40.f, 40.f, 70.f);
     OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
     if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_LeftHand"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::LEFT_HAND), m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Hand"))))
@@ -237,7 +237,7 @@ HRESULT CVampire_Basic::Ready_Collider_Attack()
         return E_FAIL;
 
     OBBDesc.vAngles = _float3(XMConvertToRadians(60.f), XMConvertToRadians(90.f), XMConvertToRadians(180.f));
-    OBBDesc.vExtents = _float3(30.f, 20.f, 30.f);
+    OBBDesc.vExtents = _float3(40.f, 40.f, 70.f);
     OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
     if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_RightHand"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::RIGHT_HAND), m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Hand"))))
@@ -249,16 +249,6 @@ HRESULT CVampire_Basic::Ready_Collider_Attack()
 
     DisableColliderChannel(COLLIDER_CHANNEL::ATTACK);
 
-    return S_OK;
-}
-
-HRESULT CVampire_Basic::Ready_AttackMapping()
-{
-    _uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
-    
-    m_AttackMapping[iFlag].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_HAND), ATTACK_TYPE::STRONG, 1.f, _float2(70.f, 75.f)});
-    m_AttackMapping[iFlag].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_HAND), ATTACK_TYPE::STRONG, 1.f, _float2(89.f, 94.f) });
-    
     return S_OK;
 }
 

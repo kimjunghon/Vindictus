@@ -25,7 +25,7 @@ void CQS_Jump::Update(CMonster* pMonster, _float fTimeDelta)
 	if (pMonster->IsAnimationInRangeTrackPosition(m_vJumpReadyTime))
 		pMonster->LookAtTarget();
 	else if (pMonster->IsAnimationInRangeTrackPosition(m_vJumpMoveTime))
-		pMonster->MoveToTarget(fTimeDelta);
+		pMonster->MoveToTarget(fTimeDelta * 2.f);
 }
 
 void CQS_Jump::Exit(CMonster* pMonster)

@@ -14,6 +14,12 @@ CGlasgavelenBody::CGlasgavelenBody(const CGlasgavelenBody& Prototype)
 {
 }
 
+HRESULT CGlasgavelenBody::Add_AnimNotify(const string& strAnimName, _float fTrackPosition, function<void()> Callback)
+{
+	m_pBrokenModelCom->Add_AnimNotify(strAnimName, fTrackPosition, Callback);
+	return m_pModelCom->Add_AnimNotify(strAnimName, fTrackPosition, Callback);
+}
+
 HRESULT CGlasgavelenBody::Initialize_Prototype()
 {
 	m_DefaultOption.PositionX = true;

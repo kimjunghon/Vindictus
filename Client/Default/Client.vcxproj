@@ -204,6 +204,7 @@
     <ClInclude Include="..\public\QS_NearAttack.h" />
     <ClInclude Include="..\Public\QS_Spawn.h" />
     <ClInclude Include="..\public\QS_Turn.h" />
+    <ClInclude Include="..\public\State_Grap.h" />
     <ClInclude Include="..\Public\VS_Attack.h" />
     <ClInclude Include="..\public\VS_Dead.h" />
     <ClInclude Include="..\public\VS_DeadStrong.h" />
@@ -341,6 +342,7 @@
     <ClCompile Include="..\private\QS_NearAttack.cpp" />
     <ClCompile Include="..\Private\QS_Spawn.cpp" />
     <ClCompile Include="..\private\QS_Turn.cpp" />
+    <ClCompile Include="..\private\State_Grap.cpp" />
     <ClCompile Include="..\Private\VS_Attack.cpp" />
     <ClCompile Include="..\private\VS_Dead.cpp" />
     <ClCompile Include="..\private\VS_DeadStrong.cpp" />

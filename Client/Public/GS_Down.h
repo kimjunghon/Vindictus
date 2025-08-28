@@ -29,9 +29,6 @@ private:
 	_uint			m_iDownPhase = {};
 	_uint			m_iDownFlag = {};
 
-	_float2			m_vChangeModelRange = {};
-	_bool			m_IsModelChange = {};
-
 public:
 	static CGS_Down*	Create();
 	virtual void		Free() override;

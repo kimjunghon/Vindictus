@@ -18,6 +18,9 @@ public:
 	virtual void	Exit(CMonster* pMonster) override;
 
 private:
+	_float2			m_vTurnRange = {};
+
+private:
 	_uint			GetTurnFlag(DIR eRightDir);
 
 public:

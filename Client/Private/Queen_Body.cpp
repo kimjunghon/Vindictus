@@ -31,7 +31,6 @@ HRESULT CQueen_Body::Initialize(void* pArg)
 	QUEEN_BODY_DESC* pDesc = static_cast<QUEEN_BODY_DESC*>(pArg);
 
 	m_pIsBrokenLeg= pDesc->IsBrokenLeg;
-
 	m_iMeshLegIndex = 2;
 	
 	m_pTransformCom->RotateQuaternion(XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(90.f), 0.f));

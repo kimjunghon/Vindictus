@@ -81,6 +81,9 @@ HRESULT CQueen::Initialize(void* pArg)
 	if (FAILED(Ready_Collider()))
 		return E_FAIL;
 
+	if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Queen_AnimData.json")))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -117,7 +120,7 @@ void CQueen::Late_Update(_float fTimeDelta)
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
 
-	__super::Update_Colliders(m_pBody->Get_BodyCombinedMatrix(), m_iStateFlag);
+	__super::Update_Colliders(m_pBody->Get_BodyCombinedMatrix());
 
 #ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
@@ -516,39 +519,67 @@ HRESULT CQueen::Ready_Collider_Attack()
 
 HRESULT CQueen::Ready_AttackMapping()
 {
-	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+//	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+//
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::LEFTLEG)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(121.f, 130.f));
+//	
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::RIGHTLEG)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(43.f, 48.f));
+//	
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::MELLE)), ENUM_CLASS(ATTACK_COLLIDER::HEAD), ATTACK_TYPE::LIGHT, 1.5f, _float2(46.f, 53.f));
+//	
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)), ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(33.f, 37.f));
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)), ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(75.f, 80.f));
+//
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_LEFT)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(118.f, 125.f));
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(121.f, 129.f));
+//
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)), ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f));
+//
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(157.f, 166.f));
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(96.f, 101.f));
+//
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::JUMP)), ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(140.f, 145.f));
+//
+//
+//
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::LEFTLEG)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(121.f, 130.f) });
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::RIGHTLEG)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(43.f, 48.f) });
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::MELLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::HEAD), ATTACK_TYPE::LIGHT, 1.5f, _float2(46.f, 53.f) });
+//
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(33.f, 37.f) });
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(75.f, 80.f) });
+//
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_LEFT)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(118.f, 125.f) });
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(121.f, 129.f) });
+//
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });
+//	/*m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG ), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });
+//	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });*/
+//
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(157.f, 166.f) });
+//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(96.f, 101.f) });
+//
+////	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::JUMP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(140.f, 145.f) });
+//
+//
+//	iFlag = ENUM_CLASS(STATE_FLAG::BURROW);
+//
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(93.f, 96.f));
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(98.f, 101.f));
+//
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f));
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f));
+//
+//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK2)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(93.f, 101.f));
 
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::LEFTLEG)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(121.f, 130.f) });
-
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::RIGHTLEG)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(43.f, 48.f) });
-
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::MELLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::HEAD), ATTACK_TYPE::LIGHT, 1.5f, _float2(46.f, 53.f) });
-
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(33.f, 37.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(75.f, 80.f) });
-
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_LEFT)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(118.f, 125.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(121.f, 129.f) });
-
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });
-	/*m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG ), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });*/
-
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(157.f, 166.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(96.f, 101.f) });
-
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::JUMP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(140.f, 145.f) });
+//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(93.f, 96.f) });
+//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(98.f, 101.f) });
 
 
-	iFlag = ENUM_CLASS(STATE_FLAG::BURROW);
+//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f) });
+//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f) });
 
-	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(93.f, 96.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(98.f, 101.f) });
-
-	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f) });
-
-	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(93.f, 101.f) });
+//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(93.f, 101.f) });
 
 
 	return S_OK;
@@ -557,16 +588,16 @@ HRESULT CQueen::Ready_AttackMapping()
 
 void CQueen::Compute_WorldMatrix()
 {
-	_vector vAnimPosition = XMVectorSetY(*m_pAnimMovement, 0.f);
+	_vector vAnimPosition = *m_pAnimMovement;//XMVectorSetY(*m_pAnimMovement, 0.f);
 	_vector vAnimRotation = *m_pAnimRotation;
 	
 	_matrix AnimRotationMatrix = XMMatrixRotationQuaternion(*m_pAnimRotation);
-
+	
 	_vector vLook = XMVector3Normalize(XMVectorSetY(AnimRotationMatrix.r[2], 0.f));
 	vAnimRotation = XMQuaternionRotationMatrix(XMMatrixInverse(nullptr, XMMatrixLookAtLH(XMVectorZero(), vLook, XMVectorSet(0.f, 1.f, 0.f, 0.f))));
 	
 	_vector vTotalRotation = XMQuaternionIdentity();
-
+	
 	vTotalRotation = vAnimRotation;
 
 	m_pTransformCom->TurnQuaternion(vTotalRotation);

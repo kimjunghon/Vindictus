@@ -29,7 +29,7 @@ void CGS_RageAttack::Enter(CMonster* pMonster)
 
 void CGS_RageAttack::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	if (pMonster->IsReadyAttack(m_iStateFlag))
+	if (pMonster->IsReadyAttack())
 		pMonster->TurnToTarget(fTimeDelta);
 }
 

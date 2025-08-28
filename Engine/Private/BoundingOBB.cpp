@@ -177,7 +177,6 @@ _bool CBoundingOBB::Intersect_OBB(const CBoundingOBB* pTarget, _float* pDisance,
 	if (XMVectorGetX(XMVector3Dot(XMLoadFloat3(&OBBDesc[1].vCenter) - XMLoadFloat3(&OBBDesc[0].vCenter), XMLoadFloat3(pNormal))) > 0.f)
 		XMStoreFloat3(pNormal, XMLoadFloat3(pNormal) * -1.f);
 
-
 	*pDisance = fMinDistance;
 
 	return true;

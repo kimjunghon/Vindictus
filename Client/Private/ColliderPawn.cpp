@@ -1,5 +1,6 @@
 #include "ClientPch.h"
 #include "ColliderPawn.h"
+#include "Body.h"
 
 CColliderPawn::CColliderPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CPawn { pDevice, pDeviceContext }
@@ -8,7 +9,6 @@ CColliderPawn::CColliderPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDevice
 
 CColliderPawn::CColliderPawn(const CColliderPawn& Prototype)
 	: CPawn { Prototype }
-	, m_AttackMapping{ Prototype.m_AttackMapping }
 {
 }
 
@@ -43,12 +43,13 @@ HRESULT CColliderPawn::Render()
 }
 
 
-void CColliderPawn::Update_Colliders(_fmatrix UpdateWorldMatrix, _uint iStateFlag)
+void CColliderPawn::Update_Colliders(_fmatrix UpdateWorldMatrix)
 {
 	Update_BoundingColliders(UpdateWorldMatrix);
 	Update_BodyColliders(UpdateWorldMatrix);
 	Update_HitColliders(UpdateWorldMatrix);
-	Update_AttackColliders(UpdateWorldMatrix, iStateFlag);
+	Update_AttackColliders(UpdateWorldMatrix);
+	Update_GrapColliders(UpdateWorldMatrix);
 }
 
 void CColliderPawn::Update_BoundingColliders(_fmatrix UpdateWorldMatrix)
@@ -67,8 +68,8 @@ void CColliderPawn::Update_BodyColliders(_fmatrix UpdateWorldMatrix)
 {
 	for (auto& pBodyCollider : m_Colliders[COLLIDER_CHANNEL::BODY])
 	{
-		if (false == pBodyCollider->IsEnable())
-			continue;
+//		if (false == pBodyCollider->IsEnable())
+//			continue;
 
 		pBodyCollider->Update(UpdateWorldMatrix);
 		m_pGameInstance->Add_ActionCollider(this, pBodyCollider);
@@ -79,8 +80,8 @@ void CColliderPawn::Update_HitColliders(_fmatrix UpdateWorldMatrix)
 {
 	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::HIT].size(); i++)
 	{
-		if (false == m_Colliders[COLLIDER_CHANNEL::HIT][i]->IsEnable())
-			continue;
+		//if (false == m_Colliders[COLLIDER_CHANNEL::HIT][i]->IsEnable())
+		//	continue;
 
 		m_HitColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_HitColliderSocketMatrix[i]), UpdateWorldMatrix);
 		m_Colliders[COLLIDER_CHANNEL::HIT][i]->Update(m_HitColliderCombinedMatrix[i]);
@@ -88,28 +89,28 @@ void CColliderPawn::Update_HitColliders(_fmatrix UpdateWorldMatrix)
 	}
 }
 
-void CColliderPawn::Update_AttackColliders(_fmatrix UpdateWorldMatrix, _uint iStateFlag)
+void CColliderPawn::Update_AttackColliders(_fmatrix UpdateWorldMatrix)
 {
-	auto iter = m_AttackMapping.find(iStateFlag);
-	if (iter == m_AttackMapping.end())
-		return;
-
-	for (auto& AttackMap : iter->second)
+	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::ATTACK].size(); i++)
 	{
-		m_CurrentAttackData.iAttackID = 0;
-		m_CurrentAttackData.eAttackType = AttackMap.eAttackType;
-		m_CurrentAttackData.fDamage = 10.f;// m_fAttackData* AttackMap.fAttackRatio;
-		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+		//if (false == m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->IsEnable())
+		//	continue;
 
-		_uint iAttackIndex = AttackMap.iAttackColliderIndex;
+		m_AttackColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[i]), UpdateWorldMatrix);
+		m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->Update(m_AttackColliderCombinedMatrix[i]);
+		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][i]);
+	}
+}
 
-		m_AttackColliderCombinedMatrix[iAttackIndex] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[iAttackIndex]), UpdateWorldMatrix);
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Update(m_AttackColliderCombinedMatrix[iAttackIndex]);
+void CColliderPawn::Update_GrapColliders(_fmatrix UpdateWorldMatrix)
+{
+	for (auto& pGrapCollider : m_Colliders[COLLIDER_CHANNEL::GRAP])
+	{
+		if (false == pGrapCollider->IsEnable())
+			continue;
 
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetEnable(true);
-		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]);
-
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Set_Desc(&m_CurrentAttackData);
+		pGrapCollider->Update(UpdateWorldMatrix);
+		m_pGameInstance->Add_ActionCollider(this, pGrapCollider);
 	}
 }
 

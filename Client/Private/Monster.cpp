@@ -32,6 +32,123 @@ void CMonster::Bind_StateFlag()
 		m_pCurrentState->Bind_StateFlag(m_iStateFlag);
 }
 
+HRESULT CMonster::Ready_AnimNotify(const string& strFilePath)
+{
+	ifstream File(strFilePath);
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed AnimData Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
+
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_uint  iColliderIndex = {};
+			ATTACK_TYPE eType = {};
+			_float fDamageRatio = {};
+			_float2 vTrackPositionRange = {};
+
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+
+			if (Notify.HasMember("Collider_Index") && Notify["Collider_Index"].IsInt())
+				iColliderIndex = Notify["Collider_Index"].GetInt();
+
+			if (Notify.HasMember("AttackType") && Notify["AttackType"].IsInt())
+				eType = static_cast<ATTACK_TYPE>(Notify["AttackType"].GetInt());
+
+			if (Notify.HasMember("DamageRatio") && Notify["DamageRatio"].IsFloat())
+				fDamageRatio = Notify["DamageRatio"].GetFloat();
+
+			if (Notify.HasMember("OnTrackPosition") && Notify["OnTrackPosition"].IsFloat())
+				vTrackPositionRange.x = Notify["OnTrackPosition"].GetFloat();
+
+			if (Notify.HasMember("OffTrackPosition") && Notify["OffTrackPosition"].IsFloat())
+				vTrackPositionRange.y = Notify["OffTrackPosition"].GetFloat();
+
+			if (FAILED(Add_AttackCollisionNotify(strAnimName, iColliderIndex, eType, fDamageRatio, vTrackPositionRange)))
+				return E_FAIL;
+		}
+	}
+
+	if (Doc.HasMember("ReadyNotify") && Doc["ReadyNotify"].IsArray())
+	{
+		const Value& ReadyNotifies = Doc["ReadyNotify"];
+
+		for (auto& ReadyNotify : ReadyNotifies.GetArray())
+		{
+			string strAnimName = "";
+			_float2 vReadyTrackPositionRange = {};
+
+			if (ReadyNotify.HasMember("AnimName") && ReadyNotify["AnimName"].IsString())
+				strAnimName = ReadyNotify["AnimName"].GetString();
+
+			if (ReadyNotify.HasMember("OnReadyTrackPosition") && ReadyNotify["OnReadyTrackPosition"].IsFloat())
+				vReadyTrackPositionRange.x = ReadyNotify["OnReadyTrackPosition"].GetFloat();
+
+			if (ReadyNotify.HasMember("OffReadyTrackPosition") && ReadyNotify["OffReadyTrackPosition"].IsFloat())
+				vReadyTrackPositionRange.y = ReadyNotify["OffReadyTrackPosition"].GetFloat();
+
+			if (FAILED(Add_ReadyAttackNotify(strAnimName, vReadyTrackPositionRange)))
+				return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CMonster::Add_ReadyAttackNotify(const string& strAnimName, _float2 vTrackPosition)
+{
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this]() {
+		this->Set_ReadyAttack(true);
+		})))
+		return E_FAIL;
+
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this]() {
+		this->Set_ReadyAttack(false);
+		})))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMonster::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+{
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
+		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(true);
+		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
+		m_CurrentAttackData.eAttackType = eType;
+		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
+		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(&m_CurrentAttackData);
+		})))
+		return E_FAIL;
+
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this, iAttackColliderIndex]() {
+		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
+		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(nullptr);
+		})))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 _float CMonster::Get_TargetDistance()
 {
 	if (nullptr == m_pTargetTransform)
@@ -73,15 +190,23 @@ void CMonster::TurnToTarget(_float fRatio)
 	_vector vLook = XMVector3Normalize(XMVectorSetY(m_pTransformCom->Get_State(STATE::LOOK),0.f));
 	_vector vDir = XMVector3Normalize(XMVectorSetY(XMVectorSubtract(vTargetPos, m_pTransformCom->Get_State(STATE::POSITION)), 0.f));
 
-	_float fComparisonRadian = cosf(XMConvertToRadians(15.f));
+	_float fComparisonRadian = cosf(XMConvertToRadians(30.f));
 
-	if(XMVectorGetX(XMVector3Dot(vLook, vDir)) >= fComparisonRadian)
+	_float vLookDot = XMVectorGetX(XMVector3Dot(vLook, vDir));
+
+	if(vLookDot >= fComparisonRadian)
 		m_pTransformCom->LookAt(vTargetPos);
 	else
 	{
 		_matrix RotationMatrix = XMMatrixInverse(nullptr, XMMatrixLookAtLH(XMVectorZero(), vDir, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-		_vector vRotateQuat = XMQuaternionSlerp(XMQuaternionIdentity(), XMQuaternionRotationMatrix(RotationMatrix), fRatio);
-		
+		_vector vLookQuat = m_pTransformCom->Get_LookQuaternion();
+		_vector vDirQuat = XMQuaternionRotationMatrix(RotationMatrix);
+		if (vLookDot < 0.f)
+			vDirQuat = XMVectorNegate(vDirQuat);
+
+		_vector vRotateQuat = XMQuaternionSlerp(vLookQuat, vDirQuat, fRatio);
+		vRotateQuat = XMQuaternionMultiply(vRotateQuat, XMQuaternionInverse(vLookQuat));
+
 		m_pTransformCom->TurnQuaternion(vRotateQuat);
 	}
 }
@@ -112,29 +237,6 @@ _bool CMonster::IsAnimationPassToTrackPosition(_float fTrackPosition)
 		return false;
 
 	return m_pBody->IsAnimationPassToTrackPosition(fTrackPosition);
-}
-
-_bool CMonster::IsReadyAttack(_uint iStateFlag)
-{
-	if (m_AttackMapping[iStateFlag].empty())
-		return false;
-
-	_float fLastAttackTrackPosition = m_AttackMapping[iStateFlag].back().vAttackRange.y;
-
-	if (IsAnimationPassToTrackPosition(fLastAttackTrackPosition))
-		return false;
-
-	for(auto& Attack : m_AttackMapping[iStateFlag])
-	{
-		_float2 vOffset = _float2(10.f, 10.f);
-
-		_float2 vRange = _float2(Attack.vAttackRange.x - vOffset.x, Attack.vAttackRange.y + vOffset.y);
-
-		if (IsAnimationInRangeTrackPosition(vRange))
-			return false;
-	}
-
-	return true;
 }
 
 HRESULT CMonster::Initialize_Prototype()
@@ -242,40 +344,6 @@ BT_STATE CMonster::CanAttackRange()
 		return BT_STATE::SUCCESS;
 
 	return BT_STATE::FAILED;
-}
-
-void CMonster::Update_AttackColliders(_fmatrix UpdateWorldMatrix, _uint iStateFlag)
-{
-	auto iter = m_AttackMapping.find(iStateFlag);
-	if (iter == m_AttackMapping.end())
-		return;
-
-	for (auto& AttackMap : iter->second)
-	{
-		_uint iAttackIndex = AttackMap.iAttackColliderIndex;
-
-		if (false == m_pBody->IsAnimationInRangeTrackPosition(AttackMap.vAttackRange))
-		{
-			m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetEnable(false);
-			m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Set_Desc(nullptr);
-			continue;
-		}
-
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetEnable(true);
-
-		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
-		m_CurrentAttackData.eAttackType = AttackMap.eAttackType;
-		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * AttackMap.fAttackRatio;
-		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
-
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Set_Desc(&m_CurrentAttackData);
-
-		m_AttackColliderCombinedMatrix[iAttackIndex] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[iAttackIndex]), UpdateWorldMatrix);
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Update(m_AttackColliderCombinedMatrix[iAttackIndex]);
-
-		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]);
-		
-	}
 }
 
 void CMonster::OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData)

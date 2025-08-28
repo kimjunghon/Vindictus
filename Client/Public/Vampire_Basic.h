@@ -29,7 +29,6 @@ private:
 	HRESULT			Ready_Collider_Body();
 	HRESULT			Ready_Collider_Hit();
 	HRESULT			Ready_Collider_Attack();
-	HRESULT			Ready_AttackMapping();
 
 public:
 	static CVampire_Basic*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

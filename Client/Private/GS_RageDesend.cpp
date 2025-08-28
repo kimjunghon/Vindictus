@@ -62,13 +62,13 @@ void CGS_RageDesend::Update_Begin(CMonster* pMonster, _float fTimeDelta)
 	if (pMonster->IsAnimationInRangeTrackPosition(m_vMoveReadyTime))
 		pMonster->TurnToTarget(fTimeDelta);
 	else if (pMonster->IsAnimationInRangeTrackPosition(m_vMoveTime))
-		pMonster->MoveToTarget(fTimeDelta);
+		pMonster->MoveToTarget(fTimeDelta * 2.f);
 }
 
 void CGS_RageDesend::Update_End(CMonster* pMonster, _float fTimeDelta)
 {
-	if (pMonster->IsReadyAttack(m_iStateFlag))
-		pMonster->LookAtTarget();
+	if (pMonster->IsReadyAttack())
+		pMonster->TurnToTarget(fTimeDelta);
 }
 
 CGS_RageDesend* CGS_RageDesend::Create()

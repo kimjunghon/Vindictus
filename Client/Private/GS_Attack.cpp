@@ -29,7 +29,7 @@ void CGS_Attack::Enter(CMonster* pMonster)
 
 void CGS_Attack::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	if (pMonster->IsReadyAttack(m_iStateFlag))
+	if (pMonster->IsReadyAttack())
 		pMonster->TurnToTarget(fTimeDelta);
 }
 
@@ -47,6 +47,9 @@ void CGS_Attack::ChangeAttackState(CMonster* pMonster, _uint iAttackFlag)
 		break;
 	case ENUM_CLASS(ATTACK_FLAG::HANG):
 		pMonster->ChangeState(ENUM_CLASS(GAVELEN_STATE::HANG));
+		break;
+	case ENUM_CLASS(ATTACK_FLAG::DESEND):
+		pMonster->ChangeState(ENUM_CLASS(GAVELEN_STATE::DESEND));
 		break;
 	}
 }

@@ -25,6 +25,8 @@ protected:
 	virtual ~CBody() = default;
 
 public:
+	virtual HRESULT		Add_AnimNotify(const string& strAnimName, _float fTrackPosition, function<void()> Callback);
+
 	_bool				IsAnimationInRangeTrackPosition(_float2 vRange) { return m_pModelCom->IsAnimationInRangeTrackPosition(vRange); }
 	_bool				IsAnimationPassToTrackPosition(_float fTrackPosition) { return m_pModelCom->IsAnimationPassToTrackPosition(fTrackPosition); }
 	_bool				AnimIsFinished() { return m_pModelCom->CurrentAnim_Finished(); }
@@ -32,6 +34,7 @@ public:
 	const _vector*		Get_AnimMovementPtr() const { return m_pModelCom->Get_AnimMovementPtr(); }
 	const _vector*		Get_AnimRotationPtr() const { return m_pModelCom->Get_AnimRotationPtr(); }
 	const _float4x4*	SocketCombinedMatrixPtr(const string& strSocektBoneName) const { return m_pModelCom->Find_SocketBoneCombinedMatrix(strSocektBoneName); }
+	const _float4x4*	OffsetMatrixPtr(const string& strSocketBoneName) const { return m_pModelCom->Find_OffsetMatrix(strSocketBoneName); }
 	CModel*				Get_ParentModelPtr() const { return m_pModelCom; }
 	_float				Get_CurrentAnimSpeed() { return m_pModelCom->Get_CurrentAnimSpeed(); }
 	virtual const _matrix Get_BodyCombinedMatrix() const { return XMMatrixIdentity(); }

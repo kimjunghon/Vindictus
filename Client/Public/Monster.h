@@ -26,9 +26,11 @@ public:
 	void			Dead() { m_IsActive = false;}
 	_bool			IsAnimationInRangeTrackPosition(_float2 vRange);
 	_bool			IsAnimationPassToTrackPosition(_float fTrackPosition);
-	_bool			IsReadyAttack(_uint iStateFlag);
+	_bool			IsReadyAttack() { return m_IsReadyAttack; }
 	_float			Get_TargetDistance();
 	DIR 			Compute_TargetDir(_float fDegree);
+
+	void			Set_ReadyAttack(_bool IsReady) { m_IsReadyAttack = IsReady; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -83,13 +85,19 @@ protected:
 
 	vector<CMonsterState*>		m_States;
 	CMonsterState*				m_pCurrentState = { nullptr };
+	_bool						m_IsReadyAttack = {};
 
 	_uint						m_iStateFlag = {};
 	size_t						m_iHitAttackID = {};
 
 protected:
 	void			Bind_StateFlag();
-	virtual void	Update_AttackColliders(_fmatrix UpdateWorldMatrix,_uint iStateFlag) override;
+
+	virtual HRESULT	Ready_AnimNotify(const string& strFilePath);
+
+	virtual HRESULT	Add_ReadyAttackNotify(const string& strAnimName, _float2 vTrackPosition);
+	virtual HRESULT	Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition);
+
 	void			OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData);
 	virtual void	Update_AttackCoolTime(_float fTimeDelta);
 

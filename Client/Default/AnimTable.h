@@ -101,7 +101,10 @@ namespace Client
 			STRONG_BACK_ROLLUP = 1 << 21,
 
 			GUARD = 1 << 22,
-			HEAVYSTAND = 1 << 23
+			HEAVYSTAND = 1 << 23,
+
+			GRAP = 1 << 24,
+			GRAP_END = 1 << 25
 		};
 	}
 
@@ -236,8 +239,9 @@ namespace Client
 
 		enum class MOVE_FLAG {
 			RUN = 1 << 8,
-			TURN_LEFT = 1<<9,
-			TURN_RIGHT = 1<< 10
+			TURN = 1 << 9,
+			TURN_LEFT = 1<<10,
+			TURN_RIGHT = 1<< 11
 		};
 
 		enum class ATTACK_FLAG {

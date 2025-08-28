@@ -34,6 +34,9 @@ void CQS_Burrow::Enter(CMonster* pMonster)
 
 void CQS_Burrow::Update(CMonster* pMonster, _float fTimeDelta)
 {
+	if (pMonster->IsReadyAttack())
+		pMonster->TurnToTarget(fTimeDelta * 2.f);
+
 	if (pMonster->AnimCanChange() || pMonster->AnimIsFinished())
 	{
 		switch (m_eBurrowState)

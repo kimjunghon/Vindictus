@@ -154,6 +154,17 @@ HRESULT CMesh::Bind_PoseBoneMatrices(CShader* pShader, const _char* pConstantNam
 	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
 }
 
+const _float4x4* CMesh::Find_OffsetMatrix(vector<CBone*>& Bones, const string& strSocketBoneName)
+{
+	for (_uint i = 0; i < m_iNumBones; i++)
+	{
+		if (Bones[m_BoneIndices[i]]->Compare_Name(strSocketBoneName.c_str()))
+			return &m_OffsetMatrices[i];
+	}
+
+	return nullptr;
+}
+
 #ifdef _DEBUG
 _bool CMesh::Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist)
 {

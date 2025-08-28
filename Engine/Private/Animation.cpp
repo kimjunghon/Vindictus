@@ -64,50 +64,84 @@ HRESULT CAnimation::Initialize(ifstream& File, const vector<class CBone*>& Bones
 	return S_OK;
 }
 
+void CAnimation::Update_TransformationMatricesLerp(const vector<class CBone*>& Bones, _bool* pFinished, _float fTimeDelta)
+{
+	m_fAnimChangeTime += fTimeDelta;
+
+	_float fRatio = m_fAnimChangeTime / m_fAnimChangeDelay;
+
+	if (m_fAnimChangeTime >= m_fAnimChangeDelay)
+	{
+		m_fAnimChangeTime = 0.f;
+
+		fRatio = 1.f;
+
+		*pFinished = false;
+	}
+
+	for (auto& pChannel : m_Channels)
+		pChannel->Update_AnimChangeTransformationMatrix(Bones, fRatio, &m_bAnimChangeFirstCall);
+
+	if (m_bAnimChangeFirstCall)
+		m_bAnimChangeFirstCall = false;
+}
+
 void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _bool* IsAnimStart)
 {
-	if (m_bAnimChange)
+	m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+
+	Check_Notify(m_fCurrentTrackPosition);
+
+	if (m_fCurrentTrackPosition >= m_fDuration)
 	{
-		m_fCurrentTrackPosition += fTimeDelta;
-
-		_float fRatio = m_fCurrentTrackPosition / m_fAnimChangeDelay;
-
-		if(m_fCurrentTrackPosition >= m_fAnimChangeDelay)
+		if (false == IsLoop)
 		{
+			*pFinished = true;
+			m_fCurrentTrackPosition = m_fDuration;
+			Reset_Notify();
+		}
+		else
+		{
+			*IsAnimStart = true;
 			m_fCurrentTrackPosition = 0.f;
-
-			fRatio = 1.f;
-
-			m_bAnimChange = false;
 		}
-
-		for (auto& pChannel : m_Channels)
-			pChannel->Update_AnimChangeTransformationMatrix(Bones, fRatio, &m_bAnimChangeFirstCall);
-
-		if (m_bAnimChangeFirstCall)
-			m_bAnimChangeFirstCall = false;
 	}
-	else
+
+	for (_uint i =0; i< m_iNumChannels; i++)
+		m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i]);
+}
+
+HRESULT CAnimation::Add_Notify(_float fTrackPosition, function<void()> Callback)
+{
+	if (nullptr == Callback)
+		return E_FAIL;
+
+	ANIM_NOTIFY Notify = {};
+	Notify.fTrackPosition = fTrackPosition;
+	Notify.Callback = Callback;
+	Notify.IsRun = false;
+
+	m_Notifies.push_back(Notify);
+
+	return S_OK;
+}
+
+void CAnimation::Check_Notify(_float fCurrentTrackPosition)
+{
+	for (auto Notify : m_Notifies)
 	{
-		m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
-
-		if (m_fCurrentTrackPosition >= m_fDuration)
+		if (false == Notify.IsRun && Notify.fTrackPosition <= fCurrentTrackPosition)
 		{
-			if (false == IsLoop)
-			{
-				*pFinished = true;
-				m_fCurrentTrackPosition = m_fDuration;
-			}
-			else
-			{
-				*IsAnimStart = true;
-				m_fCurrentTrackPosition = 0.f;
-			}
+			Notify.Callback();
+			Notify.IsRun = true;
 		}
-
-		for (_uint i =0; i< m_iNumChannels; i++)
-			m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i]);
 	}
+}
+
+void CAnimation::Reset_Notify()
+{
+	for (auto& Notify : m_Notifies)
+		Notify.IsRun = false;
 }
 
 _bool CAnimation::Anim_InRangeOfRatio(_float fBeginRatio, _float fEndRatio)
@@ -131,8 +165,10 @@ void CAnimation::Enter(_bool IsChange)
 
 	m_fCurrentTrackPosition = 0.f;
 
-	m_bAnimChange = IsChange;
+//	m_bAnimChange = IsChange;
 	m_bAnimChangeFirstCall = IsChange;
+
+	Reset_Notify();
 }
 
 CAnimation* CAnimation::Create(const aiAnimation* pAIAnimation, const vector<CBone*>& Bones)

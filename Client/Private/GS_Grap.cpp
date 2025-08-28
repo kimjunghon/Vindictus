@@ -49,7 +49,8 @@ void CGS_Grap::Update(CMonster* pMonster, _float fTimeDelta)
 
 			m_eGrapPhase = GRAP_PHASE::END;
 		}
-		else if (pMonster->IsReadyAttack(m_iStateFlag))
+
+		else if (pMonster->IsReadyAttack())
 			pMonster->LookAtTarget();
 	}
 }
@@ -57,6 +58,7 @@ void CGS_Grap::Update(CMonster* pMonster, _float fTimeDelta)
 void CGS_Grap::Exit(CMonster* pMonster)
 {
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::GRAP);
+	static_cast<CGlasgavelen*>(pMonster)->SetIsGrap(false);
 }
 
 CGS_Grap* CGS_Grap::Create()

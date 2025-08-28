@@ -43,7 +43,6 @@ public:
 	BT_STATE				CanNearAttack();
 	BT_STATE				NearAttack();
 
-	BT_STATE				IsStun();
 
 	BT_STATE				IsLook();
 	BT_STATE				Turn();

@@ -20,7 +20,7 @@ void CQS_Move::Enter(CMonster* pMonster)
 
 void CQS_Move::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	pMonster->TurnToTarget(fTimeDelta);
+	pMonster->TurnToTarget(fTimeDelta * 2.f);
 }
 
 void CQS_Move::Exit(CMonster* pMonster)

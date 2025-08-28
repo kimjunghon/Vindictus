@@ -128,8 +128,8 @@ void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones
 
 		if (Bones[m_iBoneIndex]->Compare_Name("ValveBiped.Bip01") || Bones[m_iBoneIndex]->Compare_Name("root"))
 		{
-			m_vChangePrevPosition = XMVectorSetX(m_vChangePrevPosition, 0.f);
-			m_vChangePrevPosition = XMVectorSetY(m_vChangePrevPosition, 0.f);
+			m_vChangePrevPosition = XMVectorSetX(m_vChangePrevPosition, m_KeyFrames[0].vPosition.x);
+			m_vChangePrevPosition = XMVectorSetY(m_vChangePrevPosition, m_KeyFrames[0].vPosition.y);
 			m_vChangePrevRotation = XMLoadFloat4(&m_KeyFrames[0].vRotation);
 		}
 	}

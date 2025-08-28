@@ -32,9 +32,6 @@ HRESULT CVampire_Elder::Initialize_Prototype()
 	m_fChaseRange = 120.f;
 	m_fMinDistance = 50.f;
 
-	if (FAILED(Ready_AttackMapping()))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -50,6 +47,9 @@ HRESULT CVampire_Elder::Initialize(void* pArg)
 		return E_FAIL;
 
 	if (FAILED(Ready_Collider()))
+		return E_FAIL;
+
+	if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Vampire_Elder_AnimData.json")))
 		return E_FAIL;
 
 	return S_OK;
@@ -87,7 +87,7 @@ void CVampire_Elder::Late_Update(_float fTimeDelta)
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
 
-	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix(), m_iStateFlag);
+	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix());
 
 #ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
@@ -109,16 +109,6 @@ HRESULT CVampire_Elder::Render()
 #endif
 	return S_OK;
 }
-
-
-//BT_STATE CVampire_Elder::Attack()
-//{
-//	ChangeState(ENUM_CLASS(VAMPIRE_STATE::ATTACK));
-//
-//	m_AttackTime[m_iCurrentAttack] = 0.f;
-//
-//	return BT_STATE::SUCCESS;
-//}
 
 HRESULT CVampire_Elder::Ready_PawnObject()
 {
@@ -259,12 +249,51 @@ HRESULT CVampire_Elder::Ready_Collider_Attack()
 	return S_OK;
 }
 
-HRESULT CVampire_Elder::Ready_AttackMapping()
+void CVampire_Elder::CreateFireBall(ATTACK_TYPE eType, _float fAttackRatio)
 {
-	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+}
 
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::MELEE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_HAND), ATTACK_TYPE::LIGHT, 1.f, _float2(70.f, 75.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::MELEE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_HAND), ATTACK_TYPE::LIGHT, 1.f, _float2(89.f, 94.f) });
+void CVampire_Elder::ThrowFireBall()
+{
+}
+
+HRESULT CVampire_Elder::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+{
+	if (!strcmp(strAnimName.c_str(), "Attack_FireBall"))
+		Add_FireBallNotify(eType, fAttackRatio, vTrackPosition);
+	else
+	{
+		if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
+			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(true);
+			m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
+			m_CurrentAttackData.eAttackType = eType;
+			m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
+			m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(&m_CurrentAttackData);
+			})))
+			return E_FAIL;
+
+		if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this, iAttackColliderIndex]() {
+			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
+			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(nullptr);
+			})))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CVampire_Elder::Add_FireBallNotify(ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+{
+	if (FAILED(m_pBody->Add_AnimNotify("Attack_FireBall", vTrackPosition.x, [this, eType, fAttackRatio]() {
+		this->CreateFireBall(eType, fAttackRatio);
+		})))
+		return E_FAIL;
+
+	if (FAILED(m_pBody->Add_AnimNotify("Attack_FireBall", vTrackPosition.y, [this]() {
+		this->ThrowFireBall();
+		})))
+		return E_FAIL;
 
 	return S_OK;
 }

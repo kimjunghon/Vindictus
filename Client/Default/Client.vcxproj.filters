@@ -163,9 +163,6 @@
     <Filter Include="01.Instance\Monster">
       <UniqueIdentifier>{805079d1-d68c-4e0c-b909-03890185eafd}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Instance\Monster\Pool_Manager">
-      <UniqueIdentifier>{ed93d96e-5f5b-416a-abd9-639c9af76c1f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Instance\Player\Equip_Manager">
       <UniqueIdentifier>{d42ce48f-7b21-450f-86a8-21cdf72a3a9e}</UniqueIdentifier>
     </Filter>
@@ -429,6 +426,12 @@
     </Filter>
     <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\AI">
       <UniqueIdentifier>{48d68f22-3e3a-4f4d-adc0-38d03fa1f9b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Pool_Manager">
+      <UniqueIdentifier>{ed93d96e-5f5b-416a-abd9-639c9af76c1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\PlayerState\Hit\Grap">
+      <UniqueIdentifier>{bfbfb77f-8fe9-4746-bf4f-622aca78e8e5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -697,7 +700,7 @@
       <Filter>01.Instance\Player\Equip_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Pooling_Manager.h">
-      <Filter>01.Instance\Monster\Pool_Manager</Filter>
+      <Filter>01.Instance\Pool_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Spawn_Manager.h">
       <Filter>01.Instance\Monster\Spawn_Manager</Filter>
@@ -839,6 +842,9 @@
     </ClInclude>
     <ClInclude Include="..\public\GlasgavelenAI.h">
       <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\AI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\State_Grap.h">
+      <Filter>03.GameObject\Pawns\State\PlayerState\Hit\Grap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1093,7 +1099,7 @@
       <Filter>01.Instance\Player\Equip_Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Pooling_Manager.cpp">
-      <Filter>01.Instance\Monster\Pool_Manager</Filter>
+      <Filter>01.Instance\Pool_Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Spawn_Manager.cpp">
       <Filter>01.Instance\Monster\Spawn_Manager</Filter>
@@ -1235,6 +1241,9 @@
     </ClCompile>
     <ClCompile Include="..\private\GlasgavelenAI.cpp">
       <Filter>03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\AI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\State_Grap.cpp">
+      <Filter>03.GameObject\Pawns\State\PlayerState\Hit\Grap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

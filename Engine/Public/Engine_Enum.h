@@ -36,7 +36,7 @@ namespace Engine
 	enum class LINE { AB, BC, CA, END};
 
 	enum class COLLIDER { AABB, OBB, SPHERE, END };
- 
+	enum class COLLIDER_TYPE { NONE, OVERLAP, BLOCK, END};
 	enum class COLLIDER_STATE { BEGIN, DURING, END, NONE };
 }
 

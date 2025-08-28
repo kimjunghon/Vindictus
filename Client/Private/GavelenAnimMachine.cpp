@@ -40,8 +40,9 @@ void CGavelenAnimMachine::Initialize_MOVE()
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::MOVE);
 
 	m_AnimDatas[iFlag | ENUM_CLASS(MOVE_FLAG::RUN)] =			{ "Run", true, _float2(0.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(MOVE_FLAG::TURN_LEFT)] =		{ "Turn_Left", false, _float2(1.f, 1.f), 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(MOVE_FLAG::TURN_RIGHT)] =	{ "Turn_Right", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(MOVE_FLAG::TURN)] =		{ "Turn", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(MOVE_FLAG::TURN_LEFT)] =		{ "Turn_Left", false, _float2(1.f, 1.f), 3.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(MOVE_FLAG::TURN_RIGHT)] =	{ "Turn_Right", false, _float2(1.f, 1.f), 3.f };
 }
 
 void CGavelenAnimMachine::Initialize_ATTACK()

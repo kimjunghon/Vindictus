@@ -35,8 +35,7 @@ _bool CPlayerPawn::AnimCanChange()
 
 HRESULT CPlayerPawn::Initialize_Prototype()
 {
-	if (FAILED(Ready_AttackMapping()))
-		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -87,6 +86,9 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	//test
 	m_Status.fAttackDamage = 20.f;
 
+	if (FAILED(Ready_AttackMapping()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -113,14 +115,15 @@ void CPlayerPawn::Update(_float fTimeDelta)
 
 void CPlayerPawn::Late_Update(_float fTimeDelta)
 {
-	Compute_WorldMatrix();
+	if(false == m_IsGrap)
+		Compute_WorldMatrix();
 
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
 
 	Update_HitColliderEnable();
 
-	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix(), m_iStateFlag);
+	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix());
 
 #ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
@@ -185,6 +188,27 @@ void CPlayerPawn::Compute_PlayerMoveDir()
 	//m_vPlayerRotationQuat = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw);
 }
 
+void CPlayerPawn::Grap()
+{
+	_matrix GrapMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_GrapData.SocketMatrixPtr), XMLoadFloat4x4(m_GrapData.WorldMatrixPtr));
+
+	_vector vScale = {};
+	_vector vRotation = {};
+	_vector vPosition = {};
+
+	_vector vOffsetPosition = XMVectorSet(3.f, -5.f, 20.f, 1.f);
+	_vector vOffsetRotate = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(90.f), XMConvertToRadians(-90.f), XMConvertToRadians(90.f));
+	_matrix OffsetMatrix = XMMatrixAffineTransformation(XMVectorSet(1.f, 1.f, 1.f, 0.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), vOffsetRotate, vOffsetPosition);
+
+	XMMatrixDecompose(&vScale, &vRotation, &vPosition, GrapMatrix);
+
+	_matrix CombinedTransformationMatrix = XMMatrixAffineTransformation(XMVectorSet(1.f, 1.f, 1.f, 0.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
+	
+	CombinedTransformationMatrix = XMMatrixMultiply(OffsetMatrix, CombinedTransformationMatrix);
+
+	m_pTransformCom->Set_WorldMatrix(CombinedTransformationMatrix);
+}
+
 HRESULT CPlayerPawn::EquipWeapon(CWeapon* pWeapon)
 {
 	if (nullptr == pWeapon)
@@ -233,7 +257,10 @@ HRESULT CPlayerPawn::EquipArmor(CArmor* pArmor)
 	ARMOR_TYPE eArmorType = pArmor->Get_ArmorType();
 
 	if (eArmorType == ARMOR_TYPE::HEAD)
-		m_pPlayerBody->IsHair(false);
+	{
+		if(false == pArmor->IsBroekn())
+			m_pPlayerBody->IsHair(false);
+	}
 
 	if (m_strEquipArmors[ENUM_CLASS(eArmorType)].size() > 0)
 		UnEquipArmor(ENUM_CLASS(eArmorType));
@@ -314,6 +341,41 @@ void CPlayerPawn::OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_D
 
 	if (FAILED(m_pPlayerBody->Forcing_Play_Animation()))
 		return;
+}
+
+void CPlayerPawn::OnCollisionGrap(const CCollider::COLLISION_DATA& CollisionData)
+{
+	if (nullptr == CollisionData.pDesc)
+		return;
+
+	DisableColliderChannel(COLLIDER_CHANNEL::HIT);
+	DisableColliderChannel(COLLIDER_CHANNEL::BODY);
+
+	GRAP_DATA* pGrapData = static_cast<GRAP_DATA*>(CollisionData.pDesc);
+
+	m_GrapData = *pGrapData;
+
+	m_IsGrap = true;
+
+	Change_State(ENUM_CLASS(PLAYER_STATE::GRAP));
+
+	m_pCurrentState->Bind_StateFlag(m_iStateFlag);
+
+	if (FAILED(m_pPlayerBody->Forcing_Play_Animation()))
+		return;
+}
+
+void CPlayerPawn::EndCollisionGrap(const CCollider::COLLISION_DATA& CollisionData)
+{
+	m_IsGrap = false;
+	
+	if (nullptr == CollisionData.pDesc)
+		return;
+	
+	EnableColliderChannel(COLLIDER_CHANNEL::HIT);
+	EnableColliderChannel(COLLIDER_CHANNEL::BODY);
+	
+	ATTACK_DATA* AttackData = static_cast<ATTACK_DATA*>(CollisionData.pDesc);
 }
 
 void CPlayerPawn::Change_HitState(ATTACK_TYPE eAttackType, _fvector vPosition, _fvector vAttackPosition)
@@ -428,38 +490,6 @@ void CPlayerPawn::Move(_float fTimeDelta)
 	m_pTransformCom->MovePositionToVector(vMovePosition, m_pNavigationCom);
 }
 
-void CPlayerPawn::Update_AttackColliders(_fmatrix UpdateWorldMatrix, _uint iStateFlag)
-{
-	auto iter = m_AttackMapping.find(iStateFlag);
-	if (iter == m_AttackMapping.end())
-		return;
-
-	for (auto& AttackMap : iter->second)
-	{
-		_uint iAttackIndex = AttackMap.iAttackColliderIndex;
-
-		if (false == m_pPlayerBody->IsAnimationInRangeTrackPosition(AttackMap.vAttackRange))
-		{
-			m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetEnable(false);
-			m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Set_Desc(nullptr);
-			continue;
-		}
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->SetEnable(true);
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Set_Desc(&m_CurrentAttackData);
-
-		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) <<1);
-		m_CurrentAttackData.eAttackType= AttackMap.eAttackType;
-		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * AttackMap.fAttackRatio;
-		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
-
-
-		m_AttackColliderCombinedMatrix[iAttackIndex] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[iAttackIndex]), UpdateWorldMatrix);
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]->Update(m_AttackColliderCombinedMatrix[iAttackIndex]);
-
-		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackIndex]);
-
-	}
-}
 
 HRESULT CPlayerPawn::Init_Level(_int iCellIndex, _float3 vStartPostion)
 {
@@ -597,6 +627,7 @@ HRESULT CPlayerPawn::Ready_States()
 	m_States[ENUM_CLASS(PLAYER_STATE::HIT_STRONG)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::HIT_STRONG));
 	m_States[ENUM_CLASS(PLAYER_STATE::HIT_GUARD)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::HIT_GUARD));
 	m_States[ENUM_CLASS(PLAYER_STATE::HIT_HEAVYSTAND)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::HIT_HEAVYSTAND));
+	m_States[ENUM_CLASS(PLAYER_STATE::GRAP)] = pStateFactory->Create(ENUM_CLASS(PLAYER_STATE::GRAP));
 
 	m_pCurrentState = m_States[ENUM_CLASS(PLAYER_STATE::IDLE)];
 
@@ -615,6 +646,9 @@ HRESULT CPlayerPawn::Ready_Collider()
 		return E_FAIL;
 
 	if (FAILED(Ready_Collider_Attack()))
+		return E_FAIL;
+
+	if (FAILED(Add_Collider_Grap()))
 		return E_FAIL;
 
 	return S_OK;
@@ -777,33 +811,141 @@ HRESULT CPlayerPawn::Ready_Collider_Attack()
 	return S_OK;
 }
 
+HRESULT CPlayerPawn::Add_Collider_Grap()
+{
+	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
+	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(10.f, 18.f, 10.f);
+	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
+
+	CCollider::COLLIDER_DESC ColliderDesc = {};
+	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::GRAP);
+	ColliderDesc.iOwner = ENUM_CLASS(COLLIDER_OWNER::PLAYER);
+	ColliderDesc.BoundingDesc = &OBBDesc;
+
+	CCollider* pGrapCollider = { nullptr };
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		TEXT("Com_Collider_Grap"), reinterpret_cast<CComponent**>(&pGrapCollider), &ColliderDesc)))
+		return E_FAIL;
+
+	m_Colliders[COLLIDER_CHANNEL::GRAP].push_back(pGrapCollider);
+	
+	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::GRAP, 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
+		this->OnCollisionGrap(Data); })))
+		return E_FAIL;
+
+	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::GRAP, 0, COLLIDER_STATE::END, [this](const CCollider::COLLISION_DATA& Data) {
+		this->EndCollisionGrap(Data); })))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CPlayerPawn::Ready_AttackMapping()
 {
-	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+	ifstream File("../Bin/Resources/AnimDatas/Player_AnimData.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Player_AnimData Open"));
+		return E_FAIL;
+	}
 
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(12.f, 22.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(15.f, 25.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO3)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(8.f, 18.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO4)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(29.f, 38.f) });
+	IStreamWrapper FileWrap(File);
 
-	iFlag = ENUM_CLASS(STATE_FLAG::SMASH);
+	Document Doc;
+	Doc.ParseStream(FileWrap);
 
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 1.2f, _float2(18.f, 22.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::STRONG, 2.f, _float2(13.f, 18.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 1.5, _float2(11.f, 19.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_0)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 1.8f, _float2(23.f, 29.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 1.8f, _float2(24.f, 30.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::STRONG, 2.f, _float2(19.f, 25.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_0)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 2.f, _float2(18.f, 22.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 2.f, _float2(11.f, 18.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(25.f, 36.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH4)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(33.f, 44.f) });
-	m_AttackMapping[iFlag | ENUM_CLASS(SMASH_FLAG::SMASH_GUARD_COUNTER)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::STRONG, 2.f, _float2(8.f, 13.f) });
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
 
-	iFlag = ENUM_CLASS(STATE_FLAG::GUARD);
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
 
-	m_AttackMapping[iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_ATTACK)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.2f, _float2(9.f, 12.f) });
-	
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_uint  iColliderIndex = {};
+			ATTACK_TYPE eType = {};
+			_float fDamageRatio = {};
+			_float2 vTrackPositionRange = {};
+
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+			
+			if (Notify.HasMember("Collider_Index") && Notify["Collider_Index"].IsInt())
+				iColliderIndex = Notify["Collider_Index"].GetInt();
+
+			if (Notify.HasMember("AttackType") && Notify["AttackType"].IsInt())
+				eType = static_cast<ATTACK_TYPE>(Notify["AttackType"].GetInt());
+
+			if (Notify.HasMember("DamageRatio") && Notify["DamageRatio"].IsFloat())
+				fDamageRatio = Notify["DamageRatio"].GetFloat();
+
+			if (Notify.HasMember("OnTrackPosition") && Notify["OnTrackPosition"].IsFloat())
+				vTrackPositionRange.x = Notify["OnTrackPosition"].GetFloat();
+
+			if (Notify.HasMember("OffTrackPosition") && Notify["OffTrackPosition"].IsFloat())
+				vTrackPositionRange.y = Notify["OffTrackPosition"].GetFloat();
+
+			if (FAILED(Add_AttackCollisionInfo(strAnimName, iColliderIndex, eType, fDamageRatio, vTrackPositionRange)))
+				return E_FAIL;
+		}
+	}
+
+	//_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO1), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(12.f, 22.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO2), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(15.f, 25.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO3), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(8.f, 18.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO4), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(29.f, 38.f));
+
+	//iFlag = ENUM_CLASS(STATE_FLAG::SMASH);
+
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 1.2f, _float2(18.f, 22.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::STRONG, 2.f, _float2(13.f, 18.f));
+
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH1), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 1.5f, _float2(11.f, 19.f));
+
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_0), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 1.8f, _float2(23.f, 29.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_1), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 1.8f, _float2(24.f, 30.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_2), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::STRONG, 2.f, _float2(19.f, 25.f));
+
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_0), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 2.f, _float2(18.f, 22.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_1), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 2.f, _float2(11.f, 18.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_2), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(25.f, 36.f));
+
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH4), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(33.f, 44.f));
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH_GUARD_COUNTER), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::STRONG, 2.f, _float2(8.f, 13.f));
+	//
+	//iFlag = ENUM_CLASS(STATE_FLAG::GUARD);
+	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_ATTACK), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.2f, _float2(9.f, 12.f));
+	//
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+{
+	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
+		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(true);
+		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
+		m_CurrentAttackData.eAttackType = eType;
+		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
+		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(&m_CurrentAttackData);
+		})))
+		return E_FAIL;
+
+	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this, iAttackColliderIndex]() {
+		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
+		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(nullptr);
+		})))
+		return E_FAIL;
+
 	return S_OK;
 }
 

@@ -207,13 +207,19 @@ HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
     if (nullptr == pAnimation)
         return E_FAIL;
 
+    if(nullptr == m_pCurrentAnimation)
+        m_IsAnimChange = false;
+    else
+        m_IsAnimChange = true;
+
     m_pCurrentAnimation = pAnimation;
+    
     _bool IsAnimChange = false;
 
-    if (false == m_IsFinished)
+  //  if (false == m_IsFinished)
         IsAnimChange = true;
 
-    m_pCurrentAnimation->Enter(IsAnimChange);
+    m_pCurrentAnimation->Enter(m_IsAnimChange);
 
     m_IsAnimStart = true;
 
@@ -228,18 +234,18 @@ HRESULT CModel::Forcing_Set_Animation(const ANIM_DATA& AnimData)
     if (nullptr == pAnimation)
         return E_FAIL;
 
+    if (nullptr == m_pCurrentAnimation)
+        m_IsAnimChange = false;
+    else
+        m_IsAnimChange = true;
+
     m_pCurrentAnimation = pAnimation;
 
     m_vPrevRootPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 
     m_vPrevRootRotation = XMQuaternionIdentity();
 
-    _bool IsAnimChange = false;
-
-    /*if (false == m_IsFinished)
-        IsAnimChange = true;*/
-
-    m_pCurrentAnimation->Enter(IsAnimChange);
+    m_pCurrentAnimation->Enter(m_IsAnimChange);
 
     m_IsAnimStart = true;
 
@@ -254,7 +260,12 @@ _bool CModel::Play_Animation(_float fTimeDelta)
     {
         m_IsFinished = false;
 
-        m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed, &m_IsAnimStart);
+        if (m_IsAnimChange)
+            m_pCurrentAnimation->Update_TransformationMatricesLerp(m_Bones, &m_IsAnimChange, fTimeDelta * m_CurrentAnimData.fAnimSpeed);
+        else
+        {
+            m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed, &m_IsAnimStart);
+        }
     }
 
     for(_uint i =0; i< m_Bones.size(); i++)
@@ -653,6 +664,7 @@ void CModel::RootMotion()
     if (m_RootMotionOption.Rotation)
     {
         m_vAnimRotation = XMQuaternionMultiply(vRotation, XMQuaternionInverse(vTempPrevRotation));
+        //m_vAnimRotation = vRotation;
 
         if(m_RootMotionOption.RotationOnlyZ)
         {
@@ -663,13 +675,26 @@ void CModel::RootMotion()
             vRotation = XMQuaternionMultiply(vRotation, vRotationInverse);
         }
         else
+        {
             vRotation = XMQuaternionIdentity();
+        }
     }
-
 
     _matrix CombinedTransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vPosition);
 
     m_Bones[m_iRootBoneIndex]->Set_CombinedTransformationMatrix(CombinedTransformationMatrix);
+}
+
+HRESULT CModel::Add_AnimNotify(const string& strAnimationTag, _float fTrackPosition, function<void()> Callback)
+{
+    CAnimation* pAnimation = Find_Animation(strAnimationTag);
+    if (nullptr == pAnimation)
+        return E_FAIL;
+
+    if (FAILED(pAnimation->Add_Notify(fTrackPosition, Callback)))
+        return E_FAIL;
+
+    return S_OK;
 }
 
 const _float4x4* CModel::Find_SocketBoneCombinedMatrix(const string& strSocketBoneName)
@@ -684,6 +709,21 @@ const _float4x4* CModel::Find_SocketBoneCombinedMatrix(const string& strSocketBo
         return nullptr;
 
     return (*iter)->Get_CombinedTransformationMatrixPtr();
+}
+
+const _float4x4* CModel::Find_OffsetMatrix(const string& strSocketBoneName)
+{
+    for (auto& Mesh : m_Meshes)
+    {
+        const _float4x4* pOffsetMatrix = nullptr;
+
+        pOffsetMatrix = Mesh->Find_OffsetMatrix(m_Bones, strSocketBoneName);
+
+        if (pOffsetMatrix)
+            return pOffsetMatrix;
+    }
+
+    return nullptr;
 }
 
 #ifdef _DEBUG

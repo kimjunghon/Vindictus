@@ -28,8 +28,8 @@ void CQS_Attack::Enter(CMonster* pMonster)
 
 void CQS_Attack::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	if (pMonster->IsReadyAttack(m_iStateFlag))
-		pMonster->TurnToTarget(fTimeDelta);
+	if (pMonster->IsReadyAttack())
+		pMonster->TurnToTarget(fTimeDelta * 2.f);
 }
 
 void CQS_Attack::Exit(CMonster* pMonster)

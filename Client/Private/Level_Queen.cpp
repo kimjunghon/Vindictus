@@ -36,7 +36,7 @@ void CLevel_Queen::Update(_float fTimeDelta)
 		m_pMonsterInstance->BeginRoomSpawn(0);
 	}
 
-	if (m_pGameInstance->Get_KeyDown(DIK_I))
+	if (m_pGameInstance->Get_KeyDown(DIK_T))
 	{
 		m_pMonsterInstance->WaveEnd();
 	}

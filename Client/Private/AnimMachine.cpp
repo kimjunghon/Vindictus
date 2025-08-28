@@ -26,6 +26,14 @@ HRESULT CAnimMachine::Forcing_Set_Animation(CModel* pModelCom, _uint iState)
 	return 	pModelCom->Forcing_Set_Animation(m_AnimDatas[iState]);
 }
 
+const ANIM_DATA* CAnimMachine::Get_AnimationData(_uint iState)
+{
+	if (m_AnimDatas.end() == m_AnimDatas.find(iState))
+		return nullptr;
+
+	return &m_AnimDatas[iState];
+}
+
 void CAnimMachine::Free()
 {
     __super::Free();

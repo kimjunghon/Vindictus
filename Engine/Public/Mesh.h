@@ -23,6 +23,7 @@ public:
 	
 	HRESULT			Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones);
 	HRESULT			Bind_PoseBoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CBone*>& Bones);
+	const _float4x4* Find_OffsetMatrix(vector<CBone*>& Bones, const string& strSocketBoneName);
 #ifdef _DEBUG
 	_bool			Is_Pick(_fvector vLocalPickPosition, _fvector vLocalPickDir, _float& fDist);
 #endif

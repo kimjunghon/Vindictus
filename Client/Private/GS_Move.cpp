@@ -20,8 +20,8 @@ void CGS_Move::Enter(CMonster* pMonster)
 
 void CGS_Move::Update(CMonster* pMonster, _float fTimeDelta)
 {
-	pMonster->LookAtTarget();
-//	pMonster->TurnToTarget(fTimeDelta);
+//	pMonster->LookAtTarget();
+	pMonster->TurnToTarget(10.f);
 }
 
 void CGS_Move::Exit(CMonster* pMonster)
