@@ -15,6 +15,12 @@ private:
 	CModel(const CModel& Prototype);
 	virtual ~CModel() = default;
 
+#ifdef _DEBUG
+public:
+	const map<string, CAnimation*>& Get_Animations() { return m_Animations; }
+	void Set_AnimChange(_bool IsChange) { m_IsAnimChange = IsChange; }
+#endif
+
 public:
 	_uint					Get_NumMeshes() const { return m_iNumMeshes; }
 

@@ -183,9 +183,6 @@ void CPlayerPawn::Compute_PlayerMoveDir()
 	if (fDot < 0.f)
 		m_vPlayerRotationQuat = XMVectorNegate(m_vPlayerRotationQuat);
 
-
-	//_float fYaw = atan2f(XMVectorGetX(m_vPlayerMoveDir), XMVectorGetZ(m_vPlayerMoveDir));
-	//m_vPlayerRotationQuat = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw);
 }
 
 void CPlayerPawn::Grap()
@@ -196,7 +193,7 @@ void CPlayerPawn::Grap()
 	_vector vRotation = {};
 	_vector vPosition = {};
 
-	_vector vOffsetPosition = XMVectorSet(3.f, -5.f, 20.f, 1.f);
+	_vector vOffsetPosition = XMVectorSet(-3.f, -6.f, 20.f, 1.f);
 	_vector vOffsetRotate = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(90.f), XMConvertToRadians(-90.f), XMConvertToRadians(90.f));
 	_matrix OffsetMatrix = XMMatrixAffineTransformation(XMVectorSet(1.f, 1.f, 1.f, 0.f), XMVectorSet(0.f, 0.f, 0.f, 1.f), vOffsetRotate, vOffsetPosition);
 

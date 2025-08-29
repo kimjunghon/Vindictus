@@ -213,11 +213,6 @@ HRESULT CModel::Set_Animation(const ANIM_DATA& AnimData)
         m_IsAnimChange = true;
 
     m_pCurrentAnimation = pAnimation;
-    
-    _bool IsAnimChange = false;
-
-  //  if (false == m_IsFinished)
-        IsAnimChange = true;
 
     m_pCurrentAnimation->Enter(m_IsAnimChange);
 

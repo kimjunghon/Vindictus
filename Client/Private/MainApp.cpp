@@ -306,7 +306,6 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Test.png"), 1))))
 		return E_FAIL;
 
-
 #pragma region LOADING_UI
 	/* Ready_Prototype_Component_Texture_LoadingScreen */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LoadingScreen"),

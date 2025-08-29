@@ -165,7 +165,6 @@ void CAnimation::Enter(_bool IsChange)
 
 	m_fCurrentTrackPosition = 0.f;
 
-//	m_bAnimChange = IsChange;
 	m_bAnimChangeFirstCall = IsChange;
 
 	Reset_Notify();

@@ -179,24 +179,28 @@ technique11 DefaultTechnique
     pass DefaultPass
     {
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
     pass AlphaBlendPass
     {
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BLEND();
     }
 
     pass ProgressBarPass
     {
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_PROGRESSBAR();
     }
 
     pass LoadingPointPass
     {
         VertexShader = compile vs_5_0 VS_LOADINGPOINT();
+        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_LOADINGPOINT();
     }
 }

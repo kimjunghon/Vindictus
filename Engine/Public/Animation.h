@@ -21,6 +21,13 @@ private:
 	CAnimation(const CAnimation& Prototype);
 	virtual ~CAnimation() = default;
 
+#ifdef _DEBUG
+public:
+	_float			Get_Duration() { return m_fDuration; }
+	_float*			Get_CurrentTrackPositionPtr() { return &m_fCurrentTrackPosition; }
+	void			Reset_KeyFrameIndex() { fill(m_CurrentKeyFrameIndices.begin(), m_CurrentKeyFrameIndices.end(), 0);}
+#endif
+
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
 	HRESULT Initialize(ifstream& File, const vector<class CBone*>& Bones);
