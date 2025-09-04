@@ -216,6 +216,21 @@ namespace Engine
 		};
 	}VTXPOINTPARTICLE;
 
+	typedef struct tagVertexTrail
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT2		vTexcoord;
+		XMFLOAT2		vLifeTime;
+
+		static const unsigned int	iNumElements = { 3 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+	}VTXTRAIL;
+
 	typedef struct tagAnimData
 	{
 		string		strAnimKey;
@@ -239,6 +254,13 @@ namespace Engine
 		XMFLOAT3 vMinPosition;
 		XMFLOAT3 vMaxPosition;
 	}MODEL_BOUNDING;
+
+	typedef struct tagTrailNode
+	{
+		XMFLOAT3 vTrailLeft;
+		XMFLOAT3 vTrailRight;
+		XMFLOAT2 vLifeTime;
+	}TRAIL_NODE;
 }
 
 

@@ -160,17 +160,11 @@
     <Filter Include="01.Instance\Player">
       <UniqueIdentifier>{4e5a0e78-895a-4a43-9b42-c385d7530386}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Instance\Monster">
-      <UniqueIdentifier>{805079d1-d68c-4e0c-b909-03890185eafd}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Instance\Player\Equip_Manager">
       <UniqueIdentifier>{d42ce48f-7b21-450f-86a8-21cdf72a3a9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="01.Instance\Player\Storage_Manager">
       <UniqueIdentifier>{65ef9f0d-30ca-41e8-a776-0625986f80ab}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01.Instance\Monster\Spawn_Manager">
-      <UniqueIdentifier>{238be20a-b21b-489b-b8e1-6febf3104d12}</UniqueIdentifier>
     </Filter>
     <Filter Include="03.GameObject\Map">
       <UniqueIdentifier>{2ca07e59-9edc-42f6-af4c-ed7ef0be0179}</UniqueIdentifier>
@@ -427,11 +421,32 @@
     <Filter Include="03.GameObject\Pawns\ColliderPawn\Monster\Glasgavelen\AI">
       <UniqueIdentifier>{48d68f22-3e3a-4f4d-adc0-38d03fa1f9b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Instance\Pool_Manager">
-      <UniqueIdentifier>{ed93d96e-5f5b-416a-abd9-639c9af76c1f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.GameObject\Pawns\State\PlayerState\Hit\Grap">
       <UniqueIdentifier>{bfbfb77f-8fe9-4746-bf4f-622aca78e8e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Effect">
+      <UniqueIdentifier>{ed71bdc4-cbe5-4ae5-b73f-98a6589d966a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Effect\Billboard">
+      <UniqueIdentifier>{9644226e-193d-40c9-9367-4dcc0a10caea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Effect\Trail">
+      <UniqueIdentifier>{cf9de3f8-12c5-48ff-8984-35e52b34600f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Pool">
+      <UniqueIdentifier>{805079d1-d68c-4e0c-b909-03890185eafd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Pool\Pool_Manager">
+      <UniqueIdentifier>{ed93d96e-5f5b-416a-abd9-639c9af76c1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Instance\Pool\Spawn_Manager">
+      <UniqueIdentifier>{238be20a-b21b-489b-b8e1-6febf3104d12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Effect\Prefab">
+      <UniqueIdentifier>{9dda7fbd-abd3-45c4-a0a6-1397d334d780}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Effect\Static">
+      <UniqueIdentifier>{4607269b-5fdd-4982-8740-804e0804f8b7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -690,8 +705,8 @@
     <ClInclude Include="..\public\PlayerInstance.h">
       <Filter>01.Instance\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\MonsterInstance.h">
-      <Filter>01.Instance\Monster</Filter>
+    <ClInclude Include="..\public\Pool_Instance.h">
+      <Filter>01.Instance\Pool</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Storage_Manager.h">
       <Filter>01.Instance\Player\Storage_Manager</Filter>
@@ -699,11 +714,8 @@
     <ClInclude Include="..\public\Equipment_Manager.h">
       <Filter>01.Instance\Player\Equip_Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Pooling_Manager.h">
-      <Filter>01.Instance\Pool_Manager</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Spawn_Manager.h">
-      <Filter>01.Instance\Monster\Spawn_Manager</Filter>
+      <Filter>01.Instance\Pool\Spawn_Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\public\ColliderPawn.h">
       <Filter>03.GameObject\Pawns\ColliderPawn</Filter>
@@ -845,6 +857,24 @@
     </ClInclude>
     <ClInclude Include="..\public\State_Grap.h">
       <Filter>03.GameObject\Pawns\State\PlayerState\Hit\Grap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SwordTrail.h">
+      <Filter>03.GameObject\Effect\Trail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Effect.h">
+      <Filter>03.GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Pooling_Manager.h">
+      <Filter>01.Instance\Pool\Pool_Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Effect_Billboard.h">
+      <Filter>03.GameObject\Effect\Static</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Effect_Prefab.h">
+      <Filter>03.GameObject\Effect\Prefab</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Static.h">
+      <Filter>03.GameObject\Effect\Billboard</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1089,8 +1119,8 @@
     <ClCompile Include="..\private\PlayerInstance.cpp">
       <Filter>01.Instance\Player</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\MonsterInstance.cpp">
-      <Filter>01.Instance\Monster</Filter>
+    <ClCompile Include="..\private\Pool_Instance.cpp">
+      <Filter>01.Instance\Pool</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Storage_Manager.cpp">
       <Filter>01.Instance\Player\Storage_Manager</Filter>
@@ -1098,11 +1128,8 @@
     <ClCompile Include="..\private\Equipment_Manager.cpp">
       <Filter>01.Instance\Player\Equip_Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Pooling_Manager.cpp">
-      <Filter>01.Instance\Pool_Manager</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Spawn_Manager.cpp">
-      <Filter>01.Instance\Monster\Spawn_Manager</Filter>
+      <Filter>01.Instance\Pool\Spawn_Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\private\ColliderPawn.cpp">
       <Filter>03.GameObject\Pawns\ColliderPawn</Filter>
@@ -1245,6 +1272,24 @@
     <ClCompile Include="..\private\State_Grap.cpp">
       <Filter>03.GameObject\Pawns\State\PlayerState\Hit\Grap</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\SwordTrail.cpp">
+      <Filter>03.GameObject\Effect\Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Effect.cpp">
+      <Filter>03.GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Pooling_Manager.cpp">
+      <Filter>01.Instance\Pool\Pool_Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Effect_Billboard.cpp">
+      <Filter>03.GameObject\Effect\Static</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Effect_Prefab.cpp">
+      <Filter>03.GameObject\Effect\Prefab</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Static.cpp">
+      <Filter>03.GameObject\Effect\Billboard</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
@@ -1263,6 +1308,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTrail.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

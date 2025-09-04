@@ -5,7 +5,7 @@
 
 NS_BEGIN(Client)
 
-class CMonsterInstance;
+class CPool_Instance;
 
 class CLevel_Queen final : public CLevel
 {
@@ -19,7 +19,7 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CMonsterInstance* m_pMonsterInstance = { nullptr };
+	CPool_Instance* m_pPool_Instance = { nullptr };
 
 private:
 	HRESULT Ready_Light();

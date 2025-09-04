@@ -4,7 +4,7 @@
 
 NS_BEGIN(Client)
 
-class CMonsterInstance;
+class CPool_Instance;
 
 class CSpawn_Manager final : public CBase
 {
@@ -27,7 +27,7 @@ public:
 	HRESULT		WaveEnd();
 
 private:
-	CMonsterInstance*		m_pMonsterInstance = { nullptr };
+	CPool_Instance*		m_pPool_Instance = { nullptr };
 	ROOM_SPAWN_MAP			m_RoomData;
 	ROOM_SPAWN_DATA*		m_pCurrentRoomData;
 	_uint					m_iMaxWave = {};

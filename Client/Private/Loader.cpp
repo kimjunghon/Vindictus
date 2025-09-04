@@ -9,6 +9,12 @@
 #include "RoundShield.h"
 #include "Armor.h"
 
+//Effect
+#include "SwordTrail.h"
+#include "Effect_Static.h"
+#include "Effect_Billboard.h"
+#include "Effect_Prefab.h"
+
 #include "Glasgavelen.h"
 #include "GlasgavelenBody.h"
 #include "GlasgavelenSword.h"
@@ -159,8 +165,27 @@ HRESULT CLoader::Loading_For_Town_Level()
 
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
+	//////////////////////////////////////////////////////////////EFFECT//////////////////////////////////////////////////////////////
+	lstrcpy(m_szLoadingText, TEXT("이펙트 원형를 로딩중입니다."));
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Effect_Static"),
+		CEffect_Static::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Effect_Billboard"),
+		CEffect_Billboard::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	Loading_For_Effect("../Bin/Resources/EffectData/LoadFile/TownEffect.json", ENUM_CLASS(LEVEL::TOWN));
+
+
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
+
+	/* Prototype_Component_Texture_SwordTrail */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordTrail"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Effect/heroes_effect_blade_trail_longsword.png"), 1))))
+		return E_FAIL;
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -261,6 +286,11 @@ HRESULT CLoader::Loading_For_Town_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
 
+	/* Prototype_Effect_SwordTrail */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Effect_SwordTrail"),
+		CSwordTrail::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
@@ -286,6 +316,17 @@ HRESULT CLoader::Loading_For_Queen_Level()
 	Event.fRatio = m_fLoadingRatio;
 
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
+	//////////////////////////////////////////////////////////////EFFECT//////////////////////////////////////////////////////////////
+	lstrcpy(m_szLoadingText, TEXT("이펙트 원형를 로딩중입니다."));
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_Effect_Static"),
+		CEffect_Static::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_Effect_Billboard"),
+		CEffect_Billboard::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
@@ -330,8 +371,6 @@ HRESULT CLoader::Loading_For_Queen_Level()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Queen_Body"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Queen.dat", PreTransformMatrix))))
 		return E_FAIL;
-
-
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -422,6 +461,17 @@ HRESULT CLoader::Loading_For_Gavelen_Level()
 	Event.fRatio = m_fLoadingRatio;
 
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
+	//////////////////////////////////////////////////////////////EFFECT//////////////////////////////////////////////////////////////
+	lstrcpy(m_szLoadingText, TEXT("이펙트 원형를 로딩중입니다."));
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Effect_Static"),
+		CEffect_Static::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Effect_Billboard"),
+		CEffect_Billboard::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
@@ -781,6 +831,350 @@ HRESULT CLoader::Loading_For_GamePlay_ArmorModel()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_LightMale_Upper_Broken"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/LightMale_Upper_Broken.dat", PreTransformMatrix))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Effect(const _char* pFilePath, _uint iLevel)
+{
+	ifstream File(pFilePath);
+
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("EffectFile") && Doc["EffectFile"].IsArray())
+	{
+		const auto& Effects = Doc["EffectFile"].GetArray();
+
+		for(auto& Effect : Effects)
+		{
+			EFFECT_TYPE eType = {};
+
+			if (Effect.HasMember("Type") && Effect["Type"].IsInt())
+				eType = static_cast<EFFECT_TYPE>(Effect["Type"].GetInt());
+
+			string strFilePath = {};
+
+			if (Effect.HasMember("FilePath") && Effect["FilePath"].IsString())
+				strFilePath = (Effect["FilePath"].GetString());
+
+			switch (eType)
+			{
+			case EFFECT_TYPE::STATIC:
+				Load_Static_Effect(strFilePath.c_str(), iLevel);
+				break;
+
+			case EFFECT_TYPE::BILLBAORD:
+				Load_Billboard_Effect(strFilePath.c_str(), iLevel);
+				break;
+
+			case EFFECT_TYPE::PREFAB:
+				Load_Effect_Prefab(strFilePath.c_str(), iLevel);
+				break;
+
+			}
+		}
+	}
+
+
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Static_Effect(const _char* pFilePath, _uint iLevel)
+{
+	ifstream File(pFilePath);
+
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("Effect") && Doc["Effect"].IsObject())
+	{
+		const Value& Effect = Doc["Effect"];
+
+		_tchar EffectName[MAX_PATH] = {};
+
+		if (Effect.HasMember("Name") && Effect["Name"].IsString())
+		{
+			string Name = Effect["Name"].GetString();
+
+			MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), EffectName, static_cast<_int>(Name.size()));
+		}
+
+		string strTexturePath = {};
+		_uint iNumTextures = {};
+
+		if (Effect.HasMember("Texture") && Effect["Texture"].IsString())
+			strTexturePath = Effect["Texture"].GetString();
+
+		if (Effect.HasMember("NumTextures") && Effect["NumTextures"].IsInt())
+			iNumTextures = Effect["NumTextures"].GetInt();
+
+		_wstring TextureTag = TEXT("Prototype_Component_Texture_");
+		_tchar TextureFilePath[MAX_PATH] = {};
+
+		MultiByteToWideChar(CP_UTF8, 0, strTexturePath.c_str(), static_cast<_int>(strTexturePath.size()), TextureFilePath, static_cast<_int>(strTexturePath.size()));
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, TextureTag + EffectName,
+			CTexture::Create(m_pDevice, m_pDeviceContext, TextureFilePath, iNumTextures))))
+			return E_FAIL;
+
+		CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC RectDesc = {};
+
+		if (Effect.HasMember("NumInstance") && Effect["NumInstance"].IsInt())
+			RectDesc.iNumInstance = Effect["NumInstance"].GetInt();
+
+		if (Effect.HasMember("CenterX") && Effect["CenterX"].IsFloat() &&
+			Effect.HasMember("CenterY") && Effect["CenterY"].IsFloat() &&
+			Effect.HasMember("CenterZ") && Effect["CenterZ"].IsFloat())
+		{
+			RectDesc.vCenter.x = Effect["CenterX"].GetFloat();
+			RectDesc.vCenter.y = Effect["CenterY"].GetFloat();
+			RectDesc.vCenter.z = Effect["CenterZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("RangeX") && Effect["RangeX"].IsFloat() &&
+			Effect.HasMember("RangeY") && Effect["RangeY"].IsFloat() &&
+			Effect.HasMember("RangeZ") && Effect["RangeZ"].IsFloat())
+		{
+			RectDesc.vRange.x = Effect["RangeX"].GetFloat();
+			RectDesc.vRange.y = Effect["RangeY"].GetFloat();
+			RectDesc.vRange.z = Effect["RangeZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("SizeX") && Effect["SizeX"].IsFloat() &&
+			Effect.HasMember("SizeY") && Effect["SizeY"].IsFloat())
+		{
+			RectDesc.vSize.x = Effect["SizeX"].GetFloat();
+			RectDesc.vSize.y = Effect["SizeY"].GetFloat();
+		}
+
+		if (Effect.HasMember("PivotX") && Effect["PivotX"].IsFloat() &&
+			Effect.HasMember("PivotY") && Effect["PivotY"].IsFloat() &&
+			Effect.HasMember("PivotZ") && Effect["PivotZ"].IsFloat())
+		{
+			RectDesc.vPivot.x = Effect["PivotX"].GetFloat();
+			RectDesc.vPivot.y = Effect["PivotY"].GetFloat();
+			RectDesc.vPivot.z = Effect["PivotZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("SpeedX") && Effect["SpeedX"].IsFloat() &&
+			Effect.HasMember("SpeedY") && Effect["SpeedY"].IsFloat())
+		{
+			RectDesc.vSpeed.x = Effect["SpeedX"].GetFloat();
+			RectDesc.vSpeed.y = Effect["SpeedY"].GetFloat();
+		}
+
+		if (Effect.HasMember("LifeTimeX") && Effect["LifeTimeX"].IsFloat() &&
+			Effect.HasMember("LifeTimeY") && Effect["LifeTimeY"].IsFloat())
+		{
+			RectDesc.vLifeTime.x = Effect["LifeTimeX"].GetFloat();
+			RectDesc.vLifeTime.y = Effect["LifeTimeY"].GetFloat();
+		}
+
+		if (Effect.HasMember("Loop") && Effect["Loop"].IsBool())
+			RectDesc.IsLoop = Effect["Loop"].GetBool();
+
+		if (Effect.HasMember("FX_Type") && Effect["FX_Type"].IsInt())
+			RectDesc.eType = static_cast<CVIBuffer_Rect_Instance::FX_RECT_TYPE>(Effect["FX_Type"].GetInt());
+
+		_wstring VIBufferTag = TEXT("Prototype_Component_EffectBuffer_");
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, VIBufferTag + EffectName,
+			CVIBuffer_Rect_Instance::Create(m_pDevice, m_pDeviceContext, &RectDesc))))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Billboard_Effect(const _char* pFilePath, _uint iLevel)
+{
+	ifstream File(pFilePath);
+
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("Effect") && Doc["Effect"].IsObject())
+	{
+		const Value& Effect = Doc["Effect"];
+
+		_tchar EffectName[MAX_PATH] = {};
+
+		if (Effect.HasMember("Name") && Effect["Name"].IsString())
+		{
+			string Name = Effect["Name"].GetString();
+
+			MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), EffectName, static_cast<_int>(Name.size()));
+		}
+
+		string strTexturePath = {};
+		_uint iNumTextures = {};
+
+		if (Effect.HasMember("Texture") && Effect["Texture"].IsString())
+			strTexturePath = Effect["Texture"].GetString();
+
+		if (Effect.HasMember("NumTextures") && Effect["NumTextures"].IsInt())
+			iNumTextures = Effect["NumTextures"].GetInt();
+
+		_wstring TextureTag = TEXT("Prototype_Component_Texture_");
+		_tchar TextureFilePath[MAX_PATH] = {};
+
+		MultiByteToWideChar(CP_UTF8, 0, strTexturePath.c_str(), static_cast<_int>(strTexturePath.size()), TextureFilePath, static_cast<_int>(strTexturePath.size()));
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, TextureTag + EffectName,
+			CTexture::Create(m_pDevice, m_pDeviceContext, TextureFilePath, iNumTextures))))
+			return E_FAIL;
+
+		CVIBuffer_Point_Instance::POINT_INSTANCE_DESC PointDesc = {};
+
+		if (Effect.HasMember("NumInstance") && Effect["NumInstance"].IsInt())
+			PointDesc.iNumInstance = Effect["NumInstance"].GetInt();
+
+		if (Effect.HasMember("CenterX") && Effect["CenterX"].IsFloat() &&
+			Effect.HasMember("CenterY") && Effect["CenterY"].IsFloat() &&
+			Effect.HasMember("CenterZ") && Effect["CenterZ"].IsFloat())
+		{
+			PointDesc.vCenter.x = Effect["CenterX"].GetFloat();
+			PointDesc.vCenter.y = Effect["CenterY"].GetFloat();
+			PointDesc.vCenter.z = Effect["CenterZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("RangeX") && Effect["RangeX"].IsFloat() &&
+			Effect.HasMember("RangeY") && Effect["RangeY"].IsFloat() &&
+			Effect.HasMember("RangeZ") && Effect["RangeZ"].IsFloat())
+		{
+			PointDesc.vRange.x = Effect["RangeX"].GetFloat();
+			PointDesc.vRange.y = Effect["RangeY"].GetFloat();
+			PointDesc.vRange.z = Effect["RangeZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("SizeX") && Effect["SizeX"].IsFloat() &&
+			Effect.HasMember("SizeY") && Effect["SizeY"].IsFloat())
+		{
+			PointDesc.vSize.x = Effect["SizeX"].GetFloat();
+			PointDesc.vSize.y = Effect["SizeY"].GetFloat();
+		}
+
+		if (Effect.HasMember("PivotX") && Effect["PivotX"].IsFloat() &&
+			Effect.HasMember("PivotY") && Effect["PivotY"].IsFloat() &&
+			Effect.HasMember("PivotZ") && Effect["PivotZ"].IsFloat())
+		{
+			PointDesc.vPivot.x = Effect["PivotX"].GetFloat();
+			PointDesc.vPivot.y = Effect["PivotY"].GetFloat();
+			PointDesc.vPivot.z = Effect["PivotZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("SpeedX") && Effect["SpeedX"].IsFloat() &&
+			Effect.HasMember("SpeedY") && Effect["SpeedY"].IsFloat())
+		{
+			PointDesc.vSpeed.x = Effect["SpeedX"].GetFloat();
+			PointDesc.vSpeed.y = Effect["SpeedY"].GetFloat();
+		}
+
+		if (Effect.HasMember("LifeTimeX") && Effect["LifeTimeX"].IsFloat() &&
+			Effect.HasMember("LifeTimeY") && Effect["LifeTimeY"].IsFloat())
+		{
+			PointDesc.vLifeTime.x = Effect["LifeTimeX"].GetFloat();
+			PointDesc.vLifeTime.y = Effect["LifeTimeY"].GetFloat();
+		}
+
+		if (Effect.HasMember("Loop") && Effect["Loop"].IsBool())
+			PointDesc.IsLoop = Effect["Loop"].GetBool();
+
+		_wstring VIBufferTag = TEXT("Prototype_Component_EffectBuffer_");
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, VIBufferTag + EffectName,
+			CVIBuffer_Point_Instance::Create(m_pDevice, m_pDeviceContext, &PointDesc))))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Effect_Prefab(const _char* pFilePath, _uint iLevel)
+{
+	ifstream File(pFilePath);
+
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	_tchar EffectName[MAX_PATH] = {};
+
+	if (Doc.HasMember("PrefabName") && Doc["PrefabName"].IsString())
+	{
+		string Name = Doc["PrefabName"].GetString();
+
+		MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), EffectName, static_cast<_int>(Name.size()));
+	}
+
+
+	_wstring strEffectTag = TEXT("Prototype_Effect_");
+
+	if (Doc.HasMember("PrefabEffect") && Doc["PrefabEffect"].IsArray())
+	{
+		const Value& Effects = Doc["PrefabEffect"].GetArray();
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, strEffectTag + EffectName,
+			CEffect_Prefab::Create(m_pDevice, m_pDeviceContext, Effects))))
+			return E_FAIL;
+	}
+
 
 	return S_OK;
 }

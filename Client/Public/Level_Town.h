@@ -6,6 +6,7 @@
 NS_BEGIN(Client)
 
 class CPlayerInstance;
+class CPool_Instance;
 
 class CLevel_Town final : public CLevel
 {
@@ -20,12 +21,14 @@ public:
 
 private:
 	CPlayerInstance* m_pPlayerInstance = { nullptr };
+	CPool_Instance* m_pPool_Instance = { nullptr };
 
 private:
 	HRESULT Ready_Light();
 	HRESULT Ready_GameObjectToJson();
 	HRESULT Ready_Player(const Value& Player);
 
+	HRESULT	Ready_Effect();
 	HRESULT Ready_DefaultWeapon();
 	HRESULT Ready_DefaultArmor();
 	HRESULT Ready_Map(const _wstring& strLayerTag);

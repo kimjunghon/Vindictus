@@ -4,7 +4,7 @@
 
 NS_BEGIN(Client)
 
-class CWeapon final : public CPawnObject
+class CWeapon : public CPawnObject
 {
 public:
 	typedef struct tagWeaponInfo {
@@ -21,7 +21,7 @@ public:
 		_vector				vRotationQuaternion;
 	}WEAPON_DESC;
 
-private:
+protected:
 	CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CWeapon(const CWeapon& Prototype);
 	virtual ~CWeapon() = default;
@@ -37,10 +37,10 @@ public:
 
 	const _wstring&			Get_WeaponName() { return m_WeaponInfo.strWeaponName; }
 	WEAPON_TYPE				Get_WeaponType() { return m_eWeaponType; }
-	HRESULT					Equip(const _float4x4* pParentMatrix, const _float4x4* pSocketMatrix);
-	HRESULT					UnEquip();
+	virtual HRESULT			Equip(const _float4x4* pParentMatrix, const _float4x4* pSocketMatrix, void* pDesc = nullptr);
+	virtual HRESULT			UnEquip();
 
-private:
+protected:
 	const _float4x4*		m_pSocketMatrix = { nullptr };
 	_float4x4				m_CombinedMatrix = { };
 
@@ -51,11 +51,11 @@ private:
 	CModel*					m_pModelCom = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };
 
-	
-private:
+protected:
 	HRESULT					Ready_Components(_uint iWeaponModelPrototypeLevelIndex, const _wstring& strWeaponModelPrototypeTag);
 	HRESULT					Bind_ShaderResources();
 	HRESULT					Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc);
+
 public:
 	static CWeapon*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

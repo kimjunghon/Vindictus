@@ -63,6 +63,10 @@ HRESULT CVIBuffer_Instance::Render()
     return S_OK;
 }
 
+void CVIBuffer_Instance::Update(_float fTimeDelta, _bool* pIsFinshed)
+{
+}
+
 void CVIBuffer_Instance::Free()
 {
     __super::Free();

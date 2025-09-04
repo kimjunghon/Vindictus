@@ -25,6 +25,8 @@ public:
 	virtual HRESULT Bind_Resources() override;
 	virtual HRESULT Render() override;
 
+	virtual void	Update(_float fTimeDelta, _bool* pIsFinshed = nullptr);
+
 protected:
 	ID3D11Buffer*		m_pVBInstance = { nullptr };
 	void*				m_pInstanceVertices = { nullptr };

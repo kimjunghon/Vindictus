@@ -49,14 +49,17 @@
 #include "Map.h"
 #include "MapObject.h"
 
+//Effect
+#include "Effect_Static.h"
+
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
 	, m_pPlayerInstance { CPlayerInstance::GetInstance()}
-	, m_pMonsterInstance { CMonsterInstance::GetInstance()}
+	, m_pPool_Instance { CPool_Instance::GetInstance()}
 {
 	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pPlayerInstance);
-	Safe_AddRef(m_pMonsterInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 HRESULT CMainApp::Initialize()
@@ -79,7 +82,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(m_pPlayerInstance->Initialize(g_iInventoryCount)))
 		return E_FAIL;
 
-	if (FAILED(m_pMonsterInstance->Initialize()))
+	if (FAILED(m_pPool_Instance->Initialize()))
 		return E_FAIL;
 
 	if (FAILED(Ready_DefaultColliderChannel()))
@@ -97,7 +100,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::GLASGAVELEN)))
+	if (FAILED(Start_Level(LEVEL::TOWN)))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
@@ -113,7 +116,7 @@ void CMainApp::Post_Update()
 		if (FAILED(m_pGameInstance->Clear_Resources()))
 			MSG_BOX(TEXT("Failed Clear Resrouces"));
 
-		m_pMonsterInstance->ClearLevel();
+		m_pPool_Instance->ClearLevel();
 
 		EVENT_UI_LEVEL_CHANGE Event_UIChange;
 		Event_UIChange.iChange_Level = m_iChange_Level;
@@ -244,6 +247,18 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_Paritlce"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../../Client/Bin/ShaderFiles/Shader_VtxInstance_Particle.hlsl"), VTXPARTICLE::Elements, VTXPARTICLE::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_PointParitlce"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../../Client/Bin/ShaderFiles/Shader_VtxInstance_PointParticle.hlsl"), VTXPOINTPARTICLE::Elements, VTXPOINTPARTICLE::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxTrail"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../../Client/Bin/ShaderFiles/Shader_VtxTrail.hlsl"), VTXTRAIL::Elements, VTXTRAIL::iNumElements))))
+		return E_FAIL;
+
 	/* Prototype_Component_Collider_AABB */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
 		CCollider::Create(m_pDevice, m_pDeviceContext, COLLIDER::AABB))))
@@ -269,6 +284,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	/* Prototype_Component_VIBuffer_Sphere */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Sphere"),
 		CVIBuffer_Sphere::Create(m_pDevice, m_pDeviceContext, 32, 32))))
+		return E_FAIL;
+
+	/* Prototype_Component_VIBuffer_Trail */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Trail"),
+		CVIBuffer_Trail::Create(m_pDevice, m_pDeviceContext, 48))))
 		return E_FAIL;
 #pragma endregion
 
@@ -636,6 +656,6 @@ void CMainApp::Free()
 	m_pPlayerInstance->Release_PlayerInstance();
 	Safe_Release(m_pPlayerInstance);
 
-	m_pMonsterInstance->Release_MonsterInstance();
-	Safe_Release(m_pMonsterInstance);
+	m_pPool_Instance->Release_MonsterInstance();
+	Safe_Release(m_pPool_Instance);
 }

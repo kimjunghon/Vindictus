@@ -5,6 +5,7 @@
 #include "VIBuffer_Sphere.h"
 #include "VIBuffer_Point_Instance.h"
 #include "VIBuffer_Rect_Instance.h"
+#include "VIBuffer_Trail.h"
 #include "Transform.h"
 #include "Shader.h"
 #include "Texture.h"

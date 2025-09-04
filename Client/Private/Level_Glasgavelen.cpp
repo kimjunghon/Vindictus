@@ -3,13 +3,13 @@
 
 #include "Map.h"
 #include "PlayerPawn.h"
-#include "MonsterInstance.h"
+#include "Pool_Instance.h"
 
 CLevel_Glasgavelen::CLevel_Glasgavelen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
-	, m_pMonsterInstance{ CMonsterInstance::GetInstance() }
+	, m_pPool_Instance{ CPool_Instance::GetInstance() }
 {
-	Safe_AddRef(m_pMonsterInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 HRESULT CLevel_Glasgavelen::Initialize()
@@ -33,7 +33,7 @@ void CLevel_Glasgavelen::Update(_float fTimeDelta)
 {
 	if (m_pGameInstance->Get_KeyDown(DIK_F1))
 	{
-		m_pMonsterInstance->BeginRoomSpawn(0);
+		m_pPool_Instance->BeginRoomSpawn(0);
 	}
 
 }
@@ -93,7 +93,7 @@ HRESULT CLevel_Glasgavelen::Ready_GameObjectToJson()
 	{
 		const Value& RoomSpawnDatas = Doc["RoomSpawnDatas"];
 
-		if (FAILED(m_pMonsterInstance->Ready_Spawn_Data(RoomSpawnDatas)))
+		if (FAILED(m_pPool_Instance->Ready_Spawn_Data(RoomSpawnDatas)))
 			return E_FAIL;
 	}
 
@@ -152,7 +152,7 @@ HRESULT CLevel_Glasgavelen::Ready_PoolingMonster()
 	{
 		const Value& MonsterPool = Doc["MonsterPool"];
 
-		if (FAILED(m_pMonsterInstance->Ready_MonsterPool(MonsterPool)))
+		if (FAILED(m_pPool_Instance->Ready_MonsterPool(MonsterPool)))
 			return E_FAIL;
 	}
 
@@ -189,5 +189,5 @@ void CLevel_Glasgavelen::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pMonsterInstance);
+	Safe_Release(m_pPool_Instance);
 }

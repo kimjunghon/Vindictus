@@ -1,11 +1,11 @@
 #include "ClientPch.h"
 #include "Spawn_Manager.h"
-#include "MonsterInstance.h"
+#include "Pool_Instance.h"
 
 CSpawn_Manager::CSpawn_Manager()
-	: m_pMonsterInstance{ CMonsterInstance::GetInstance() }
+	: m_pPool_Instance{ CPool_Instance::GetInstance() }
 {
-	Safe_AddRef(m_pMonsterInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 HRESULT CSpawn_Manager::Ready_SpawnDatas(const Value& RoomDatas)
@@ -44,7 +44,7 @@ HRESULT CSpawn_Manager::Ready_SpawnDatas(const Value& RoomDatas)
 						if (SpawnData.HasMember("Name") && SpawnData["Name"].IsString())
 						{
 							strMonsterName = SpawnData["Name"].GetString();
-							MonsterSpawnData.eMonsterType = m_pMonsterInstance->Get_MonsterType(strMonsterName);
+							MonsterSpawnData.eMonsterType = m_pPool_Instance->Get_MonsterType(strMonsterName);
 						}
 
 						if (SpawnData.HasMember("CellIndex") && SpawnData["CellIndex"].IsInt())
@@ -89,11 +89,11 @@ HRESULT CSpawn_Manager::BeginRoomSpawn(_uint iRoomIndex)
 
 	m_iMaxWave = m_pCurrentRoomData->SpawnDatas.size();
 
-	m_pMonsterInstance->Request_SpawnMonster(m_pCurrentRoomData->SpawnDatas[0][0]);
+	m_pPool_Instance->Request_SpawnMonster(m_pCurrentRoomData->SpawnDatas[0][0]);
 
 	/*
 	for (auto& SpawnData : m_pCurrentRoomData->SpawnDatas[m_pCurrentRoomData->iCurrentSpawnIndex])
-		m_pMonsterInstance->Request_SpawnMonster(SpawnData);
+		m_pPool_Instance->Request_SpawnMonster(SpawnData);
 		*/
 
 	return S_OK;
@@ -116,7 +116,7 @@ HRESULT CSpawn_Manager::WaveEnd()
 		return S_OK;
 
 	for (auto& MonsterSpawn : m_pCurrentRoomData->SpawnDatas[m_pCurrentRoomData->iCurrentSpawnIndex])
-		m_pMonsterInstance->Request_SpawnMonster(MonsterSpawn);
+		m_pPool_Instance->Request_SpawnMonster(MonsterSpawn);
 
 	return S_OK;
 }
@@ -130,5 +130,5 @@ void CSpawn_Manager::Free()
 {
 	__super::Free();
 
-	Safe_Release(m_pMonsterInstance);
+	Safe_Release(m_pPool_Instance);
 }

@@ -13,6 +13,12 @@ sampler DefaultSampler = sampler_state
     
 };
 
+sampler PointSampler = sampler_state
+{
+    filter = min_mag_mip_point;
+    AddressU = wrap;
+    AddressV = wrap;
+};
 
 struct VS_IN
 {
@@ -172,7 +178,28 @@ PS_OUT PS_LOADINGPOINT(PS_LOADINGPOINT_IN In)
     return Out;
 }
 
+
+
 // LoadingPoint Pass End ---------------------------------------------------------------------------
+
+PS_OUT PS_TRAIL(PS_DEFAULT_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vMask = g_Texture.Sample(PointSampler, In.vTexcoord);
+    
+    vector vSourColor = 1.f;
+    
+    float fAlpha = 1.f * vMask.x;
+    
+    Out.vColor = vSourColor * vMask;
+    Out.vColor.a = fAlpha;
+    
+    //if (Out.vColor.a <= 0.3f)
+    //    discard;
+    
+    return Out;
+}
 
 technique11 DefaultTechnique
 {
@@ -202,5 +229,12 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_LOADINGPOINT();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_LOADINGPOINT();
+    }
+
+    pass TrailPass
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_TRAIL();
     }
 }

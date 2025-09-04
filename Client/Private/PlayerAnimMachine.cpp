@@ -113,7 +113,7 @@ void CPlayerAnimMachine::Initialize_HIT()
 	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::MIDDLE_BACK_UP)] =		{ "Hit_Middle_Back_Up", false, _float2{0.6f, 1.f}, 2.f };
 
 	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_FRONT)] =		{ "Hit_Strong_Front", false, _float2{1.f, 1.f}, 2.f };
-	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_FRONT_UP)] = { "Hit_Strong_Front_Up", false, _float2{1.f, 1.f}, 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_FRONT_UP)] =	{ "Hit_Strong_Front_Up", false, _float2{1.f, 1.f}, 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_FRONT_ROLLUP)] ={ "Hit_Strong_Front_RollUp", false, _float2{1.f, 1.f}, 2.f };
 
 	m_AnimDatas[iFlag | ENUM_CLASS(HIT_FLAG::STRONG_BACK)] =		{ "Hit_Strong_Back", false, _float2{1.f, 1.f}, 2.f };

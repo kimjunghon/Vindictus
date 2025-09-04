@@ -8,7 +8,7 @@ class CCollider;
 NS_END
 
 NS_BEGIN(Client)
-class CMonsterInstance;
+class CPool_Instance;
 class CMonsterState;
 class CBody;
 
@@ -23,7 +23,7 @@ public:
 	_uint			Get_AttackIndex() { return m_iCurrentAttack; }
 	_float			Get_MinDistance() { return m_fMinDistance; }
 	_float			Get_AttackRange() { return m_fAttackRange; }
-	void			Dead() { m_IsActive = false;}
+	void			Dead();
 	_bool			IsAnimationInRangeTrackPosition(_float2 vRange);
 	_bool			IsAnimationPassToTrackPosition(_float fTrackPosition);
 	_bool			IsReadyAttack() { return m_IsReadyAttack; }
@@ -76,7 +76,7 @@ protected:
 	CTransform*		m_pTargetTransform = { nullptr };
 
 protected:
-	CMonsterInstance*			m_pMonsterInstance = { nullptr };
+	CPool_Instance*			m_pPool_Instance = { nullptr };
 	MONSTER_TYPE				m_eType = {};
 	CBehaviorTree*				m_pAI = { nullptr };
 	CBody*						m_pBody = { nullptr };

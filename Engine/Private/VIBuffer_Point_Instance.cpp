@@ -12,19 +12,34 @@ CVIBuffer_Point_Instance::CVIBuffer_Point_Instance(const CVIBuffer_Point_Instanc
 	, m_vPivot{ Prototype.m_vPivot }
 	, m_pSpeeds{ Prototype.m_pSpeeds }
 	, m_IsLoop{ Prototype.m_IsLoop }
+	, m_eType { Prototype.m_eType }
 #ifdef _DEBUG
 	, m_Desc{ Prototype.m_Desc }
 #endif
 {
 }
 
-#ifdef _DEBUG
-void CVIBuffer_Point_Instance::Update_Vertices(POINT_INSTANCE_DESC PointDesc)
-{
-	Free();
 
-	Initialize_Prototype(&PointDesc);
-	Initialize(nullptr);
+
+#ifdef _DEBUG
+void CVIBuffer_Point_Instance::Reset()
+{
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
+
+	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+	m_pDeviceContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
+
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		pVertices[i].vLifeTime.x = 0.f;
+		pVertices[i].vPosition = pInstanceVertices[i].vPosition;
+	}
+
+	m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
 #endif
 
@@ -36,7 +51,7 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 	m_Desc = *pPointDesc;
 #endif
 
-
+	m_eType = pPointDesc->eType;
 	m_vPivot = pPointDesc->vPivot;
 	m_IsLoop = pPointDesc->IsLoop;
 
@@ -140,7 +155,20 @@ HRESULT CVIBuffer_Point_Instance::Render()
 	return S_OK;
 }
 
-void CVIBuffer_Point_Instance::Spread(_float fTimeDelta)
+void CVIBuffer_Point_Instance::Update(_float fTimeDelta, _bool* pIsFinshed)
+{
+	switch (m_eType)
+	{
+	case FX_POINT_TYPE::SPREAD:
+		Spread(fTimeDelta, pIsFinshed);
+		break;
+	case FX_POINT_TYPE::DROP:
+		Drop(fTimeDelta, pIsFinshed);
+		break;
+	}
+}
+
+void CVIBuffer_Point_Instance::Spread(_float fTimeDelta, _bool* pIsFinished)
 {
 	D3D11_MAPPED_SUBRESOURCE SubResource = {};
 
@@ -157,12 +185,17 @@ void CVIBuffer_Point_Instance::Spread(_float fTimeDelta)
 		XMStoreFloat4(&pVertices[i].vPosition, XMLoadFloat4(&pVertices[i].vPosition) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
 		pVertices[i].vLifeTime.x += fTimeDelta;
 
-		if (m_IsLoop)
+		if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
 		{
-			if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
+			if (m_IsLoop)
 			{
 				pVertices[i].vLifeTime.x = 0.f;
 				pVertices[i].vPosition = pInstanceVertices[i].vPosition;
+			}
+			else
+			{
+				if(pIsFinished)
+					*pIsFinished = true;
 			}
 		}
 	}
@@ -170,7 +203,7 @@ void CVIBuffer_Point_Instance::Spread(_float fTimeDelta)
 	m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
 
-void CVIBuffer_Point_Instance::Drop(_float fTimeDelta)
+void CVIBuffer_Point_Instance::Drop(_float fTimeDelta, _bool* pIsFinished)
 {
 	D3D11_MAPPED_SUBRESOURCE	SubResource{};
 
@@ -188,17 +221,25 @@ void CVIBuffer_Point_Instance::Drop(_float fTimeDelta)
 		XMStoreFloat4(&pVertices[i].vPosition, XMLoadFloat4(&pVertices[i].vPosition) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
 		pVertices[i].vLifeTime.x += fTimeDelta;
 
-		if (m_IsLoop)
+		if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
 		{
-			if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
+			if (m_IsLoop)
 			{
 				pVertices[i].vLifeTime.x = 0.f;
 				pVertices[i].vPosition = pInstanceVertices[i].vPosition;
 			}
+			else
+				*pIsFinished = true;
 		}
 	}
 
 	m_pDeviceContext->Unmap(m_pVBInstance, 0);
+}
+
+void CVIBuffer_Point_Instance::Projectile(_float fTimeDelta, _bool* pIsFinsihed)
+{
+
+
 }
 
 CVIBuffer_Point_Instance* CVIBuffer_Point_Instance::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const INSTANCE_DESC* pDesc)

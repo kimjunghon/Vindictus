@@ -1,14 +1,15 @@
 #include "ClientPch.h"
 #include "Pooling_Manager.h"
-#include "MonsterInstance.h"
+#include "Pool_Instance.h"
 #include "Monster.h"
+#include "Effect.h"
 
 CPooling_Manager::CPooling_Manager()
-	: m_pMonsterInstance { CMonsterInstance::GetInstance()}
+	: m_pPool_Instance{ CPool_Instance::GetInstance()}
 	,m_pGameInstance { CGameInstance::GetInstance()}
 
 {
-	Safe_AddRef(m_pMonsterInstance);
+	Safe_AddRef(m_pPool_Instance);
 	Safe_AddRef(m_pGameInstance);
 }
 
@@ -27,7 +28,7 @@ HRESULT CPooling_Manager::Ready_MonsterPool(const Value& MonsterPool)
 		if (Monster.HasMember("Name") && Monster["Name"].IsString())
 			strMonsterName = Monster["Name"].GetString();
 
-		MONSTER_TYPE eMonsterType = m_pMonsterInstance->Get_MonsterType(strMonsterName);
+		MONSTER_TYPE eMonsterType = m_pPool_Instance->Get_MonsterType(strMonsterName);
 
 		for (_uint i = 0; i < iNumMonster; i++)
 		{
@@ -39,7 +40,19 @@ HRESULT CPooling_Manager::Ready_MonsterPool(const Value& MonsterPool)
 	return S_OK;
 }
 
-void CPooling_Manager::Clear_MonsterPool()
+HRESULT CPooling_Manager::Add_EffectToPool(_uint iPrototypeLevelIndex, const _wstring& strEffectName, const _wstring& strEffectTag, void* pArg)
+{
+	CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strEffectTag, pArg));
+
+	if (nullptr == pEffect)
+		return E_FAIL;
+
+	m_Effect_Pool[strEffectName].push(pEffect);
+
+	return S_OK;
+}
+
+void CPooling_Manager::Clear_Pool()
 {
 	for (auto& Pair : m_Monster_Pool)
 	{
@@ -55,6 +68,22 @@ void CPooling_Manager::Clear_MonsterPool()
 		Safe_Release(Pair.second);
 	
 	m_Active_Monsters.clear();
+
+	for (auto& Pair : m_Effect_Pool)
+	{
+		while (false == Pair.second.empty())
+		{
+			Safe_Release(Pair.second.front());
+			Pair.second.pop();
+		}
+	}
+	m_Effect_Pool.clear();
+
+	for (auto& Pair : m_Active_Effects)
+		Safe_Release(Pair.second);
+
+	m_Active_Effects.clear();
+
 }
 
 void CPooling_Manager::ReturnPool(MONSTER_TYPE eMonsterType, CMonster* pMonster)
@@ -67,8 +96,9 @@ void CPooling_Manager::ReturnPool(MONSTER_TYPE eMonsterType, CMonster* pMonster)
 			iter = m_Active_Monsters.erase(iter);
 
 			if (m_Active_Monsters.empty())
-				m_pMonsterInstance->WaveEnd();
+				m_pPool_Instance->WaveEnd();
 
+			break;
 		}
 		else
 			iter++;
@@ -89,6 +119,38 @@ HRESULT CPooling_Manager::Request_SpawnMonster(MONSTER_SPAWN_DATA SpawnData)
 	m_Active_Monsters.push_back(make_pair(eMonsterType, pMonster));
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Monster"), pMonster)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void CPooling_Manager::ReturnPool(const _wstring& strEffect, CEffect* pEffect)
+{
+	for (auto iter = m_Active_Effects.begin(); iter != m_Active_Effects.end();)
+	{
+		if ((iter->second) == pEffect)
+		{
+			m_Effect_Pool[strEffect].push(iter->second);
+			iter = m_Active_Effects.erase(iter);
+			break;
+		}
+		else
+			iter++;
+	}
+}
+
+HRESULT CPooling_Manager::Request_SpawnEffect(const _wstring& strEffect, void* pSpawnData)
+{
+	if (m_Effect_Pool[strEffect].empty())
+		return E_FAIL;
+
+	CEffect* pEffect = m_Effect_Pool[strEffect].front();
+	pEffect->Spawn(pSpawnData);
+
+	m_Effect_Pool[strEffect].pop();
+	m_Active_Effects.push_back(make_pair(strEffect, pEffect));
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Effect"), pEffect)))
 		return E_FAIL;
 
 	return S_OK;
@@ -149,9 +211,9 @@ void CPooling_Manager::Free()
 {
 	__super::Free();
 
-	Clear_MonsterPool();
+	Clear_Pool();
 
-	Safe_Release(m_pMonsterInstance);
+	Safe_Release(m_pPool_Instance);
 	Safe_Release(m_pGameInstance);
 
 }

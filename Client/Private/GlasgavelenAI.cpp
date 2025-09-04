@@ -29,7 +29,6 @@ HRESULT CGlasgavelenAI::Ready_Nodes()
 
 			pActionSelectorNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->CanOtherAction(); }));
 			
-
 			CBT_SequenceNode* pLookSequenceNode = CBT_SequenceNode::Create();
 			pLookSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->IsLook(); }));
 			pLookSequenceNode->Add_Child(CBT_ActionNode::Create([this]()->BT_STATE { return m_pControlledGlasgavelen->Turn(); }));

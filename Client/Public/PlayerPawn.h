@@ -11,6 +11,7 @@ class CPlayerBody;
 class CArmor;
 class CWeapon;
 class CPlayerInstance;
+class CPool_Instance;
 
 class CPlayerPawn final : public CColliderPawn
 {
@@ -58,6 +59,7 @@ public:
 	
 private:
 	CPlayerInstance*			m_pPlayerInstance = { nullptr };
+	CPool_Instance*				m_pPool_Instance = { nullptr };
 	CPlayerBody*				m_pPlayerBody = { nullptr };
 	CCamera_Target*				m_pCamera = { nullptr };
 
@@ -65,7 +67,9 @@ private:
 	_wstring					m_strEquipWeapons[ENUM_CLASS(WEAPON_TYPE::END)] = {};
 	_wstring					m_strEquipArmors[ENUM_CLASS(ARMOR_TYPE::END)] = {};
 	CArmor*						m_pEquipArmors[ENUM_CLASS(ARMOR_TYPE::END)] = { nullptr };
+	_bool						m_IsSwing = {};
 	//State
+	
 	PLAYER_STATUS				m_Status = {};
 
 	INPUT_MOVE_DESC				m_MoveInput = {};
@@ -112,7 +116,9 @@ private:
 	HRESULT			Ready_Collider_Attack();
 
 	HRESULT			Add_Collider_Grap();
-	HRESULT			Ready_AttackMapping();
+	HRESULT			Ready_AttackNotify();
+	HRESULT			Ready_TrailNotify();
+
 	HRESULT			Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition);
 
 	void			Compute_WorldMatrix();

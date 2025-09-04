@@ -12,7 +12,7 @@ NS_BEGIN(Client)
 class CStateFactory;
 class CMonsterStateFactory;
 class CPlayerInstance;
-class CMonsterInstance;
+class CPool_Instance;
 
 class CMainApp final : public CBase
 {
@@ -38,7 +38,7 @@ private:
 	CStateFactory*			m_pStateFactory = {nullptr};
 	CMonsterStateFactory*	m_pMonsterStateFactory = { nullptr };
 	CPlayerInstance*		m_pPlayerInstance = { nullptr };
-	CMonsterInstance*		m_pMonsterInstance = { nullptr };
+	CPool_Instance*		m_pPool_Instance = { nullptr };
 
 private:
 	void	Event_LevelChange(const EVENT_LEVEL_CHANGE& Event);
@@ -53,7 +53,7 @@ private:
 	HRESULT Ready_UI_Container();
 	HRESULT Ready_Controller();
 	HRESULT Ready_Navigations();
-
+	
 	HRESULT Start_Level(LEVEL eStartLevelID);
 	
 

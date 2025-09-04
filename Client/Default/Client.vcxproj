@@ -159,6 +159,10 @@
     <ClInclude Include="..\public\BastardSword.h" />
     <ClInclude Include="..\public\Body.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\public\Effect.h" />
+    <ClInclude Include="..\public\Effect_Billboard.h" />
+    <ClInclude Include="..\public\Effect_Prefab.h" />
+    <ClInclude Include="..\Public\Effect_Static.h" />
     <ClInclude Include="..\public\GlasgavelenAI.h" />
     <ClInclude Include="..\public\GS_Idle.h" />
     <ClInclude Include="..\Public\Client_Struct.h" />
@@ -189,7 +193,7 @@
     <ClInclude Include="..\public\Level_Town.h" />
     <ClInclude Include="..\public\Map.h" />
     <ClInclude Include="..\public\Monster.h" />
-    <ClInclude Include="..\public\MonsterInstance.h" />
+    <ClInclude Include="..\public\Pool_Instance.h" />
     <ClInclude Include="..\Public\MonsterState.h" />
     <ClInclude Include="..\Public\MonsterStateFactory.h" />
     <ClInclude Include="..\public\Mouse.h" />
@@ -205,6 +209,7 @@
     <ClInclude Include="..\Public\QS_Spawn.h" />
     <ClInclude Include="..\public\QS_Turn.h" />
     <ClInclude Include="..\public\State_Grap.h" />
+    <ClInclude Include="..\public\SwordTrail.h" />
     <ClInclude Include="..\Public\VS_Attack.h" />
     <ClInclude Include="..\public\VS_Dead.h" />
     <ClInclude Include="..\public\VS_DeadStrong.h" />
@@ -300,6 +305,10 @@
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\private\Controller_Mouse.cpp" />
     <ClCompile Include="..\private\ColliderPawn.cpp" />
+    <ClCompile Include="..\private\Effect.cpp" />
+    <ClCompile Include="..\private\Effect_Billboard.cpp" />
+    <ClCompile Include="..\private\Effect_Prefab.cpp" />
+    <ClCompile Include="..\Private\Effect_Static.cpp" />
     <ClCompile Include="..\private\Equipment.cpp" />
     <ClCompile Include="..\private\Equipment_Manager.cpp" />
     <ClCompile Include="..\private\GavelenAnimMachine.cpp" />
@@ -327,7 +336,7 @@
     <ClCompile Include="..\private\Level_Town.cpp" />
     <ClCompile Include="..\private\Map.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
-    <ClCompile Include="..\private\MonsterInstance.cpp" />
+    <ClCompile Include="..\private\Pool_Instance.cpp" />
     <ClCompile Include="..\Private\MonsterState.cpp" />
     <ClCompile Include="..\Private\MonsterStateFactory.cpp" />
     <ClCompile Include="..\private\Mouse.cpp" />
@@ -343,6 +352,7 @@
     <ClCompile Include="..\Private\QS_Spawn.cpp" />
     <ClCompile Include="..\private\QS_Turn.cpp" />
     <ClCompile Include="..\private\State_Grap.cpp" />
+    <ClCompile Include="..\private\SwordTrail.cpp" />
     <ClCompile Include="..\Private\VS_Attack.cpp" />
     <ClCompile Include="..\private\VS_Dead.cpp" />
     <ClCompile Include="..\private\VS_DeadStrong.cpp" />
@@ -439,6 +449,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTrail.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

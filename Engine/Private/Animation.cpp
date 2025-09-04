@@ -128,7 +128,7 @@ HRESULT CAnimation::Add_Notify(_float fTrackPosition, function<void()> Callback)
 
 void CAnimation::Check_Notify(_float fCurrentTrackPosition)
 {
-	for (auto Notify : m_Notifies)
+	for (auto& Notify : m_Notifies)
 	{
 		if (false == Notify.IsRun && Notify.fTrackPosition <= fCurrentTrackPosition)
 		{

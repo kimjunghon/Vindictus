@@ -6,12 +6,15 @@
 #include "PlayerPawn.h"
 #include "Weapon.h"
 #include "Armor.h"
+#include "SwordTrail.h"
 
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
 	, m_pPlayerInstance{ CPlayerInstance::GetInstance() }
+	, m_pPool_Instance	{ CPool_Instance::GetInstance() }
 {
 	Safe_AddRef(m_pPlayerInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 HRESULT CLevel_Town::Initialize()
@@ -29,6 +32,9 @@ HRESULT CLevel_Town::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_DefaultArmor()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Effect()))
 		return E_FAIL;
 
 	return S_OK;
@@ -94,12 +100,13 @@ HRESULT CLevel_Town::Ready_GameObjectToJson()
 			return E_FAIL;
 	}
 
+	File.close();
+
 	return S_OK;
 }
 
 HRESULT CLevel_Town::Ready_Player(const Value& Player)
 {
-
 	_int iCellIndex = { };
 	_float3 vPosition = {};
 
@@ -126,6 +133,88 @@ HRESULT CLevel_Town::Ready_Player(const Value& Player)
 	return S_OK;
 }
 
+HRESULT CLevel_Town::Ready_Effect()
+{
+	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
+	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
+	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
+
+	ifstream File("../Bin/Resources/EffectData/LoadFile/TownEffectPool.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed TownEffectPool Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("EffectPool") && Doc["EffectPool"].IsArray())
+	{
+		const auto& Effects = Doc["EffectPool"].GetArray();
+
+		for (auto& Effect : Effects)
+		{
+
+			CEffect::EFFECT_DESC EffectDesc = {};
+
+			_tchar EffectName[MAX_PATH] = {};
+
+			if (Effect.HasMember("Name") && Effect["Name"].IsString())
+			{
+				string Name = Effect["Name"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), EffectName, static_cast<_int>(Name.size()));
+			}
+			
+			_wstring strEffectTag = {};
+
+			if (Effect.HasMember("Type") && Effect["Type"].IsInt())
+			{
+				EFFECT_TYPE eType = static_cast<EFFECT_TYPE>(Effect["Type"].GetInt());
+				switch (eType)
+				{
+				case EFFECT_TYPE::STATIC:
+					strEffectTag = TEXT("Prototype_Effect_Static");
+					break;
+				case EFFECT_TYPE::BILLBAORD:
+					strEffectTag = TEXT("Prototype_Effect_Billboard");
+					break;
+				case EFFECT_TYPE::PREFAB:
+					strEffectTag = TEXT("Prototype_Effect_");
+					strEffectTag = strEffectTag + EffectName;
+					break;
+				}
+			}
+
+			EffectDesc.strEffectName = EffectName;
+
+			if (Effect.HasMember("Pass") && Effect["Pass"].IsInt())
+				EffectDesc.iPassIndex = Effect["Pass"].GetInt();
+
+			_uint iNumPool = {};
+
+			if (Effect.HasMember("NumPool") && Effect["NumPool"].IsInt())
+				iNumPool = Effect["NumPool"].GetInt();
+
+			EffectDesc.iLevel = ENUM_CLASS(LEVEL::TOWN);
+
+			for(_uint i = 0; i<iNumPool; i++)
+				m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::TOWN), EffectName, strEffectTag, &EffectDesc);
+		}
+	}
+	
+	return S_OK;
+}
+
 HRESULT CLevel_Town::Ready_DefaultWeapon()
 {
 	CWeapon::WEAPON_DESC WeaponDesc = {};
@@ -138,7 +227,6 @@ HRESULT CLevel_Town::Ready_DefaultWeapon()
 
 	CGameObject* pBastardSword = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::WEAPON, pBastardSword);
-
 
 	WeaponDesc.strWeaponModelPrototypeTag = TEXT("Prototype_Component_Model_RoundShield");
 	WeaponDesc.WeaponInfo = { TEXT("RoundShield"), 0.f, 20.f };
@@ -227,6 +315,7 @@ CLevel_Town* CLevel_Town::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDe
 void CLevel_Town::Free()
 {
 	__super::Free();
-
+	
 	Safe_Release(m_pPlayerInstance);
+	Safe_Release(m_pPool_Instance);
 }

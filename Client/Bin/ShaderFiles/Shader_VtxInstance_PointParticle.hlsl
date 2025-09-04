@@ -102,6 +102,53 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
     Vertices.RestartStrip();
 }
 
+[maxvertexcount(6)]
+void GS_SPRITE(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
+{
+    GS_OUT Out[4];
+    
+    vector vRight;
+    vector vUp;
+    vector vLook;
+    
+    vLook = g_vCamPosition - In[0].vPosition;
+    vRight = normalize(vector(cross(float3(0.f, 1.f, 0.f), vLook.xyz), 0.f)) * In[0].fSize * 0.5f;
+    vUp = normalize(vector(cross(vLook.xyz, vRight.xyz), 0.f)) * In[0].fSize * 0.5f;
+    
+    matrix matrVP = mul(g_ViewMatrix, g_ProjMatrix);
+        
+    int iCurrentTime = (In[0].vLifeTime.x / In[0].vLifeTime.y) * 25;
+    
+    float fU = (iCurrentTime % 5) * 0.2f;
+    float fV = (iCurrentTime / 5) * 0.2f;
+    
+    Out[0].vPosition = mul(In[0].vPosition + vRight + vUp, matrVP);
+    Out[0].vTexcoord = float2(fU, fV);
+    Out[0].vLifeTime = In[0].vLifeTime;
+    
+    Out[1].vPosition = mul(In[0].vPosition - vRight + vUp, matrVP);
+    Out[1].vTexcoord = float2(fU + 0.2f, fV);
+    Out[1].vLifeTime = In[0].vLifeTime;
+    
+    Out[2].vPosition = mul(In[0].vPosition - vRight - vUp, matrVP);
+    Out[2].vTexcoord = float2(fU + 0.2f, fV + 0.2f);
+    Out[2].vLifeTime = In[0].vLifeTime;
+    
+    Out[3].vPosition = mul(In[0].vPosition + vRight - vUp, matrVP);
+    Out[3].vTexcoord = float2(fU, fV + 0.2f);
+    Out[3].vLifeTime = In[0].vLifeTime;
+    
+    Vertices.Append(Out[0]);
+    Vertices.Append(Out[1]);
+    Vertices.Append(Out[2]);
+    Vertices.RestartStrip();
+    
+    Vertices.Append(Out[0]);
+    Vertices.Append(Out[2]);
+    Vertices.Append(Out[3]);
+    Vertices.RestartStrip();
+}
+
 struct PS_DEFAULT_IN
 {
     float4 vPosition : SV_POSITION;
@@ -137,6 +184,13 @@ technique11 DefaultTechnique
     {
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass SpritePass
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_SPRITE();
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 }

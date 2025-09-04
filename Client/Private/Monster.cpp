@@ -3,12 +3,13 @@
 #include "Body.h"
 #include "BehaviorTree.h"
 #include "MonsterState.h"
+#include "Pool_Instance.h"
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CColliderPawn{ pDevice, pDeviceContext }
-	, m_pMonsterInstance {CMonsterInstance::GetInstance()}
+	, m_pPool_Instance {CPool_Instance::GetInstance()}
 {
-	Safe_AddRef(m_pMonsterInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 CMonster::CMonster(const CMonster& Prototype)
@@ -19,11 +20,11 @@ CMonster::CMonster(const CMonster& Prototype)
 	, m_fAttackRange{ Prototype.m_fAttackRange }
 	, m_fChaseRange{ Prototype.m_fChaseRange }
 	, m_fMinDistance{ Prototype.m_fMinDistance }
-	, m_pMonsterInstance{ Prototype.m_pMonsterInstance }
+	, m_pPool_Instance{ Prototype.m_pPool_Instance }
 	, m_eType { Prototype.m_eType }
 	, m_Status { Prototype.m_Status }
 {
-	Safe_AddRef(m_pMonsterInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 void CMonster::Bind_StateFlag()
@@ -223,6 +224,11 @@ void CMonster::MoveToTarget(_float fRatio)
 	m_pTransformCom->MovePositionToVector(vPosition, m_pNavigationCom);
 }
 
+void CMonster::Dead()
+{
+	m_pPool_Instance->ReturnPool(m_eType, this);
+}
+
 _bool CMonster::IsAnimationInRangeTrackPosition(_float2 vRange)
 {
 	if (nullptr == m_pBody)
@@ -364,5 +370,5 @@ void CMonster::Free()
 		Safe_Release(pState);
 
 	Safe_Release(m_pAI);
-	Safe_Release(m_pMonsterInstance);
+	Safe_Release(m_pPool_Instance);
 }

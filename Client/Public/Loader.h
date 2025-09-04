@@ -46,11 +46,15 @@ private:
 
 	HRESULT Loading_For_MapModel(LEVEL eLevel, const _char* pMapFilePath);
 
-
-
 	HRESULT Loading_For_GamePlay_Level();
 	HRESULT Loading_For_GamePlay_ArmorModel();
 	
+	HRESULT Loading_For_Effect(const _char* pFilePath, _uint iLevel);
+	HRESULT Load_Static_Effect(const _char* pFilePath, _uint iLevel);
+	HRESULT Load_Billboard_Effect(const _char* pFilePath, _uint iLevel);
+	HRESULT Load_Effect_Prefab(const _char* pFilePath, _uint iLevel);
+
+
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, LEVEL eNextLevelID);
 	virtual void	Free() override;

@@ -43,10 +43,12 @@ _bool CCell::IsInCell(_fvector vPosition, _int* pNeighborIndex, _float3** ppInNo
 {
     for (_uint i = 0; i < ENUM_CLASS(LINE::END); ++i)
     {
-        _vector	vDir = XMVector3Normalize(vPosition - XMVectorSetW(XMLoadFloat3(&m_vPoints[i]), 1.f));
+        _vector vComputePosition = XMVectorSetY(vPosition, m_vPoints[i].y);
+
+        _vector	vDir = XMVector3Normalize(vComputePosition - XMVectorSetW(XMLoadFloat3(&m_vPoints[i]), 1.f));
         _vector vOutNormal = XMVector3Normalize(XMLoadFloat3(&m_vOutNormals[i]));
 
-        if (0 < XMVectorGetX(XMVector3Dot(vDir, vOutNormal)))
+        if (0.f < XMVectorGetX(XMVector3Dot(vDir, vOutNormal)))
         {
             *pNeighborIndex = m_iNeighborIndices[i];
 

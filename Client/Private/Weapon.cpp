@@ -111,12 +111,12 @@ HRESULT CWeapon::RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 	return S_OK;
 }
 
-HRESULT CWeapon::Equip(const _float4x4* pPawnMatrix, const _float4x4* pSocketMatrix)
+HRESULT CWeapon::Equip(const _float4x4* pParentMatrix, const _float4x4* pSocketMatrix, void* pDesc)
 {
 	if (nullptr == pSocketMatrix)
 		return E_FAIL;
 
-	m_pPawnMatrix = pPawnMatrix;
+	m_pPawnMatrix = pParentMatrix;
 	m_pSocketMatrix = pSocketMatrix;
 
 	m_IsEquip = true;

@@ -8,19 +8,24 @@
 #include "PlayerBody.h"
 #include "Armor.h"
 #include "Weapon.h"
+#include "SwordTrail.h"
 
 CPlayerPawn::CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CColliderPawn{ pDevice, pDeviceContext }
 	, m_pPlayerInstance{ CPlayerInstance::GetInstance() }
+	, m_pPool_Instance { CPool_Instance::GetInstance()}
 {
 	Safe_AddRef(m_pPlayerInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 CPlayerPawn::CPlayerPawn(const CPlayerPawn& Prototype)
 	: CColliderPawn{ Prototype }
 	, m_pPlayerInstance { Prototype.m_pPlayerInstance}
+	, m_pPool_Instance{ Prototype.m_pPool_Instance }
 {
 	Safe_AddRef(m_pPlayerInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 _bool CPlayerPawn::AnimIsFinished()
@@ -86,8 +91,24 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	//test
 	m_Status.fAttackDamage = 20.f;
 
-	if (FAILED(Ready_AttackMapping()))
+	if (FAILED(Ready_AttackNotify()))
 		return E_FAIL;
+
+	if (FAILED(Ready_TrailNotify()))
+		return E_FAIL;
+
+
+
+	/////Test
+
+	m_pPlayerBody->Add_AnimNotify("Smash_04", 40.f, [this]() {
+		_matrix CombinedMatrix = {};
+		CombinedMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Foot")), m_pTransformCom->Get_WorldMatrix());
+
+		m_pPool_Instance->Request_SpawnEffect(TEXT("Smash04_Prefab"), &CombinedMatrix);
+		});
+
+
 
 	return S_OK;
 }
@@ -839,7 +860,7 @@ HRESULT CPlayerPawn::Add_Collider_Grap()
 	return S_OK;
 }
 
-HRESULT CPlayerPawn::Ready_AttackMapping()
+HRESULT CPlayerPawn::Ready_AttackNotify()
 {
 	ifstream File("../Bin/Resources/AnimDatas/Player_AnimData.json");
 	if (!File.is_open())
@@ -893,35 +914,73 @@ HRESULT CPlayerPawn::Ready_AttackMapping()
 				return E_FAIL;
 		}
 	}
+	return S_OK;
+}
 
-	//_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
+HRESULT CPlayerPawn::Ready_TrailNotify()
+{
+	ifstream File("../Bin/Resources/AnimDatas/Player_Trail_AnimDatas.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Player_Trail_AnimDatas Open"));
+		return E_FAIL;
+	}
 
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO1), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(12.f, 22.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO2), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(15.f, 25.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO3), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(8.f, 18.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(ATTACK_FLAG::COMBO4), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.f, _float2(29.f, 38.f));
+	IStreamWrapper FileWrap(File);
 
-	//iFlag = ENUM_CLASS(STATE_FLAG::SMASH);
+	Document Doc;
+	Doc.ParseStream(FileWrap);
 
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 1.2f, _float2(18.f, 22.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::STRONG, 2.f, _float2(13.f, 18.f));
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
 
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH1), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 1.5f, _float2(11.f, 19.f));
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
 
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_0), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 1.8f, _float2(23.f, 29.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_1), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 1.8f, _float2(24.f, 30.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH2_2), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::STRONG, 2.f, _float2(19.f, 25.f));
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_float fTrackPosition = {};
+			NOTIFY_TYPE eType = {};
 
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_0), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::MIDDLE, 2.f, _float2(18.f, 22.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_1), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::MIDDLE, 2.f, _float2(11.f, 18.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH3_2), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(25.f, 36.f));
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
 
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH4), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(33.f, 44.f));
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(SMASH_FLAG::SMASH_GUARD_COUNTER), ENUM_CLASS(ATTACK_COLLIDER::SHILED), ATTACK_TYPE::STRONG, 2.f, _float2(8.f, 13.f));
-	//
-	//iFlag = ENUM_CLASS(STATE_FLAG::GUARD);
-	//Add_AttackCollisionInfo(iFlag | ENUM_CLASS(GUARD_FLAG::GUARD_ATTACK), ENUM_CLASS(ATTACK_COLLIDER::SWORD), ATTACK_TYPE::LIGHT, 1.2f, _float2(9.f, 12.f));
-	//
+			if (Notify.HasMember("TrackPosition") && Notify["TrackPosition"].IsFloat())
+				fTrackPosition = Notify["TrackPosition"].GetFloat();
+
+			if (Notify.HasMember("NotifyType") && Notify["NotifyType"].IsInt())
+				eType = static_cast<NOTIFY_TYPE>(Notify["NotifyType"].GetInt());
+
+			if(eType == NOTIFY_TYPE::ON)
+			{
+				m_pPlayerBody->Add_AnimNotify(strAnimName, fTrackPosition, [this]() {
+					CSwordTrail::TRAIL_DESC TrailDesc = {};
+					
+					TrailDesc.pSocketMatrix = m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH");
+					TrailDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+					TrailDesc.IsSwing = &m_IsSwing;
+					TrailDesc.vLeftPosition = _float3(0.f, 0.f, 0.f);
+					TrailDesc.vRightPosition = _float3(0.f, 30.f, 0.f);
+					TrailDesc.fLifeTime = 0.5f;
+
+					m_pPool_Instance->Request_SpawnEffect(TEXT("SwordTrail"), &TrailDesc);
+
+					m_IsSwing = true; });
+			}
+			else
+			{
+				m_pPlayerBody->Add_AnimNotify(strAnimName, fTrackPosition, [this]() {
+					m_IsSwing = false; });
+			}
+
+		}
+	}
+
 	return S_OK;
 }
 
@@ -1030,9 +1089,9 @@ void CPlayerPawn::Free()
 		Safe_Release(pState);
 
 	Safe_Release(m_pCamera);
-
-	Safe_Release(m_pPlayerInstance);
-
+	
+	Safe_Release(m_pPlayerInstance); 
+	Safe_Release(m_pPool_Instance);
 	for (_uint i = 0; i < ENUM_CLASS(ARMOR_TYPE::END); i++)
 		Safe_Release(m_pEquipArmors[i]);
 }

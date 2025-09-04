@@ -6,14 +6,16 @@ NS_BEGIN(Client)
 
 class CPooling_Manager;
 class CSpawn_Manager;
+class CMonster;
+class CEffect;
 
-class CMonsterInstance final : public CBase
+class CPool_Instance final : public CBase
 {
-	DECLARE_SINGLETON(CMonsterInstance)
+	DECLARE_SINGLETON(CPool_Instance)
 
 private:
-	CMonsterInstance();
-	virtual ~CMonsterInstance() = default;
+	CPool_Instance();
+	virtual ~CPool_Instance() = default;
 
 public:
 	MONSTER_TYPE	Get_MonsterType(string strMonsterName) { return m_MonsterTypeMap[strMonsterName]; }
@@ -24,11 +26,16 @@ public:
 
 	HRESULT			Ready_Spawn_Data(const Value& RoomSpawnDatas);
 
+	void			ReturnPool(MONSTER_TYPE eMonsterType, CMonster* pMonster);
 	HRESULT			BeginRoomSpawn(_uint iRoomIndex);
 	HRESULT			WaveEnd();
-
 	HRESULT			Ready_MonsterPool(const Value& MonsterPool);
 	HRESULT			Request_SpawnMonster(MONSTER_SPAWN_DATA SpawnData);
+
+
+	HRESULT			Add_EffectToPool(_uint iPrototypeLevelIndex, const _wstring& strEffectName, const _wstring& strEffectTag, void* pArg = nullptr);
+	void			ReturnPool(const _wstring& strEffect, CEffect* pEffect);
+	HRESULT			Request_SpawnEffect(const _wstring& strEffect, void* pSpawnData = nullptr);
 	
 private:
 	CSpawn_Manager*		m_pSpawn_Manager = { nullptr };
