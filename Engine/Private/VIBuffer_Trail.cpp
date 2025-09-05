@@ -194,7 +194,6 @@ void CVIBuffer_Trail::Update_TrailBuffer(TRAIL_NODE Trail, _float fTimeDelta)
 		pVertices[iIndex+1].vLifeTime = _float2(m_Trails[i].vLifeTime.x, m_Trails[i].vLifeTime.y);
 	}
 
-
 	D3D11_MAPPED_SUBRESOURCE	SubResource{};
 
 	m_pDeviceContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);

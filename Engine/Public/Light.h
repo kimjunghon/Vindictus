@@ -8,10 +8,13 @@ class CLight : public CBase
 private:
 	CLight();
 	virtual ~CLight() = default;
+	
+public:
+	const LIGHT_DESC* Get_LightDesc() { return &m_LightDesc; }
 
 public:
 	HRESULT Initialize(const LIGHT_DESC& LightDesc);
-	const LIGHT_DESC* Get_LightDesc() { return &m_LightDesc; }
+	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 private:
 	LIGHT_DESC		m_LightDesc = {};
 

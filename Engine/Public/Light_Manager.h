@@ -16,6 +16,7 @@ public:
 	const LIGHT_DESC*	Get_LightDesc(const _wstring& strLightTag);
 	HRESULT				Add_Light(const _wstring& strLightTag, const LIGHT_DESC& LightDesc);
 	class CLight*		Find_Light(const _wstring& strLightTag);
+	HRESULT				Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 	void				Clear();
 private:
 	LIGHTS		m_Lights;

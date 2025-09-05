@@ -948,6 +948,15 @@ HRESULT CLoader::Load_Static_Effect(const _char* pFilePath, _uint iLevel)
 
 		CVIBuffer_Rect_Instance::RECT_INSTANCE_DESC RectDesc = {};
 
+		if (Effect.HasMember("ColorR") && Effect["ColorR"].IsFloat() &&
+			Effect.HasMember("ColorG") && Effect["ColorG"].IsFloat() &&
+			Effect.HasMember("ColorB") && Effect["ColorB"].IsFloat())
+		{
+			RectDesc.vSourceColor.x = Effect["ColorR"].GetFloat();
+			RectDesc.vSourceColor.y = Effect["ColorG"].GetFloat();
+			RectDesc.vSourceColor.z = Effect["ColorB"].GetFloat();
+		}
+
 		if (Effect.HasMember("NumInstance") && Effect["NumInstance"].IsInt())
 			RectDesc.iNumInstance = Effect["NumInstance"].GetInt();
 
@@ -1068,6 +1077,15 @@ HRESULT CLoader::Load_Billboard_Effect(const _char* pFilePath, _uint iLevel)
 			return E_FAIL;
 
 		CVIBuffer_Point_Instance::POINT_INSTANCE_DESC PointDesc = {};
+
+		if (Effect.HasMember("ColorR") && Effect["ColorR"].IsFloat() &&
+			Effect.HasMember("ColorG") && Effect["ColorG"].IsFloat() &&
+			Effect.HasMember("ColorB") && Effect["ColorB"].IsFloat())
+		{
+			PointDesc.vSourceColor.x = Effect["ColorR"].GetFloat();
+			PointDesc.vSourceColor.y = Effect["ColorG"].GetFloat();
+			PointDesc.vSourceColor.z = Effect["ColorB"].GetFloat();
+		}
 
 		if (Effect.HasMember("NumInstance") && Effect["NumInstance"].IsInt())
 			PointDesc.iNumInstance = Effect["NumInstance"].GetInt();

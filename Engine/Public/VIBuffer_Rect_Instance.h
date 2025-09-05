@@ -37,12 +37,13 @@ public:
 	virtual HRESULT Initialize_Prototype(const INSTANCE_DESC* pDesc) override;
 	virtual HRESULT Initialize(void* pArg) override;
 
-	virtual void	Update(_float fTimeDelta, _bool* pIsFinshed = nullptr) override;
+	virtual void	Update(_float fTimeDelta, _bool* pIsFinished = nullptr) override;
 
 public:
-	void Spread(_float fTimeDelta, _bool* pIsFinshed = nullptr);
-	void Drop(_float fTimeDelta, _bool* pIsFinshed = nullptr);
-	void Ring(_float fTimeDelta, _bool* pIsFinshed = nullptr);
+	void Spread(_float fTimeDelta, _bool* pIsFinished = nullptr);
+	void Drop(_float fTimeDelta, _bool* pIsFinished = nullptr);
+	void Ring(_float fTimeDelta, _bool* pIsFinished = nullptr);
+	void Circle(_float fTimeDelta, _bool* pIsFinished = nullptr);
 
 private:
 	FX_RECT_TYPE			m_eType = {};

@@ -1,27 +1,21 @@
 #include "Engine_Shader_Defines.hlsli"
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-
-texture2D g_Texture;
+vector g_vColor = 1.f;
 
 struct VS_IN
 {
-    float3 vPosition : POSITION;
-    float2 vTexcoord : TEXCOORD0;
-    float2 vLifeTime : TEXCOORD1;
+    float3 vPosition : POSITION;    
 };
 
 struct VS_OUT
 {
-    float4 vPosition : SV_POSITION;
-    float2 vTexcoord : TEXCOORD0;
-    float2 vLifeTime : TEXCOORD1;
+    float4 vPosition : SV_POSITION;    
 };
 
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out = (VS_OUT) 0;
-     
         
     float4x4 matWV, matWVP;
     
@@ -29,8 +23,6 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
-    Out.vTexcoord = In.vTexcoord;
-    Out.vLifeTime = In.vLifeTime;
     
     return Out;
 }
@@ -38,8 +30,6 @@ VS_OUT VS_MAIN(VS_IN In)
 struct PS_IN
 {
     float4 vPosition : SV_POSITION;
-    float2 vTexcoord : TEXCOORD0;
-    float2 vLifeTime : TEXCOORD1;
 
 };
 
@@ -49,21 +39,11 @@ struct PS_OUT
     
 };
 
-
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    vector vMask = g_Texture.Sample(PointSampler, In.vTexcoord);
-    
-    vector vSourColor = 1.f;
-    
-    float fAlpha = 1.f * vMask.x;
-    
-    Out.vColor = vSourColor * vMask;
-    Out.vColor.a = fAlpha;
-    
-    Out.vColor.a -= (In.vLifeTime.x / In.vLifeTime.y);
+    Out.vColor = g_vColor;
     
     return Out;
 }
@@ -72,10 +52,9 @@ technique11 DefaultTechnique
 {
     pass DefaultPass
     {
-        SetRasterizerState(RS_CULL_NONE);
+        SetRasterizerState(RS_WIRE);
         SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();

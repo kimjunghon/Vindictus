@@ -9,3 +9,6 @@ xcopy			/y			.\Engine\Bin\Debug\Engine.lib		.\EngineSDK\Lib\Debug\
 xcopy			/y			.\Engine\Bin\Release\Engine.dll		.\Client\Bin\Release\
 xcopy			/y			.\Engine\Bin\Release\Engine.dll		.\Edit\Bin\Release\
 xcopy			/y			.\Engine\Bin\Release\Engine.lib		.\EngineSDK\Lib\Release\
+
+xcopy			/y			.\Engine\Bin\Shaderfiles\*.*		.\Client\Bin\ShaderFiles\
+xcopy			/y			.\Engine\Bin\Shaderfiles\*.*		.\Edit\Bin\ShaderFiles\

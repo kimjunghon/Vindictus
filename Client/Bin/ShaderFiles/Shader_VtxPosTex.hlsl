@@ -1,24 +1,10 @@
+#include "Engine_Shader_Defines.hlsli"
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float g_fStartX, g_fSizeX, g_fProgressBarRatio;
-float g_fWinSizeX = 1280.f;
-float g_fWinSizeY = 720.f;
 float g_Alpha = 1.f;
 
 texture2D g_Texture;
-
-sampler DefaultSampler = sampler_state
-{
-    filter = min_mag_mip_linear;
-    
-};
-
-sampler PointSampler = sampler_state
-{
-    filter = min_mag_mip_point;
-    AddressU = wrap;
-    AddressV = wrap;
-};
 
 struct VS_IN
 {
@@ -205,6 +191,10 @@ technique11 DefaultTechnique
 {
     pass DefaultPass
     {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
@@ -212,6 +202,10 @@ technique11 DefaultTechnique
 
     pass AlphaBlendPass
     {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BLEND();
@@ -219,6 +213,10 @@ technique11 DefaultTechnique
 
     pass ProgressBarPass
     {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_PROGRESSBAR();
@@ -226,6 +224,10 @@ technique11 DefaultTechnique
 
     pass LoadingPointPass
     {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_LOADINGPOINT();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_LOADINGPOINT();
@@ -233,6 +235,10 @@ technique11 DefaultTechnique
 
     pass TrailPass
     {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_TRAIL();

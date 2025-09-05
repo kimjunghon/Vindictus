@@ -48,9 +48,6 @@ HRESULT CLoadingPoint::Render()
 {
 	__super::Begin();
 
-	if (FAILED(m_pGameInstance->BSSetState(ENUM_CLASS(D3DBS::ALPHABLEND))))
-		return E_FAIL;
-
 	if (FAILED(m_pTransformCom->Bind_Shader_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
 
@@ -68,9 +65,6 @@ HRESULT CLoadingPoint::Render()
 	m_pVIBufferCom->Bind_Resources();
 
 	m_pVIBufferCom->Render();
-
-	if (FAILED(m_pGameInstance->BSSetState(ENUM_CLASS(D3DBS::DEFAULT))))
-		return E_FAIL;
 
 	return S_OK;
 }

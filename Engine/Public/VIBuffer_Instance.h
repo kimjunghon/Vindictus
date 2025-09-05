@@ -12,6 +12,7 @@ public:
 		_float3	vCenter;
 		_float3 vRange;
 		_float2	vSize;
+		_float3 vSourceColor = _float3(1.f, 1.f, 1.f);
 	}INSTANCE_DESC;
 
 protected:
@@ -25,6 +26,8 @@ public:
 	virtual HRESULT Bind_Resources() override;
 	virtual HRESULT Render() override;
 
+	virtual HRESULT Bind_Shader_Color(class CShader* pShader, const _char* pConstantName);
+
 	virtual void	Update(_float fTimeDelta, _bool* pIsFinshed = nullptr);
 
 protected:
@@ -34,6 +37,7 @@ protected:
 	_uint				m_iNumInstance = {};
 	_uint				m_iNumIndexPerInstance = {};
 	_uint				m_iInstanceVertexStride = {};
+	_float3				m_vSourceColor = {};
 
 public:
 	virtual CComponent* Clone(void* pArg) PURE;

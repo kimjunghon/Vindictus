@@ -1,15 +1,11 @@
+#include "Engine_Shader_Defines.hlsli"
+
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_DiffuseTexture;
 
+float3 g_vSourceColor = float3(1.f, 1.f, 1.f);
+
 vector g_vCamPosition;
-
-sampler DefaultSampler = sampler_state
-{
-    filter = min_mag_mip_linear;
-    AddressU = wrap;
-    AddressV = wrap;
-};
-
 
 struct VS_IN
 {
@@ -42,7 +38,34 @@ VS_DEFAULT_OUT VS_MAIN(VS_IN In)
     Out.vPosition = mul(vPosition, g_WorldMatrix);
     Out.fSize = length(In.vRight);
     Out.vLifeTime = In.vLifeTime;
+
+    return Out;
+}
+
+
+struct VS_ROTATE_OUT
+{
+    float4 vPosition : SV_POSITION;
+    float fSize : PSIZE;
+    float2 vLifeTime : TEXCOORD0;
+    float4 vUp : TEXCOORD1;
+};
+
+VS_ROTATE_OUT VS_ROTATE(VS_IN In)
+{
+    VS_ROTATE_OUT Out = (VS_ROTATE_OUT) 0;
     
+    float4x4 TransformMatrix = float4x4(In.vRight, In.vUp, In.vLook, In.vTranslation);
+    
+    vector vPosition = mul(float4(In.vPosition, 1.f), TransformMatrix);
+    
+    vector vUp = mul(float4(g_WorldMatrix[1].xyz, 0.f), TransformMatrix);
+    
+    Out.vPosition = mul(vPosition, g_WorldMatrix);
+    Out.fSize = length(In.vRight);
+    Out.vLifeTime = In.vLifeTime;
+    Out.vUp = vUp;
+   
     return Out;
 }
 
@@ -149,6 +172,56 @@ void GS_SPRITE(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
     Vertices.RestartStrip();
 }
 
+struct GS_ROTATE_IN
+{
+    float4 vPosition : SV_POSITION;
+    float fSize : PSIZE;
+    float2 vLifeTime : TEXCOORD0;
+    float4 vUp : TEXCOORD1;
+};
+
+[maxvertexcount(6)]
+void GS_ROTATE(point GS_ROTATE_IN In[1], inout TriangleStream<GS_OUT> Vertices)
+{
+    GS_OUT Out[4];
+    
+    vector vRight;
+    vector vUp;
+    vector vLook;
+    
+    vLook = g_vCamPosition - In[0].vPosition;
+    vRight = normalize(vector(cross(In[0].vUp.xyz, vLook.xyz), 0.f)) * In[0].fSize * 0.5f;
+    vUp = normalize(vector(cross(vLook.xyz, vRight.xyz), 0.f)) * In[0].fSize * 0.5f;
+    
+    matrix matrVP = mul(g_ViewMatrix, g_ProjMatrix);
+    
+    Out[0].vPosition = mul(In[0].vPosition + vRight + vUp, matrVP);
+    Out[0].vTexcoord = float2(0.f, 0.f);
+    Out[0].vLifeTime = In[0].vLifeTime;
+    
+    Out[1].vPosition = mul(In[0].vPosition - vRight + vUp, matrVP);
+    Out[1].vTexcoord = float2(1.f, 0.f);
+    Out[1].vLifeTime = In[0].vLifeTime;
+    
+    Out[2].vPosition = mul(In[0].vPosition - vRight - vUp, matrVP);
+    Out[2].vTexcoord = float2(1.f, 1.f);
+    Out[2].vLifeTime = In[0].vLifeTime;
+    
+    Out[3].vPosition = mul(In[0].vPosition + vRight - vUp, matrVP);
+    Out[3].vTexcoord = float2(0.f, 1.f);
+    Out[3].vLifeTime = In[0].vLifeTime;
+    
+    Vertices.Append(Out[0]);
+    Vertices.Append(Out[1]);
+    Vertices.Append(Out[2]);
+    Vertices.RestartStrip();
+    
+    Vertices.Append(Out[0]);
+    Vertices.Append(Out[2]);
+    Vertices.Append(Out[3]);
+    Vertices.RestartStrip();
+}
+
 struct PS_DEFAULT_IN
 {
     float4 vPosition : SV_POSITION;
@@ -166,15 +239,20 @@ PS_OUT PS_MAIN(PS_DEFAULT_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMask = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
     
-    if(Out.vColor.a <= 0.3f)
+    vector vSourColor = float4(g_vSourceColor, 1.f) * vMask;
+    
+    Out.vColor = vSourColor * vMask;
+    
+    Out.vColor.a = 1.f * vMask.x;
+    
+    float fAlpha = (In.vLifeTime.x / In.vLifeTime.y);
+    
+    Out.vColor.a -= fAlpha;
+    
+    if (Out.vColor.a <= 0.f)
         discard;
-    
-    float fAlpha = saturate(In.vLifeTime.y - In.vLifeTime.x);
-    
-    Out.vColor.a = fAlpha;
-    
     return Out;
 }
 
@@ -182,6 +260,10 @@ technique11 DefaultTechnique
 {
     pass DefaultPass
     {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
@@ -189,8 +271,23 @@ technique11 DefaultTechnique
 
     pass SpritePass
     {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_SPRITE();
+        PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass RotatePass
+    {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_ROTATE();
+        GeometryShader = compile gs_5_0 GS_ROTATE();
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 }

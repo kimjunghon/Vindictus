@@ -58,14 +58,15 @@ void CMap::Late_Update(_float fTimeDelta)
 #ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
+
+	if (FAILED(m_pGameInstance->Add_DebugComponent(m_pNavigationCom)))
+		return;
+
 #endif
 }
 
 HRESULT CMap::Render()
 {
-#ifdef _DEBUG
-	m_pNavigationCom->Render();
-#endif
 
 	return S_OK;
 }

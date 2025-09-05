@@ -38,6 +38,14 @@ CLight* CLight_Manager::Find_Light(const _wstring& strLightTag)
 	return Pair->second;
 }
 
+HRESULT CLight_Manager::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+{
+	for (auto& Pair : m_Lights)
+		Pair.second->Render(pShader, pVIBuffer);
+
+	return S_OK;
+}
+
 void CLight_Manager::Clear()
 {
 	for (auto& Pair : m_Lights)

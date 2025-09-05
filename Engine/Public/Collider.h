@@ -62,7 +62,7 @@ public:
 	void			Check_Collision(COLLISION_DATA& Data);
 
 #ifdef _DEBUG
-	HRESULT			Render();
+	virtual HRESULT	Render() override;
 #endif
 
 private:

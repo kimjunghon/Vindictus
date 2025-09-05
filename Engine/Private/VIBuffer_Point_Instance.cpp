@@ -50,6 +50,7 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 #ifdef _DEBUG
 	m_Desc = *pPointDesc;
 #endif
+	m_vSourceColor = pPointDesc->vSourceColor;
 
 	m_eType = pPointDesc->eType;
 	m_vPivot = pPointDesc->vPivot;
@@ -236,7 +237,13 @@ void CVIBuffer_Point_Instance::Drop(_float fTimeDelta, _bool* pIsFinished)
 	m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
 
-void CVIBuffer_Point_Instance::Projectile(_float fTimeDelta, _bool* pIsFinsihed)
+void CVIBuffer_Point_Instance::Projectile(_float fTimeDelta, _bool* pIsFinished)
+{
+
+
+}
+
+void CVIBuffer_Point_Instance::Circle(_float fTimeDelta, _bool* pIsFinished)
 {
 
 

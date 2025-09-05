@@ -42,7 +42,9 @@ public:
 public:
 	void Spread(_float fTimeDelta, _bool* pIsFinished);
 	void Drop(_float fTimeDelta, _bool* pIsFinished);
-	void Projectile(_float fTimeDelta, _bool* pIsFinsihed);
+	void Projectile(_float fTimeDelta, _bool* pIsFinished);
+	void Circle(_float fTimeDelta, _bool* pIsFinished = nullptr);
+
 private:
 	FX_POINT_TYPE			m_eType = {};
 	_float3					m_vPivot = {};

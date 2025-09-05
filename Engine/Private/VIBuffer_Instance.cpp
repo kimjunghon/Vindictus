@@ -1,5 +1,6 @@
 #include "EnginePch.h"
 #include "VIBuffer_Instance.h"
+#include "Shader.h"
 
 CVIBuffer_Instance::CVIBuffer_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
     : CVIBuffer { pDevice, pDeviceContext }
@@ -13,6 +14,7 @@ CVIBuffer_Instance::CVIBuffer_Instance(const CVIBuffer_Instance& Prototype)
     , m_iNumInstance{ Prototype.m_iNumInstance }
     , m_iNumIndexPerInstance{ Prototype.m_iNumIndexPerInstance }
     , m_iInstanceVertexStride{ Prototype.m_iInstanceVertexStride }
+    , m_vSourceColor { Prototype.m_vSourceColor }
 {
 }
 
@@ -61,6 +63,11 @@ HRESULT CVIBuffer_Instance::Render()
     m_pDeviceContext->DrawIndexedInstanced(m_iNumIndexPerInstance, m_iNumInstance, 0, 0, 0);
 
     return S_OK;
+}
+
+HRESULT CVIBuffer_Instance::Bind_Shader_Color(CShader* pShader, const _char* pConstantName)
+{
+    return pShader->Bind_RawValue(pConstantName, &m_vSourceColor, sizeof(_float3));
 }
 
 void CVIBuffer_Instance::Update(_float fTimeDelta, _bool* pIsFinshed)

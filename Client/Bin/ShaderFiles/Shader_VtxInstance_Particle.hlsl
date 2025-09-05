@@ -1,23 +1,12 @@
+#include "Engine_Shader_Defines.hlsli"
+
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
 texture2D g_DiffuseTexture;
 
+float3 g_vSourceColor = float3(1.f, 1.f, 1.f);
+
 float g_Radius = 10.f;
-
-sampler DefaultSampler = sampler_state
-{
-    filter = min_mag_mip_linear;
-    AddressU = wrap;
-    AddressV = wrap;
-};
-
-sampler PointSampler = sampler_state
-{
-    filter = min_mag_mip_point;
-    AddressU = wrap;
-    AddressV = wrap;
-};
-
 
 struct VS_IN
 {
@@ -90,7 +79,6 @@ VS_DEFAULT_OUT VS_RING(VS_IN In)
     return Out;
 }
 
-
 struct PS_DEFAULT_IN
 {
     float4 vPosition : SV_POSITION;
@@ -152,6 +140,10 @@ technique11 DefaultTechnique
 {
     pass DefaultPass
     {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
@@ -159,6 +151,10 @@ technique11 DefaultTechnique
 
     pass RingPass
     {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
         VertexShader = compile vs_5_0 VS_RING();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_RING();

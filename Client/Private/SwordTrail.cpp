@@ -80,23 +80,11 @@ HRESULT CSwordTrail::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->RSSetState(ENUM_CLASS(D3DRS::NONCULL))))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->BSSetState(ENUM_CLASS(D3DBS::ALPHABLEND))))
-		return E_FAIL;
-
 	m_pShaderCom->Begin(0);
 
 	m_pVIBufferCom->Bind_Resources();
 
 	m_pVIBufferCom->Render();
-
-	if (FAILED(m_pGameInstance->RSSetState(ENUM_CLASS(D3DRS::DEFAULT))))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->BSSetState(ENUM_CLASS(D3DBS::DEFAULT))))
-		return E_FAIL;
 
 	return S_OK;
 }

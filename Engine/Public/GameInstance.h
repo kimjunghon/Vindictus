@@ -89,14 +89,31 @@ public:
 	HRESULT Add_Node(class CGameObject* pGameObject, const BoundingBox& ObjectBoundingBox);
 #pragma endregion
 
+#pragma region RT_MANAGER
+	HRESULT Add_RenderTarget(const _wstring& strRTTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
+	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strRTTag);
+	HRESULT Bind_Shader_RenderTarget(const _wstring& strRTTag, CShader* pShader, const _char* pConstantName);
+	HRESULT Begin_MRT(const _wstring& strMRTTag);
+	HRESULT End_MRT();
+#ifdef _DEBUG
+	HRESULT Ready_Debug(const _wstring& strRTTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Render_RT_Debug(CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+#endif
+#pragma endregion
+
 #pragma region RENDERER
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRenderObject);
+#ifdef _DEBUG
+public:
+	HRESULT Add_DebugComponent(class CComponent* pComponent);
+#endif
 #pragma endregion
 
 #pragma region LIGHT_MANAGER
 	const LIGHT_DESC*	Get_LightDesc(const _wstring& strLightTag);
 	HRESULT				Add_Light(const _wstring& strLightTag, const LIGHT_DESC& LightDesc);
+	HRESULT				Render_Light(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #pragma endregion
 
 #pragma region EVENTBUS
@@ -161,6 +178,7 @@ private:
 	class CRenderState*			m_pRenderState = { nullptr };
 	class CLevel_Manager*		m_pLevel_Manager = { nullptr };
 	class CPrototype_Manager*	m_pPrototype_Manager = { nullptr };
+	class CRT_Manager*			m_pRT_Manager = { nullptr };
 	class CRenderer*			m_pRenderer = { nullptr };
 	class CGameObject_Manager*	m_pObject_Manager = { nullptr };
 	class CPipeLine*			m_pPipeLine = { nullptr };

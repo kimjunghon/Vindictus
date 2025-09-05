@@ -25,6 +25,11 @@ protected:
 	_bool						m_IsCloned = { false };
 	_bool						m_bNeedCloned = { true };
 
+#ifdef _DEBUG
+public:
+	virtual HRESULT Render() { return S_OK; }
+#endif
+
 public:
 	virtual CComponent* Clone(void* pArg) PURE;
 	virtual void		Free() override;

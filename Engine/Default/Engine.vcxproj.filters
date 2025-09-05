@@ -223,6 +223,12 @@
     <Filter Include="01.Utility\04.Component\VIBuffer\Trail">
       <UniqueIdentifier>{dbaa46d4-21b1-41a6-bef7-4fbc2f032849}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\09.RenderTargets">
+      <UniqueIdentifier>{a45f6ec1-5073-4711-9538-6908c05a52e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\09.RenderTargets\Manager">
+      <UniqueIdentifier>{e80de621-6b8f-4d74-acf3-e7964c2cecfd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -305,9 +311,6 @@
     </ClInclude>
     <ClInclude Include="..\Public\Controller_Manager.h">
       <Filter>01.Utility\06.Controller\Manager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\VindictusBack\Vindictus\Engine\Public\Light.h">
-      <Filter>01.Utility\96.Light</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\EnginePch.h">
       <Filter>99.Defines</Filter>
@@ -452,6 +455,15 @@
     </ClInclude>
     <ClInclude Include="..\public\VIBuffer_Trail.h">
       <Filter>01.Utility\04.Component\VIBuffer\Trail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RenderTarget.h">
+      <Filter>01.Utility\09.RenderTargets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\RT_Manager.h">
+      <Filter>01.Utility\09.RenderTargets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light.h">
+      <Filter>01.Utility\96.Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -659,10 +671,24 @@
     <ClCompile Include="..\private\VIBuffer_Trail.cpp">
       <Filter>01.Utility\04.Component\VIBuffer\Trail</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\RenderTarget.cpp">
+      <Filter>01.Utility\09.RenderTargets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\RT_Manager.cpp">
+      <Filter>01.Utility\09.RenderTargets\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Cell.hlsl">
       <Filter>95.ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Deferred.hlsl">
+      <Filter>95.ShaderFiles</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
+      <Filter>95.ShaderFiles</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -10,6 +10,7 @@
 #include "Prototype_Manager.h"
 #include "GameObject_Manager.h"
 #include "GameObject.h"
+#include "RT_Manager.h"
 #include "Renderer.h"
 #include "Octree.h"
 #include "EventBus.h"
@@ -30,29 +31,28 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 {
     m_pGraphic_Device = CGraphic_Device::Create(EngineDesc.hWnd, EngineDesc.eWinMode, EngineDesc.iWinSizeX, EngineDesc.iWinSizeY, ppDevice, ppDeviceContext);
     if (nullptr == m_pGraphic_Device)
-    {
-        MSG_BOX(TEXT("GRAPIC"));
         return E_FAIL;
-    }
+    
 
     m_pInput_Device = CInput_Device::Create(EngineDesc.hInst, EngineDesc.hWnd);
     if (nullptr == m_pInput_Device)
-    {
-        MSG_BOX(TEXT("INPUT"));
         return E_FAIL;
-    }
+    
     m_pTimer_Manager = CTimer_Manager::Create();
     if (nullptr == m_pTimer_Manager)
-    {
-        MSG_BOX(TEXT("TIMER"));
         return E_FAIL;
-    }
+    
+
     m_pRenderState = CRenderState::Create(*ppDevice, *ppDeviceContext);
     if (nullptr == m_pRenderState)
         return E_FAIL;
 
     m_pLevel_Manager = CLevel_Manager::Create();
     if (nullptr == m_pLevel_Manager)
+        return E_FAIL;
+
+    m_pRT_Manager = CRT_Manager::Create(*ppDevice, *ppDeviceContext);
+    if (nullptr == m_pRT_Manager)
         return E_FAIL;
 
     m_pRenderer = CRenderer::Create(*ppDevice, *ppDeviceContext);
@@ -299,11 +299,52 @@ HRESULT CGameInstance::Add_Objects(CCollisionObject* pGameObject, const Bounding
 }
 #pragma endregion
 
+#pragma region RT_MANAGER
+HRESULT CGameInstance::Add_RenderTarget(const _wstring& strRTTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
+{
+    return m_pRT_Manager->Add_RenderTarget(strRTTag, iSizeX, iSizeY, ePixelFormat, vClearColor);
+}
+HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strRTTag)
+{
+    return m_pRT_Manager->Add_MRT(strMRTTag, strRTTag);
+}
+HRESULT CGameInstance::Bind_Shader_RenderTarget(const _wstring& strRTTag, CShader* pShader, const _char* pConstantName)
+{
+    return m_pRT_Manager->Bind_Shader_RenderTarget(strRTTag, pShader, pConstantName);
+}
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag)
+{
+    return m_pRT_Manager->Begin_MRT(strMRTTag);
+}
+HRESULT CGameInstance::End_MRT()
+{
+    return m_pRT_Manager->End_MRT();
+}
+#ifdef _DEBUG
+HRESULT CGameInstance::Ready_Debug(const _wstring& strRTTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+{
+    return m_pRT_Manager->Ready_Debug(strRTTag, fX, fY, fSizeX, fSizeY);
+}
+
+HRESULT CGameInstance::Render_RT_Debug(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+{
+    return m_pRT_Manager->Render(pShader, pVIBuffer);
+}
+#endif
+
+#pragma endregion
+
 #pragma region RENDERER
 HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRenderObject)
 {
     return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);
 }
+#ifdef _DEBUG
+HRESULT CGameInstance::Add_DebugComponent(CComponent* pComponent)
+{
+    return m_pRenderer->Add_DebugComponent(pComponent);
+}
+#endif
 #pragma endregion
 
 #pragma region LIGHT_MANAGER
@@ -315,6 +356,10 @@ const LIGHT_DESC* CGameInstance::Get_LightDesc(const _wstring& strLightTag)
 HRESULT CGameInstance::Add_Light(const _wstring& strLightTag, const LIGHT_DESC& LightDesc)
 {
     return m_pLight_Manager->Add_Light(strLightTag, LightDesc);
+}
+HRESULT CGameInstance::Render_Light(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+{
+    return m_pLight_Manager->Render(pShader, pVIBuffer);
 }
 #pragma endregion
 
@@ -444,6 +489,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pRenderState);
     Safe_Release(m_pLevel_Manager);
     Safe_Release(m_pPrototype_Manager);
+    Safe_Release(m_pRT_Manager);
     Safe_Release(m_pRenderer);
     Safe_Release(m_pObject_Manager);
     Safe_Release(m_pEventBus);
