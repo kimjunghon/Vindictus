@@ -2,6 +2,7 @@
 #include "Pooling_Manager.h"
 #include "Pool_Instance.h"
 #include "Monster.h"
+#include "Projectile.h"
 #include "Effect.h"
 
 CPooling_Manager::CPooling_Manager()
@@ -40,6 +41,17 @@ HRESULT CPooling_Manager::Ready_MonsterPool(const Value& MonsterPool)
 	return S_OK;
 }
 
+HRESULT CPooling_Manager::Add_ProjectilePool(_uint iPrototypeLevelIndex, const _wstring& strProjectileTag, const _wstring& strProjectileName, void* pArg)
+{
+	CProjectile* pProjectile = static_cast<CProjectile*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strProjectileTag, pArg));
+	if (nullptr == pProjectile)
+		return E_FAIL;
+
+	m_Projectile_Pool[strProjectileName].push(pProjectile);
+
+	return S_OK;
+}
+
 HRESULT CPooling_Manager::Add_EffectToPool(_uint iPrototypeLevelIndex, const _wstring& strEffectName, const _wstring& strEffectTag, void* pArg)
 {
 	CEffect* pEffect = static_cast<CEffect*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strEffectTag, pArg));
@@ -69,6 +81,21 @@ void CPooling_Manager::Clear_Pool()
 	
 	m_Active_Monsters.clear();
 
+	for (auto& Pair : m_Projectile_Pool)
+	{
+		while (false == Pair.second.empty())
+		{
+			Safe_Release(Pair.second.front());
+			Pair.second.pop();
+		}
+	}
+	m_Projectile_Pool.clear();
+
+	for (auto& Pair : m_Active_Projectile)
+		Safe_Release(Pair.second);
+
+	m_Active_Projectile.clear();
+
 	for (auto& Pair : m_Effect_Pool)
 	{
 		while (false == Pair.second.empty())
@@ -83,7 +110,6 @@ void CPooling_Manager::Clear_Pool()
 		Safe_Release(Pair.second);
 
 	m_Active_Effects.clear();
-
 }
 
 void CPooling_Manager::ReturnPool(MONSTER_TYPE eMonsterType, CMonster* pMonster)
@@ -121,6 +147,38 @@ HRESULT CPooling_Manager::Request_SpawnMonster(MONSTER_SPAWN_DATA SpawnData)
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Monster"), pMonster)))
 		return E_FAIL;
 
+	return S_OK;
+}
+
+void CPooling_Manager::ReturnPool(const _wstring& strProjectileName, CProjectile* pProjectile)
+{
+	for (auto iter = m_Active_Projectile.begin(); iter != m_Active_Projectile.end();)
+	{
+		if ((iter->second) == pProjectile)
+		{
+			m_Projectile_Pool[strProjectileName].push(iter->second);
+			iter = m_Active_Projectile.erase(iter);
+			break;
+		}
+		else
+			iter++;
+	}
+}
+
+HRESULT CPooling_Manager::Request_SpawnProjectile(const _wstring& strProjectileName, void* pSpawnData)
+{
+	if (m_Projectile_Pool[strProjectileName].empty())
+		return E_FAIL;
+
+	CProjectile* pProjectile = m_Projectile_Pool[strProjectileName].front();
+	pProjectile->Spawn(pSpawnData);
+
+	m_Projectile_Pool[strProjectileName].pop();
+	m_Active_Projectile.push_back(make_pair(strProjectileName, pProjectile));
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Projectile"), pProjectile)))
+		return E_FAIL;
+	
 	return S_OK;
 }
 

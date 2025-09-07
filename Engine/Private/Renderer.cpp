@@ -62,13 +62,13 @@ HRESULT CRenderer::Initialize()
 #ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Diffuse"), 150.0f, 100.0f, 200.f, 200.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Normal"), 150.0f, 250.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Normal"), 150.0f, 350.0f, 200.f, 200.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Depth"), 150.0f, 500.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Depth"), 150.0f, 600.0f, 200.f, 200.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Shade"), 400.0f, 150.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Shade"), 400.0f, 100.0f, 200.f, 200.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Specular"), 650.0f, 150.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Specular"), 650.0f, 100.0f, 200.f, 200.f)))
 		return E_FAIL;
 #endif
 
@@ -217,6 +217,10 @@ HRESULT CRenderer::Render_NonLight()
 
 HRESULT CRenderer::Render_Blend()
 {
+	sort(m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)].begin(), m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)].end(), [&](CGameObject* pSour, CGameObject* pDest) {
+		return pSour->Get_Depth() < pDest->Get_Depth();
+		});
+
 	for (auto& Object : m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)])
 	{
 		if (nullptr != Object)
@@ -264,6 +268,20 @@ HRESULT CRenderer::Add_DebugComponent(CComponent* pComponent)
 
 HRESULT CRenderer::Render_Debug()
 {
+	if (m_pGameInstance->Get_KeyDown(DIK_END))
+		m_IsDebugDraw = !m_IsDebugDraw;
+
+	if (false == m_IsDebugDraw)
+	{
+		for (auto& pDebugCom : m_DebugComponent)
+		{
+			Safe_Release(pDebugCom);
+		}
+		m_DebugComponent.clear();
+
+		return S_OK;
+	}
+
 	for (auto& pDebugCom : m_DebugComponent)
 	{
 		if (nullptr != pDebugCom)

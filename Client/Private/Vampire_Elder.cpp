@@ -3,6 +3,7 @@
 #include "Body.h"
 #include "VampireAI.h"
 #include "MonsterState.h"
+#include "FireBall.h"
 
 CVampire_Elder::CVampire_Elder(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CVampire { pDevice, pDeviceContext }
@@ -251,10 +252,22 @@ HRESULT CVampire_Elder::Ready_Collider_Attack()
 
 void CVampire_Elder::CreateFireBall(ATTACK_TYPE eType, _float fAttackRatio)
 {
+	m_IsSwing = false;
+
+	CFireBall::FIREBALL_DESC Fireball_Desc = {};
+	Fireball_Desc.eType = eType;
+	Fireball_Desc.fDamage = m_Status.fAttackDamage * fAttackRatio;
+	Fireball_Desc.pIsSwing = &m_IsSwing;
+	Fireball_Desc.pSocketMatrixPtr = m_pBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH");
+	Fireball_Desc.pOwnerMatrixPtr = m_pTransformCom->Get_WorldMatrixPtr();
+	Fireball_Desc.pTargetTransform = m_pTargetTransform;
+	
+	m_pPool_Instance->Request_SpawnProjectile(TEXT("FireBall"), &Fireball_Desc);
 }
 
 void CVampire_Elder::ThrowFireBall()
 {
+	m_IsSwing = true;
 }
 
 HRESULT CVampire_Elder::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)

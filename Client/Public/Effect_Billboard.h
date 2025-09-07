@@ -31,9 +31,11 @@ private:
 	CTexture*					m_pTextureCom = { nullptr };
 	CVIBuffer_Point_Instance*	m_pVIBufferCom = { nullptr };
 	CShader*					m_pShaderCom = { nullptr };
+	_bool						m_IsFinished = {};
 
 private:
-	HRESULT				Ready_Component(const _wstring& EffectName);
+	HRESULT	Ready_Component();
+	HRESULT	Bind_ShaderResources();
 
 public:
 	static CEffect_Billboard*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

@@ -10,6 +10,7 @@ NS_BEGIN(Client)
 
 class CPool_Instance;
 class CMonster;
+class CProjectile;
 class CEffect;
 
 class CPooling_Manager final : public CBase
@@ -19,8 +20,8 @@ private:
 	typedef list<pair<MONSTER_TYPE, CMonster*>>				ACTIVE_MONSTERS;
 	
 	//PROJ_TYPE
-	typedef unordered_map<_uint, queue<CGameObject*>>	PROJECTILE_POOL;
-	typedef list<pair<_uint, CGameObject*>>				ACTIVE_PROJECTILE;
+	typedef unordered_map<_wstring, queue<CProjectile*>>	PROJECTILE_POOL;
+	typedef list<pair<_wstring, CProjectile*>>				ACTIVE_PROJECTILE;
 
 	typedef unordered_map<_wstring, queue<CEffect*>>		EFFECT_POOL;
 	typedef list<pair<_wstring, CEffect*>>				ACTIVE_EFFECT;
@@ -32,7 +33,7 @@ private:
 
 public:
 	HRESULT		Ready_MonsterPool(const Value& MonsterPool);
-	
+	HRESULT		Add_ProjectilePool(_uint iPrototypeLevelIndex, const _wstring& strProjectileTag, const _wstring& strProjectileName, void* pArg = nullptr);
 	HRESULT		Add_EffectToPool(_uint iPrototypeLevelIndex, const _wstring& strEffectName, const _wstring& strEffectTag, void* pArg = nullptr);
 
 public:
@@ -42,6 +43,8 @@ public:
 	void		ReturnPool(MONSTER_TYPE eMonsterType, CMonster* pMonster);
 	HRESULT		Request_SpawnMonster(MONSTER_SPAWN_DATA SpawnData);
 
+	void		ReturnPool(const _wstring& strProjectileName, CProjectile* pProjectile);
+	HRESULT		Request_SpawnProjectile(const _wstring& strProjectileName, void* pSpawnData = nullptr);
 
 	void		ReturnPool(const _wstring& strEffect, CEffect* pEffect);
 	HRESULT		Request_SpawnEffect(const _wstring& strEffect, void* pSpawnData = nullptr);
@@ -52,6 +55,9 @@ private:
 
 	MONSTER_POOL			m_Monster_Pool;
 	ACTIVE_MONSTERS			m_Active_Monsters;
+
+	PROJECTILE_POOL			m_Projectile_Pool;
+	ACTIVE_PROJECTILE		m_Active_Projectile;
 
 	EFFECT_POOL				m_Effect_Pool;
 	ACTIVE_EFFECT			m_Active_Effects;

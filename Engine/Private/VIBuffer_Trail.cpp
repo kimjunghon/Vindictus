@@ -9,14 +9,17 @@ CVIBuffer_Trail::CVIBuffer_Trail(ID3D11Device* pDevice, ID3D11DeviceContext* pDe
 CVIBuffer_Trail::CVIBuffer_Trail(const CVIBuffer_Trail& Prototype)
 	: CVIBuffer { Prototype }
 	, m_iNumMaxNode { Prototype.m_iNumMaxNode }
+	, m_iNumSample { Prototype.m_iNumSample }
 {
 }
 
 HRESULT CVIBuffer_Trail::Initialize_Prototype(_uint iNumMaxNode)
 {
+	m_iNumSample = 3;
+
 	m_iNumMaxNode = iNumMaxNode;
 
-	m_iNumVertices = iNumMaxNode * 2;
+	m_iNumVertices = (iNumMaxNode-3) * 2 * m_iNumSample;
 	m_iVertexStride = sizeof(VTXTRAIL);
 	m_iNumIndices = m_iNumVertices;
 	m_iIndexStride = 2;
@@ -101,7 +104,10 @@ HRESULT CVIBuffer_Trail::Bind_Resources()
 
 HRESULT CVIBuffer_Trail::Render()
 {
-	m_pDeviceContext->DrawIndexed((m_iNumCurrentNode * 2), 0, 0);
+	if (m_iNumCurrentNode <= 3)
+		return S_OK;
+//	m_pDeviceContext->DrawIndexed((m_iNumCurrentNode * 2), 0, 0);
+	m_pDeviceContext->DrawIndexed((m_iNumCurrentNode - 3) * 2 * m_iNumSample, 0, 0);
 
 	return S_OK;
 }
@@ -113,12 +119,13 @@ void CVIBuffer_Trail::Clear()
 
 _bool CVIBuffer_Trail::IsFinished()
 {
-	return m_Trails.empty();
+	return m_Trails.size() <= m_iNumSample;
+//	return m_Trails.empty();
 }
 
 void CVIBuffer_Trail::Update(_float fTimeDelta)
 {	
-	if(false == m_Trails.empty())
+	if (false == m_Trails.empty())
 	{
 		for (auto& Trail : m_Trails)
 			Trail.vLifeTime.x += fTimeDelta;
@@ -139,13 +146,17 @@ void CVIBuffer_Trail::Update(_float fTimeDelta)
 
 		VTXTRAIL* pVertices = static_cast<VTXTRAIL*>(SubResource.pData);
 
-		for (size_t i = 0; i < m_iNumCurrentNode; i++)
+		_uint iIndex = {};
+		for (_uint i = 0; i < m_iNumCurrentNode - 3; i++)
 		{
-			pVertices[i].vLifeTime.x = m_Trails[i].vLifeTime.x;
+			for (_uint j = 0; j < m_iNumSample; j++)
+			{
+				pVertices[iIndex++].vLifeTime.x += fTimeDelta;
+				pVertices[iIndex++].vLifeTime.x += fTimeDelta;
+			}
 		}
 
 		m_pDeviceContext->Unmap(m_pVB, 0);
-
 	}
 }
 
@@ -172,37 +183,122 @@ void CVIBuffer_Trail::Update_TrailBuffer(TRAIL_NODE Trail, _float fTimeDelta)
 
 	m_iNumCurrentNode = m_Trails.size();
 
-	VTXTRAIL* pVertices = new VTXTRAIL[(m_iNumCurrentNode * 2)];
+	if (m_iNumCurrentNode <= m_iNumSample)
+		return;
 
-	for (_uint i = 0; i < m_iNumCurrentNode; i++)
+	VTXTRAIL* pVertices = new VTXTRAIL[(m_iNumCurrentNode - 3) * 2 * m_iNumSample];
+
+	_uint iIndex = {};
+
+	for (_uint i = 0; i < m_iNumCurrentNode - 3; i++)
 	{
-		_uint iIndex = i * 2;
-		
-		_float fU = {};
+		for (_uint j = 0; j < m_iNumSample; j++)
+		{
+			_float fRatio = static_cast<_float>(j) / static_cast<_float>(m_iNumSample);
 
-		if (i == 0)
-			fU = 0.f;
-		else
-			fU = (static_cast<_float>(i) / static_cast<_float>((m_iNumCurrentNode - 1)));
+			_vector vLeftPosition = CatmullRom(m_Trails[i].vTrailLeft, m_Trails[i+1].vTrailLeft, m_Trails[i+2].vTrailLeft, m_Trails[i+3].vTrailLeft, fRatio);
+			_vector vRightPosition = CatmullRom(m_Trails[i].vTrailRight, m_Trails[i + 1].vTrailRight, m_Trails[i + 2].vTrailRight, m_Trails[i + 3].vTrailRight, fRatio);
 
-		pVertices[iIndex].vPosition = m_Trails[i].vTrailLeft;
-		pVertices[iIndex].vTexcoord = _float2(fU, 1.f);
-		pVertices[iIndex].vLifeTime = _float2(m_Trails[i].vLifeTime.x, m_Trails[i].vLifeTime.y);
+			_float fU = (static_cast<_float>(i) + fRatio) / static_cast<_float>(m_iNumCurrentNode - 3);
 
-		pVertices[iIndex+1].vPosition = m_Trails[i].vTrailRight;
-		pVertices[iIndex+1].vTexcoord = _float2(fU, 0.f);
-		pVertices[iIndex+1].vLifeTime = _float2(m_Trails[i].vLifeTime.x, m_Trails[i].vLifeTime.y);
+			XMStoreFloat3(&pVertices[iIndex].vPosition, vLeftPosition);
+			pVertices[iIndex].vTexcoord = _float2(fU, 1.f);
+			pVertices[iIndex++].vLifeTime = _float2(m_Trails[i].vLifeTime.x, m_Trails[i].vLifeTime.y);
+
+			XMStoreFloat3(&pVertices[iIndex].vPosition, vRightPosition);
+			pVertices[iIndex].vTexcoord = _float2(fU, 0.f);
+			pVertices[iIndex++].vLifeTime = _float2(m_Trails[i].vLifeTime.x, m_Trails[i].vLifeTime.y);
+
+		}
+	}
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
+
+	m_pDeviceContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
+	
+	memcpy(SubResource.pData, pVertices, sizeof(VTXTRAIL) * ((m_iNumCurrentNode - 3) * 2 * m_iNumSample));
+	
+	m_pDeviceContext->Unmap(m_pVB, 0);
+
+	Safe_Delete_Array(pVertices);
+}
+
+void CVIBuffer_Trail::Update_TrailBuffer_Billboard(TRAIL_NODE Trail, _float fTimeDelta)
+{
+	if (false == m_Trails.empty())
+	{
+		for (auto& Trail : m_Trails)
+			Trail.vLifeTime.x += fTimeDelta;
+
+		while (m_Trails.front().vLifeTime.x > m_Trails.front().vLifeTime.y)
+		{
+			m_Trails.pop_front();
+
+			if (m_Trails.empty())
+				break;
+		}
 	}
 
+	m_Trails.push_back(Trail);
+
+	if (m_Trails.size() > m_iNumMaxNode)
+		m_Trails.pop_front();
+
+	m_iNumCurrentNode = m_Trails.size();
+
+	if (m_iNumCurrentNode <= m_iNumSample)
+		return;
+
+	VTXTRAIL* pVertices = new VTXTRAIL[(m_iNumCurrentNode - 3) * 2 * m_iNumSample];
+
+	_uint iIndex = {};
+
+	for (_uint i = 0; i < m_iNumCurrentNode - 3; i++)
+	{
+		for (_uint j = 0; j < m_iNumSample; j++)
+		{
+			_float fRatio = static_cast<_float>(j) / static_cast<_float>(m_iNumSample);
+
+			_vector vLeftPosition = CatmullRom(m_Trails[i].vTrailLeft, m_Trails[i + 1].vTrailLeft, m_Trails[i + 2].vTrailLeft, m_Trails[i + 3].vTrailLeft, fRatio);
+			_vector vRightPosition = CatmullRom(m_Trails[i].vTrailRight, m_Trails[i + 1].vTrailRight, m_Trails[i + 2].vTrailRight, m_Trails[i + 3].vTrailRight, fRatio);
+
+			//Left, Right Billboard Ã³¸®
+
+			_float fU = (static_cast<_float>(i) + fRatio) / static_cast<_float>(m_iNumCurrentNode - 3);
+
+			XMStoreFloat3(&pVertices[iIndex].vPosition, vLeftPosition);
+			pVertices[iIndex].vTexcoord = _float2(fU, 1.f);
+			pVertices[iIndex++].vLifeTime = _float2(m_Trails[i].vLifeTime.x, m_Trails[i].vLifeTime.y);
+
+			XMStoreFloat3(&pVertices[iIndex].vPosition, vRightPosition);
+			pVertices[iIndex].vTexcoord = _float2(fU, 0.f);
+			pVertices[iIndex++].vLifeTime = _float2(m_Trails[i].vLifeTime.x, m_Trails[i].vLifeTime.y);
+
+		}
+	}
 	D3D11_MAPPED_SUBRESOURCE	SubResource{};
 
 	m_pDeviceContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
 
-	memcpy(SubResource.pData, pVertices, sizeof(VTXTRAIL) * (m_iNumCurrentNode*2));
+	memcpy(SubResource.pData, pVertices, sizeof(VTXTRAIL) * ((m_iNumCurrentNode - 3) * 2 * m_iNumSample));
 
 	m_pDeviceContext->Unmap(m_pVB, 0);
 
 	Safe_Delete_Array(pVertices);
+}
+
+_vector CVIBuffer_Trail::CatmullRom(_float3 vPoint0, _float3 vPoint1, _float3 vPoint2, _float3 vPoint3, _float fRatio)
+{
+	_vector vP0 = XMLoadFloat3(&vPoint0);
+	_vector vP1 = XMLoadFloat3(&vPoint1);
+	_vector vP2 = XMLoadFloat3(&vPoint2);
+	_vector vP3 = XMLoadFloat3(&vPoint3);
+
+	_float fRatio2 = static_cast<_float>(pow(fRatio, 2.f));
+	_float fRatio3 = static_cast<_float>(pow(fRatio, 3.f));
+
+	_vector vResult = 0.5f * ((2.f * vP1) + (vP2 - vP0) * fRatio + (vP0 * 2.f - vP1 * 5.f + vP2 * 4.f - vP3) * fRatio2 + (vP1 * 3.f - vP0 - vP2 * 3.f + vP3) * fRatio3);
+
+	return vResult;
 }
 
 CVIBuffer_Trail* CVIBuffer_Trail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, _uint iNumMaxNode)

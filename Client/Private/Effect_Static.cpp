@@ -123,6 +123,9 @@ HRESULT CEffect_Static::Bind_ShaderResources()
 	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_DiffuseTexture", 0)))
 		return E_FAIL;
 
+	if (FAILED(m_pVIBufferCom->Bind_Shader_Color(m_pShaderCom, "g_vSourceColor")))
+		return E_FAIL;
+
 	return S_OK;
 }
 

@@ -23,6 +23,17 @@ CGameObject::CGameObject(const CGameObject& Prototype)
 	Safe_AddRef(m_pGameInstance);
 }
 
+_float CGameObject::Get_Depth()
+{
+	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+
+//	_float fDepth = XMVectorGetX(XMVector3Length((XMVectorSubtract(vPosition, vCamPos))));
+	_float fDepth = XMVectorGetZ(XMVectorSubtract(vPosition, vCamPos));
+
+	return fDepth;
+}
+
 CComponent* CGameObject::Get_Component(const _wstring& strComponentTag)
 {
 	auto iter = m_Components.find(strComponentTag);

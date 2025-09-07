@@ -85,6 +85,7 @@ HRESULT CMonster::Ready_AnimNotify(const string& strFilePath)
 
 			if (FAILED(Add_AttackCollisionNotify(strAnimName, iColliderIndex, eType, fDamageRatio, vTrackPositionRange)))
 				return E_FAIL;
+			
 		}
 	}
 
@@ -226,6 +227,7 @@ void CMonster::MoveToTarget(_float fRatio)
 
 void CMonster::Dead()
 {
+	m_IsActive = false;
 	m_pPool_Instance->ReturnPool(m_eType, this);
 }
 

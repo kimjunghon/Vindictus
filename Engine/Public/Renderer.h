@@ -44,6 +44,7 @@ public:
 	HRESULT Add_DebugComponent(class CComponent* pComponent);
 private:
 	list<class CComponent*>		m_DebugComponent;
+	_bool						m_IsDebugDraw = {};
 private:
 	HRESULT Render_Debug();
 #endif

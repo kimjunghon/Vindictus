@@ -163,6 +163,8 @@
     <ClInclude Include="..\public\Effect_Billboard.h" />
     <ClInclude Include="..\public\Effect_Prefab.h" />
     <ClInclude Include="..\Public\Effect_Static.h" />
+    <ClInclude Include="..\public\EnergyBall.h" />
+    <ClInclude Include="..\public\FireBall.h" />
     <ClInclude Include="..\public\GlasgavelenAI.h" />
     <ClInclude Include="..\public\GS_Idle.h" />
     <ClInclude Include="..\Public\Client_Struct.h" />
@@ -197,6 +199,7 @@
     <ClInclude Include="..\Public\MonsterState.h" />
     <ClInclude Include="..\Public\MonsterStateFactory.h" />
     <ClInclude Include="..\public\Mouse.h" />
+    <ClInclude Include="..\public\Projectile.h" />
     <ClInclude Include="..\Public\QS_Attack.h" />
     <ClInclude Include="..\public\QS_Burrow.h" />
     <ClInclude Include="..\Public\QS_Dead.h" />
@@ -309,8 +312,10 @@
     <ClCompile Include="..\private\Effect_Billboard.cpp" />
     <ClCompile Include="..\private\Effect_Prefab.cpp" />
     <ClCompile Include="..\Private\Effect_Static.cpp" />
+    <ClCompile Include="..\private\EnergyBall.cpp" />
     <ClCompile Include="..\private\Equipment.cpp" />
     <ClCompile Include="..\private\Equipment_Manager.cpp" />
+    <ClCompile Include="..\private\FireBall.cpp" />
     <ClCompile Include="..\private\GavelenAnimMachine.cpp" />
     <ClCompile Include="..\private\Glasgavelen.cpp" />
     <ClCompile Include="..\private\GlasgavelenAI.cpp" />
@@ -340,6 +345,7 @@
     <ClCompile Include="..\Private\MonsterState.cpp" />
     <ClCompile Include="..\Private\MonsterStateFactory.cpp" />
     <ClCompile Include="..\private\Mouse.cpp" />
+    <ClCompile Include="..\private\Projectile.cpp" />
     <ClCompile Include="..\Private\QS_Attack.cpp" />
     <ClCompile Include="..\private\QS_Burrow.cpp" />
     <ClCompile Include="..\Private\QS_Dead.cpp" />

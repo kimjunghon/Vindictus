@@ -22,11 +22,25 @@ VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out = (VS_OUT) 0;
      
-        
     float4x4 matWV, matWVP;
     
     matWV = mul(g_WorldMatrix, g_ViewMatrix);
     matWVP = mul(matWV, g_ProjMatrix);
+    
+    Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
+    Out.vTexcoord = In.vTexcoord;
+    Out.vLifeTime = In.vLifeTime;
+    
+    return Out;
+}
+
+VS_OUT VS_BILLBOARD(VS_IN In)
+{
+    VS_OUT Out = (VS_OUT) 0;
+    
+    float4x4 matWV, matWVP;
+    
+    matWV = mul(g_WorldMatrix, g_ViewMatrix);
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
     Out.vTexcoord = In.vTexcoord;
@@ -77,6 +91,17 @@ technique11 DefaultTechnique
         SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass BillboardPass
+    {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_BILLBOARD();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }

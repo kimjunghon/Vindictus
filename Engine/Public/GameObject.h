@@ -19,6 +19,7 @@ protected:
 	virtual ~CGameObject() = default;
 
 public:
+	_float				Get_Depth();
 	class CComponent*	Get_Component(const _wstring& strComponentTag);
 	_bool				Is_Active() { return m_IsActive; }
 public:
@@ -37,6 +38,8 @@ protected:
 	class CGameInstance*			m_pGameInstance = { nullptr };
 	CTransform*						m_pTransformCom = { nullptr };
 	COMPONENTS						m_Components;
+
+	_float							m_fDepth = {};
 
 protected:
 	HRESULT Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag,

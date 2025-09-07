@@ -3,6 +3,7 @@
 #include "Pooling_Manager.h"
 #include "Spawn_Manager.h"
 #include "Effect.h"
+#include "Projectile.h"
 
 IMPLEMENT_SINGLETON(CPool_Instance);
 
@@ -61,6 +62,21 @@ HRESULT CPool_Instance::Ready_MonsterPool(const Value& MonsterPool)
 HRESULT CPool_Instance::Request_SpawnMonster(MONSTER_SPAWN_DATA SpawnData)
 {
 	return m_pPooling_Manager->Request_SpawnMonster(SpawnData);
+}
+
+HRESULT CPool_Instance::Add_ProjectilePool(_uint iPrototypeLevelIndex, const _wstring& strProjectileTag, const _wstring& strProjectileName, void* pArg)
+{
+	return m_pPooling_Manager->Add_ProjectilePool(iPrototypeLevelIndex, strProjectileTag, strProjectileName, pArg);
+}
+
+void CPool_Instance::ReturnPool(const _wstring& strProjectileName, CProjectile* pProjectile)
+{
+	m_pPooling_Manager->ReturnPool(strProjectileName, pProjectile);
+}
+
+HRESULT CPool_Instance::Request_SpawnProjectile(const _wstring& strProjectileName, void* pSpawnData)
+{
+	return m_pPooling_Manager->Request_SpawnProjectile(strProjectileName, pSpawnData);
 }
 
 HRESULT CPool_Instance::Add_EffectToPool(_uint iPrototypeLevelIndex, const _wstring& strEffectName, const _wstring& strEffectTag, void* pArg)

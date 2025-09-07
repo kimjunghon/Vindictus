@@ -13,14 +13,21 @@ CEffect_Billboard::CEffect_Billboard(const CEffect_Billboard& Prototype)
 
 HRESULT CEffect_Billboard::Initialize_Prototype()
 {
-    return S_OK;
+	if (FAILED(__super::Initialize_Prototype()))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 HRESULT CEffect_Billboard::Initialize(void* pArg)
 {
-	
+	if (FAILED(__super::Initialize(pArg)))
+		return E_FAIL;
 
-    return S_OK;
+	if (FAILED(Ready_Component()))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 void CEffect_Billboard::Priority_Update(_float fTimeDelta)
@@ -29,30 +36,62 @@ void CEffect_Billboard::Priority_Update(_float fTimeDelta)
 
 void CEffect_Billboard::Update(_float fTimeDelta)
 {
+	m_pVIBufferCom->Update(fTimeDelta, &m_IsFinished);
+
+	if (m_IsFinished)
+	{
+		ReturnToPool();
+	}
 }
 
 void CEffect_Billboard::Late_Update(_float fTimeDelta)
 {
+	m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
 }
 
 HRESULT CEffect_Billboard::Render()
 {
-    return S_OK;
+	if (FAILED(Bind_ShaderResources()))
+		return E_FAIL;
+
+	m_pShaderCom->Begin(m_iPassIndex);
+
+	m_pVIBufferCom->Bind_Resources();
+
+	m_pVIBufferCom->Render();
+
+	return S_OK;
 }
+
 
 HRESULT CEffect_Billboard::Spawn(void* pArg)
 {
-    return S_OK;
+	if (nullptr == pArg)
+		return E_FAIL;
+
+	_matrix* pWorldMatrix = static_cast<_matrix*>(pArg);
+
+	_matrix CurrentWorldMatrix = *pWorldMatrix;
+
+	m_pTransformCom->Set_WorldMatrix(CurrentWorldMatrix);
+
+	m_IsActive = true;
+
+	m_IsFinished = false;
+
+	m_pVIBufferCom->Reset();
+
+	return S_OK;
 }
 
-HRESULT CEffect_Billboard::Ready_Component(const _wstring& EffectName)
+HRESULT CEffect_Billboard::Ready_Component()
 {
-    _wstring strTextureTag = TEXT("Prototype_Component_Texture_") + EffectName;
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), strTextureTag, TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
+    _wstring strTextureTag = TEXT("Prototype_Component_Texture_") + m_strEffectName;
+    if (FAILED(CGameObject::Add_Component(m_iCurrentLevel, strTextureTag, TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
         return E_FAIL;
 
-    _wstring strVIBufferTag = TEXT("Prototype_Component_EffectBuffer_") + EffectName;
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), strVIBufferTag, TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
+    _wstring strVIBufferTag = TEXT("Prototype_Component_EffectBuffer_") + m_strEffectName;
+    if (FAILED(CGameObject::Add_Component(m_iCurrentLevel, strVIBufferTag, TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
         return E_FAIL;
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_PointParitlce"),
@@ -60,6 +99,29 @@ HRESULT CEffect_Billboard::Ready_Component(const _wstring& EffectName)
         return E_FAIL;
 
     return S_OK;
+}
+
+HRESULT CEffect_Billboard::Bind_ShaderResources()
+{
+	if (FAILED(m_pTransformCom->Bind_Shader_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+		return E_FAIL;
+
+	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_DiffuseTexture", 0)))
+		return E_FAIL;	
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+		return E_FAIL;
+
+	if (FAILED(m_pVIBufferCom->Bind_Shader_Color(m_pShaderCom, "g_vSourceColor")))
+		return E_FAIL;
+
+	return S_OK;
 }
 
 CEffect_Billboard* CEffect_Billboard::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

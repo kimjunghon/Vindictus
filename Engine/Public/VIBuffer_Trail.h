@@ -25,8 +25,13 @@ public:
 	void	Update(_float fTimeDelta);
 	void	Update_TrailBuffer(TRAIL_NODE Trail, _float fTimeDelta);
 
+	void	Update_TrailBuffer_Billboard(TRAIL_NODE Trail, _float fTimeDelta);
+
+	_vector CatmullRom(_float3 vPoint0, _float3 vPoint1, _float3 vPoint2, _float3 vPoint3, _float fRatio);
+
 private:
 	deque<TRAIL_NODE>	m_Trails;
+	_uint				m_iNumSample = {};
 	_uint				m_iNumMaxNode = {};
 	_uint				m_iNumCurrentNode = {};
 	

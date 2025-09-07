@@ -448,6 +448,15 @@
     <Filter Include="03.GameObject\Effect\Static">
       <UniqueIdentifier>{4607269b-5fdd-4982-8740-804e0804f8b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\Projectile">
+      <UniqueIdentifier>{99d7e417-227c-4191-9d09-879ce184067b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Projectile\FireBall">
+      <UniqueIdentifier>{ec5f29ad-fe85-4caa-8792-7acc5be589e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Projectile\EnergyBall">
+      <UniqueIdentifier>{4cffd7e2-0cdc-4f6b-9822-a210e03090b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -867,14 +876,23 @@
     <ClInclude Include="..\public\Pooling_Manager.h">
       <Filter>01.Instance\Pool\Pool_Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Effect_Billboard.h">
-      <Filter>03.GameObject\Effect\Static</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\Effect_Prefab.h">
       <Filter>03.GameObject\Effect\Prefab</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Projectile.h">
+      <Filter>03.GameObject\Projectile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\FireBall.h">
+      <Filter>03.GameObject\Projectile\FireBall</Filter>
+    </ClInclude>
     <ClInclude Include="..\Public\Effect_Static.h">
+      <Filter>03.GameObject\Effect\Static</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Effect_Billboard.h">
       <Filter>03.GameObject\Effect\Billboard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\EnergyBall.h">
+      <Filter>03.GameObject\Projectile\EnergyBall</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1281,14 +1299,23 @@
     <ClCompile Include="..\private\Pooling_Manager.cpp">
       <Filter>01.Instance\Pool\Pool_Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Effect_Billboard.cpp">
-      <Filter>03.GameObject\Effect\Static</Filter>
-    </ClCompile>
     <ClCompile Include="..\private\Effect_Prefab.cpp">
       <Filter>03.GameObject\Effect\Prefab</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Projectile.cpp">
+      <Filter>03.GameObject\Projectile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\FireBall.cpp">
+      <Filter>03.GameObject\Projectile\FireBall</Filter>
+    </ClCompile>
     <ClCompile Include="..\Private\Effect_Static.cpp">
+      <Filter>03.GameObject\Effect\Static</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Effect_Billboard.cpp">
       <Filter>03.GameObject\Effect\Billboard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\EnergyBall.cpp">
+      <Filter>03.GameObject\Projectile\EnergyBall</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

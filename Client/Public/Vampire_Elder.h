@@ -23,6 +23,9 @@ public:
 	virtual HRESULT Render() override;
 
 private:
+	_bool				m_IsSwing = {};
+
+private:
 	HRESULT				Ready_PawnObject();
 	HRESULT				Ready_Collider();
 	HRESULT				Ready_Collider_Bounding();

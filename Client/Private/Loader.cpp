@@ -9,11 +9,12 @@
 #include "RoundShield.h"
 #include "Armor.h"
 
-//Effect
 #include "SwordTrail.h"
 #include "Effect_Static.h"
 #include "Effect_Billboard.h"
 #include "Effect_Prefab.h"
+
+#include "FireBall.h"
 
 #include "Glasgavelen.h"
 #include "GlasgavelenBody.h"
@@ -328,6 +329,10 @@ HRESULT CLoader::Loading_For_Queen_Level()
 		CEffect_Billboard::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	Loading_For_Effect("../Bin/Resources/EffectData/LoadFile/QueenEffect.json", ENUM_CLASS(LEVEL::QUEEN));
+
+
+
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
@@ -433,6 +438,10 @@ HRESULT CLoader::Loading_For_Queen_Level()
 	/* Prototype_GameObject_Vampire_Royal_Body */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Queen_Body"),
 		CQueen_Body::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_Projectile_FireBall"),
+		CFireBall::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	Event.fRatio += 0.2f;

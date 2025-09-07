@@ -144,8 +144,8 @@ private:
 	void			Update_HitColliderEnable();
 
 	HRESULT			Bind_HitCollisionCallback(HIT_COLLIDER eHitCollider, ARMOR_TYPE eArmor_Type);
-
 	void			DecreaseArmorDurability(_uint iArmorIndex, _float fDamage);
+
 public:
 	static CPlayerPawn*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

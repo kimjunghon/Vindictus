@@ -8,6 +8,7 @@ class CPooling_Manager;
 class CSpawn_Manager;
 class CMonster;
 class CEffect;
+class CProjectile;
 
 class CPool_Instance final : public CBase
 {
@@ -32,6 +33,9 @@ public:
 	HRESULT			Ready_MonsterPool(const Value& MonsterPool);
 	HRESULT			Request_SpawnMonster(MONSTER_SPAWN_DATA SpawnData);
 
+	HRESULT			Add_ProjectilePool(_uint iPrototypeLevelIndex, const _wstring& strProjectileTag, const _wstring& strProjectileName, void* pArg = nullptr);
+	void			ReturnPool(const _wstring& strProjectileName, CProjectile* pProjectile);
+	HRESULT			Request_SpawnProjectile(const _wstring& strProjectileName, void* pSpawnData = nullptr);
 
 	HRESULT			Add_EffectToPool(_uint iPrototypeLevelIndex, const _wstring& strEffectName, const _wstring& strEffectTag, void* pArg = nullptr);
 	void			ReturnPool(const _wstring& strEffect, CEffect* pEffect);
