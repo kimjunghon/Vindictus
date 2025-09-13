@@ -19,7 +19,6 @@ CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(const CVIBuffer_Rect_Instance& 
 {
 }
 
-#ifdef _DEBUG
 void CVIBuffer_Rect_Instance::Reset()
 {
     D3D11_MAPPED_SUBRESOURCE	SubResource{};
@@ -39,7 +38,6 @@ void CVIBuffer_Rect_Instance::Reset()
 
     m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
-#endif
 
 HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc)
 {
@@ -142,12 +140,26 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
         pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
         pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
         pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
-        pInstanceVertices[i].vPosition = _float4(
-            m_pGameInstance->Rand(pRectDesc->vCenter.x - pRectDesc->vRange.x * 0.5f, pRectDesc->vCenter.x + pRectDesc->vRange.x * 0.5f),
-            m_pGameInstance->Rand(pRectDesc->vCenter.y - pRectDesc->vRange.y * 0.5f, pRectDesc->vCenter.y + pRectDesc->vRange.y * 0.5f),
-            m_pGameInstance->Rand(pRectDesc->vCenter.z - pRectDesc->vRange.z * 0.5f, pRectDesc->vCenter.z + pRectDesc->vRange.z * 0.5f),
-            1.f
-        );
+
+        if (m_IsCircle)
+        {
+            _float fRadian = XMConvertToRadians(m_pGameInstance->Rand(m_vAngle.x, m_vAngle.y));
+            pInstanceVertices[i].vPosition = _float4(
+                cos(fRadian) * pRectDesc->vRange.x,
+                m_pGameInstance->Rand(pRectDesc->vCenter.y - pRectDesc->vRange.y * 0.5f, pRectDesc->vCenter.y + pRectDesc->vRange.y * 0.5f),
+                sin(fRadian) * pRectDesc->vRange.z,
+                1.f
+            );
+        }
+        else
+        {
+            pInstanceVertices[i].vPosition = _float4(
+                m_pGameInstance->Rand(pRectDesc->vCenter.x - pRectDesc->vRange.x * 0.5f, pRectDesc->vCenter.x + pRectDesc->vRange.x * 0.5f),
+                m_pGameInstance->Rand(pRectDesc->vCenter.y - pRectDesc->vRange.y * 0.5f, pRectDesc->vCenter.y + pRectDesc->vRange.y * 0.5f),
+                m_pGameInstance->Rand(pRectDesc->vCenter.z - pRectDesc->vRange.z * 0.5f, pRectDesc->vCenter.z + pRectDesc->vRange.z * 0.5f),
+                1.f
+            );
+        }
         pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
     }
 
@@ -176,7 +188,6 @@ void CVIBuffer_Rect_Instance::Update(_float fTimeDelta, _bool* pIsFinshed)
         Ring(fTimeDelta, pIsFinshed);
         break;
     }
-
 }
 
 void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta, _bool* pIsFinished)
@@ -195,7 +206,7 @@ void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta, _bool* pIsFinished)
 
         XMStoreFloat4(&pVertices[i].vPosition, XMLoadFloat4(&pVertices[i].vPosition) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
         pVertices[i].vLifeTime.x += fTimeDelta;
-        
+
         if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
         {
             if (m_IsLoop)
@@ -212,9 +223,9 @@ void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta, _bool* pIsFinished)
                 }
             }
         }
-        
- 
     }
+
+
 
     m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }

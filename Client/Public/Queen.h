@@ -65,13 +65,9 @@ private:
 	vector<_matrix>				m_BodyColliderCombinedMatrix;
 
 private:
-	virtual void	Update_BodyColliders(_fmatrix UpdateWorldMatrix) override;
 	virtual void	Update_AttackCoolTime(_float fTimeDelta) override;
 	void			MoveTarget(_float fRatio);
 
-
-	virtual HRESULT	Add_Collider_Body(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix);
-	
 	HRESULT			Ready_PawnObjects();
 	HRESULT			Ready_AI();
 	HRESULT			Ready_QueenStates();

@@ -11,6 +11,7 @@ namespace Client
 
 	typedef struct tagPlayerStatus : public STATUS {
 		float  fStamina;
+		float  fFullStamina;
 	}PLAYER_STATUS;
 
 	typedef struct tagQueenStatus {

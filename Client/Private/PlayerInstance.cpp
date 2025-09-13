@@ -21,6 +21,9 @@ HRESULT CPlayerInstance::Initialize(_uint iInventorySlotCount)
 	if (nullptr == m_pStorage_Manager)
 		return E_FAIL;
 
+	if (FAILED(Ready_OriginStatus()))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -81,19 +84,97 @@ _bool CPlayerInstance::IsInventoryFull()
 {
 	return m_pStorage_Manager->IsInventoryFull();
 }
+void CPlayerInstance::ChangeStatus(_float fValue, STATUS_TYPE eStatus)
+{
+	switch (eStatus)
+	{
+	case STATUS_TYPE::HP:
+	{
+		m_PlayerStatus.fFullHealth += fValue;
+		if(fValue > 0.f)
+			m_PlayerStatus.fHealth += fValue;
+		else
+		{
+			if (m_PlayerStatus.fHealth > m_PlayerStatus.fFullHealth)
+				m_PlayerStatus.fHealth = m_PlayerStatus.fFullHealth;
+		}
+		break;
+	}
+	case STATUS_TYPE::STAMINA:
+	{
+		m_PlayerStatus.fFullStamina += fValue;
+		m_PlayerStatus.fStamina += fValue;
+
+		if (m_PlayerStatus.fStamina <= 0.f)
+			m_PlayerStatus.fStamina = 1.f;
+		break;
+	}
+
+	case STATUS_TYPE::ATK:
+		m_PlayerStatus.fAttackDamage += fValue;
+		break;
+
+	case STATUS_TYPE::DEF:
+		m_PlayerStatus.fDefense += fValue;
+		break;
+	}
+
+}
+void CPlayerInstance::Reset()
+{
+	m_PlayerStatus.fHealth = m_PlayerStatus.fFullHealth;
+	m_PlayerStatus.fStamina = m_PlayerStatus.fFullStamina;
+
+	m_pEquipment_Manager->Reset_Armors();
+}
 #pragma endregion
 
-HRESULT CPlayerInstance::SavePlayerStatus(const PLAYER_STATUS& PlayerStatus)
+HRESULT CPlayerInstance::Ready_OriginStatus()
 {
-	m_PlayerStatus = PlayerStatus;
+	ifstream File("../Bin/Resources/StatusData/Player_Status.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed PlayerStatus Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("Status") && Doc["Status"].IsObject())
+	{
+		const Value& Status = Doc["Status"];
+
+		if (Status.HasMember("HP") && Status["HP"].IsFloat())
+		{
+			m_OriginPlayerStatus.fFullHealth = Status["HP"].GetFloat();
+			m_OriginPlayerStatus.fHealth = m_OriginPlayerStatus.fFullHealth;
+		}
+
+		if (Status.HasMember("DEF") && Status["DEF"].IsFloat())
+			m_OriginPlayerStatus.fDefense = Status["DEF"].GetFloat();
+
+		if (Status.HasMember("ATK") && Status["ATK"].IsFloat())
+			m_OriginPlayerStatus.fAttackDamage = Status["ATK"].GetFloat();
+
+		if (Status.HasMember("STAMINA") && Status["STAMINA"].IsFloat())
+		{
+			m_OriginPlayerStatus.fFullStamina = Status["STAMINA"].GetFloat();
+			m_OriginPlayerStatus.fStamina = m_OriginPlayerStatus.fFullStamina;
+		}
+	}
+
+	m_PlayerStatus = m_OriginPlayerStatus;
 
 	return S_OK;
-}
-
-
-PLAYER_STATUS CPlayerInstance::UpdatePlayerStatus() const
-{
-	return m_PlayerStatus;
 }
 
 void CPlayerInstance::Release_PlayerInstance()

@@ -35,6 +35,7 @@ public:
 	virtual HRESULT			Render() override;
 	HRESULT					RenderSlot(SLOT_RENDER_DESC SlotRenderDesc);
 
+	WEAPON_INFO				Get_WeaponInfo() { return m_WeaponInfo; }
 	const _wstring&			Get_WeaponName() { return m_WeaponInfo.strWeaponName; }
 	WEAPON_TYPE				Get_WeaponType() { return m_eWeaponType; }
 	virtual HRESULT			Equip(const _float4x4* pParentMatrix, const _float4x4* pSocketMatrix, void* pDesc = nullptr);

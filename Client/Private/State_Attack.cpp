@@ -9,6 +9,9 @@ CState_Attack::CState_Attack()
 
 HRESULT CState_Attack::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
 
 	m_fKeepTime = 0.5f;
@@ -86,6 +89,8 @@ void CState_Attack::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 		if (m_fCurrentKeepTime >= m_fKeepTime)
 			m_bReadyAttack = false;
 	}
+
+	pPlayerPawn->DecreaseStamina(0.f);
 }
 
 void CState_Attack::Exit(CPlayerPawn* pPlayerPawn)

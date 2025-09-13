@@ -17,7 +17,7 @@ public:
 	
 public:
 	HRESULT			Add_CameraToManager(_uint iPrototypeIndex, const _wstring& strPrototypeTag, const _wstring& strCameraTag, class CCamera** ppOut = nullptr, void* pArg = nullptr);
-	HRESULT			Change_Camera(const _wstring& strCameraTag);
+	HRESULT			Change_Camera(const _wstring& strCameraTag, void* pArg = nullptr);
 	HRESULT			Change_Camera(class CCamera* pNewCamera);
 	class CCamera*	Find_Camera(const _wstring& strCameraTag);
 	void			Clear();

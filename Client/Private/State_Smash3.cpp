@@ -9,9 +9,14 @@ CState_Smash3::CState_Smash3()
 
 HRESULT CState_Smash3::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SMASH);
 	m_iActionFlag = ENUM_CLASS(SMASH_FLAG::SMASH3_0);
 	m_iMaxComboCount = 2;
+
+	m_fComboStamina = 3.f;
 
 	m_fKeepTime = 0.5f;
 
@@ -44,6 +49,8 @@ void CState_Smash3::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInpu
 				m_iComboCount = m_iMaxComboCount;
 
 			ChangeActionFlag(m_iActionFlag << m_iComboCount);
+
+			pPlayerPawn->DecreaseStamina(m_fComboStamina + m_iComboCount);
 		}
 		else
 		{

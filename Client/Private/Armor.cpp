@@ -2,16 +2,20 @@
 #include "Armor.h"
 #include "Model.h"
 #include "Bone.h"
-
+#include "PlayerInstance.h"
 
 CArmor::CArmor(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CPawnObject { pDevice, pDeviceContext }
+	, m_pPlayerInstance { CPlayerInstance::GetInstance()}
 {
+	Safe_AddRef(m_pPlayerInstance);
 }
 
 CArmor::CArmor(const CArmor& Prototype)
 	: CPawnObject { Prototype }
+	, m_pPlayerInstance{ Prototype.m_pPlayerInstance }
 {
+	Safe_AddRef(m_pPlayerInstance);
 }
 
 HRESULT CArmor::Initialize_Prototype()
@@ -49,35 +53,7 @@ void CArmor::Priority_Update(_float fTimeDelta)
 
 void CArmor::Update(_float fTimeDelta)
 {
-	//if (m_pGameInstance->Get_KeyDown(DIK_1))
-	//{
-	//	if (m_eArmorType == ARMOR_TYPE::HEAD)
-	//		m_ArmorInfo.fHealth = 0.f;
-	//}
 
-	//if (m_pGameInstance->Get_KeyDown(DIK_2))
-	//{
-	//	if (m_eArmorType == ARMOR_TYPE::UPPER)
-	//		m_ArmorInfo.fHealth = 0.f;
-	//}
-	//if (m_pGameInstance->Get_KeyDown(DIK_3))
-	//{
-	//	if (m_eArmorType == ARMOR_TYPE::LOWER)
-	//		m_ArmorInfo.fHealth = 0.f;
-	//}
-	//if (m_pGameInstance->Get_KeyDown(DIK_4))
-	//{
-	//	if (m_eArmorType == ARMOR_TYPE::HAND)
-	//		m_ArmorInfo.fHealth = 0.f;
-	//}
-	//if (m_pGameInstance->Get_KeyDown(DIK_5))
-	//{
-	//	if (m_eArmorType == ARMOR_TYPE::FOOT)
-	//		m_ArmorInfo.fHealth = 0.f;
-	//}
-
-	//if (false == m_IsEquip)
-	//	return;
 }
 
 void CArmor::Late_Update(_float fTimeDelta)
@@ -114,7 +90,7 @@ HRESULT CArmor::Render()
 		if (FAILED(m_pModelCom[ENUM_CLASS(m_eArmorState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i, m_ParentBones[ENUM_CLASS(m_eArmorState)])))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(0);
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::DEFAULT));
 
 		m_pModelCom[ENUM_CLASS(m_eArmorState)]->Render(i);
 	}
@@ -137,7 +113,7 @@ HRESULT CArmor::RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 		if (FAILED(m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Bind_PoseBoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(0);
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::DEFAULT));
 
 		m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Render(i);
 
@@ -189,10 +165,25 @@ void CArmor::DecreaseDurability(_float fDecreaseAmount)
 		{
 			EVENT_BROKEN_HEAD Event;
 			Event.IsBroken = true;
-
 			m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
 			return;
 		}
+
+		m_pPlayerInstance->ChangeStatus(m_ArmorInfo.fDefense * -1.f, STATUS_TYPE::DEF);
+		m_pPlayerInstance->ChangeStatus(m_ArmorInfo.fBrokenDefense, STATUS_TYPE::DEF);
+	}
+}
+
+void CArmor::Reset()
+{
+	m_ArmorInfo.fHealth = m_ArmorInfo.fFullHealth;
+	
+	if (m_eArmorState == ARMOR_STATE::BROKEN)
+	{
+		m_eArmorState = ARMOR_STATE::DEFAULT;
+
+		m_pPlayerInstance->ChangeStatus(m_ArmorInfo.fDefense, STATUS_TYPE::DEF);
+		m_pPlayerInstance->ChangeStatus(m_ArmorInfo.fBrokenDefense * -1.f, STATUS_TYPE::DEF);
 	}
 }
 
@@ -229,21 +220,6 @@ HRESULT CArmor::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(TEXT("DIRECTONAL"));
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-		return E_FAIL;
-
 	return S_OK;
 }
 
@@ -256,21 +232,6 @@ HRESULT CArmor::Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &SlotRenderDesc.ProjMatrix)))
-		return E_FAIL;
-
-	const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(TEXT("DIRECTONAL"));
-	if (nullptr == pLightDesc)
-		return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-		return E_FAIL;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
 		return E_FAIL;
 
 	return S_OK;
@@ -383,6 +344,8 @@ CGameObject* CArmor::Clone(void* pArg)
 void CArmor::Free()
 {
 	__super::Free();
+
+	Safe_Release(m_pPlayerInstance);
 
 	for (_uint i = 0; i < ENUM_CLASS(ARMOR_STATE::END); i++)
 	{

@@ -15,6 +15,7 @@
 #include "Model.h"
 #include "Navigation.h"
 #include "Collider.h"
+#include "ColliderContainer.h"
 
 NS_BEGIN(Engine)
 

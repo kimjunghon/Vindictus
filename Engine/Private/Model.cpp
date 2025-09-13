@@ -43,7 +43,7 @@ _float CModel::Get_CurrentAnimSpeed()
     if (nullptr == m_pCurrentAnimation)
         return 0.f;
 
-    _float fSpeed = m_pCurrentAnimation->Get_AnimSpeed() * m_CurrentAnimData.fAnimSpeed;
+    _float fSpeed = m_pCurrentAnimation->Get_AnimTickPerSecond() * m_CurrentAnimData.fAnimSpeed;
 
     return fSpeed;
 }

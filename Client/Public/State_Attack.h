@@ -21,6 +21,7 @@ private:
 
 	_float			m_fKeepTime = {};
 	_float			m_fCurrentKeepTime = {};
+
 public:
 	static CState_Attack*	Create();
 	virtual void			Free() override;

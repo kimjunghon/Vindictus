@@ -24,6 +24,10 @@ public:
 	virtual void	Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta);
 	virtual void	Exit(CPlayerPawn* pPlayerPawn);
 
+private:
+	_float			m_fSmashStamina = {};
+	_float			m_fRoolStamina = {};
+
 protected:
 	void			Change_OtherState(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput, INPUT_ACTION_DESC ActionInput);
 	void			Find_ActionState(CPlayerPawn* pPlayerPawn, _byte byAction);

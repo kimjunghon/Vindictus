@@ -115,6 +115,74 @@ HRESULT CMonster::Ready_AnimNotify(const string& strFilePath)
 	return S_OK;
 }
 
+HRESULT CMonster::Ready_Status(const string& strFilePath)
+{
+	ifstream File(strFilePath);
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed MonsterStatus Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("Status") && Doc["Status"].IsObject())
+	{
+		const Value& Status = Doc["Status"];
+
+		if (Status.HasMember("HP") && Status["HP"].IsFloat())
+		{
+			m_Status.fFullHealth = Status["HP"].GetFloat();
+			m_Status.fHealth = m_Status.fFullHealth;
+		}
+
+		if (Status.HasMember("DEF") && Status["DEF"].IsFloat())
+			m_Status.fDefense = Status["DEF"].GetFloat();
+
+		if (Status.HasMember("ATK") && Status["ATK"].IsFloat())
+			m_Status.fAttackDamage = Status["ATK"].GetFloat();
+
+		if (Status.HasMember("AttackRange") && Status["AttackRange"].IsFloat())
+			m_fAttackRange = Status["AttackRange"].GetFloat();
+
+		if (Status.HasMember("ChaseRange") && Status["ChaseRange"].IsFloat())
+			m_fChaseRange = Status["ChaseRange"].GetFloat();
+
+		if (Status.HasMember("MinDistance") && Status["MinDistance"].IsFloat())
+			m_fMinDistance = Status["MinDistance"].GetFloat();
+
+		if (Status.HasMember("NumAttack") && Status["NumAttack"].IsInt())
+			m_iNumAttacks = Status["NumAttack"].GetInt();
+
+		m_AttackCoolTime.resize(m_iNumAttacks, 0.f);
+		m_AttackTime.resize(m_iNumAttacks, 0.f);
+
+		if(Status.HasMember("AttackTime") && Status["AttackTime"].IsArray())
+		{
+			const auto& AttackTimes = Status["AttackTime"].GetArray();
+			
+			_uint iIndex = 0;
+			for (auto& AttackTime : AttackTimes)
+			{
+				if(AttackTime.HasMember("Time") && AttackTime["Time"].IsFloat())
+					m_AttackCoolTime[iIndex++] = AttackTime["Time"].GetFloat();
+			}
+		}
+	}
+
+
+	return S_OK;
+}
+
 HRESULT CMonster::Add_ReadyAttackNotify(const string& strAnimName, _float2 vTrackPosition)
 {
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this]() {
@@ -133,18 +201,18 @@ HRESULT CMonster::Add_ReadyAttackNotify(const string& strAnimName, _float2 vTrac
 HRESULT CMonster::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
 {
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(true);
+		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 		m_CurrentAttackData.eAttackType = eType;
 		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
 		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(&m_CurrentAttackData);
+		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, &m_CurrentAttackData);
 		})))
 		return E_FAIL;
 
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this, iAttackColliderIndex]() {
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(nullptr);
+		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, false);
+		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, nullptr);
 		})))
 		return E_FAIL;
 

@@ -89,7 +89,7 @@ HRESULT CSpawn_Manager::BeginRoomSpawn(_uint iRoomIndex)
 
 	m_iMaxWave = static_cast<_uint>(m_pCurrentRoomData->SpawnDatas.size());
 
-	m_pPool_Instance->Request_SpawnMonster(m_pCurrentRoomData->SpawnDatas[2][2]);
+	m_pPool_Instance->Request_SpawnMonster(m_pCurrentRoomData->SpawnDatas[0][0]);
 
 	/*
 	for (auto& SpawnData : m_pCurrentRoomData->SpawnDatas[m_pCurrentRoomData->iCurrentSpawnIndex])
@@ -98,7 +98,17 @@ HRESULT CSpawn_Manager::BeginRoomSpawn(_uint iRoomIndex)
 
 	return S_OK;
 }
+#ifdef _DEBUG
+HRESULT CSpawn_Manager::SpawnRoom(_uint iRoomIndex, _uint iMonsterIndex)
+{
+	m_pCurrentRoomData = &m_RoomData[0];
+	m_pCurrentRoomData->iCurrentSpawnIndex = 0;
 
+	m_pPool_Instance->Request_SpawnMonster(m_pCurrentRoomData->SpawnDatas[iRoomIndex][iMonsterIndex]);
+
+	return S_OK;
+}
+#endif
 HRESULT CSpawn_Manager::WaveEnd()
 {
 	if (nullptr == m_pCurrentRoomData)

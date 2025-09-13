@@ -6,7 +6,7 @@
 #include "PlayerPawn.h"
 #include "Weapon.h"
 #include "Armor.h"
-#include "SwordTrail.h"
+#include "Effect.h"
 
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
@@ -35,6 +35,18 @@ HRESULT CLevel_Town::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Effect()))
+		return E_FAIL;
+
+
+	CUIObject::UIOBJECT_DESC Children_Desc = {};
+	Children_Desc.fX = g_iWinSizeX >> 1;
+	Children_Desc.fY = g_iWinSizeY >> 1;
+	Children_Desc.fSizeX = 256.f;
+	Children_Desc.fSizeY = 256.f;
+	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Palette"),
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Player"), &Children_Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -135,9 +147,9 @@ HRESULT CLevel_Town::Ready_Player(const Value& Player)
 
 HRESULT CLevel_Town::Ready_Effect()
 {
-	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
-	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
-	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
+//	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
+//	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
+//	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
 
 	ifstream File("../Bin/Resources/EffectData/LoadFile/TownEffectPool.json");
 	if (!File.is_open())
@@ -190,6 +202,10 @@ HRESULT CLevel_Town::Ready_Effect()
 					break;
 				case EFFECT_TYPE::PREFAB:
 					strEffectTag = TEXT("Prototype_Effect_");
+					strEffectTag = strEffectTag + EffectName;
+					break;
+				case EFFECT_TYPE::TRAIL:
+					strEffectTag = TEXT("Prototype_Effect_Trail_");
 					strEffectTag = strEffectTag + EffectName;
 					break;
 				}
@@ -246,7 +262,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Upper");
 	ArmorDesc.eArmorType = ARMOR_TYPE::UPPER;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Upper"), 10.f, 5.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Upper"), 10.f, 5.f, 30.f, 30.f };
 
 	CGameObject* pLightMale_Upper = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Upper);
@@ -254,7 +270,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Lower");
 	ArmorDesc.eArmorType = ARMOR_TYPE::LOWER;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Lower"), 10.f, 5.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Lower"), 10.f, 5.f, 30.f, 30.f };
 
 	CGameObject* pLightMale_Lower = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Lower);
@@ -262,7 +278,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Head");
 	ArmorDesc.eArmorType = ARMOR_TYPE::HEAD;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Head"), 10.f, 5.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Head"), 10.f, 5.f, 30.f, 30.f };
 
 	CGameObject* pLightMale_Head = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Head);
@@ -270,7 +286,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Hand");
 	ArmorDesc.eArmorType = ARMOR_TYPE::HAND;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Hand"), 10.f, 5.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Hand"), 10.f, 5.f, 30.f, 30.f };
 
 	CGameObject* pLightMale_Hand = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Hand);
@@ -278,7 +294,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Foot");
 	ArmorDesc.eArmorType = ARMOR_TYPE::FOOT;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Foot"), 10.f, 5.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Foot"), 10.f, 5.f, 30.f, 30.f };
 
 	CGameObject* pLightMale_Foot = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Foot);

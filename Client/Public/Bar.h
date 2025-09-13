@@ -9,12 +9,16 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CBar final : public CTextureUI
+class CBar : public CTextureUI
 {
-private:
+protected:
 	CBar(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CBar(const CBar& Prototype);
 	virtual ~CBar() = default;
+
+public:
+	void			Set_Ratio(_float fRatio) { m_fRatio = fRatio; }
+
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -23,15 +27,15 @@ public:
 	virtual void	Update(_float fTimeDelta) override;
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
-	void			Set_Ratio(_float fRatio);
-
-private:
+	
+protected:
 	CVIBuffer*	m_pVIBufferCom = { nullptr };
 	CShader*	m_pShaderCom = { nullptr };
-
+	
 	_float		m_fRatio = {};
 	_float		m_fStartX = {};
-private:
+
+protected:
 	HRESULT		Ready_Components();
 
 public:

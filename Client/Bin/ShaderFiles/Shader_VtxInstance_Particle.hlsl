@@ -37,6 +37,7 @@ VS_DEFAULT_OUT VS_MAIN(VS_IN In)
     matWV = mul(g_WorldMatrix, g_ViewMatrix);
     matWVP = mul(matWV, g_ProjMatrix);
     
+    
     float4x4 TransformMatrix = float4x4(In.vRight, In.vUp, In.vLook, In.vTranslation);
     
     vector vPosition = mul(float4(In.vPosition, 1.f), TransformMatrix);

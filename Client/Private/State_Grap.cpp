@@ -9,6 +9,9 @@ CState_Grap::CState_Grap()
 
 HRESULT CState_Grap::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
 	return S_OK;

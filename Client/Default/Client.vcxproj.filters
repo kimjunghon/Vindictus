@@ -457,6 +457,24 @@
     <Filter Include="03.GameObject\Projectile\EnergyBall">
       <UniqueIdentifier>{4cffd7e2-0cdc-4f6b-9822-a210e03090b2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\Projectile\Rock">
+      <UniqueIdentifier>{5b6a39f5-8379-4664-be2f-87be5962de08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\HUD\State">
+      <UniqueIdentifier>{d1d4e71c-a9ed-4d79-96a5-bc0d3d8d662d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\BossHPBar">
+      <UniqueIdentifier>{4cdf70f0-7e9d-4cdf-95df-df5bec122123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\BossHPBar\HPBar">
+      <UniqueIdentifier>{57e0bee6-61e5-4e03-a5af-552ed920e0fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Palette">
+      <UniqueIdentifier>{7824d1d7-c525-4d3a-8aba-16d526ea9f71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC">
+      <UniqueIdentifier>{2685ec04-e720-4401-be43-bae983ee7e05}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -511,9 +529,6 @@
       <Filter>03.GameObject\Camera</Filter>
     </ClInclude>
     <ClInclude Include="..\public\HUD.h">
-      <Filter>03.GameObject\UIObject\GamePlay\HUD</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\StateBar.h">
       <Filter>03.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClInclude>
     <ClInclude Include="..\public\OptionMain.h">
@@ -867,7 +882,7 @@
     <ClInclude Include="..\public\State_Grap.h">
       <Filter>03.GameObject\Pawns\State\PlayerState\Hit\Grap</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\SwordTrail.h">
+    <ClInclude Include="..\public\Effect_Trail.h">
       <Filter>03.GameObject\Effect\Trail</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Effect.h">
@@ -893,6 +908,24 @@
     </ClInclude>
     <ClInclude Include="..\public\EnergyBall.h">
       <Filter>03.GameObject\Projectile\EnergyBall</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GavelenRock.h">
+      <Filter>03.GameObject\Projectile\Rock</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\StateBar.h">
+      <Filter>03.GameObject\UIObject\GamePlay\HUD\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BossHP.h">
+      <Filter>03.GameObject\UIObject\GamePlay\BossHPBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\BossHPBar.h">
+      <Filter>03.GameObject\UIObject\GamePlay\BossHPBar\HPBar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Palette.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Palette</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Npc.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -943,9 +976,6 @@
       <Filter>03.GameObject\Camera</Filter>
     </ClCompile>
     <ClCompile Include="..\private\HUD.cpp">
-      <Filter>03.GameObject\UIObject\GamePlay\HUD</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\StateBar.cpp">
       <Filter>03.GameObject\UIObject\GamePlay\HUD</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ClientPch.cpp">
@@ -1290,7 +1320,7 @@
     <ClCompile Include="..\private\State_Grap.cpp">
       <Filter>03.GameObject\Pawns\State\PlayerState\Hit\Grap</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\SwordTrail.cpp">
+    <ClCompile Include="..\private\Effect_Trail.cpp">
       <Filter>03.GameObject\Effect\Trail</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Effect.cpp">
@@ -1317,6 +1347,24 @@
     <ClCompile Include="..\private\EnergyBall.cpp">
       <Filter>03.GameObject\Projectile\EnergyBall</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\GavelenRock.cpp">
+      <Filter>03.GameObject\Projectile\Rock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\StateBar.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\HUD\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BossHP.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\BossHPBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\BossHPBar.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\BossHPBar\HPBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Palette.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Palette</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Npc.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
@@ -1338,6 +1386,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxTrail.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Palette.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

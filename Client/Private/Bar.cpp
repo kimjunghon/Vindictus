@@ -80,11 +80,6 @@ HRESULT CBar::Render()
 	return S_OK;
 }
 
-void CBar::Set_Ratio(_float fRatio)
-{
-	m_fRatio = fRatio;
-}
-
 HRESULT CBar::Ready_Components()
 {
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),

@@ -9,6 +9,9 @@ CState_Hit_Guard::CState_Hit_Guard()
 
 HRESULT CState_Hit_Guard::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
     m_fCanCounterTime = 1.f;

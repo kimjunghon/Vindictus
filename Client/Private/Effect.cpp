@@ -35,6 +35,7 @@ HRESULT CEffect::Initialize(void* pArg)
 	m_iPassIndex = pDesc->iPassIndex;
 	m_strEffectName = pDesc->strEffectName;
 	m_iCurrentLevel = pDesc->iLevel;
+
 	return S_OK;
 }
 

@@ -6,7 +6,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Point_Instance final : public CVIBuffer_Instance
 {
 public:
-	enum class FX_POINT_TYPE { SPREAD, DROP, PROJECTILE, END };
+	enum class FX_POINT_TYPE { SPREAD, DROP, LOOP, END };
 
 	typedef struct tagPointInstanceDesc : public INSTANCE_DESC
 	{
@@ -22,9 +22,9 @@ private:
 	CVIBuffer_Point_Instance(const CVIBuffer_Point_Instance& Prototype);
 	virtual ~CVIBuffer_Point_Instance() = default;
 
-#ifdef _DEBUG
 public:
 	void					Reset();
+#ifdef _DEBUG
 	POINT_INSTANCE_DESC		Get_Desc() { return m_Desc; }
 
 private:
@@ -42,7 +42,7 @@ public:
 public:
 	void Spread(_float fTimeDelta, _bool* pIsFinished);
 	void Drop(_float fTimeDelta, _bool* pIsFinished);
-	void Projectile(_float fTimeDelta, _bool* pIsFinished);
+	void Loop(_float fTimeDelta, _bool* pIsFinished);
 	void Circle(_float fTimeDelta, _bool* pIsFinished = nullptr);
 
 private:

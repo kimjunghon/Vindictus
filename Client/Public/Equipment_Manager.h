@@ -27,6 +27,8 @@ public:
 	CWeapon*				UpdatePlayerEquipWeapon(_uint iWeaponTypeIndex) const;
 	CArmor*					UpdatePlayerEquipArmor(_uint iArmorTypeIndex) const;
 
+	void					Reset_Armors();
+
 private:
 	CPlayerInstance*	m_pPlayerInstance = { nullptr };
 	CGameInstance*		m_pGameInstance = { nullptr };

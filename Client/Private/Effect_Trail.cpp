@@ -1,23 +1,32 @@
 #include "ClientPch.h"
-#include "SwordTrail.h"
+#include "Effect_Trail.h"
 #include "Pool_Instance.h"
 
-CSwordTrail::CSwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
+CEffect_Trail::CEffect_Trail(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CEffect{ pDevice, pDeviceContext }
 {
 }
 
-CSwordTrail::CSwordTrail(const CSwordTrail& Prototype)
+CEffect_Trail::CEffect_Trail(const CEffect_Trail& Prototype)
 	: CEffect{ Prototype }
+	, m_eType  { Prototype.m_eType }
+	, m_RotateMatrix { Prototype.m_RotateMatrix }
+	, m_vColor { Prototype.m_vColor }
 {
 }
 
-HRESULT CSwordTrail::Initialize_Prototype()
+HRESULT CEffect_Trail::Initialize_Prototype(TRAIL_TYPE eType, _fmatrix RotateMatrix, _float3 vColor)
 {
+	m_eType = eType;
+	
+	m_vColor = vColor;
+
+	XMStoreFloat4x4(&m_RotateMatrix, RotateMatrix);
+
 	return S_OK;
 }
 
-HRESULT CSwordTrail::Initialize(void* pArg)
+HRESULT CEffect_Trail::Initialize(void* pArg)
 {
 	if(FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
@@ -25,23 +34,20 @@ HRESULT CSwordTrail::Initialize(void* pArg)
 	if (FAILED(Ready_Component()))
 		return E_FAIL;
 
-	_vector vRotationQuaternion = XMQuaternionRotationRollPitchYaw(0.f, 0.f, XMConvertToRadians(-90.f));
-
-	XMStoreFloat4x4(&m_RotateMatrix, XMMatrixRotationQuaternion(vRotationQuaternion));
 
 	return S_OK;
 }
 
-void CSwordTrail::Priority_Update(_float fTimeDelta)
+void CEffect_Trail::Priority_Update(_float fTimeDelta)
 {
 }
 
-void CSwordTrail::Update(_float fTimeDelta)
+void CEffect_Trail::Update(_float fTimeDelta)
 {
 
 }
 
-void CSwordTrail::Late_Update(_float fTimeDelta)
+void CEffect_Trail::Late_Update(_float fTimeDelta)
 {
 	if (false == *m_IsSwing)
 	{
@@ -51,36 +57,56 @@ void CSwordTrail::Late_Update(_float fTimeDelta)
 		}
 		else
 		{
-			m_pVIBufferCom->Update(fTimeDelta);
+
+			if (m_eType == TRAIL_TYPE::STATIC)
+				m_pVIBufferCom->Update(fTimeDelta);
+			else
+				m_pVIBufferCom->Update_Billboard(fTimeDelta);
+
 			m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
 		}
 		return;
 	}
 
-	_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
+	if(m_pSocketMatrix)
+	{
+		_matrix		SocketMatrix = XMLoadFloat4x4(m_pSocketMatrix);
 
-	for (size_t i = 0; i < 3; i++)
-		SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
+		for (size_t i = 0; i < 3; i++)
+			SocketMatrix.r[i] = XMVector3Normalize(SocketMatrix.r[i]);
 
-	XMStoreFloat4x4(&m_CombinedMatrix, XMMatrixMultiply(XMMatrixMultiply(XMLoadFloat4x4(&m_RotateMatrix), SocketMatrix), XMLoadFloat4x4(m_pParentMatrix)));
+		XMStoreFloat4x4(&m_CombinedMatrix, XMMatrixMultiply(XMMatrixMultiply(XMLoadFloat4x4(&m_RotateMatrix), SocketMatrix), XMLoadFloat4x4(m_pParentMatrix)));
+	}
+	else
+		XMStoreFloat4x4(&m_CombinedMatrix, XMMatrixMultiply(XMLoadFloat4x4(&m_RotateMatrix), XMLoadFloat4x4(m_pParentMatrix)));
 	
 	TRAIL_NODE Trail = {};
 
 	XMStoreFloat3(&Trail.vTrailLeft, XMVector3TransformCoord(m_vLeftPosition, XMLoadFloat4x4(&m_CombinedMatrix)));
 	XMStoreFloat3(&Trail.vTrailRight, XMVector3TransformCoord(m_vRightPosition, XMLoadFloat4x4(&m_CombinedMatrix)));
 	Trail.vLifeTime = _float2(0.f, m_fLifeTime);
+	
+	m_fCurrentTime += fTimeDelta;
 
-	m_pVIBufferCom->Update_TrailBuffer(Trail, fTimeDelta);
+	if(m_fCurrentTime >= m_fNodeUpdateTime)
+	{
+		m_fCurrentTime = 0.f;
+
+		if (m_eType == TRAIL_TYPE::STATIC)
+			m_pVIBufferCom->Add_TrailBuffer(Trail, fTimeDelta);
+		else
+			m_pVIBufferCom->Add_TrailBuffer_Billboard(Trail, fTimeDelta);
+	}
 
 	m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
 }
 
-HRESULT CSwordTrail::Render()
+HRESULT CEffect_Trail::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin(0);
+	m_pShaderCom->Begin(ENUM_CLASS(SHADER_TRAIL::DEFAULT));
 
 	m_pVIBufferCom->Bind_Resources();
 
@@ -89,7 +115,7 @@ HRESULT CSwordTrail::Render()
 	return S_OK;
 }
 
-HRESULT CSwordTrail::Spawn(void* pArg)
+HRESULT CEffect_Trail::Spawn(void* pArg)
 {
 	m_IsActive = true;
 
@@ -101,13 +127,14 @@ HRESULT CSwordTrail::Spawn(void* pArg)
 	m_vLeftPosition = XMLoadFloat3(&pDesc->vLeftPosition);
 	m_vRightPosition = XMLoadFloat3(&pDesc->vRightPosition);
 	m_fLifeTime = pDesc->fLifeTime;
+	m_fNodeUpdateTime = pDesc->fNodeUpdateTime;
 
 	m_pVIBufferCom->Clear();
 
 	return S_OK;
 }
 
-void CSwordTrail::ReturnToPool()
+void CEffect_Trail::ReturnToPool()
 {
 	m_IsActive = false;
 
@@ -118,27 +145,24 @@ void CSwordTrail::ReturnToPool()
 	m_vLeftPosition = XMVectorZero();
 	m_vRightPosition = XMVectorZero();
 	m_fLifeTime = 0.f;
-
+	m_fNodeUpdateTime = 0.f;
 	m_pVIBufferCom->Clear();
 
-	m_pPool_Instance->ReturnPool(TEXT("SwordTrail"), this);
+	m_pPool_Instance->ReturnPool(m_strEffectName, this);
 }
 
-void CSwordTrail::Clear()
+void CEffect_Trail::Clear()
 {
 	m_pVIBufferCom->Clear();
 }
 
-HRESULT CSwordTrail::Ready_Component()
+HRESULT CEffect_Trail::Ready_Component()
 {
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Trail"),
 		TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
 		return E_FAIL;
 
-	//if (FAILED(CGameObject::Add_Component(m_iCurrentLevel, TEXT("Prototype_Component_Texture_") + m_strEffectName,
-	//	TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-	//	return E_FAIL;
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordTrail"),
+	if (FAILED(CGameObject::Add_Component(m_iCurrentLevel, TEXT("Prototype_Component_Texture_") + m_strEffectName,
 		TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
 		return E_FAIL;
 
@@ -149,7 +173,7 @@ HRESULT CSwordTrail::Ready_Component()
 	return S_OK;
 }
 
-HRESULT CSwordTrail::Bind_ShaderResources()
+HRESULT CEffect_Trail::Bind_ShaderResources()
 {
 	if (FAILED(m_pTransformCom->Bind_Shader_WorldMatrix(m_pShaderCom, "g_WorldMatrix")))
 		return E_FAIL;
@@ -162,32 +186,37 @@ HRESULT CSwordTrail::Bind_ShaderResources()
 
 	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", 0)))
 		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vSourceColor", &m_vColor, sizeof(_float3))))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
-CSwordTrail* CSwordTrail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
+CEffect_Trail* CEffect_Trail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, TRAIL_TYPE eType, _fmatrix RotateMatrix, _float3 vColor)
 {
-	CSwordTrail* pInstance = new CSwordTrail(pDevice, pDeviceContext);
-	if (FAILED(pInstance->Initialize_Prototype()))
+	CEffect_Trail* pInstance = new CEffect_Trail(pDevice, pDeviceContext);
+	if (FAILED(pInstance->Initialize_Prototype(eType, RotateMatrix, vColor)))
 	{
-		MSG_BOX(TEXT("Failed Created CSwordTrail"));
+		MSG_BOX(TEXT("Failed Created CEffect_Trail"));
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-CGameObject* CSwordTrail::Clone(void* pArg)
+CGameObject* CEffect_Trail::Clone(void* pArg)
 {
-	CSwordTrail* pInstance = new CSwordTrail(*this);
+	CEffect_Trail* pInstance = new CEffect_Trail(*this);
 	if (FAILED(pInstance->Initialize(pArg)))
 	{
-		MSG_BOX(TEXT("Failed Cloned CSwordTrail"));
+		MSG_BOX(TEXT("Failed Cloned CEffect_Trail"));
 		Safe_Release(pInstance);
 	}
 	return pInstance;
 }
 
-void CSwordTrail::Free()
+void CEffect_Trail::Free()
 {
 	__super::Free();
 

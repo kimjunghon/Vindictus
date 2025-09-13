@@ -9,12 +9,14 @@
 #include "RoundShield.h"
 #include "Armor.h"
 
-#include "SwordTrail.h"
+#include "Effect_Trail.h"
 #include "Effect_Static.h"
 #include "Effect_Billboard.h"
 #include "Effect_Prefab.h"
 
 #include "FireBall.h"
+#include "EnergyBall.h"
+#include "GavelenRock.h"
 
 #include "Glasgavelen.h"
 #include "GlasgavelenBody.h"
@@ -183,10 +185,10 @@ HRESULT CLoader::Loading_For_Town_Level()
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
-	/* Prototype_Component_Texture_SwordTrail */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordTrail"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Effect/heroes_effect_blade_trail_longsword.png"), 1))))
-		return E_FAIL;
+	///* Prototype_Component_Texture_SwordTrail */
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordTrail"),
+	//	CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Effect/heroes_effect_blade_trail_longsword.png"), 1))))
+	//	return E_FAIL;
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -261,6 +263,21 @@ HRESULT CLoader::Loading_For_Town_Level()
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/RoundShield.dat", PreTransformMatrix))))
 		return E_FAIL;
 
+	/* Prototype_Component_Model_Puppy_Gray */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_Puppy_Gray"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Npc/Puppy_Gray.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Puppy_White */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_Puppy_White"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Npc/Puppy_White.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+	/* Prototype_Component_Model_Puppy_Armor */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_Puppy_Armor"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Npc/Puppy_Armor.dat", PreTransformMatrix))))
+		return E_FAIL;
+
 	if (FAILED(Loading_For_MapModel(LEVEL::TOWN, "../Bin/Resources/Map/Town.dat")))
 		return E_FAIL;
 
@@ -286,11 +303,6 @@ HRESULT CLoader::Loading_For_Town_Level()
 	//////////////////////////////////////////////////////////////GAMEOBJECT//////////////////////////////////////////////////////////////
 
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
-
-	/* Prototype_Effect_SwordTrail */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Effect_SwordTrail"),
-		CSwordTrail::Create(m_pDevice, m_pDeviceContext))))
-		return E_FAIL;
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -440,6 +452,7 @@ HRESULT CLoader::Loading_For_Queen_Level()
 		CQueen_Body::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_Projectile_FireBall */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_Projectile_FireBall"),
 		CFireBall::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
@@ -482,6 +495,8 @@ HRESULT CLoader::Loading_For_Gavelen_Level()
 		CEffect_Billboard::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	Loading_For_Effect("../Bin/Resources/EffectData/LoadFile/GavelenEffect.json", ENUM_CLASS(LEVEL::GLASGAVELEN));
+
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
@@ -504,18 +519,25 @@ HRESULT CLoader::Loading_For_Gavelen_Level()
 	PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
 
 	/* Prototype_Component_Model_Glasgavelen */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Glasgavelen"),
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Component_Model_Glasgavelen"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_GlasgavelenBroken */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Glasgavelen_Broken"),
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Component_Model_Glasgavelen_Broken"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/GlasgavelenBroken.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	/* Prototype_Component_Model_GavelneSword */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_GavelneSword"),
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Component_Model_GavelneSword"),
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen_Sword.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+
+	PreTransformMatrix = XMMatrixScaling(0.02f, 0.02f, 0.02f) * RotationMatrix;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Component_Model_GavelenRock"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/GavelenRock.dat", PreTransformMatrix))))
 		return E_FAIL;
 
 	if (FAILED(Loading_For_MapModel(LEVEL::GLASGAVELEN, "../Bin/Resources/Map/GavelenMap.dat")))
@@ -550,15 +572,23 @@ HRESULT CLoader::Loading_For_Gavelen_Level()
 		return E_FAIL;
 
 	/* Prototype_GameObject_Vampire_Basic_Body */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen_Body"),
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_GameObject_Glasgavelen_Body"),
 		CGlasgavelenBody::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	/* Prototype_GameObject_Vampire_Elder */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen_Sword"),
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_GameObject_Glasgavelen_Sword"),
 		CGlasgavelenSword::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_Projectile_EnergyBall */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Projectile_EnergyBall"),
+		CEnergyBall::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+	/* Prototype_Projectile_GavelenRock */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Projectile_GavelenRock"),
+		CGavelenRock::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -666,51 +696,6 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 
 #pragma region MODEL
-
-	//_matrix		PreTransformMatrix = XMMatrixIdentity();
-	//_vector		vRotation = XMQuaternionRotationRollPitchYaw(0.f, XMConvertToRadians(180.0f), 0.f);
-	//_matrix		RotationMatrix = XMMatrixRotationQuaternion(vRotation);
-	//PreTransformMatrix = XMMatrixScaling(0.005f, 0.005f, 0.005f) * RotationMatrix;
-
-	///* Prototype_Component_Model_BastardSword */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_BastardSword"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/Sword_Bastard.dat", PreTransformMatrix))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_Model_RoundShield */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_RoundShield"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Player/RoundShield.dat", PreTransformMatrix))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_Model_Glasgavelen */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Glasgavelen"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen.dat", PreTransformMatrix))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_Model_RoundShield */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_GavelneSword"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Glasgavelen_Sword.dat", PreTransformMatrix))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_Model_Vampire_Basic_Body */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Basic_Body"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire.dat", PreTransformMatrix))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_Model_Vampire_Elder_Body */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Elder_Body"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Elder.dat", PreTransformMatrix))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_Model_Vampire_Royal_Body */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Vampire_Royal_Body"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Vampire_Royal.dat", PreTransformMatrix))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_Model_Vampire_Queen_Body */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Model_Queen_Body"),
-	//	CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Monster/Queen.dat", PreTransformMatrix))))
-	//	return E_FAIL;
 
 
 	if (FAILED(Loading_For_GamePlay_ArmorModel()))
@@ -894,7 +879,9 @@ HRESULT CLoader::Loading_For_Effect(const _char* pFilePath, _uint iLevel)
 			case EFFECT_TYPE::PREFAB:
 				Load_Effect_Prefab(strFilePath.c_str(), iLevel);
 				break;
-
+			case EFFECT_TYPE::TRAIL:
+				Load_Effect_Trail(strFilePath.c_str(), iLevel);
+				break;
 			}
 		}
 	}
@@ -1019,6 +1006,17 @@ HRESULT CLoader::Load_Static_Effect(const _char* pFilePath, _uint iLevel)
 
 		if (Effect.HasMember("Loop") && Effect["Loop"].IsBool())
 			RectDesc.IsLoop = Effect["Loop"].GetBool();
+
+		if (Effect.HasMember("Circle") && Effect["Circle"].IsBool())
+			RectDesc.IsCircle = Effect["Circle"].GetBool();
+
+		if (Effect.HasMember("AngleX") && Effect["AngleX"].IsFloat() &&
+			Effect.HasMember("AngleY") && Effect["AngleY"].IsFloat())
+		{
+			RectDesc.vAngle.x = Effect["AngleX"].GetFloat();
+			RectDesc.vAngle.y = Effect["AngleY"].GetFloat();
+		}
+
 
 		if (Effect.HasMember("FX_Type") && Effect["FX_Type"].IsInt())
 			RectDesc.eType = static_cast<CVIBuffer_Rect_Instance::FX_RECT_TYPE>(Effect["FX_Type"].GetInt());
@@ -1150,6 +1148,18 @@ HRESULT CLoader::Load_Billboard_Effect(const _char* pFilePath, _uint iLevel)
 		if (Effect.HasMember("Loop") && Effect["Loop"].IsBool())
 			PointDesc.IsLoop = Effect["Loop"].GetBool();
 
+
+		if (Effect.HasMember("Circle") && Effect["Circle"].IsBool())
+			PointDesc.IsCircle = Effect["Circle"].GetBool();
+
+		if (Effect.HasMember("AngleX") && Effect["AngleX"].IsFloat() &&
+			Effect.HasMember("AngleY") && Effect["AngleY"].IsFloat())
+		{
+			PointDesc.vAngle.x = Effect["AngleX"].GetFloat();
+			PointDesc.vAngle.y = Effect["AngleY"].GetFloat();
+		}
+
+
 		_wstring VIBufferTag = TEXT("Prototype_Component_EffectBuffer_");
 
 		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, VIBufferTag + EffectName,
@@ -1203,6 +1213,96 @@ HRESULT CLoader::Load_Effect_Prefab(const _char* pFilePath, _uint iLevel)
 	}
 
 
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Effect_Trail(const _char* pFilePath, _uint iLevel)
+{
+	ifstream File(pFilePath);
+
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("Effect") && Doc["Effect"].IsObject())
+	{
+		const Value& Effect = Doc["Effect"];
+
+		_tchar EffectName[MAX_PATH] = {};
+
+		if (Effect.HasMember("Name") && Effect["Name"].IsString())
+		{
+			string Name = Effect["Name"].GetString();
+
+			MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), EffectName, static_cast<_int>(Name.size()));
+		}
+
+		string strTexturePath = {};
+		_uint iNumTextures = {};
+
+		if (Effect.HasMember("Texture") && Effect["Texture"].IsString())
+			strTexturePath = Effect["Texture"].GetString();
+
+		_wstring TextureTag = TEXT("Prototype_Component_Texture_");
+		_tchar TextureFilePath[MAX_PATH] = {};
+
+		MultiByteToWideChar(CP_UTF8, 0, strTexturePath.c_str(), static_cast<_int>(strTexturePath.size()), TextureFilePath, static_cast<_int>(strTexturePath.size()));
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, TextureTag + EffectName,
+			CTexture::Create(m_pDevice, m_pDeviceContext, TextureFilePath, 1))))
+			return E_FAIL;
+
+		TRAIL_TYPE eType = {};
+
+		if (Effect.HasMember("TrailType") && Effect["TrailType"].IsInt())
+			eType = static_cast<TRAIL_TYPE>(Effect["TrailType"].GetInt());
+
+		_float3 vRotate = {};
+
+		if (Effect.HasMember("RotateX") && Effect["RotateX"].IsFloat() &&
+			Effect.HasMember("RotateY") && Effect["RotateY"].IsFloat() &&
+			Effect.HasMember("RotateZ") && Effect["RotateZ"].IsFloat())
+		{
+			vRotate.x = Effect["RotateX"].GetFloat();
+			vRotate.y = Effect["RotateY"].GetFloat();
+			vRotate.z = Effect["RotateZ"].GetFloat();
+		}
+
+		_vector vRotationQuaternion = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(vRotate.x), XMConvertToRadians(vRotate.y), XMConvertToRadians(vRotate.z));
+		
+		_matrix RotateMatrix = XMMatrixRotationQuaternion(vRotationQuaternion);
+
+		_float3 vColor = {};
+
+		if (Effect.HasMember("ColorR") && Effect["ColorR"].IsFloat() &&
+			Effect.HasMember("ColorG") && Effect["ColorG"].IsFloat() &&
+			Effect.HasMember("ColorB") && Effect["ColorB"].IsFloat())
+		{
+			vColor.x = Effect["ColorR"].GetFloat();
+			vColor.y = Effect["ColorG"].GetFloat();
+			vColor.z = Effect["ColorB"].GetFloat();
+		}
+
+		_wstring strEffectTag = TEXT("Prototype_Effect_Trail_");
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, strEffectTag + EffectName,
+			CEffect_Trail::Create(m_pDevice, m_pDeviceContext, eType, RotateMatrix, vColor))))
+			return E_FAIL;
+
+	}
 	return S_OK;
 }
 

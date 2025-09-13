@@ -41,6 +41,10 @@ public:
 	void			ReturnPool(const _wstring& strEffect, CEffect* pEffect);
 	HRESULT			Request_SpawnEffect(const _wstring& strEffect, void* pSpawnData = nullptr);
 	
+#ifdef _DEBUG
+	HRESULT		SpawnRoom(_uint iRoomIndex, _uint iMonsterIndex);
+#endif
+
 private:
 	CSpawn_Manager*		m_pSpawn_Manager = { nullptr };
 	CPooling_Manager*	m_pPooling_Manager = { nullptr };

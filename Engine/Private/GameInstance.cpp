@@ -376,9 +376,9 @@ HRESULT CGameInstance::Add_CameraToManager(_uint iPrototypeIndex, const _wstring
     return m_pCamera_Manager->Add_CameraToManager(iPrototypeIndex, strPrototypeTag, strCameraTag, ppOut, pArg);
 }
 
-HRESULT CGameInstance::Change_Camera(const _wstring& strCameraTag)
+HRESULT CGameInstance::Change_Camera(const _wstring& strCameraTag, void* pArg)
 {
-    return m_pCamera_Manager->Change_Camera(strCameraTag);
+    return m_pCamera_Manager->Change_Camera(strCameraTag, pArg);
 }
 HRESULT CGameInstance::Change_Camera(CCamera* pNewCamera)
 {
@@ -465,17 +465,27 @@ CNavigation* CGameInstance::Clone_CurrentNavigation(_int iCellIndex)
 #pragma endregion
 
 #pragma region COLLIDER
+void CGameInstance::Set_BoudingChannel(_uint iBoundingChannel)
+{
+    m_pCollider_Manager->Set_BoudingChannel(iBoundingChannel);
+}
 HRESULT CGameInstance::Add_Channel(_uint iSrcChannel, _uint iDstChannel, COLLIDER_TYPE eType)
 {
     return m_pCollider_Manager->Add_Channel(iSrcChannel, iDstChannel, eType);
 }
+HRESULT CGameInstance::Add_Collider(_uint iChannel, CGameObject* pOwner, CCollider* pCollider)
+{
+    return m_pCollider_Manager->Add_Collider(iChannel, pOwner, pCollider);
+}
 HRESULT CGameInstance::Add_BoundingCollider(CGameObject* pOwner, CCollider* pBounding_Collider)
 {
-    return m_pCollider_Manager->Add_BoundingCollider(pOwner, pBounding_Collider);
+    return S_OK;
+//    return m_pCollider_Manager->Add_BoundingCollider(pOwner, pBounding_Collider);
 }
 HRESULT CGameInstance::Add_ActionCollider(CGameObject* pOwner, CCollider* pAction_Collider)
 {
-    return m_pCollider_Manager->Add_ActionCollider(pOwner, pAction_Collider);
+    return S_OK;
+    //return m_pCollider_Manager->Add_ActionCollider(pOwner, pAction_Collider);
 }
 #pragma endregion
 

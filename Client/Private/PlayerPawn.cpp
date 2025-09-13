@@ -8,7 +8,7 @@
 #include "PlayerBody.h"
 #include "Armor.h"
 #include "Weapon.h"
-#include "SwordTrail.h"
+#include "Effect_Trail.h"
 
 CPlayerPawn::CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CColliderPawn{ pDevice, pDeviceContext }
@@ -23,6 +23,8 @@ CPlayerPawn::CPlayerPawn(const CPlayerPawn& Prototype)
 	: CColliderPawn{ Prototype }
 	, m_pPlayerInstance { Prototype.m_pPlayerInstance}
 	, m_pPool_Instance{ Prototype.m_pPool_Instance }
+	, m_fStaminaDelay { Prototype.m_fStaminaDelay }
+	, m_fSpeed { Prototype.m_fSpeed }
 {
 	Safe_AddRef(m_pPlayerInstance);
 	Safe_AddRef(m_pPool_Instance);
@@ -38,9 +40,11 @@ _bool CPlayerPawn::AnimCanChange()
 	return m_pPlayerBody->AnimCanChange();
 }
 
+
 HRESULT CPlayerPawn::Initialize_Prototype()
 {
-
+	m_fStaminaDelay = 2.f;
+	m_fSpeed = 50.f;
 
 	return S_OK;
 }
@@ -52,6 +56,7 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
 
 	if (FAILED(Ready_Camera()))
 		return E_FAIL;
@@ -76,8 +81,6 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 
 	m_vPrevPlayerRotationQuat = XMQuaternionIdentity();
 
-	m_fSpeed = 50.f;
-
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::IDLE) | ENUM_CLASS(IDLE_FLAG::DEFAULT);
 
 	m_pPlayerBody->Forcing_Play_Animation();
@@ -88,19 +91,15 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	m_pGameInstance->Subscribe<EVENT_CHANGE_ARMOR>(ENUM_CLASS(EVENT_TYPE::NONSTATIC), [this](const EVENT_CHANGE_ARMOR& Event) {
 		this->Event_ChangeArmor(Event); });
 
-	//test
-	m_Status.fAttackDamage = 20.f;
-
 	if (FAILED(Ready_AttackNotify()))
 		return E_FAIL;
 
 	if (FAILED(Ready_TrailNotify()))
 		return E_FAIL;
 
+	m_pStatus = m_pPlayerInstance->GetPlayerStatusPtr();
 
-
-	/////Test
-
+	//TEST
 	m_pPlayerBody->Add_AnimNotify("Smash_04", 40.f, [this]() {
 		_matrix CombinedMatrix = {};
 		CombinedMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Foot")), m_pTransformCom->Get_WorldMatrix());
@@ -130,6 +129,8 @@ void CPlayerPawn::Update(_float fTimeDelta)
 	if (false == m_IsActive)
 		return;
 
+	IncreaseStamina(fTimeDelta);
+
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Update(fTimeDelta);
 }
@@ -144,31 +145,27 @@ void CPlayerPawn::Late_Update(_float fTimeDelta)
 
 	Update_HitColliderEnable();
 
-	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix());
+	m_pColliderContainer->Update(this, m_pTransformCom->Get_WorldMatrix());
+//	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix());
 
 #ifdef _DEBUG
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
+
+	for (auto& Pair : m_Colliders)
+	{
+		for (auto& pCollider : Pair.second)
+		{
+			if (FAILED(m_pGameInstance->Add_DebugComponent(pCollider)))
+				return;
+		}
+	}
 #endif
 }
 
 HRESULT CPlayerPawn::Render()
 {
 
-#ifdef _DEBUG
-	for (auto& Pair : m_Colliders)
-	{
-		for (auto& pCollider : Pair.second)
-		{
-			pCollider->Render();
-		}
-	}
-	//for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::ATTACK].size(); i++)
-	//{
-	//	m_AttackColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[i]), m_pTransformCom->Get_WorldMatrix());
-	//	m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->Render();
-	//}
-#endif
 	return S_OK;
 }
 
@@ -249,6 +246,9 @@ HRESULT CPlayerPawn::EquipWeapon(CWeapon* pWeapon)
 	Add_PawnObject(strWeaponName, pWeapon);
 
 	Safe_AddRef(pWeapon);
+
+//	m_Status.fAttackDamage += pWeapon->Get_ATK();
+//	m_pPlayerInstance->UpdatePlayerStatus(m_Status);
 
 	return S_OK;
 }
@@ -342,12 +342,15 @@ void CPlayerPawn::OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_D
 	if (nullptr == CollisionData.pDesc)
 		return;
 
-	DisableColliderChannel(COLLIDER_CHANNEL::HIT);
-
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::HIT), false);
+	
 	ATTACK_DATA* AttackData = static_cast<ATTACK_DATA*>(CollisionData.pDesc);
 
 	if (!(m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD)))
+	{
 		DecreaseArmorDurability(iArmorIndex, AttackData->fDamage);
+		m_pStatus->fHealth -= AttackData->fDamage;
+	}
 
 	ATTACK_TYPE eAttackType = AttackData->eAttackType;
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
@@ -366,9 +369,10 @@ void CPlayerPawn::OnCollisionGrap(const CCollider::COLLISION_DATA& CollisionData
 	if (nullptr == CollisionData.pDesc)
 		return;
 
-	DisableColliderChannel(COLLIDER_CHANNEL::HIT);
-	DisableColliderChannel(COLLIDER_CHANNEL::BODY);
 
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::HIT), false);
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::BODY), false);
+	
 	GRAP_DATA* pGrapData = static_cast<GRAP_DATA*>(CollisionData.pDesc);
 
 	m_GrapData = *pGrapData;
@@ -389,9 +393,9 @@ void CPlayerPawn::EndCollisionGrap(const CCollider::COLLISION_DATA& CollisionDat
 	
 	if (nullptr == CollisionData.pDesc)
 		return;
-	
-	EnableColliderChannel(COLLIDER_CHANNEL::HIT);
-	EnableColliderChannel(COLLIDER_CHANNEL::BODY);
+
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::HIT), true);
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::BODY), true);
 	
 	ATTACK_DATA* AttackData = static_cast<ATTACK_DATA*>(CollisionData.pDesc);
 }
@@ -454,15 +458,15 @@ void CPlayerPawn::Change_HitState(ATTACK_TYPE eAttackType, _fvector vPosition, _
 void CPlayerPawn::Update_HitColliderEnable()
 {
 	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::ROLL) || m_iStateFlag & ENUM_CLASS(STATE_FLAG::HIT))
-		DisableColliderChannel(COLLIDER_CHANNEL::HIT);
+		m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::HIT), false);
 	else
-		EnableColliderChannel(COLLIDER_CHANNEL::HIT);
+		m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::HIT), true);
 }
 
 
 HRESULT CPlayerPawn::Bind_HitCollisionCallback(HIT_COLLIDER eHitCollider, ARMOR_TYPE eArmor_Type)
 {
-	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::HIT, ENUM_CLASS(eHitCollider), COLLIDER_STATE::BEGIN, [this, eArmor_Type](const CCollider::COLLISION_DATA& Data) {
+	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(eHitCollider), COLLIDER_STATE::BEGIN, [this, eArmor_Type](const CCollider::COLLISION_DATA& Data) {
 		this->OnCollisionHit(ENUM_CLASS(eArmor_Type), Data); })))
 		return E_FAIL;
 
@@ -506,6 +510,14 @@ void CPlayerPawn::Move(_float fTimeDelta)
 	_vector vMovePosition = XMVectorScale(m_vPlayerMoveDir, m_fSpeed * m_fSpeedRatio * fTimeDelta);
 	
 	m_pTransformCom->MovePositionToVector(vMovePosition, m_pNavigationCom);
+}
+
+void CPlayerPawn::IncreaseStamina(_float fTimeDelta)
+{
+	m_fCurrentStaminaDelay += fTimeDelta;
+
+	if (m_fCurrentStaminaDelay >= m_fStaminaDelay && m_pStatus->fStamina < m_pStatus->fFullStamina)
+		m_pStatus->fStamina += 1.f;
 }
 
 
@@ -669,6 +681,10 @@ HRESULT CPlayerPawn::Ready_Collider()
 	if (FAILED(Add_Collider_Grap()))
 		return E_FAIL;
 
+	m_pColliderContainer->SetEnableAllColliderChannel(true);
+
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), false);
+
 	return S_OK;
 }
 
@@ -678,8 +694,10 @@ HRESULT CPlayerPawn::Ready_Collider_Bounding()
 	AABBDesc.vExtents = _float3(20.f, 20.f, 20.f);
 	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
 
-	if (FAILED(__super::Add_Collider_Bounding(TEXT("Com_Collider_Bounding"), COLLIDER_OWNER::PLAYER, &AABBDesc)))
+	if(FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &AABBDesc, nullptr)))
 		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -691,14 +709,15 @@ HRESULT CPlayerPawn::Ready_Collider_Body()
 	OBBDesc.vExtents = _float3(10.f, 18.f, 10.f);
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
 
-	if (FAILED(__super::Add_Collider_Body(TEXT("Com_Collider_Body"), COLLIDER_OWNER::PLAYER, &OBBDesc)))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, nullptr)))
 		return E_FAIL;
 
-	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::BODY, 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
+	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::BODY), 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
 		this->OnCollisionBlock(Data); })))
 		return E_FAIL;
 
-	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::BODY, 0, COLLIDER_STATE::DURING, [this](const CCollider::COLLISION_DATA& Data) {
+	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::BODY), 0, COLLIDER_STATE::DURING, [this](const CCollider::COLLISION_DATA& Data) {
 		this->OnCollisionBlock(Data); })))
 		return E_FAIL;
 
@@ -707,79 +726,61 @@ HRESULT CPlayerPawn::Ready_Collider_Body()
 
 HRESULT CPlayerPawn::Ready_Collider_Hit()
 {
-	m_Colliders[COLLIDER_CHANNEL::HIT].resize(ENUM_CLASS(HIT_COLLIDER::END), nullptr);
-	m_HitColliderSocketMatrix.resize(ENUM_CLASS(HIT_COLLIDER::END), nullptr);
-	m_HitColliderCombinedMatrix.resize(ENUM_CLASS(HIT_COLLIDER::END), XMMatrixIdentity());
-
-	/* Com_Collider_Hit_Head */
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(4.f, 7.f, 4.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Head"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::HEAD), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Head1"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Head1"))))
 		return E_FAIL;
 
-	Bind_HitCollisionCallback(HIT_COLLIDER::HEAD, ARMOR_TYPE::HEAD);
-
-	/* Com_Collider_Hit_Upper */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(6.f, 10.f, 6.f);
 	OBBDesc.vCenter = _float3(3.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Upper"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::UPPER), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Spine1"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Spine1"))))
 		return E_FAIL;
 
-	Bind_HitCollisionCallback(HIT_COLLIDER::UPPER, ARMOR_TYPE::UPPER);
-
-	/* Com_Collider_Hit_Lower */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(45.f));
 	OBBDesc.vExtents = _float3(6.f, 10.f, 6.f);
 	OBBDesc.vCenter = _float3(-4.f, 0.f, 0.f);
+
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Pelvis"))))
+		return E_FAIL;
+
+	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
+	OBBDesc.vExtents = _float3(3.f, 8.f, 3.f);
+	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Lower"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::LOWER), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Pelvis"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_ForeTwist1"))))
 		return E_FAIL;
 
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_ForeTwist1"))))
+		return E_FAIL;
+
+	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
+	OBBDesc.vExtents = _float3(3.f, 11.f, 3.f);
+	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y, 0.f, 0.f);
+
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Calf"))))
+		return E_FAIL;
+
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
+		return E_FAIL;
+
+	Bind_HitCollisionCallback(HIT_COLLIDER::HEAD, ARMOR_TYPE::HEAD);
+	Bind_HitCollisionCallback(HIT_COLLIDER::UPPER, ARMOR_TYPE::UPPER);
 	Bind_HitCollisionCallback(HIT_COLLIDER::LOWER, ARMOR_TYPE::LOWER);
-
-	/* Com_Collider_Hit_RightArm */
-	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
-	OBBDesc.vExtents = _float3(3.f, 8.f, 3.f);
-	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
-
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_RightArm"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_ARM), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_ForeTwist1"))))
-		return E_FAIL;
-
 	Bind_HitCollisionCallback(HIT_COLLIDER::R_ARM, ARMOR_TYPE::HAND);
-
-	/* Com_Collider_Hit_LeftArm */
-	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
-	OBBDesc.vExtents = _float3(3.f, 8.f, 3.f);
-	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
-
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_LeftArm"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_ARM), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_ForeTwist1"))))
-		return E_FAIL;
-
 	Bind_HitCollisionCallback(HIT_COLLIDER::L_ARM, ARMOR_TYPE::HAND);
-
-	/* Com_Collider_Hit_LeftLeg */
-	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
-	OBBDesc.vExtents = _float3(3.f, 11.f, 3.f);
-	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y, 0.f, 0.f);
-
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_LeftLeg"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Calf"))))
-		return E_FAIL;
-
 	Bind_HitCollisionCallback(HIT_COLLIDER::L_LEG, ARMOR_TYPE::FOOT);
-
-	/* Com_Collider_Hit_RightLeg */
-	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
-	OBBDesc.vExtents = _float3(3.f, 11.f, 3.f);
-	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y, 0.f, 0.f);
-
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_RightLeg"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
-		return E_FAIL;
-
 	Bind_HitCollisionCallback(HIT_COLLIDER::R_LEG, ARMOR_TYPE::FOOT);
 
 	return S_OK;
@@ -787,45 +788,35 @@ HRESULT CPlayerPawn::Ready_Collider_Hit()
 
 HRESULT CPlayerPawn::Ready_Collider_Attack()
 {
-	m_Colliders[COLLIDER_CHANNEL::ATTACK].resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderSocketMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderCombinedMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), XMMatrixIdentity());
-
-	/* Com_Collider_Attack_Sword */
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(20.f, 25.f, 20.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Sword"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::SWORD), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH"))))
 		return E_FAIL;
 
-	/* Com_Collider_Attack_Shield */
 	OBBDesc.vAngles = _float3(XMConvertToRadians(60.f), XMConvertToRadians(90.f), XMConvertToRadians(180.f));
 	OBBDesc.vExtents = _float3(25.f, 20.f, 20.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Shield"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::SHILED), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_LF"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_LF"))))
 		return E_FAIL;
 
-	/* Com_Collider_Attack_Left_Leg */
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(30.f, 30.f, 30.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y - 5.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Left_Leg"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Calf"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Calf"))))
 		return E_FAIL;
 
-	/* Com_Collider_Attack_Right_Leg */
-	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));
-	OBBDesc.vExtents = _float3(30.f, 30.f, 30.f);
-	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y - 5.f, 0.f, 0.f);
-
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Right_Leg"), COLLIDER_OWNER::PLAYER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
 		return E_FAIL;
-
-	DisableColliderChannel(COLLIDER_CHANNEL::ATTACK);
-
+	
 	return S_OK;
 }
 
@@ -836,24 +827,15 @@ HRESULT CPlayerPawn::Add_Collider_Grap()
 	OBBDesc.vExtents = _float3(10.f, 18.f, 10.f);
 	OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
 
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::GRAP);
-	ColliderDesc.iOwner = ENUM_CLASS(COLLIDER_OWNER::PLAYER);
-	ColliderDesc.BoundingDesc = &OBBDesc;
-
-	CCollider* pGrapCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		TEXT("Com_Collider_Grap"), reinterpret_cast<CComponent**>(&pGrapCollider), &ColliderDesc)))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::GRAP), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, nullptr)))
 		return E_FAIL;
 
-	m_Colliders[COLLIDER_CHANNEL::GRAP].push_back(pGrapCollider);
-	
-	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::GRAP, 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
+	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
 		this->OnCollisionGrap(Data); })))
 		return E_FAIL;
 
-	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::GRAP, 0, COLLIDER_STATE::END, [this](const CCollider::COLLISION_DATA& Data) {
+	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, COLLIDER_STATE::END, [this](const CCollider::COLLISION_DATA& Data) {
 		this->EndCollisionGrap(Data); })))
 		return E_FAIL;
 
@@ -959,14 +941,15 @@ HRESULT CPlayerPawn::Ready_TrailNotify()
 			if(eType == NOTIFY_TYPE::ON)
 			{
 				m_pPlayerBody->Add_AnimNotify(strAnimName, fTrackPosition, [this]() {
-					CSwordTrail::TRAIL_DESC TrailDesc = {};
+					CEffect_Trail::TRAIL_DESC TrailDesc = {};
 					
 					TrailDesc.pSocketMatrix = m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH");
 					TrailDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 					TrailDesc.IsSwing = &m_IsSwing;
 					TrailDesc.vLeftPosition = _float3(0.f, 0.f, 0.f);
-					TrailDesc.vRightPosition = _float3(0.f, 30.f, 0.f);
+					TrailDesc.vRightPosition = _float3(0.f, 20.f, 0.f);
 					TrailDesc.fLifeTime = 0.5f;
+					TrailDesc.fNodeUpdateTime = 0.f;
 
 					m_pPool_Instance->Request_SpawnEffect(TEXT("SwordTrail"), &TrailDesc);
 
@@ -987,18 +970,18 @@ HRESULT CPlayerPawn::Ready_TrailNotify()
 HRESULT CPlayerPawn::Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
 {
 	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(true);
+		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 		m_CurrentAttackData.eAttackType = eType;
-		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
+		m_CurrentAttackData.fDamage = m_pStatus->fAttackDamage * fAttackRatio;
 		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(&m_CurrentAttackData);
+		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, &m_CurrentAttackData);
 		})))
 		return E_FAIL;
 
 	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this, iAttackColliderIndex]() {
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(nullptr);
+		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, false);
+		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, nullptr);
 		})))
 		return E_FAIL;
 
@@ -1088,6 +1071,7 @@ void CPlayerPawn::Free()
 	for (auto& pState : m_States)
 		Safe_Release(pState);
 
+	Safe_Release(m_pColliderContainer);
 	Safe_Release(m_pCamera);
 	
 	Safe_Release(m_pPlayerInstance); 

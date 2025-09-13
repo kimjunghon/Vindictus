@@ -9,6 +9,9 @@ CState_Hit_Light::CState_Hit_Light()
 
 HRESULT CState_Hit_Light::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
 	return S_OK;

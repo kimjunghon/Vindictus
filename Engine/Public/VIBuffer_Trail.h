@@ -23,18 +23,29 @@ public:
 
 public:
 	void	Update(_float fTimeDelta);
-	void	Update_TrailBuffer(TRAIL_NODE Trail, _float fTimeDelta);
+	void	Update_Billboard(_float fTimeDelta);
 
-	void	Update_TrailBuffer_Billboard(TRAIL_NODE Trail, _float fTimeDelta);
+	void	Add_TrailBuffer(TRAIL_NODE Trail, _float fTimeDelta);
+	void	Add_TrailBuffer_Billboard(TRAIL_NODE Trail, _float fTimeDelta);
 
-	_vector CatmullRom(_float3 vPoint0, _float3 vPoint1, _float3 vPoint2, _float3 vPoint3, _float fRatio);
 
 private:
+	D3D11_BUFFER_DESC		m_VBDesc = {};
+	VTXTRAIL*				m_pVertices = { nullptr };
+	D3D11_BUFFER_DESC		m_IBDesc = {};
+	_ushort*				m_pIndices = { nullptr };
+
 	deque<TRAIL_NODE>	m_Trails;
 	_uint				m_iNumSample = {};
 	_uint				m_iNumMaxNode = {};
 	_uint				m_iNumCurrentNode = {};
-	
+
+private:
+	void	Update_TrailBuffer(_float fTimeDelta);
+	void	Update_TrailBuffer_Billboard(_float fTimeDelta);
+
+	_vector CatmullRom(_float3 vPoint0, _float3 vPoint1, _float3 vPoint2, _float3 vPoint3, _float fRatio);
+	void	Compute_CatmullRom_Billboard(_uint iNodeIndex, _float fRatio, _vector* pOut);
 
 public:
 	static CVIBuffer_Trail* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, _uint iNumMaxNode);

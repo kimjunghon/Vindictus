@@ -22,9 +22,9 @@ private:
 	CVIBuffer_Rect_Instance(const CVIBuffer_Rect_Instance& Prototype);
 	virtual ~CVIBuffer_Rect_Instance() = default;
 
-#ifdef _DEBUG
 public:
 	void					Reset();
+#ifdef _DEBUG
 	RECT_INSTANCE_DESC		Get_Desc() { return m_Desc; }
 
 private:

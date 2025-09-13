@@ -2,6 +2,8 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
+float3 g_vSourceColor = float3(1.f, 1.f, 1.f);
+
 texture2D g_Texture;
 
 struct VS_IN
@@ -34,21 +36,6 @@ VS_OUT VS_MAIN(VS_IN In)
     return Out;
 }
 
-VS_OUT VS_BILLBOARD(VS_IN In)
-{
-    VS_OUT Out = (VS_OUT) 0;
-    
-    float4x4 matWV, matWVP;
-    
-    matWV = mul(g_WorldMatrix, g_ViewMatrix);
-    
-    Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
-    Out.vTexcoord = In.vTexcoord;
-    Out.vLifeTime = In.vLifeTime;
-    
-    return Out;
-}
-
 struct PS_IN
 {
     float4 vPosition : SV_POSITION;
@@ -70,14 +57,18 @@ PS_OUT PS_MAIN(PS_IN In)
     
     vector vMask = g_Texture.Sample(PointSampler, In.vTexcoord);
     
-    vector vSourColor = 1.f;
-    
-    float fAlpha = 1.f * vMask.x;
+    vector vSourColor = float4(g_vSourceColor, 1.f) * vMask;
     
     Out.vColor = vSourColor * vMask;
-    Out.vColor.a = fAlpha;
     
-    Out.vColor.a -= (In.vLifeTime.x / In.vLifeTime.y);
+    Out.vColor.a = 1.f * vMask.x;
+    
+    float fAlpha = (In.vLifeTime.x / In.vLifeTime.y);
+    
+    Out.vColor.a -= fAlpha;
+    
+    if (Out.vColor.a <= 0.f)
+        discard;
     
     return Out;
 }
@@ -95,14 +86,4 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass BillboardPass
-    {
-        SetRasterizerState(RS_CULL_NONE);
-        SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_BILLBOARD();
-        GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
-    }
 }

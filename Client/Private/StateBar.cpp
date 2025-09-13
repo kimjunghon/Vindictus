@@ -1,10 +1,13 @@
 #include "ClientPch.h"
 #include "StateBar.h"
 #include "Bar.h"
+#include "PlayerInstance.h"
 
 CStateBar::CStateBar(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CUI_Panel{ pDevice, pDeviceContext }
+	, m_pPlayerInstance { CPlayerInstance::GetInstance()}
 {
+	Safe_AddRef(m_pPlayerInstance);
 }
 
 CStateBar::CStateBar(const CStateBar& Prototype)
@@ -13,7 +16,9 @@ CStateBar::CStateBar(const CStateBar& Prototype)
 	, m_fBarRatio{ Prototype.m_fBarRatio }
 	, m_fLerpBarRatio { Prototype.m_fLerpBarRatio }
 	, m_fFillSpeed{ Prototype.m_fFillSpeed }
+	, m_pPlayerInstance { Prototype.m_pPlayerInstance }
 {
+	Safe_AddRef(m_pPlayerInstance);
 }
 
 HRESULT CStateBar::Initialize_Prototype()
@@ -21,7 +26,7 @@ HRESULT CStateBar::Initialize_Prototype()
 	m_fRatio = 1.f;
 	m_fBarRatio = 1.f;
 	m_fLerpBarRatio = 1.f;
-	m_fFillSpeed = 0.5f;
+	m_fFillSpeed = 0.2f;
 
 	return S_OK;
 }
@@ -42,7 +47,6 @@ HRESULT CStateBar::Initialize(void* pArg)
 	if (FAILED(Ready_Children()))
 		return E_FAIL;
 
-
 	m_pGameInstance->Subscribe<EVENT_PROGRESSBAR>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_PROGRESSBAR& Event) {
 		this->Event_ProgressBar(Event); });
 
@@ -56,6 +60,8 @@ void CStateBar::Priority_Update(_float fTimeDelta)
 
 void CStateBar::Update(_float fTimeDelta)
 {
+	m_fRatio = (*m_pCurrentState) / (*m_pMaxState);
+
 	Update_BarRatio(fTimeDelta);
 	Update_LerpBarRatio(fTimeDelta);
 
@@ -74,18 +80,24 @@ HRESULT CStateBar::Render()
 
 void CStateBar::Ready_TypeDesc()
 {
+	PLAYER_STATUS* pPlayerStatus = m_pPlayerInstance->GetPlayerStatusPtr();
+
 	switch (m_eType)
 	{
 	case PROGRESS_TYPE::HP:
 		m_strType = TEXT("PlayerHpBar");
 		m_fBackSizeX = 68.f;
 		m_fBackSizeY = 8.f;
+		m_pCurrentState = &pPlayerStatus->fHealth;
+		m_pMaxState = &pPlayerStatus->fFullHealth;
 		break;
 
 	case PROGRESS_TYPE::STAMINA:
 		m_strType = TEXT("PlayerStaminaBar");
 		m_fBackSizeX = 35.f;
 		m_fBackSizeY = 7.f;
+		m_pCurrentState = &pPlayerStatus->fStamina;
+		m_pMaxState = &pPlayerStatus->fFullStamina;
 		break;
 
 //	case PROGRESS_TYPE::SP:
@@ -197,4 +209,5 @@ void CStateBar::Free()
 
 	Safe_Release(m_pBar);
 	Safe_Release(m_pLerpBar);
+	Safe_Release(m_pPlayerInstance);
 }

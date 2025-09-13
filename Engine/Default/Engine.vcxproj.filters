@@ -229,6 +229,9 @@
     <Filter Include="01.Utility\09.RenderTargets\Manager">
       <UniqueIdentifier>{e80de621-6b8f-4d74-acf3-e7964c2cecfd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\04.Component\Collider\Container">
+      <UniqueIdentifier>{97faeec1-107a-4732-9185-eb08fc0a7564}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -465,6 +468,9 @@
     <ClInclude Include="..\Public\Light.h">
       <Filter>01.Utility\96.Light</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\ColliderContainer.h">
+      <Filter>01.Utility\04.Component\Collider\Container</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -676,6 +682,9 @@
     </ClCompile>
     <ClCompile Include="..\private\RT_Manager.cpp">
       <Filter>01.Utility\09.RenderTargets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ColliderContainer.cpp">
+      <Filter>01.Utility\04.Component\Collider\Container</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

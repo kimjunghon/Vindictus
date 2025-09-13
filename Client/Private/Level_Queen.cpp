@@ -38,16 +38,27 @@ HRESULT CLevel_Queen::Initialize()
 
 void CLevel_Queen::Update(_float fTimeDelta)
 {
+#ifdef _DEBUG
 	if (m_pGameInstance->Get_KeyDown(DIK_F1))
 	{
-		m_pPool_Instance->BeginRoomSpawn(0);
+		m_pPool_Instance->SpawnRoom(2, 2);
+//		m_pPool_Instance->BeginRoomSpawn(0);
 	}
-
+	if (m_pGameInstance->Get_KeyDown(DIK_F2))
+	{
+		m_pPool_Instance->SpawnRoom(0, 0);
+		//		m_pPool_Instance->BeginRoomSpawn(0);
+	}
+	if (m_pGameInstance->Get_KeyDown(DIK_F3))
+	{
+		m_pPool_Instance->SpawnRoom(3, 0);
+		//		m_pPool_Instance->BeginRoomSpawn(0);
+	}
 	if (m_pGameInstance->Get_KeyDown(DIK_T))
 	{
 		m_pPool_Instance->WaveEnd();
 	}
-
+#endif
 	if (m_pGameInstance->Get_KeyDown(DIK_RETURN))
 	{
 		EVENT_LEVEL_CHANGE Event;
@@ -206,6 +217,10 @@ HRESULT CLevel_Queen::Ready_Effect()
 					break;
 				case EFFECT_TYPE::PREFAB:
 					strEffectTag = TEXT("Prototype_Effect_");
+					strEffectTag = strEffectTag + EffectName;
+					break;
+				case EFFECT_TYPE::TRAIL:
+					strEffectTag = TEXT("Prototype_Effect_Trail_");
 					strEffectTag = strEffectTag + EffectName;
 					break;
 				}

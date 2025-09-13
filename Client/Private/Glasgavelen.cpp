@@ -5,6 +5,8 @@
 #include "GlasgavelenSword.h"
 #include "MonsterState.h"
 #include "GlasgavelenAI.h"
+#include "EnergyBall.h"
+#include "GavelenRock.h"
 
 CGlasgavelen::CGlasgavelen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -27,7 +29,6 @@ void CGlasgavelen::WingBreak()
 
 void CGlasgavelen::Change_BrokenModel()
 {
-
 	CGlasgavelenBody* pBrokenBody = static_cast<CGlasgavelenBody*>(m_pBody);
 	pBrokenBody->Change_BrokenModel();
 
@@ -53,7 +54,7 @@ HRESULT CGlasgavelen::Initialize_Prototype()
 	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DESEND)] = 5000.f;
 	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::BLAZE)] = 5000.f;
 	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DOUBLE)] = 5000.f;
-	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::GRAP)] = 0.f;
+	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::GRAP)] = 5000.f;
 	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::HANG)] = 5000.f;
 	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DESEND)] = 30.f;
 	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::BLAZE)] = 20.f;
@@ -108,11 +109,34 @@ HRESULT CGlasgavelen::Initialize(void* pArg)
 	if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Gavelen_AnimData.json")))
 		return E_FAIL;
 
+	EVENT_BIND_BOSSHP Event = {};
+	Event.m_fLineHP = 200.f;
+	Event.m_fMaxBossHP = m_Status.fFullHealth;
+	Event.m_pCurrentBossHP = &m_Status.fHealth;
+
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+
 	return S_OK;
 }
 
 void CGlasgavelen::Priority_Update(_float fTimeDelta)
 {
+	//test
+	if (m_pGameInstance->Get_KeyDown(DIK_1))
+	{
+		m_AttackTime[ENUM_CLASS(NORMAL_ATTACK::BLAZE)] = 5000.f;
+	}
+
+	if (m_pGameInstance->Get_KeyDown(DIK_2))
+	{
+		m_AttackTime[ENUM_CLASS(NORMAL_ATTACK::HANG)] = 5000.f;
+	}
+
+	if (m_pGameInstance->Get_KeyDown(DIK_3))
+	{
+		m_AttackTime[ENUM_CLASS(NORMAL_ATTACK::GRAP)] = 5000.f;
+	}
+
 	m_vPrevPosition = m_pTransformCom->Get_State(STATE::POSITION);
 
 	for (auto& Pair : m_PawnObjects)
@@ -140,25 +164,12 @@ void CGlasgavelen::Late_Update(_float fTimeDelta)
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
 	
-	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix());
-
-#ifdef _DEBUG
-	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
-		return;
-#endif
+	m_pColliderContainer->Update(this, m_pTransformCom->Get_WorldMatrix());
 }
 
 HRESULT CGlasgavelen::Render()
 {
-#ifdef _DEBUG
-	for (auto& Pair : m_Colliders)
-	{
-		for (auto& pCollider : Pair.second)
-		{
-			pCollider->Render();
-		}
-	}
-#endif
+
 	return S_OK;
 }
 
@@ -179,8 +190,9 @@ HRESULT CGlasgavelen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 
-	EnableAllColliderChannel();
-	DisableColliderChannel(COLLIDER_CHANNEL::ATTACK);
+	m_pColliderContainer->SetEnableAllColliderChannel(true);
+
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), false);
 
 	return S_OK;
 }
@@ -295,93 +307,14 @@ BT_STATE CGlasgavelen::Idle()
 	return BT_STATE::SUCCESS;
 }
 
-void CGlasgavelen::Update_BodyColliders(_fmatrix UpdateWorldMatrix)
+
+HRESULT CGlasgavelen::Add_Bone_Collider(COLLIDER_CHANNEL eChannel, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, const string& strSocketName)
 {
-	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::BODY].size(); i++)
-	{
-		if (false == m_Colliders[COLLIDER_CHANNEL::BODY][i]->IsEnable())
-			continue;
-
-		m_BodyColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_BodyColliderSocketMatrix[i]), UpdateWorldMatrix);
-		m_Colliders[COLLIDER_CHANNEL::BODY][i]->Update(m_BodyColliderCombinedMatrix[i]);
-		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::BODY][i]);
-	}
-}
-
-HRESULT CGlasgavelen::Add_Collider_Body(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const string& strSocketName)
-{
-	if (iColliderIndex >= m_Colliders[COLLIDER_CHANNEL::BODY].size())
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"), ENUM_CLASS(eChannel),
+		ENUM_CLASS(COLLIDER_OWNER::MONSTER), pDesc, m_pBody->SocketCombinedMatrixPtr(strSocketName))))
 		return E_FAIL;
 
-	const _float4x4* pSocketCombinedMatrix = m_pBody->SocketCombinedMatrixPtr(strSocketName);
-
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::BODY);
-	ColliderDesc.iOwner = ENUM_CLASS(eOwner);
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pBodyCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pBodyCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_BodyColliderSocketName.push_back(strSocketName);
-	m_Colliders[COLLIDER_CHANNEL::BODY][iColliderIndex] = pBodyCollider;
-	m_BodyColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
-
-	return S_OK;
-}
-
-HRESULT CGlasgavelen::Add_Collider_Hit(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const string& strSocketName)
-{
-	if (iColliderIndex >= m_Colliders[COLLIDER_CHANNEL::HIT].size())
-		return E_FAIL;
-
-	const _float4x4* pSocketCombinedMatrix = m_pBody->SocketCombinedMatrixPtr(strSocketName);
-
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::HIT);
-	ColliderDesc.iOwner = ENUM_CLASS(eOwner);
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pHitCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pHitCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_HitColliderSocketName.push_back(strSocketName);
-	m_Colliders[COLLIDER_CHANNEL::HIT][iColliderIndex] = pHitCollider;
-	m_HitColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
-
-	return S_OK;
-}
-
-HRESULT CGlasgavelen::Add_Collider_Attack(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const string& strSocketName)
-{
-	if (iColliderIndex >= m_Colliders[COLLIDER_CHANNEL::ATTACK].size())
-		return E_FAIL;
-
-	const _float4x4* pSocketCombinedMatrix = m_pBody->SocketCombinedMatrixPtr(strSocketName);
-
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = iColliderIndex == ENUM_CLASS(ATTACK_COLLIDER::R_UPPER_ARM) ? ENUM_CLASS(COLLIDER_CHANNEL::GRAP) : ENUM_CLASS(COLLIDER_CHANNEL::ATTACK);
-	ColliderDesc.iOwner = ENUM_CLASS(eOwner);
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pAttackCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pAttackCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_AttackColliderSocketName.push_back(strSocketName);
-	m_Colliders[COLLIDER_CHANNEL::ATTACK][iColliderIndex] = pAttackCollider;
-	m_AttackColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
-
-
-
+	m_ColliderBoneNames[eChannel].push_back(strSocketName);
 
 	return S_OK;
 }
@@ -392,13 +325,13 @@ HRESULT CGlasgavelen::Ready_PawnObjects()
 	BodyObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 	BodyObjectDesc.pStateFlag = &m_iStateFlag;
 
-	if (FAILED(__super::Add_PawnObject(TEXT("GlasgavelenBody"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen_Body"), &BodyObjectDesc)))
+	if (FAILED(__super::Add_PawnObject(TEXT("GlasgavelenBody"), ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_GameObject_Glasgavelen_Body"), &BodyObjectDesc)))
 		return E_FAIL;
 
 	CPawnObject::PAWNOBJECT_DESC PawnObjectDesc = {};
 	PawnObjectDesc.pPawnMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
-	if (FAILED(__super::Add_PawnObject(TEXT("GlasgavelenSword"), ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Glasgavelen_Sword"), &PawnObjectDesc)))
+	if (FAILED(__super::Add_PawnObject(TEXT("GlasgavelenSword"), ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_GameObject_Glasgavelen_Sword"), &PawnObjectDesc)))
 		return E_FAIL;
 
 	m_pBody = static_cast<CBody*>(Find_PawnObject(TEXT("GlasgavelenBody")));
@@ -476,56 +409,51 @@ HRESULT CGlasgavelen::Ready_Collider_Bounding()
 	AABBDesc.vExtents = _float3(150.f, 300.f, 150.f);
 	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
 
-	if (FAILED(__super::Add_Collider_Bounding(TEXT("Com_Collider_Bounding"), COLLIDER_OWNER::MONSTER, &AABBDesc)))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &AABBDesc, nullptr)))
 		return E_FAIL;
+
 
 	return S_OK;
 }
 
 HRESULT CGlasgavelen::Ready_Collider_Body()
 {
-	m_Colliders[COLLIDER_CHANNEL::BODY].resize(ENUM_CLASS(BODY_COLLIDER::END), nullptr);
-	m_BodyColliderSocketMatrix.resize(ENUM_CLASS(BODY_COLLIDER::END), nullptr);
-	m_BodyColliderCombinedMatrix.resize(ENUM_CLASS(BODY_COLLIDER::END), XMMatrixIdentity());
-
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 50.f, 30.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body_L_Arm"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_COLLIDER::L_ARM), "ValveBiped.Bip01_L_2_Forearm")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::BODY, &OBBDesc, "ValveBiped.Bip01_L_2_Forearm")))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 50.f, 30.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body_R_Arm"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_COLLIDER::R_ARM), "ValveBiped.Bip01_R_2_Forearm")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::BODY, &OBBDesc, "ValveBiped.Bip01_R_2_Forearm")))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 30.f, 60.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * 0.5f, 0.f, OBBDesc.vExtents.z * -0.5f);
 
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body_L_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_COLLIDER::L_LEG), "ValveBiped.Bip01_L_Calf")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::BODY, &OBBDesc, "ValveBiped.Bip01_L_Calf")))
 		return E_FAIL;
-
-
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 30.f, 60.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * 0.5f, 0.f, OBBDesc.vExtents.z * 0.5f);
 
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body_R_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_COLLIDER::R_LEG), "ValveBiped.Bip01_R_Calf")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::BODY, &OBBDesc, "ValveBiped.Bip01_R_Calf")))
 		return E_FAIL;
-
 
 	for (_uint i = 0; i < ENUM_CLASS(BODY_COLLIDER::END); i++)
 	{
-		if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::BODY, i, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
+		if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::BODY), i, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
 			this->OnCollisionBlock(Data); })))
 			return E_FAIL;
 
-		if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::BODY, i, COLLIDER_STATE::DURING, [this](const CCollider::COLLISION_DATA& Data) {
+		if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::BODY), i, COLLIDER_STATE::DURING, [this](const CCollider::COLLISION_DATA& Data) {
 			this->OnCollisionBlock(Data); })))
 			return E_FAIL;
 	}
@@ -535,63 +463,51 @@ HRESULT CGlasgavelen::Ready_Collider_Body()
 
 HRESULT CGlasgavelen::Ready_Collider_Hit()
 {
-	m_Colliders[COLLIDER_CHANNEL::HIT].resize(ENUM_CLASS(HIT_COLLIDER::END), nullptr);
-	m_HitColliderSocketMatrix.resize(ENUM_CLASS(HIT_COLLIDER::END), nullptr);
-	m_HitColliderCombinedMatrix.resize(ENUM_CLASS(HIT_COLLIDER::END), XMMatrixIdentity());
-
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(30.f, 30.f, 30.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_Head"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::HEAD), "ValveBiped.Bip01_Head1")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::HIT, &OBBDesc, "ValveBiped.Bip01_Head1")))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 30.f, 30.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_L_Upper_Arm"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_UPPER_ARM), "ValveBiped.Bip01_L_2_Forearm")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::HIT, &OBBDesc, "ValveBiped.Bip01_L_2_Forearm")))
 		return E_FAIL;
 
-	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(60.f, 30.f, 30.f);
-	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_L_Arm"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_ARM), "ValveBiped.Bip01_L_Forearm")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::HIT, &OBBDesc, "ValveBiped.Bip01_L_Forearm")))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 30.f, 30.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * -1.f, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_R_Upper_Arm"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_UPPER_ARM), "ValveBiped.Bip01_R_2_Forearm")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::HIT, &OBBDesc, "ValveBiped.Bip01_R_2_Forearm")))
 		return E_FAIL;
+
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 30.f, 30.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_R_Arm"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_ARM), "ValveBiped.Bip01_R_Forearm")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::HIT, &OBBDesc, "ValveBiped.Bip01_R_Forearm")))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(60.f, 30.f, 30.f);
-	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * 0.5f, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_L_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::L_LEG), "ValveBiped.Bip01_L_Calf")))
+	OBBDesc.vExtents = _float3(60.f, 30.f, 60.f);
+	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * 0.5f, 0.f, OBBDesc.vExtents.z * -0.5f);
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::HIT, &OBBDesc, "ValveBiped.Bip01_L_Calf")))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(60.f, 30.f, 30.f);
-	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * 0.5f, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Hit(TEXT("Com_Collider_Hit_R_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(HIT_COLLIDER::R_LEG), "ValveBiped.Bip01_R_Calf")))
+	OBBDesc.vExtents = _float3(60.f, 30.f, 60.f);
+	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * 0.5f, 0.f, OBBDesc.vExtents.z * 0.5f);
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::HIT, &OBBDesc, "ValveBiped.Bip01_R_Calf")))
 		return E_FAIL;
 
 	for (_uint i = 0; i < ENUM_CLASS(HIT_COLLIDER::END); i++)
 	{
-		if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::HIT, i, COLLIDER_STATE::BEGIN, [this, i](const CCollider::COLLISION_DATA& Data) {
+		if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::HIT), i, COLLIDER_STATE::BEGIN, [this, i](const CCollider::COLLISION_DATA& Data) {
 			this->OnCollisionHit(i, Data); })))
 			return E_FAIL;
 	}
@@ -601,79 +517,105 @@ HRESULT CGlasgavelen::Ready_Collider_Hit()
 
 HRESULT CGlasgavelen::Ready_Collider_Attack()
 {
-	m_Colliders[COLLIDER_CHANNEL::ATTACK].resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderSocketMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderCombinedMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), XMMatrixIdentity());
-
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
+
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(100.f, 70.f, 70.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * -1.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Attack(TEXT("Com_Collider_Attack_L_Sword"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::L_SWORD), "ValveBiped.Anim_Attachment_LH")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::ATTACK, &OBBDesc, "ValveBiped.Anim_Attachment_LH")))
 		return E_FAIL;
+
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(100.f, 70.f, 70.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Attack(TEXT("Com_Collider_Attack_R_Sword"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::R_SWORD), "ValveBiped.Anim_Attachment_RH")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::ATTACK, &OBBDesc, "ValveBiped.Anim_Attachment_RH")))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 50.f, 60.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Attack(TEXT("Com_Collider_Attack_L_Arm"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::L_UPPER_ARM), "ValveBiped.Bip01_L_2_Hand")))
+	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::GRAP, &OBBDesc, "ValveBiped.Bip01_R_2_Hand")))
 		return E_FAIL;
 
-	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(60.f, 50.f, 60.f);
-	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Attack(TEXT("Com_Collider_Attack_R_Arm"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::R_UPPER_ARM), "ValveBiped.Bip01_R_2_Hand")))
-		return E_FAIL;
-
-	if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::ATTACK, ENUM_CLASS(ATTACK_COLLIDER::R_UPPER_ARM), COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
+	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
 		this->OnCollisionGrap(Data); })))
 		return E_FAIL;
-
-	DisableColliderChannel(COLLIDER_CHANNEL::ATTACK);
 
 	return S_OK;
 }
 
 void CGlasgavelen::CreateStone(ATTACK_TYPE eType, _float fAttackRatio)
 {
+	m_IsSwing = false;
+
+	CGavelenRock::GAVELEN_ROCK_DESC GavelenRock_Desc = {};
+	GavelenRock_Desc.eType = eType;
+	GavelenRock_Desc.fDamage = m_Status.fAttackDamage * fAttackRatio;
+	GavelenRock_Desc.pIsSwing = &m_IsSwing;
+	GavelenRock_Desc.pSocketMatrixPtr = m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_2_Hand");
+	GavelenRock_Desc.pOwnerMatrixPtr = m_pTransformCom->Get_WorldMatrixPtr();
+	GavelenRock_Desc.pTargetTransform = m_pTargetTransform;
+
+	m_pPool_Instance->Request_SpawnProjectile(TEXT("GavelenRock"), &GavelenRock_Desc);
+}
+
+void CGlasgavelen::CreateEneryBall(ATTACK_TYPE eType, _float fAttackRatio)
+{
+	_matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+	_matrix SocketMatrix = XMLoadFloat4x4(m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Head1"));
+
+	_vector vPosition = XMMatrixMultiply(SocketMatrix, WorldMatrix).r[3];
+
+	CEnergyBall::ENERGYBALL_DESC EnergyBallDesc = {};
+	EnergyBallDesc.eType = eType;
+	EnergyBallDesc.fDamage = m_Status.fAttackDamage * fAttackRatio;
+	EnergyBallDesc.StartPosition = vPosition;
+	EnergyBallDesc.pTargetTransform = m_pTargetTransform;
+
+	m_pPool_Instance->Request_SpawnProjectile(TEXT("EnergyBall"), &EnergyBallDesc);
 }
 
 void CGlasgavelen::ThrowStone()
 {
+	m_IsSwing = true;
 }
 
 HRESULT CGlasgavelen::Add_StoneNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
 {
-	return S_OK;
-}
 
-HRESULT CGlasgavelen::Add_GrapNotify(const string& strAnimName, _uint iAttackColliderIndex, _float2 vTrackPosition)
-{
-	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex]() {
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(true);
-		m_GrapData.WorldMatrixPtr = m_pTransformCom->Get_WorldMatrixPtr();
-		m_GrapData.SocketMatrixPtr = m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_2_Finger2");
-		m_GrapData.OffsetMatrixPtr = m_pBody->OffsetMatrixPtr("ValveBiped.Bip01_R_2_Finger2");
-		cout << "ÄÑÁ³À½" << endl;
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(&m_GrapData);
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, eType, fAttackRatio]() {
+		this->CreateStone(eType, fAttackRatio);
 		})))
 		return E_FAIL;
 
-	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this, iAttackColliderIndex]() {
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this]() {
+		this->ThrowStone();
+		})))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CGlasgavelen::Add_GrapNotify(const string& strAnimName, _float2 vTrackPosition)
+{
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this]() {
+		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, true);
+		m_GrapData.WorldMatrixPtr = m_pTransformCom->Get_WorldMatrixPtr();
+		m_GrapData.SocketMatrixPtr = m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_2_Finger2");
+		m_GrapData.OffsetMatrixPtr = m_pBody->OffsetMatrixPtr("ValveBiped.Bip01_R_2_Finger2");
+		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, &m_GrapData);
+		})))
+		return E_FAIL;
+
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this]() {
 		if(false == m_IsGrap)
 		{
 			cout << "²¨Áü" << endl;
-			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
-			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(nullptr);
+			this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, false);
+			this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, nullptr);
 		}
 		})))
 		return E_FAIL;
@@ -681,14 +623,25 @@ HRESULT CGlasgavelen::Add_GrapNotify(const string& strAnimName, _uint iAttackCol
 	return S_OK;
 }
 
-HRESULT CGlasgavelen::Add_GrapEndNotify(const string& strAnimName, _uint iAttackColliderIndex, _float fAttackRatio, _float fTrackPosition)
+HRESULT CGlasgavelen::Add_GrapEndNotify(const string& strAnimName,  _float fAttackRatio, _float fTrackPosition)
 {
-	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, iAttackColliderIndex, fAttackRatio]() {
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, fAttackRatio]() {
 		cout << "²¨Áü" << endl;
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
+		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, false);
+//		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
-		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(&m_CurrentAttackData);
+		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, &m_CurrentAttackData);
+		})))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CGlasgavelen::Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float fTrackPosition)
+{
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, eType, fAttackRatio]() {
+		this->CreateEneryBall(eType, fAttackRatio);
 		})))
 		return E_FAIL;
 
@@ -700,24 +653,26 @@ HRESULT CGlasgavelen::Add_AttackCollisionNotify(const string& strAnimName, _uint
 	if (!strcmp(strAnimName.c_str(), "Hang_During"))
 		Add_StoneNotify(strAnimName, eType, fAttackRatio, vTrackPosition);
 	else if (!strcmp(strAnimName.c_str(), "Grappling_Try"))
-		Add_GrapNotify(strAnimName, iAttackColliderIndex, vTrackPosition);
+		Add_GrapNotify(strAnimName, vTrackPosition);
 	else if (!strcmp(strAnimName.c_str(), "Grappling_Success"))
-		Add_GrapEndNotify(strAnimName, iAttackColliderIndex, fAttackRatio, vTrackPosition.y);
+		Add_GrapEndNotify(strAnimName, fAttackRatio, vTrackPosition.y);
+	else if (!strcmp(strAnimName.c_str(), "Blaze"))
+		Add_EnergyBallNotify(strAnimName, eType, fAttackRatio, vTrackPosition.x);
 	else
 	{
 		if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
-			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(true);
+			this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 			m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 			m_CurrentAttackData.eAttackType = eType;
 			m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
 			m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
-			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(&m_CurrentAttackData);
+			this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, &m_CurrentAttackData);
 			})))
 			return E_FAIL;
 
 		if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this, iAttackColliderIndex]() {
-			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
-			this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->Set_Desc(nullptr);
+			this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, false);
+			this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, nullptr);
 			})))
 			return E_FAIL;
 	}
@@ -728,14 +683,14 @@ HRESULT CGlasgavelen::Add_AttackCollisionNotify(const string& strAnimName, _uint
 
 void CGlasgavelen::Change_ColliderSocketMatrix()
 {
-	for (_uint i = 0; i < m_BodyColliderSocketName.size(); i++)
-		m_BodyColliderSocketMatrix[i] = m_pBody->SocketCombinedMatrixPtr(m_BodyColliderSocketName[i]);
-	
-	for (_uint i = 0; i < m_HitColliderSocketName.size(); i++)
-		m_HitColliderSocketMatrix[i] = m_pBody->SocketCombinedMatrixPtr(m_HitColliderSocketName[i]);
-
-	for (_uint i = 0; i < m_AttackColliderSocketName.size(); i++)
-		m_AttackColliderSocketMatrix[i] = m_pBody->SocketCombinedMatrixPtr(m_AttackColliderSocketName[i]);
+	for (auto& Pair : m_ColliderBoneNames)
+	{
+		_uint iIndex = {};
+		for (auto& Name : Pair.second)
+		{
+			m_pColliderContainer->Change_Collider_BoneMatrix(ENUM_CLASS(Pair.first), iIndex, m_pBody->SocketCombinedMatrixPtr(Name));
+		}
+	}
 }
 
 void CGlasgavelen::Compute_WorldMatrix()

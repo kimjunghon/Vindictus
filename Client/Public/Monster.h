@@ -94,6 +94,7 @@ protected:
 	void			Bind_StateFlag();
 
 	virtual HRESULT	Ready_AnimNotify(const string& strFilePath);
+	virtual HRESULT Ready_Status(const string& strFilePath);
 
 	virtual HRESULT	Add_ReadyAttackNotify(const string& strAnimName, _float2 vTrackPosition);
 	virtual HRESULT	Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition);

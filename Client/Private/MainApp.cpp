@@ -29,6 +29,9 @@
 #include "Storage.h"
 #include "Equipment.h"
 #include "Slot.h"
+#include "BossHPBar.h"
+#include "BossHP.h"
+#include "Palette.h"
 
 //Controller
 #include "Controller_KeyBoard.h"
@@ -117,6 +120,7 @@ void CMainApp::Post_Update()
 			MSG_BOX(TEXT("Failed Clear Resrouces"));
 
 		m_pPool_Instance->ClearLevel();
+		m_pPlayerInstance->Reset();
 
 		EVENT_UI_LEVEL_CHANGE Event_UIChange;
 		Event_UIChange.iChange_Level = m_iChange_Level;
@@ -216,10 +220,13 @@ CLevel* CMainApp::Create_NewLevel(_uint iChangeLevel)
 
 HRESULT CMainApp::Ready_DefaultColliderChannel()
 {
+	m_pGameInstance->Set_BoudingChannel(ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING));
+
 	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), COLLIDER_TYPE::OVERLAP);
 	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_CHANNEL::BODY), COLLIDER_TYPE::BLOCK);
 	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_CHANNEL::HIT), COLLIDER_TYPE::OVERLAP);
 	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), ENUM_CLASS(COLLIDER_CHANNEL::GRAP), COLLIDER_TYPE::OVERLAP);
+	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_CHANNEL::INTERACTION), COLLIDER_TYPE::OVERLAP);
 
 	return S_OK;
 }
@@ -259,6 +266,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../../Client/Bin/ShaderFiles/Shader_VtxTrail.hlsl"), VTXTRAIL::Elements, VTXTRAIL::iNumElements))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Palette"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../../Client/Bin/ShaderFiles/Shader_Palette.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
+
+
 	/* Prototype_Component_Collider_AABB */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
 		CCollider::Create(m_pDevice, m_pDeviceContext, COLLIDER::AABB))))
@@ -272,6 +284,10 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	/* Prototype_Component_Collider_Sphere */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
 		CCollider::Create(m_pDevice, m_pDeviceContext, COLLIDER::SPHERE))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Container"),
+		CColliderContainer::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 #pragma endregion
 
@@ -441,6 +457,17 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/Equipment.png"), 1))))
 		return E_FAIL;
 
+	/* Prototype_Component_Texture_GamePlay_BossHP */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_BossHP"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/BossHp%d.png"), 3))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_BossHP_Back */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_BossHP_Back"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/BossHP_Back.png"), 1))))
+		return E_FAIL;
+
+
 #pragma endregion
 
 	return S_OK;
@@ -539,6 +566,22 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Slot"),
 		CSlot::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
+
+	/* Prototype_UIObject_BossHP */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_BossHP"),
+		CBossHP::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_BossHPBar */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_BossHPBar"),
+		CBossHPBar::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_Palette */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Palette"),
+		CPalette::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 #pragma endregion
 
 #pragma endregion

@@ -26,6 +26,10 @@ public:
 	HRESULT		BeginRoomSpawn(_uint iRoomIndex);
 	HRESULT		WaveEnd();
 
+#ifdef _DEBUG
+	HRESULT		SpawnRoom(_uint iRoomIndex, _uint iMonsterIndex);
+#endif
+
 private:
 	CPool_Instance*		m_pPool_Instance = { nullptr };
 	ROOM_SPAWN_MAP			m_RoomData;

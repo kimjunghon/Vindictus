@@ -21,7 +21,6 @@ CVIBuffer_Point_Instance::CVIBuffer_Point_Instance(const CVIBuffer_Point_Instanc
 
 
 
-#ifdef _DEBUG
 void CVIBuffer_Point_Instance::Reset()
 {
 	D3D11_MAPPED_SUBRESOURCE	SubResource{};
@@ -41,7 +40,6 @@ void CVIBuffer_Point_Instance::Reset()
 
 	m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
-#endif
 
 HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc)
 {
@@ -55,6 +53,8 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 	m_eType = pPointDesc->eType;
 	m_vPivot = pPointDesc->vPivot;
 	m_IsLoop = pPointDesc->IsLoop;
+	m_IsCircle = pPointDesc->IsCircle;
+	m_vAngle = pPointDesc->vAngle;
 
 	m_iInstanceVertexStride = sizeof(VTXINSTANCE_PARTICLE);
 	m_iNumInstance = pPointDesc->iNumInstance;
@@ -92,6 +92,8 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 	m_pInstanceVertices = new VTXINSTANCE_PARTICLE[m_iNumInstance];
 	m_pSpeeds = new _float[m_iNumInstance];
 
+
+
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
 		VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
@@ -103,12 +105,26 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 		pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
 		pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
 		pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
-		pInstanceVertices[i].vPosition= _float4(
-			m_pGameInstance->Rand(pPointDesc->vCenter.x - pPointDesc->vRange.x * 0.5f, pPointDesc->vCenter.x + pPointDesc->vRange.x * 0.5f),
-			m_pGameInstance->Rand(pPointDesc->vCenter.y - pPointDesc->vRange.y * 0.5f, pPointDesc->vCenter.y + pPointDesc->vRange.y * 0.5f),
-			m_pGameInstance->Rand(pPointDesc->vCenter.z - pPointDesc->vRange.z * 0.5f, pPointDesc->vCenter.z + pPointDesc->vRange.z * 0.5f),
-			1.f
-		);
+
+		if (m_IsCircle)
+		{
+			_float fRadian = XMConvertToRadians(m_pGameInstance->Rand(m_vAngle.x, m_vAngle.y));
+			pInstanceVertices[i].vPosition = _float4(
+				cos(fRadian) * pPointDesc->vRange.x,
+				m_pGameInstance->Rand(pPointDesc->vCenter.y - pPointDesc->vRange.y * 0.5f, pPointDesc->vCenter.y + pPointDesc->vRange.y * 0.5f),
+				sin(fRadian) * pPointDesc->vRange.z,
+				1.f
+			);
+		}
+		else
+		{
+			pInstanceVertices[i].vPosition = _float4(
+				m_pGameInstance->Rand(pPointDesc->vCenter.x - pPointDesc->vRange.x * 0.5f, pPointDesc->vCenter.x + pPointDesc->vRange.x * 0.5f),
+				m_pGameInstance->Rand(pPointDesc->vCenter.y - pPointDesc->vRange.y * 0.5f, pPointDesc->vCenter.y + pPointDesc->vRange.y * 0.5f),
+				m_pGameInstance->Rand(pPointDesc->vCenter.z - pPointDesc->vRange.z * 0.5f, pPointDesc->vCenter.z + pPointDesc->vRange.z * 0.5f),
+				1.f
+			);
+		}
 
 		pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
 
@@ -165,6 +181,9 @@ void CVIBuffer_Point_Instance::Update(_float fTimeDelta, _bool* pIsFinshed)
 		break;
 	case FX_POINT_TYPE::DROP:
 		Drop(fTimeDelta, pIsFinshed);
+		break;
+	case FX_POINT_TYPE::LOOP:
+		Loop(fTimeDelta, pIsFinshed);
 		break;
 	}
 }
@@ -237,10 +256,31 @@ void CVIBuffer_Point_Instance::Drop(_float fTimeDelta, _bool* pIsFinished)
 	m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
 
-void CVIBuffer_Point_Instance::Projectile(_float fTimeDelta, _bool* pIsFinished)
+void CVIBuffer_Point_Instance::Loop(_float fTimeDelta, _bool* pIsFinished)
 {
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
 
+	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
 
+	m_pDeviceContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		_vector	vMoveDir = XMVector3Normalize(XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_vPivot), 0.f));
+
+		XMStoreFloat4(&pVertices[i].vPosition, XMLoadFloat4(&pVertices[i].vPosition) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
+
+		if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
+			m_IsLoop = true;
+		else if (pVertices[i].vLifeTime.x <= 0.f)
+			m_IsLoop = false;
+
+		m_IsLoop ? pVertices[i].vLifeTime.x -= fTimeDelta : pVertices[i].vLifeTime.x += fTimeDelta;
+	}
+
+	m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
 
 void CVIBuffer_Point_Instance::Circle(_float fTimeDelta, _bool* pIsFinished)

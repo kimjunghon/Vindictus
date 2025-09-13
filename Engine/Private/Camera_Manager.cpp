@@ -38,11 +38,13 @@ HRESULT CCamera_Manager::Add_CameraToManager(_uint iPrototypeIndex, const _wstri
 	return S_OK;
 }
 
-HRESULT CCamera_Manager::Change_Camera(const _wstring& strCameraTag)
+HRESULT CCamera_Manager::Change_Camera(const _wstring& strCameraTag, void* pArg)
 {
 	CCamera* pCamera = Find_Camera(strCameraTag);
 	if (nullptr == pCamera)
 		return E_FAIL;
+
+	pCamera->Reset(pArg);
 
 	m_pCurrentCamera = pCamera;
 

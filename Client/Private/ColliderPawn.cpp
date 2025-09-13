@@ -22,6 +22,10 @@ HRESULT CColliderPawn::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Container"),
+		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderContainer))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -42,108 +46,6 @@ HRESULT CColliderPawn::Render()
 	return S_OK;
 }
 
-
-void CColliderPawn::Update_Colliders(_fmatrix UpdateWorldMatrix)
-{
-	Update_BoundingColliders(UpdateWorldMatrix);
-	Update_BodyColliders(UpdateWorldMatrix);
-	Update_HitColliders(UpdateWorldMatrix);
-	Update_AttackColliders(UpdateWorldMatrix);
-	Update_GrapColliders(UpdateWorldMatrix);
-}
-
-void CColliderPawn::Update_BoundingColliders(_fmatrix UpdateWorldMatrix)
-{
-	for (auto& pBoundingCollider : m_Colliders[COLLIDER_CHANNEL::BOUNDING])
-	{
-		if (false == pBoundingCollider->IsEnable())
-			continue;
-
-		pBoundingCollider->Update(UpdateWorldMatrix);
-		m_pGameInstance->Add_BoundingCollider(this, pBoundingCollider);
-	}
-}
-
-void CColliderPawn::Update_BodyColliders(_fmatrix UpdateWorldMatrix)
-{
-	for (auto& pBodyCollider : m_Colliders[COLLIDER_CHANNEL::BODY])
-	{
-//		if (false == pBodyCollider->IsEnable())
-//			continue;
-
-		pBodyCollider->Update(UpdateWorldMatrix);
-		m_pGameInstance->Add_ActionCollider(this, pBodyCollider);
-	}
-}
-
-void CColliderPawn::Update_HitColliders(_fmatrix UpdateWorldMatrix)
-{
-	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::HIT].size(); i++)
-	{
-		//if (false == m_Colliders[COLLIDER_CHANNEL::HIT][i]->IsEnable())
-		//	continue;
-
-		m_HitColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_HitColliderSocketMatrix[i]), UpdateWorldMatrix);
-		m_Colliders[COLLIDER_CHANNEL::HIT][i]->Update(m_HitColliderCombinedMatrix[i]);
-		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::HIT][i]);
-	}
-}
-
-void CColliderPawn::Update_AttackColliders(_fmatrix UpdateWorldMatrix)
-{
-	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::ATTACK].size(); i++)
-	{
-		//if (false == m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->IsEnable())
-		//	continue;
-
-		m_AttackColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[i]), UpdateWorldMatrix);
-		m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->Update(m_AttackColliderCombinedMatrix[i]);
-		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::ATTACK][i]);
-	}
-}
-
-void CColliderPawn::Update_GrapColliders(_fmatrix UpdateWorldMatrix)
-{
-	for (auto& pGrapCollider : m_Colliders[COLLIDER_CHANNEL::GRAP])
-	{
-		if (false == pGrapCollider->IsEnable())
-			continue;
-
-		pGrapCollider->Update(UpdateWorldMatrix);
-		m_pGameInstance->Add_ActionCollider(this, pGrapCollider);
-	}
-}
-
-void CColliderPawn::EnableAllColliderChannel()
-{
-	for (auto& Pair : m_Colliders)
-	{
-		for (auto& pCollider : Pair.second)
-			pCollider->SetEnable(true);
-	}
-}
-
-void CColliderPawn::EnableColliderChannel(COLLIDER_CHANNEL eChannel)
-{
-	for (auto& pCollider : m_Colliders[eChannel])
-		pCollider->SetEnable(true);
-}
-
-void CColliderPawn::DisableAllColliderChannel()
-{
-	for (auto& Pair : m_Colliders)
-	{
-		for (auto& pCollider : Pair.second)
-			pCollider->SetEnable(false);
-	}
-}
-
-void CColliderPawn::DisableColliderChannel(COLLIDER_CHANNEL eChannel)
-{
-	for (auto& pCollider : m_Colliders[eChannel])
-		pCollider->SetEnable(false);
-}
-
 void CColliderPawn::OnCollisionBlock(const CCollider::COLLISION_DATA& ColliderData)
 {
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
@@ -159,98 +61,6 @@ void CColliderPawn::OnCollisionBlock(const CCollider::COLLISION_DATA& ColliderDa
 	else
 		m_pTransformCom->Sliding(vDir, vNormal, m_pNavigationCom);
 
-}
-
-HRESULT CColliderPawn::Add_Collider_Bounding(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingAABB::BOUNDING_AABB_DESC* pDesc)
-{
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING);
-	ColliderDesc.iOwner = ENUM_CLASS(eOwner);
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pBoundingCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pBoundingCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_Colliders[COLLIDER_CHANNEL::BOUNDING].push_back(pBoundingCollider);
-
-	return S_OK;
-}
-
-HRESULT CColliderPawn::Add_Collider_Body(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc)
-{
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::BODY);
-	ColliderDesc.iOwner = ENUM_CLASS(eOwner);
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pBodyCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pBodyCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_Colliders[COLLIDER_CHANNEL::BODY].push_back(pBodyCollider);
-
-	return S_OK;
-}
-
-HRESULT CColliderPawn::Add_Collider_Hit(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix)
-{
-	if (iColliderIndex >= m_Colliders[COLLIDER_CHANNEL::HIT].size() ||
-		nullptr == pSocketCombinedMatrix)
-		return E_FAIL;
-
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::HIT);
-	ColliderDesc.iOwner = ENUM_CLASS(eOwner);
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pHitCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pHitCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_Colliders[COLLIDER_CHANNEL::HIT][iColliderIndex] = pHitCollider;
-	m_HitColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
-
-	return S_OK;
-}
-
-HRESULT CColliderPawn::Add_Collider_Attack(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix)
-{
-	if (iColliderIndex >= m_Colliders[COLLIDER_CHANNEL::ATTACK].size() ||
-		nullptr == pSocketCombinedMatrix)
-		return E_FAIL;
-
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::ATTACK);
-	ColliderDesc.iOwner = ENUM_CLASS(eOwner);
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pAttackCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pAttackCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_Colliders[COLLIDER_CHANNEL::ATTACK][iColliderIndex] = pAttackCollider;
-	m_AttackColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
-
-	return S_OK;
-}
-
-HRESULT CColliderPawn::Bind_Collision_Callback(COLLIDER_CHANNEL eChannel, _uint iColliderIndex, COLLIDER_STATE eState, CCollider::Collision_CallBack Callback)
-{
-	if (nullptr == m_Colliders[eChannel][iColliderIndex])
-		return E_FAIL;
-
-	m_Colliders[eChannel][iColliderIndex]->SetCollisionCallBack(ENUM_CLASS(eState), Callback);
-
-	return S_OK;
 }
 
 DIR CColliderPawn::Compute_HitDir(_fvector vHitPosition, _fvector vAttackPosition, _float fDegree)
@@ -318,6 +128,7 @@ void CColliderPawn::Free()
 	__super::Free();
 
 	Safe_Release(m_pNavigationCom);
+	Safe_Release(m_pColliderContainer);
 
 	for (auto& Pair : m_Colliders)
 	{

@@ -9,6 +9,9 @@ CState_Smash4::CState_Smash4()
 
 HRESULT CState_Smash4::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SMASH);
 	
 	return S_OK;

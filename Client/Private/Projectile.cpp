@@ -58,11 +58,14 @@ void CProjectile::ReturnToPool()
 
 void CProjectile::Ready_Bezier(_uint iNumPoints, _vector* pPointArray)
 {
+	m_Points.clear();
+	m_LUT.clear();
+
 	m_Points.resize(iNumPoints);
 
 	for (_uint i = 0; i < iNumPoints; i++)
-		m_Points[i] = pPointArray[i];
-	
+		m_Points[i] = (pPointArray[i]);
+
 	Ready_LUT();
 }
 
@@ -99,7 +102,7 @@ _uint CProjectile::Combination(_uint iN, _uint iR)
 
 void CProjectile::Ready_LUT()
 {
-	_uint iNumDatas = 256;
+	_uint iNumDatas = 512;
 
 	m_LUT.reserve(iNumDatas);
 
@@ -155,7 +158,6 @@ _vector CProjectile::Compute_CurvePosition_LUT(_float fDistance)
 		else
 			iHigh = iMid;
 	}
-	
 	if (iLow >= 1)
 		int a = 10;
 
@@ -200,6 +202,9 @@ void CProjectile::Move_Curve(_float fTimeDelta)
 	}
 	else
 		vPosition = Compute_CurvePosition_LUT(m_fCurrentDistance);
+
+
+	m_vPrevPos = m_pTransformCom->Get_State(STATE::POSITION);
 
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 }

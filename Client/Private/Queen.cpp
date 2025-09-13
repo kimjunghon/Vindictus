@@ -120,30 +120,11 @@ void CQueen::Late_Update(_float fTimeDelta)
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
 
-	__super::Update_Colliders(m_pBody->Get_BodyCombinedMatrix());
-
-#ifdef _DEBUG
-	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
-		return;
-#endif
+	m_pColliderContainer->Update(this, m_pBody->Get_BodyCombinedMatrix());
 }
 
 HRESULT CQueen::Render()
 {
-#ifdef _DEBUG
-	/*for (auto& Pair : m_Colliders)
-	{
-		for (auto& pCollider : Pair.second)
-		{
-			pCollider->Render();
-		}
-	}*/
-	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::ATTACK].size(); i++)
-	{
-	    m_AttackColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_AttackColliderSocketMatrix[i]), m_pTransformCom->Get_WorldMatrix());
-	    m_Colliders[COLLIDER_CHANNEL::ATTACK][i]->Render();
-	}
-#endif
 	return S_OK;
 }
 
@@ -163,7 +144,8 @@ HRESULT CQueen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 
-	EnableAllColliderChannel();
+	m_pColliderContainer->SetEnableAllColliderChannel(true);
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), false);
 
 	return S_OK;
 }
@@ -257,19 +239,6 @@ BT_STATE CQueen::Idle()
 	return BT_STATE::SUCCESS;
 }
 
-void CQueen::Update_BodyColliders(_fmatrix UpdateWorldMatrix)
-{
-	for (_uint i = 0; i < m_Colliders[COLLIDER_CHANNEL::BODY].size(); i++)
-	{
-		if (false == m_Colliders[COLLIDER_CHANNEL::BODY][i]->IsEnable())
-			continue;
-
-		m_BodyColliderCombinedMatrix[i] = XMMatrixMultiply(XMLoadFloat4x4(m_BodyColliderSocketMatrix[i]), UpdateWorldMatrix);
-		m_Colliders[COLLIDER_CHANNEL::BODY][i]->Update(m_BodyColliderCombinedMatrix[i]);
-		m_pGameInstance->Add_ActionCollider(this, m_Colliders[COLLIDER_CHANNEL::BODY][i]);
-	}
-}
-
 void CQueen::Update_AttackCoolTime(_float fTimeDelta)
 {
 	for (auto& AttackTime : m_AttackTime)
@@ -289,29 +258,6 @@ void CQueen::MoveTarget(_float fRatio)
 	_vector vPosition = XMVectorScale(vDir, fRatio);
 
 	m_pTransformCom->MovePositionToVector(vPosition, m_pNavigationCom);
-}
-
-HRESULT CQueen::Add_Collider_Body(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const _float4x4* pSocketCombinedMatrix)
-{
-	if (iColliderIndex >= m_Colliders[COLLIDER_CHANNEL::BODY].size() ||
-		nullptr == pSocketCombinedMatrix)
-		return E_FAIL;
-
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::BODY);
-	ColliderDesc.iOwner = ENUM_CLASS(eOwner);
-	ColliderDesc.BoundingDesc = pDesc;
-
-	CCollider* pBodyCollider = { nullptr };
-
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
-		strColliderTag, reinterpret_cast<CComponent**>(&pBodyCollider), &ColliderDesc)))
-		return E_FAIL;
-
-	m_Colliders[COLLIDER_CHANNEL::BODY][iColliderIndex] = pBodyCollider;
-	m_BodyColliderSocketMatrix[iColliderIndex] = pSocketCombinedMatrix;
-
-	return S_OK;
 }
 
 HRESULT CQueen::Ready_PawnObjects()
@@ -384,7 +330,8 @@ HRESULT CQueen::Ready_Collider_Bounding()
 	AABBDesc.vExtents = _float3(150.f, 150.f, 150.f);
 	AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y, 0.f);
 
-	if (FAILED(__super::Add_Collider_Bounding(TEXT("Com_Collider_Bounding"), COLLIDER_OWNER::MONSTER, &AABBDesc)))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &AABBDesc, nullptr)))
 		return E_FAIL;
 
 	return S_OK;
@@ -392,81 +339,76 @@ HRESULT CQueen::Ready_Collider_Bounding()
 
 HRESULT CQueen::Ready_Collider_Body_Hit()
 {
-	m_Colliders[COLLIDER_CHANNEL::BODY].resize(ENUM_CLASS(BODY_HIT_COLLIDER::END), nullptr);
-	m_BodyColliderSocketMatrix.resize(ENUM_CLASS(BODY_HIT_COLLIDER::END), nullptr);
-	m_BodyColliderCombinedMatrix.resize(ENUM_CLASS(BODY_HIT_COLLIDER::END), XMMatrixIdentity());
-
-	m_Colliders[COLLIDER_CHANNEL::HIT].resize(ENUM_CLASS(BODY_HIT_COLLIDER::END), nullptr);
-	m_HitColliderSocketMatrix.resize(ENUM_CLASS(BODY_HIT_COLLIDER::END), nullptr);
-	m_HitColliderCombinedMatrix.resize(ENUM_CLASS(BODY_HIT_COLLIDER::END), XMMatrixIdentity());
-
-
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(30.f, 30.f, 30.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body_Head"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::HEAD), m_pBody->SocketCombinedMatrixPtr("root"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("root"))))
 		return E_FAIL;
-
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Head"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::HEAD), m_pBody->SocketCombinedMatrixPtr("root"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("root"))))
 		return E_FAIL;
-
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(80.f, 50.f, 50.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::BODY), m_pBody->SocketCombinedMatrixPtr("Bone03"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("Bone03"))))
 		return E_FAIL;
-
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Body"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::BODY), m_pBody->SocketCombinedMatrixPtr("Bone03"))))
-		return E_FAIL;
-
-	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(30.f, 30.f, 30.f);
-	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
-
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body_L_Front_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::L_FRONT_LEG), m_pBody->SocketCombinedMatrixPtr("bindingpoint_left_leg_1_3_03"))))
-		return E_FAIL;
-
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_L_Front_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::L_FRONT_LEG), m_pBody->SocketCombinedMatrixPtr("bindingpoint_left_leg_1_3_03"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("Bone03"))))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(30.f, 30.f, 30.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body_R_Front_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::R_FRONT_LEG), m_pBody->SocketCombinedMatrixPtr("bindingpoint_right_leg_1_3_03"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("bindingpoint_left_leg_1_3_03"))))
+		return E_FAIL;
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("bindingpoint_left_leg_1_3_03"))))
 		return E_FAIL;
 
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_R_Front_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::R_FRONT_LEG), m_pBody->SocketCombinedMatrixPtr("bindingpoint_right_leg_1_3_03"))))
+	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(30.f, 30.f, 30.f);
+	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
+
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("bindingpoint_right_leg_1_3_03"))))
+		return E_FAIL;
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("bindingpoint_right_leg_1_3_03"))))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 60.f, 80.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.y, 0.f, 0.f);
 
-	if (FAILED(Add_Collider_Body(TEXT("Com_Collider_Body_Side_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::SIDE_LEG), m_pBody->SocketCombinedMatrixPtr("Bone02"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("Bone02"))))
 		return E_FAIL;
-
-	if (FAILED(__super::Add_Collider_Hit(TEXT("Com_Collider_Hit_Side_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(BODY_HIT_COLLIDER::SIDE_LEG), m_pBody->SocketCombinedMatrixPtr("Bone02"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::HIT), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("Bone02"))))
 		return E_FAIL;
 
 	for (_uint i = 0; i < ENUM_CLASS(BODY_HIT_COLLIDER::END); i++)
 	{
-		if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::BODY, i, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
+
+		if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::BODY), i, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
 			this->OnCollisionBlock(Data); })))
 			return E_FAIL;
 
-		if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::BODY, i, COLLIDER_STATE::DURING, [this](const CCollider::COLLISION_DATA& Data) {
+		if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::BODY), i, COLLIDER_STATE::DURING, [this](const CCollider::COLLISION_DATA& Data) {
 			this->OnCollisionBlock(Data); })))
 			return E_FAIL;
 
-		if (FAILED(__super::Bind_Collision_Callback(COLLIDER_CHANNEL::HIT, i, COLLIDER_STATE::BEGIN, [this, i](const CCollider::COLLISION_DATA& Data) {
+		if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::HIT), i, COLLIDER_STATE::BEGIN, [this, i](const CCollider::COLLISION_DATA& Data) {
 			this->OnCollisionHit(i, Data); })))
 			return E_FAIL;
-
 	}
 	
 	return S_OK;
@@ -474,44 +416,45 @@ HRESULT CQueen::Ready_Collider_Body_Hit()
 
 HRESULT CQueen::Ready_Collider_Attack()
 {
-	m_Colliders[COLLIDER_CHANNEL::ATTACK].resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderSocketMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderCombinedMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), XMMatrixIdentity());
-
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(45.f, 30.f, 30.f);
 	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * -1.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Head"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::HEAD), m_pBody->SocketCombinedMatrixPtr("root"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("root"))))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(150.f, 60.f, 100.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Body"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::BODY), m_pBody->SocketCombinedMatrixPtr("Bone02"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("Bone02"))))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 45.f, 60.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Left_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), m_pBody->SocketCombinedMatrixPtr("bindingpoint_left_leg_1_3_03"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("bindingpoint_left_leg_1_3_03"))))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(60.f, 45.f, 60.f);
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Right_Leg"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), m_pBody->SocketCombinedMatrixPtr("bindingpoint_right_leg_1_3_03"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("bindingpoint_right_leg_1_3_03"))))
 		return E_FAIL;
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(70.f, 30.f, 50.f);
 	OBBDesc.vCenter = _float3(20.f, 0.f, 0.f);
 
-	if (FAILED(__super::Add_Collider_Attack(TEXT("Com_Collider_Attack_Tail"), COLLIDER_OWNER::MONSTER, &OBBDesc, ENUM_CLASS(ATTACK_COLLIDER::TAIL), m_pBody->SocketCombinedMatrixPtr("Bone04"))))
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, m_pBody->SocketCombinedMatrixPtr("Bone04"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -519,69 +462,6 @@ HRESULT CQueen::Ready_Collider_Attack()
 
 HRESULT CQueen::Ready_AttackMapping()
 {
-//	_uint iFlag = ENUM_CLASS(STATE_FLAG::ATTACK);
-//
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::LEFTLEG)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(121.f, 130.f));
-//	
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::RIGHTLEG)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(43.f, 48.f));
-//	
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::MELLE)), ENUM_CLASS(ATTACK_COLLIDER::HEAD), ATTACK_TYPE::LIGHT, 1.5f, _float2(46.f, 53.f));
-//	
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)), ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(33.f, 37.f));
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)), ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(75.f, 80.f));
-//
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_LEFT)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(118.f, 125.f));
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(121.f, 129.f));
-//
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)), ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f));
-//
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(157.f, 166.f));
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(96.f, 101.f));
-//
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(ATTACK_FLAG::JUMP)), ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(140.f, 145.f));
-//
-//
-//
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::LEFTLEG)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(121.f, 130.f) });
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::RIGHTLEG)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(43.f, 48.f) });
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::MELLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::HEAD), ATTACK_TYPE::LIGHT, 1.5f, _float2(46.f, 53.f) });
-//
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(33.f, 37.f) });
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TAIL)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::TAIL), ATTACK_TYPE::MIDDLE, 1.5f, _float2(75.f, 80.f) });
-//
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_LEFT)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(118.f, 125.f) });
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::TURN_RIGHT)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 1.5f, _float2(121.f, 129.f) });
-//
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });
-//	/*m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG ), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });
-//	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::SWOOP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(95.f, 110.f) });*/
-//
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(157.f, 166.f) });
-//	//m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::DOUBLE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 2.5f, _float2(96.f, 101.f) });
-//
-////	m_AttackMapping[iFlag | ENUM_CLASS(ATTACK_FLAG::JUMP)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::BODY), ATTACK_TYPE::STRONG, 2.5f, _float2(140.f, 145.f) });
-//
-//
-//	iFlag = ENUM_CLASS(STATE_FLAG::BURROW);
-//
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(93.f, 96.f));
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(98.f, 101.f));
-//
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f));
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)), ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f));
-//
-//	Add_AttackCollisionNotify((iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK2)), ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(93.f, 101.f));
-
-//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(93.f, 96.f) });
-//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK1)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::STRONG, 3.f, _float2(98.f, 101.f) });
-
-
-//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f) });
-//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::MOVE)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::RIGHT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(94.f, 126.f) });
-
-//	m_AttackMapping[iFlag | ENUM_CLASS(BURROW_FLAG::ATTACK2)].push_back({ ENUM_CLASS(ATTACK_COLLIDER::LEFT_LEG), ATTACK_TYPE::MIDDLE, 2.f, _float2(93.f, 101.f) });
-
-
 	return S_OK;
 }
 

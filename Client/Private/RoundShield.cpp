@@ -67,7 +67,7 @@ HRESULT CRoundShield::Render()
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(0);
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXMESH::DEFAULT));
 
 		m_pModelCom->Render(i);
 

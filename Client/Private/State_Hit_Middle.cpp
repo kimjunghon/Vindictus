@@ -9,6 +9,9 @@ CState_Hit_Middle::CState_Hit_Middle()
 
 HRESULT CState_Hit_Middle::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
     return S_OK;

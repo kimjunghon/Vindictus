@@ -9,6 +9,9 @@ CState_Guard::CState_Guard()
 
 HRESULT CState_Guard::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::GUARD);
 
 	return S_OK;
@@ -65,7 +68,7 @@ void CState_Guard::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput
 
 void CState_Guard::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 {
-
+	pPlayerPawn->DecreaseStamina(0.f);
 }
 
 void CState_Guard::Exit(CPlayerPawn* pPlayerPawn)

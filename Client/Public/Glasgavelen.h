@@ -15,7 +15,7 @@ private:
 	enum class RAGE_ATTACK { DESEND, COMBO, DOUBLE, BLAZE, GRAP, HANG, END};
 	enum class BODY_COLLIDER {L_ARM, R_ARM, L_LEG, R_LEG, END};
 	enum class HIT_COLLIDER { HEAD, L_UPPER_ARM, L_ARM, R_UPPER_ARM, R_ARM, L_LEG, R_LEG, END };
-	enum class ATTACK_COLLIDER { L_UPPER_ARM, L_SWORD, R_UPPER_ARM, R_SWORD, END };
+	enum class ATTACK_COLLIDER { L_SWORD, R_SWORD, END };
 	enum class GRAP_COLLIDER { R_UPPER_ARM, END};
 	
 private:
@@ -58,6 +58,7 @@ private:
 	_bool						m_IsBroken = {};
 	_bool						m_IsRage = {};
 	_bool						m_IsGrap = {};
+	_bool						m_IsSwing = {};
 
 	GAVELEN_STATUS				m_GavelenStatus = {};
 	GRAP_DATA					m_GrapData = {};
@@ -66,18 +67,11 @@ private:
 	vector<_float>				m_RageAttackTime = {};
 	vector<_float>				m_RageAttackCoolTime = {};
 
-	vector<const _float4x4*>	m_BodyColliderSocketMatrix;
-	vector<_matrix>				m_BodyColliderCombinedMatrix;
-	
-	vector<string>				m_BodyColliderSocketName;
-	vector<string>				m_HitColliderSocketName;
-	vector<string>				m_AttackColliderSocketName;
+	unordered_map<COLLIDER_CHANNEL, vector<string>> m_ColliderBoneNames;
+
 
 private:
-	virtual void		Update_BodyColliders(_fmatrix UpdateWorldMatrix) override;
-	virtual HRESULT		Add_Collider_Body(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const string& strSocketName);
-	virtual HRESULT		Add_Collider_Hit(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const string& strSocketName);
-	virtual HRESULT		Add_Collider_Attack(const _wstring& strColliderTag, COLLIDER_OWNER eOwner, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, _uint iColliderIndex, const string& strSocketName);
+	virtual HRESULT		Add_Bone_Collider(COLLIDER_CHANNEL eChannel, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, const string& strSocketName);
 
 	HRESULT				Ready_PawnObjects();
 	HRESULT				Ready_AI();
@@ -90,10 +84,12 @@ private:
 	HRESULT				Ready_Collider_Attack();
 
 	void				CreateStone(ATTACK_TYPE eType, _float fAttackRatio);
+	void				CreateEneryBall(ATTACK_TYPE eType, _float fAttackRatio);
 	void				ThrowStone();
 	HRESULT				Add_StoneNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition);
-	HRESULT				Add_GrapNotify(const string& strAnimName, _uint iAttackColliderIndex, _float2 vTrackPosition);
-	HRESULT				Add_GrapEndNotify(const string& strAnimName, _uint iAttackColliderIndex, _float fAttackRatio, _float fTrackPosition);
+	HRESULT				Add_GrapNotify(const string& strAnimName, _float2 vTrackPosition);
+	HRESULT				Add_GrapEndNotify(const string& strAnimName, _float fAttackRatio, _float fTrackPosition);
+	HRESULT				Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float fTrackPosition);
 	virtual HRESULT		Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition) override;
 
 	void				Change_ColliderSocketMatrix();

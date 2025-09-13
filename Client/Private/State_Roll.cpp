@@ -9,6 +9,9 @@ CState_Roll::CState_Roll()
 
 HRESULT CState_Roll::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::ROLL);
 
 	return S_OK;

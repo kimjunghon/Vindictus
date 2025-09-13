@@ -9,6 +9,9 @@ CState_GuardCounter::CState_GuardCounter()
 
 HRESULT CState_GuardCounter::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::SMASH);
 
 	return S_OK;

@@ -35,7 +35,7 @@ public:
 	void	Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _bool* IsAnimStart);
 
 	_bool	IsAnimChanging() { return m_bAnimChange; }
-	_float	Get_AnimSpeed() { return m_fDuration / m_fTickPerSecond; }
+	_float	Get_AnimTickPerSecond() { return m_fTickPerSecond; }
 
 public:
 	HRESULT Add_Notify(_float fTrackPosition, function<void()> Callback);

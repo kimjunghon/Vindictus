@@ -27,7 +27,7 @@ HRESULT CEffect_Prefab::Initialize_Prototype(const Value& Effects)
 		if (Effect.HasMember("Name") && Effect["Name"].IsString())
 		{
 			TempName = Effect["Name"].GetString();
-			MultiByteToWideChar(CP_UTF8, 0, TempName.c_str(), TempName.size(), EffectName, TempName.size());
+			MultiByteToWideChar(CP_UTF8, 0, TempName.c_str(), static_cast<_int>(TempName.size()), EffectName, static_cast<_int>(TempName.size()));
 			PrefabEffect.strEffectName = EffectName;
 		}
 

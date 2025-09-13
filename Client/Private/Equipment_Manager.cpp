@@ -23,6 +23,10 @@ HRESULT CEquipment_Manager::EquipWeapon(_uint iWeaponTypeIndex, CWeapon* pEquipW
 
 	m_pPlayerEquipWeapon[iWeaponTypeIndex] = pEquipWeapon;
 
+	CWeapon::WEAPON_INFO WeaponInfo = pEquipWeapon->Get_WeaponInfo();
+	m_pPlayerInstance->ChangeStatus(WeaponInfo.fAttackPower, STATUS_TYPE::ATK);
+	m_pPlayerInstance->ChangeStatus(WeaponInfo.fDefense, STATUS_TYPE::DEF);
+
 	EVENT_CHANGE_WEAPON Event = {};
 	Event.iWeaponTypeIndex = iWeaponTypeIndex;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -43,6 +47,12 @@ HRESULT CEquipment_Manager::EquipArmor(_uint iArmorTypeIndex, CArmor* pEquipArmo
 
 	m_pPlayerEquipArmor[iArmorTypeIndex] = pEquipArmor;
 
+	CArmor::ARMOR_INFO ArmorInfo = pEquipArmor->Get_ArmorInfo();
+
+	m_pPlayerInstance->ChangeStatus(ArmorInfo.fHealth, STATUS_TYPE::HP);
+	m_pPlayerInstance->ChangeStatus(ArmorInfo.fDefense, STATUS_TYPE::DEF);
+
+
 	EVENT_CHANGE_ARMOR Event = {};
 	Event.iArmorTypeIndex = iArmorTypeIndex;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -58,6 +68,11 @@ HRESULT CEquipment_Manager::UnEquipWeapon(_uint iWeaponTypeIndex, _int iItemInve
 
 	if (nullptr == m_pPlayerEquipWeapon[iWeaponTypeIndex])
 		return S_OK;
+
+	CWeapon::WEAPON_INFO WeaponInfo = m_pPlayerEquipWeapon[iWeaponTypeIndex]->Get_WeaponInfo();
+	m_pPlayerInstance->ChangeStatus(WeaponInfo.fAttackPower * -1.f, STATUS_TYPE::ATK);
+	m_pPlayerInstance->ChangeStatus(WeaponInfo.fDefense * -1.f, STATUS_TYPE::DEF);
+
 
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::WEAPON, m_pPlayerEquipWeapon[iWeaponTypeIndex], iItemInventoryIndex);
 
@@ -77,6 +92,11 @@ HRESULT CEquipment_Manager::UnEquipArmor(_uint iArmorTypeIndex, _int iItemInvent
 		return E_FAIL;
 	if (nullptr == m_pPlayerEquipArmor[iArmorTypeIndex])
 		return S_OK;
+
+	CArmor::ARMOR_INFO ArmorInfo = m_pPlayerEquipArmor[iArmorTypeIndex]->Get_ArmorInfo();
+	m_pPlayerInstance->ChangeStatus(ArmorInfo.fHealth * -1.f, STATUS_TYPE::HP);
+	m_pPlayerInstance->ChangeStatus(ArmorInfo.fDefense * -1.f, STATUS_TYPE::DEF);
+
 
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, m_pPlayerEquipArmor[iArmorTypeIndex], iItemInventoryIndex);
 
@@ -104,6 +124,15 @@ CArmor* CEquipment_Manager::UpdatePlayerEquipArmor(_uint iArmorTypeIndex) const
 		return nullptr;
 
 	return m_pPlayerEquipArmor[iArmorTypeIndex];
+}
+
+void CEquipment_Manager::Reset_Armors()
+{
+	for(_uint i=0; i< ENUM_CLASS(ARMOR_TYPE::END); i++)
+	{
+		if (nullptr != m_pPlayerEquipArmor[i])
+			m_pPlayerEquipArmor[i]->Reset();
+	}
 }
 
 CEquipment_Manager* CEquipment_Manager::Create()

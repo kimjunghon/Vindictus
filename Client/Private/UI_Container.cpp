@@ -190,6 +190,9 @@ HRESULT CUI_Container::Ready_GamePlay_UI()
 	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Inventory"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
 		return E_FAIL;
 
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_BossHP"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 

@@ -23,6 +23,11 @@ private:
 	virtual ~CPlayerInstance() = default;
 
 public:
+	PLAYER_STATUS			GetPlayerStatus() const { return m_PlayerStatus; }
+	PLAYER_STATUS*			GetPlayerStatusPtr() { return &m_PlayerStatus; }
+	void					UpdatePlayerStatus(const PLAYER_STATUS& PlayerStatus) { m_PlayerStatus = PlayerStatus; }
+
+public:
 	HRESULT					Initialize(_uint iInventorySlotCount);
 
 #pragma region EQUIPMENT_MANAGER
@@ -45,16 +50,21 @@ public:
 	_bool					IsInventoryFull();
 #pragma endregion
 
-public:
-	PLAYER_STATUS			UpdatePlayerStatus() const;
-	HRESULT					SavePlayerStatus(const PLAYER_STATUS& PlayerStatus);
+#pragma region STATUS
+	void					ChangeStatus(_float fValue, STATUS_TYPE eStatus);
+	void					Reset();
+#pragma endregion
 
 private:
 	CGameInstance*			m_pGameInstance = { nullptr };
 	CEquipment_Manager*		m_pEquipment_Manager = { nullptr };
 	CStorage_Manager*		m_pStorage_Manager = { nullptr };
 
+	PLAYER_STATUS			m_OriginPlayerStatus = {};
 	PLAYER_STATUS			m_PlayerStatus = {};
+
+private:
+	HRESULT					Ready_OriginStatus();
 
 public:
 	void			Release_PlayerInstance();

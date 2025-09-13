@@ -62,6 +62,8 @@ protected:
 	_float					m_fTotalDistance = {};
 	_float					m_fSpeed = {};
 	_bool					m_IsCurveFinished = {};
+
+	_vector					m_vPrevPos = {};
 	_vector					m_vLastDir = {};
 
 protected:

@@ -9,6 +9,9 @@ CState_Hit_Strong::CState_Hit_Strong()
 
 HRESULT CState_Hit_Strong::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::HIT);
 
     return S_OK;

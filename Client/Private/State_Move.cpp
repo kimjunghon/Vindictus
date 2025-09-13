@@ -9,7 +9,13 @@ CState_Move::CState_Move()
 
 HRESULT CState_Move::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::MOVE);
+
+	m_fSprintStamina = 1.f;
+	m_fDecreaseTime = 0.1f;
 
 	return S_OK;
 }
@@ -49,8 +55,11 @@ void CState_Move::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput,
 	{
 		if (MoveInput.bSprint)
 		{
-			pPlayerPawn->Sprint();
-			ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::SPRINT));
+			if(pPlayerPawn->CanAction(m_fSprintStamina))
+			{
+				pPlayerPawn->Sprint();
+				ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::SPRINT));
+			}
 		}
 		else
 		{
@@ -62,6 +71,23 @@ void CState_Move::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput,
 
 void CState_Move::Update(CPlayerPawn* pPlayerPawn, _float fTimeDelta)
 {
+	if (m_iStateFlag & ENUM_CLASS(MOVE_FLAG::SPRINT))
+	{
+		if (false == pPlayerPawn->CanAction(m_fSprintStamina))
+		{
+			pPlayerPawn->Run();
+			ChangeActionFlag(ENUM_CLASS(MOVE_FLAG::DEFAULT));
+			return;
+		}
+
+		m_fCurrentTime += fTimeDelta;
+
+		if(m_fCurrentTime >= m_fDecreaseTime)
+		{
+			m_fCurrentTime = 0.f;
+			pPlayerPawn->DecreaseStamina(m_fSprintStamina);
+		}
+	}
 }
 
 void CState_Move::Exit(CPlayerPawn* pPlayerPawn)

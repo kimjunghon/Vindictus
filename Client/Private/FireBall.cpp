@@ -89,7 +89,10 @@ HRESULT CFireBall::Spawn(void* pArg)
 	m_pOwnerMatrixPtr = pDesc->pOwnerMatrixPtr;
 
 	m_fCurrentDistance = 0.f;
+	m_IsCurveFinished = false;
+
 	m_fCurrentEffectTime = 0.f;
+
 	m_LUT.clear();
 
 	return S_OK;
@@ -133,16 +136,20 @@ void CFireBall::Update_Bezier()
 	_vector vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vDir);
 	_vector vUp = XMVector3Normalize(XMVector3Cross(vDir, vRight));
 
+	vFinishPosition = vFinishPosition + (vDir * 10.f);
+
 	_float fLength = XMVectorGetX(XMVector3Length(XMVectorSubtract(vFinishPosition, vStartPosition)));
 
 	_float fLookWieght = fLength * 0.2f;
 	_float fUpWieght = fLength * 0.3f;
 
+	vFinishPosition = vFinishPosition + XMVectorSet(0.f, 20.f, 0.f, 0.f);
+
 	_vector vPoints[4] = {};
 
 	vPoints[0] = vStartPosition;
 	vPoints[1] = vStartPosition + (vDir * fLookWieght) + (vUp * fUpWieght);
-	vPoints[2] = vFinishPosition - (vDir * fLookWieght) + (vUp * fUpWieght);
+	vPoints[2] = vPoints[1] + (vDir * fLookWieght);//vFinishPosition - (vDir * fLookWieght +(vUp * fUpWieght);
 	vPoints[3] = vFinishPosition;
 
 	CProjectile::Ready_Bezier(4, vPoints);

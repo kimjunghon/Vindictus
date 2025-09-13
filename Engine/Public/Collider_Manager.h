@@ -21,18 +21,23 @@ public:
 	HRESULT				Initialize();
 	void				Update();
 
+	void				Set_BoudingChannel(_uint iBoundingChannel) { m_iBoundingChannel = iBoundingChannel; }
+	HRESULT				Add_Collider(_uint iChannel, CGameObject* pOwner, CCollider* pCollider);
+
 	HRESULT				Add_Channel(_uint iSrcChannel, _uint iDstChannel, COLLIDER_TYPE eType);
 	HRESULT				Change_Type_ToChannel(_uint iSrcChannel, _uint iDstChannel, COLLIDER_TYPE eChangeType);
-	HRESULT				Add_BoundingCollider(CGameObject* pOwner, CCollider* pBounding_Collider);
-	HRESULT				Add_ActionCollider(CGameObject* pOwner, CCollider* pAction_Collider);
 
 private:
+	_uint					m_iBoundingChannel = {};
 	COLLIDER_CHANNEL		m_Channels;
 	BOUNDING_COLLDER		m_Boundings;
 	ACTION_COLLDER			m_Actions;
 	CHECK_COLLIDER			m_CheckCollisions;
 	
 private:
+	HRESULT				Add_BoundingCollider(CGameObject* pOwner, CCollider* pBounding_Collider);
+	HRESULT				Add_ActionCollider(CGameObject* pOwner, CCollider* pAction_Collider);
+
 	void				Clear_Collider();
 	COLLIDER_TYPE		Check_Type(_uint iSrcChannel, _uint iDstChannel);
 	_bool				Intersect_Bounding(CCollider* pSrcCollider ,CCollider* pDstCollider);

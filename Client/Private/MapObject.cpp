@@ -67,7 +67,7 @@ HRESULT CMapObject::Render()
 		//if (hasNormal)
 		//	m_pShaderCom->Bind_RawValue("g_HasNormal", &hasNormal, sizeof(_bool));
 
-		m_pShaderCom->Begin(0);
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXMESH::DEFAULT));
 
 		m_pModelCom->Render(i);
 

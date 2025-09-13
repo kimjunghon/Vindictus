@@ -184,6 +184,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\Cell.h" />
     <ClInclude Include="..\public\Channel.h" />
     <ClInclude Include="..\public\Collider.h" />
+    <ClInclude Include="..\public\ColliderContainer.h" />
     <ClInclude Include="..\public\Collider_Manager.h" />
     <ClInclude Include="..\Public\CollisionObject.h" />
     <ClInclude Include="..\public\Component.h" />
@@ -263,6 +264,7 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\Cell.cpp" />
     <ClCompile Include="..\private\Channel.cpp" />
     <ClCompile Include="..\private\Collider.cpp" />
+    <ClCompile Include="..\private\ColliderContainer.cpp" />
     <ClCompile Include="..\private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\CollisionObject.cpp" />
     <ClCompile Include="..\private\Component.cpp" />

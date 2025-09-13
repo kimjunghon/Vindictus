@@ -40,6 +40,14 @@ void CCollider_Manager::Update()
 	Clear_Collider();
 }
 
+HRESULT CCollider_Manager::Add_Collider(_uint iChannel, CGameObject* pOwner, CCollider* pCollider)
+{
+	if (m_iBoundingChannel == iChannel)
+		return Add_BoundingCollider(pOwner, pCollider);
+	else
+		return Add_ActionCollider(pOwner, pCollider);
+}
+
 HRESULT CCollider_Manager::Add_Channel(_uint iSrcChannel, _uint iDstChannel, COLLIDER_TYPE eType)
 {
 	if (Check_Type(iSrcChannel, iDstChannel) != COLLIDER_TYPE::END)

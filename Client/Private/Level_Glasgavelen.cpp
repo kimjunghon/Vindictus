@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "PlayerPawn.h"
 #include "Pool_Instance.h"
+#include "Effect.h"
 
 CLevel_Glasgavelen::CLevel_Glasgavelen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
@@ -20,9 +21,15 @@ HRESULT CLevel_Glasgavelen::Initialize()
 	if (FAILED(Ready_GameObjectToJson()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Effect()))
+		return E_FAIL;
+
 	if (FAILED(Ready_PoolingMonster()))
 		return E_FAIL;
 
+	if (FAILED(Ready_PoolingProjectile()))
+		return E_FAIL;
+	
 	if (FAILED(Ready_Map(TEXT("Layer_GameObject"))))
 		return E_FAIL;
 
@@ -33,7 +40,7 @@ void CLevel_Glasgavelen::Update(_float fTimeDelta)
 {
 	if (m_pGameInstance->Get_KeyDown(DIK_F1))
 	{
-		m_pPool_Instance->BeginRoomSpawn(0);
+		m_pPool_Instance->SpawnRoom(0, 0);
 	}
 
 }
@@ -128,6 +135,88 @@ HRESULT CLevel_Glasgavelen::Ready_Player(const Value& Player)
 	return S_OK;
 }
 
+HRESULT CLevel_Glasgavelen::Ready_Effect()
+{
+	ifstream File("../Bin/Resources/EffectData/LoadFile/GavelenEffectPool.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed GavelenEffectPool Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("EffectPool") && Doc["EffectPool"].IsArray())
+	{
+		const auto& Effects = Doc["EffectPool"].GetArray();
+
+		for (auto& Effect : Effects)
+		{
+
+			CEffect::EFFECT_DESC EffectDesc = {};
+
+			_tchar EffectName[MAX_PATH] = {};
+
+			if (Effect.HasMember("Name") && Effect["Name"].IsString())
+			{
+				string Name = Effect["Name"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), EffectName, static_cast<_int>(Name.size()));
+			}
+
+			_wstring strEffectTag = {};
+
+			if (Effect.HasMember("Type") && Effect["Type"].IsInt())
+			{
+				EFFECT_TYPE eType = static_cast<EFFECT_TYPE>(Effect["Type"].GetInt());
+				switch (eType)
+				{
+				case EFFECT_TYPE::STATIC:
+					strEffectTag = TEXT("Prototype_Effect_Static");
+					break;
+				case EFFECT_TYPE::BILLBAORD:
+					strEffectTag = TEXT("Prototype_Effect_Billboard");
+					break;
+				case EFFECT_TYPE::PREFAB:
+					strEffectTag = TEXT("Prototype_Effect_");
+					strEffectTag = strEffectTag + EffectName;
+					break;
+				case EFFECT_TYPE::TRAIL:
+					strEffectTag = TEXT("Prototype_Effect_Trail_");
+					strEffectTag = strEffectTag + EffectName;
+					break;
+				}
+			}
+
+			EffectDesc.strEffectName = EffectName;
+
+			if (Effect.HasMember("Pass") && Effect["Pass"].IsInt())
+				EffectDesc.iPassIndex = Effect["Pass"].GetInt();
+
+			_uint iNumPool = {};
+
+			if (Effect.HasMember("NumPool") && Effect["NumPool"].IsInt())
+				iNumPool = Effect["NumPool"].GetInt();
+
+			EffectDesc.iLevel = ENUM_CLASS(LEVEL::GLASGAVELEN);
+
+			for (_uint i = 0; i < iNumPool; i++)
+				m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::GLASGAVELEN), EffectName, strEffectTag, &EffectDesc);
+		}
+	}
+
+	return S_OK;
+}
+
 HRESULT CLevel_Glasgavelen::Ready_PoolingMonster()
 {
 	ifstream File("../Bin/Resources/Map/GavelenMap_PoolingList.json");
@@ -153,6 +242,29 @@ HRESULT CLevel_Glasgavelen::Ready_PoolingMonster()
 		const Value& MonsterPool = Doc["MonsterPool"];
 
 		if (FAILED(m_pPool_Instance->Ready_MonsterPool(MonsterPool)))
+			return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+HRESULT CLevel_Glasgavelen::Ready_PoolingProjectile()
+{
+	CGameObject::GAMEOBJECT_DESC GameObjectDesc = {};
+	GameObjectDesc.fSpeedPerSec = 150.f;
+	GameObjectDesc.fRotationPerSec = 0.f;
+
+	for (_uint i = 0; i < 5; i++)
+	{
+		if (FAILED(m_pPool_Instance->Add_ProjectilePool(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Projectile_EnergyBall"), TEXT("EnergyBall"), &GameObjectDesc)))
+			return E_FAIL;
+	}
+
+	GameObjectDesc.fSpeedPerSec = 400.f;
+
+	for (_uint i = 0; i < 5; i++)
+	{
+		if (FAILED(m_pPool_Instance->Add_ProjectilePool(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Projectile_GavelenRock"), TEXT("GavelenRock"), &GameObjectDesc)))
 			return E_FAIL;
 	}
 

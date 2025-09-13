@@ -17,8 +17,10 @@ public:
 	virtual void	Exit(CPlayerPawn* pPlayerPawn) override;
 
 private:
-	_bool			m_bStop;
-
+	_bool			m_bStop = {};
+	_float			m_fDecreaseTime = {};
+	_float			m_fCurrentTime = {};
+	_float			m_fSprintStamina = {};
 public:
 	static CState_Move* Create();
 	virtual void		Free() override;

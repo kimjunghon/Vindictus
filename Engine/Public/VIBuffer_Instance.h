@@ -12,6 +12,8 @@ public:
 		_float3	vCenter;
 		_float3 vRange;
 		_float2	vSize;
+		_float2 vAngle;
+		_bool   IsCircle;
 		_float3 vSourceColor = _float3(1.f, 1.f, 1.f);
 	}INSTANCE_DESC;
 
@@ -38,7 +40,8 @@ protected:
 	_uint				m_iNumIndexPerInstance = {};
 	_uint				m_iInstanceVertexStride = {};
 	_float3				m_vSourceColor = {};
-
+	_bool				m_IsCircle = {};
+	_float2				m_vAngle;
 public:
 	virtual CComponent* Clone(void* pArg) PURE;
 	virtual void		Free() override;

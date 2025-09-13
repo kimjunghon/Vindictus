@@ -69,8 +69,9 @@ HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 
-	EnableAllColliderChannel();
-
+	m_pColliderContainer->SetEnableAllColliderChannel(true);
+	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), false);
+	
 	return S_OK;
 }
 
@@ -199,7 +200,7 @@ void CVampire::ChangeHitState(ATTACK_TYPE eAttackType)
 
 void CVampire::ChangeDeadState(ATTACK_TYPE eAttackType)
 {
-	DisableAllColliderChannel();
+	m_pColliderContainer->SetEnableAllColliderChannel(false);
 
 	switch (eAttackType)
 	{

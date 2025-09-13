@@ -24,7 +24,10 @@ private:
 	HRESULT Ready_Light();
 	HRESULT Ready_GameObjectToJson();
 	HRESULT Ready_Player(const Value& Player);
+
+	HRESULT	Ready_Effect();
 	HRESULT Ready_PoolingMonster();
+	HRESULT Ready_PoolingProjectile();
 
 	HRESULT Ready_Map(const _wstring& strLayerTag);
 

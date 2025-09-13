@@ -187,6 +187,21 @@ PS_OUT PS_TRAIL(PS_DEFAULT_IN In)
     return Out;
 }
 
+PS_OUT PS_BLENDBAR(PS_DEFAULT_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (Out.vColor.a <= 0.35f)
+        discard;
+    
+    if (In.vPosition.x > g_fStartX + (g_fSizeX * g_fProgressBarRatio))
+        Out.vColor.a = 0.5f;
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass
@@ -242,5 +257,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_TRAIL();
+    }
+
+    pass BlendBarPass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BLENDBAR();
     }
 }

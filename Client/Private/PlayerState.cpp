@@ -17,6 +17,9 @@ _bool CPlayerState::CanMove()
 
 HRESULT CPlayerState::Initialize()
 {
+	m_fSmashStamina = 10.f;
+	m_fRoolStamina = 15.f;
+
 	return S_OK;
 }
 
@@ -67,14 +70,23 @@ void CPlayerState::Find_ActionState(CPlayerPawn* pPlayerPawn, _byte byAction)
 	else if (byAction & ENUM_CLASS(ACTION_INPUT::SMASH))
 	{
 		_uint iComboCount = pPlayerPawn->Get_ComboCount();
-		
-		_uint iSmashState = ENUM_CLASS(PLAYER_STATE::SMASH0) + iComboCount;
-		
-		pPlayerPawn->Change_State(ENUM_CLASS(iSmashState));
+
+		_float fSmashStamina = m_fSmashStamina + (iComboCount * 2.f);
+
+		if (pPlayerPawn->CanAction(fSmashStamina))
+		{
+			pPlayerPawn->DecreaseStamina(fSmashStamina);
+			_uint iSmashState = ENUM_CLASS(PLAYER_STATE::SMASH0) + iComboCount;
+			pPlayerPawn->Change_State(ENUM_CLASS(iSmashState));
+		}
 	}
 	else if (byAction & ENUM_CLASS(ACTION_INPUT::ROLL))
 	{
-		pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::ROLL));
+		if(pPlayerPawn->CanAction(m_fRoolStamina))
+		{
+			pPlayerPawn->DecreaseStamina(m_fRoolStamina);
+			pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::ROLL));
+		}
 	}
 	else if (byAction & ENUM_CLASS(ACTION_INPUT::HEAVYSTAND))
 	{

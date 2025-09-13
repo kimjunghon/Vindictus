@@ -21,6 +21,7 @@ public:
 	_uint		m_iComboCount = {}; 
 	_uint		m_iMaxComboCount = {};
 
+	_float		m_fComboStamina = {};
 	_bool		m_bReadySmash = {};
 	_float		m_fKeepTime = {};
 	_float		m_fCurrentKeepTime = {};

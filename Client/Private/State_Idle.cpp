@@ -9,6 +9,9 @@ CState_Idle::CState_Idle()
 
 HRESULT CState_Idle::Initialize()
 {
+    if (FAILED(__super::Initialize()))
+        return E_FAIL;
+
     m_iStateFlag |= ENUM_CLASS(STATE_FLAG::IDLE);
 
     m_fRestDelay = 10.f;

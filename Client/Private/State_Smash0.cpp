@@ -9,6 +9,9 @@ CState_Smash0::CState_Smash0()
 
 HRESULT CState_Smash0::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
     m_iStateFlag = ENUM_CLASS(STATE_FLAG::SMASH);
 
 	m_fFullChargeTime = 0.7f;

@@ -95,6 +95,13 @@ HRESULT CPool_Instance::Request_SpawnEffect(const _wstring& strEffect, void* pSp
 }
 
 
+#ifdef _DEBUG
+HRESULT CPool_Instance::SpawnRoom(_uint iRoomIndex, _uint iMonsterIndex)
+{
+	return m_pSpawn_Manager->SpawnRoom(iRoomIndex, iMonsterIndex);
+}
+#endif
+
 HRESULT CPool_Instance::Ready_MonsterTypeMap()
 {
 	m_MonsterTypeMap["Vampire_Basic"]	= MONSTER_TYPE::VAMPIRE_BASIC;

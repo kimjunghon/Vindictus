@@ -53,6 +53,7 @@ private:
 	HRESULT Load_Static_Effect(const _char* pFilePath, _uint iLevel);
 	HRESULT Load_Billboard_Effect(const _char* pFilePath, _uint iLevel);
 	HRESULT Load_Effect_Prefab(const _char* pFilePath, _uint iLevel);
+	HRESULT Load_Effect_Trail(const _char* pFilePath, _uint iLevel);
 
 
 public:

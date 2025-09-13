@@ -128,7 +128,7 @@ public:
 #pragma region CAMERA_MANAGER
 public:
 	HRESULT Add_CameraToManager(_uint iPrototypeIndex, const _wstring& strPrototypeTag, const _wstring& strCameraTag, class CCamera** ppOut = nullptr, void* pArg = nullptr);
-	HRESULT Change_Camera(const _wstring& strCameraTag);
+	HRESULT Change_Camera(const _wstring& strCameraTag, void* pArg = nullptr);
 	HRESULT Change_Camera(class CCamera* pNewCamera);
 #pragma endregion
 
@@ -161,7 +161,10 @@ public:
 #pragma endregion
 
 #pragma region COLLIDER
+	void				Set_BoudingChannel(_uint iBoundingChannel);
 	HRESULT				Add_Channel(_uint iSrcChannel, _uint iDstChannel, COLLIDER_TYPE eType);
+	HRESULT				Add_Collider(_uint iChannel, CGameObject* pOwner, CCollider* pCollider);
+
 	HRESULT				Add_BoundingCollider(CGameObject* pOwner, CCollider* pBounding_Collider);
 	HRESULT				Add_ActionCollider(CGameObject* pOwner, CCollider* pAction_Collider);
 #pragma endregion

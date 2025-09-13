@@ -103,4 +103,11 @@ namespace Client
 		WEAPON_TYPE eWeaponType;
 		ARMOR_TYPE eArmorType;
 	}EVENT_UNEQUIP_EQUIPMENT;
+
+	typedef struct tagEventBindBossHP final : public CEvent
+	{
+		_float	m_fLineHP;
+		_float	m_fMaxBossHP;
+		_float* m_pCurrentBossHP;
+	}EVENT_BIND_BOSSHP;
 }

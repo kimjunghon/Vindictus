@@ -3,6 +3,10 @@
 
 using namespace Player;
 
+NS_BEGIN(Engine)
+class CColliderContainer;
+NS_END
+
 NS_BEGIN(Client)
 
 class CCamera_Target;
@@ -41,6 +45,8 @@ public:
 	DIR				Get_HirDir() { return m_eHitDir; }
 	_bool			IsGaurdHit() { return m_iStateFlag & ENUM_CLASS(HIT_FLAG::GUARD); }
 	_bool			IsGrap() { return m_IsGrap; }
+	_bool			CanAction(_float fStamina) { return m_pStatus->fStamina >= fStamina; }
+	void			DecreaseStamina(_float fValue) { m_pStatus->fStamina -= fValue, m_fCurrentStaminaDelay = 0.f; }
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -70,7 +76,9 @@ private:
 	_bool						m_IsSwing = {};
 	//State
 	
-	PLAYER_STATUS				m_Status = {};
+	PLAYER_STATUS*				m_pStatus = {};
+	_float						m_fStaminaDelay = {};
+	_float						m_fCurrentStaminaDelay = {};
 
 	INPUT_MOVE_DESC				m_MoveInput = {};
 	INPUT_ACTION_DESC			m_ActionInput = {};
@@ -124,6 +132,7 @@ private:
 	void			Compute_WorldMatrix();
 	void			Bind_InputData(_float fTimeDelta);
 	void			Move(_float fTimeDelta);
+	void			IncreaseStamina(_float fTimeDelta);
 
 	HRESULT			EquipWeapon(CWeapon* pWeapon);
 	HRESULT			UnEquipWeapon(_uint iWeaponTypeIndex);

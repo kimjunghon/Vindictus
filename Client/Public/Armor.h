@@ -10,6 +10,8 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CPlayerInstance;
+
 class CArmor final : public CPawnObject
 {
 public:
@@ -18,6 +20,7 @@ public:
 		_float		fDefense;
 		_float		fBrokenDefense;
 		_float		fHealth;
+		_float		fFullHealth;
 	}ARMOR_INFO;
 
 	typedef struct tagArmorDesc : public PAWNOBJECT_DESC {
@@ -41,6 +44,7 @@ public:
 	virtual HRESULT			Render() override;
 	HRESULT					RenderSlot(SLOT_RENDER_DESC SlotRenderDesc);
 
+	ARMOR_INFO				Get_ArmorInfo() { return m_ArmorInfo; }
 	const _wstring&			Get_ArmorName() { return m_ArmorInfo.strArmorName; }
 	ARMOR_TYPE				Get_ArmorType() { return m_eArmorType; }
 	HRESULT					Equip(const _float4x4* pPawnMatrix, CModel* pParentModelCom);
@@ -48,7 +52,9 @@ public:
 
 	_bool					IsBroekn() { return m_ArmorInfo.fHealth <= 0.f; }
 	void					DecreaseDurability(_float fDecreaseAmount);
+	void					Reset();
 private:
+	CPlayerInstance*		m_pPlayerInstance = { nullptr };
 	_bool					m_IsEquip = { false };
 	ARMOR_TYPE				m_eArmorType = { ARMOR_TYPE::END };
 	ARMOR_STATE				m_eArmorState = { ARMOR_STATE::DEFAULT };

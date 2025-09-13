@@ -9,6 +9,9 @@ CState_HeavyStand::CState_HeavyStand()
 
 HRESULT CState_HeavyStand::Initialize()
 {
+	if (FAILED(__super::Initialize()))
+		return E_FAIL;
+
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::HEAVYSTAND);
 
 	return S_OK;
