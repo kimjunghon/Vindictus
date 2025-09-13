@@ -2,7 +2,6 @@
 #include "PlayerPawn.h"
 #include "SocketObject.h"
 #include "Camera_Target.h"
-#include "GameInstance.h"
 #include "PlayerState.h"
 #include "StateFactory.h"
 #include "PlayerBody.h"
@@ -56,7 +55,6 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
-
 
 	if (FAILED(Ready_Camera()))
 		return E_FAIL;
@@ -146,21 +144,6 @@ void CPlayerPawn::Late_Update(_float fTimeDelta)
 	Update_HitColliderEnable();
 
 	m_pColliderContainer->Update(this, m_pTransformCom->Get_WorldMatrix());
-//	__super::Update_Colliders(m_pTransformCom->Get_WorldMatrix());
-
-#ifdef _DEBUG
-	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
-		return;
-
-	for (auto& Pair : m_Colliders)
-	{
-		for (auto& pCollider : Pair.second)
-		{
-			if (FAILED(m_pGameInstance->Add_DebugComponent(pCollider)))
-				return;
-		}
-	}
-#endif
 }
 
 HRESULT CPlayerPawn::Render()

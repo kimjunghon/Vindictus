@@ -4,6 +4,7 @@
 #include "Map.h"
 #include "Camera_Free.h"
 #include "PlayerPawn.h"
+#include "Puppy.h"
 #include "Weapon.h"
 #include "Armor.h"
 #include "Effect.h"
@@ -112,6 +113,16 @@ HRESULT CLevel_Town::Ready_GameObjectToJson()
 			return E_FAIL;
 	}
 
+	if (Doc.HasMember("NPC") && Doc["NPC"].IsArray())
+	{
+		const Value& NPC = Doc["NPC"];
+
+		if (FAILED(Ready_NPC(NPC)))
+			return E_FAIL;
+	}
+
+
+
 	File.close();
 
 	return S_OK;
@@ -145,12 +156,48 @@ HRESULT CLevel_Town::Ready_Player(const Value& Player)
 	return S_OK;
 }
 
+HRESULT CLevel_Town::Ready_NPC(const Value& NPC_Data)
+{
+	for (auto& NPC : NPC_Data.GetArray())
+	{
+		string strName = {};
+		if (NPC.HasMember("Name") && NPC["Name"].IsString())
+			strName = NPC["Name"].GetString();
+		
+		_uint iCellIndex = {};
+		if (NPC.HasMember("CellIndex") && NPC["CellIndex"].IsInt())
+			iCellIndex = NPC["CellIndex"].GetInt();
+
+		_float3 vPosition = {};
+		if (NPC.HasMember("PositionX") && NPC["PositionX"].IsFloat()
+			&& NPC.HasMember("PositionY") && NPC["PositionY"].IsFloat()
+			&& NPC.HasMember("PositionZ") && NPC["PositionZ"].IsFloat())
+		{
+			vPosition = _float3(NPC["PositionX"].GetFloat(), NPC["PositionY"].GetFloat(), NPC["PositionZ"].GetFloat());
+		}
+
+		if (!strcmp(strName.c_str(), "Puppy"))
+		{
+			_uint iType = {};
+			if (NPC.HasMember("Type") && NPC["Type"].IsInt())
+				iType = NPC["Type"].GetInt();
+
+			CPuppy::PUPPY_DESC PuppyDesc = {};
+			PuppyDesc.iCellIndex = iCellIndex;
+			PuppyDesc.vPosition = vPosition;
+			PuppyDesc.iPuppyTypeIndex = iType;
+
+			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Puppy"),
+				ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_NPC"), &PuppyDesc)))
+				return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
 HRESULT CLevel_Town::Ready_Effect()
 {
-//	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
-//	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
-//	m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::STATIC), TEXT("SwordTrail"), TEXT("Prototype_Effect_SwordTrail"));
-
 	ifstream File("../Bin/Resources/EffectData/LoadFile/TownEffectPool.json");
 	if (!File.is_open())
 	{

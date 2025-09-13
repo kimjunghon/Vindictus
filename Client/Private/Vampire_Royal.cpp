@@ -158,10 +158,6 @@ HRESULT CVampire_Royal::Ready_Collider_Body()
 
 HRESULT CVampire_Royal::Ready_Collider_Hit()
 {
-	m_Colliders[COLLIDER_CHANNEL::HIT].resize(ENUM_CLASS(HIT_COLLIDER::END), nullptr);
-	m_HitColliderSocketMatrix.resize(ENUM_CLASS(HIT_COLLIDER::END), nullptr);
-	m_HitColliderCombinedMatrix.resize(ENUM_CLASS(HIT_COLLIDER::END), XMMatrixIdentity());
-
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(18.f, 30.f, 18.f);
@@ -202,10 +198,6 @@ HRESULT CVampire_Royal::Ready_Collider_Hit()
 
 HRESULT CVampire_Royal::Ready_Collider_Attack()
 {
-	m_Colliders[COLLIDER_CHANNEL::ATTACK].resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderSocketMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderCombinedMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), XMMatrixIdentity());
-
 	/* Com_Collider_Attack_Sword */
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, XMConvertToRadians(90.f));

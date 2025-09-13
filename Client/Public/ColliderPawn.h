@@ -32,12 +32,6 @@ protected:
 	CNavigation*				m_pNavigationCom = { nullptr };
 	CColliderContainer*			m_pColliderContainer = { nullptr };
 
-	COLLIDER					m_Colliders;
-	vector<const _float4x4*>	m_HitColliderSocketMatrix;
-	vector<_matrix>				m_HitColliderCombinedMatrix;
-	vector<const _float4x4*>	m_AttackColliderSocketMatrix;
-	vector<_matrix>				m_AttackColliderCombinedMatrix;
-
 	ATTACK_DATA					m_CurrentAttackData = {};
 
 	_vector						m_vPrevPosition = {};

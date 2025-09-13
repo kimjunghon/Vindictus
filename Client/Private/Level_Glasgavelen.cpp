@@ -38,10 +38,12 @@ HRESULT CLevel_Glasgavelen::Initialize()
 
 void CLevel_Glasgavelen::Update(_float fTimeDelta)
 {
+#ifdef _DEBUG
 	if (m_pGameInstance->Get_KeyDown(DIK_F1))
 	{
 		m_pPool_Instance->SpawnRoom(0, 0);
 	}
+#endif
 
 }
 
@@ -93,8 +95,6 @@ HRESULT CLevel_Glasgavelen::Ready_GameObjectToJson()
 		if (FAILED(Ready_Player(Player)))
 			return E_FAIL;
 	}
-
-
 
 	if (Doc.HasMember("RoomSpawnDatas") && Doc["RoomSpawnDatas"].IsArray())
 	{

@@ -160,10 +160,6 @@ HRESULT CVampire_Elder::Ready_Collider_Body()
 
 HRESULT CVampire_Elder::Ready_Collider_Hit()
 {
-	m_Colliders[COLLIDER_CHANNEL::HIT].resize(ENUM_CLASS(HIT_COLLIDER::END), nullptr);
-	m_HitColliderSocketMatrix.resize(ENUM_CLASS(HIT_COLLIDER::END), nullptr);
-	m_HitColliderCombinedMatrix.resize(ENUM_CLASS(HIT_COLLIDER::END), XMMatrixIdentity());
-
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
 	OBBDesc.vExtents = _float3(18.f, 30.f, 18.f);
@@ -204,10 +200,6 @@ HRESULT CVampire_Elder::Ready_Collider_Hit()
 
 HRESULT CVampire_Elder::Ready_Collider_Attack()
 {
-	m_Colliders[COLLIDER_CHANNEL::ATTACK].resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderSocketMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), nullptr);
-	m_AttackColliderCombinedMatrix.resize(ENUM_CLASS(ATTACK_COLLIDER::END), XMMatrixIdentity());
-
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(XMConvertToRadians(60.f), XMConvertToRadians(90.f), XMConvertToRadians(90.f));
 	OBBDesc.vExtents = _float3(40.f, 40.f, 90.f);

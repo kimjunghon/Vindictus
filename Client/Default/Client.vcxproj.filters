@@ -475,6 +475,18 @@
     <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC">
       <UniqueIdentifier>{2685ec04-e720-4401-be43-bae983ee7e05}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\Pawns\AnimMachine\PuppyAnimMachine">
+      <UniqueIdentifier>{15a5cfe2-d81e-4dca-81df-a512dc639c61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC\Puppy">
+      <UniqueIdentifier>{746cc94e-6e2f-491d-b182-dd16156d2c46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC\Puppy\PuppyBody">
+      <UniqueIdentifier>{55178912-34a2-4bd5-ac9c-42448d2006d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC\Puppy\Ai">
+      <UniqueIdentifier>{e25e2035-699b-4a5c-bb8e-a9f71527715d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -924,8 +936,17 @@
     <ClInclude Include="..\public\Palette.h">
       <Filter>03.GameObject\UIObject\GamePlay\Palette</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Npc.h">
-      <Filter>03.GameObject\Pawns\ColliderPawn\NPC</Filter>
+    <ClInclude Include="..\public\PuppyAnimMachine.h">
+      <Filter>03.GameObject\Pawns\AnimMachine\PuppyAnimMachine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Puppy.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Puppy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PuppyAI.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Puppy\Ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\PuppyBody.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Puppy\PuppyBody</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1362,8 +1383,17 @@
     <ClCompile Include="..\private\Palette.cpp">
       <Filter>03.GameObject\UIObject\GamePlay\Palette</Filter>
     </ClCompile>
-    <ClCompile Include="..\private\Npc.cpp">
-      <Filter>03.GameObject\Pawns\ColliderPawn\NPC</Filter>
+    <ClCompile Include="..\private\PuppyAnimMachine.cpp">
+      <Filter>03.GameObject\Pawns\AnimMachine\PuppyAnimMachine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Puppy.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Puppy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PuppyAI.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Puppy\Ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\PuppyBody.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Puppy\PuppyBody</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

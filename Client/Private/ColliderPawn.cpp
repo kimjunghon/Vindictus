@@ -129,13 +129,4 @@ void CColliderPawn::Free()
 
 	Safe_Release(m_pNavigationCom);
 	Safe_Release(m_pColliderContainer);
-
-	for (auto& Pair : m_Colliders)
-	{
-		for (auto& pCollider : Pair.second)
-		{
-			Safe_Release(pCollider);
-		}
-	}
-	m_Colliders.clear();
 }

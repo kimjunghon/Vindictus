@@ -27,6 +27,7 @@ private:
 	HRESULT Ready_Light();
 	HRESULT Ready_GameObjectToJson();
 	HRESULT Ready_Player(const Value& Player);
+	HRESULT Ready_NPC(const Value& NPC_Data);
 
 	HRESULT	Ready_Effect();
 	HRESULT Ready_DefaultWeapon();

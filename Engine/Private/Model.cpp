@@ -762,7 +762,7 @@ HRESULT CModel::Ready_Bones(ifstream& File, _int iParentIndex)
     
     if(m_iRootBoneIndex == -1)
     {
-        if (pBone->Compare_Name("ValveBiped.Bip01") || pBone->Compare_Name("root"))
+        if (pBone->Compare_Name("ValveBiped.Bip01") || pBone->Compare_Name("root") || pBone->Compare_Name("Bip01"))
             m_iRootBoneIndex = static_cast<_uint>(m_Bones.size() - 1);
     }
 

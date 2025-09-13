@@ -18,6 +18,8 @@
 #include "EnergyBall.h"
 #include "GavelenRock.h"
 
+#include "Puppy.h"
+#include "PuppyBody.h"
 #include "Glasgavelen.h"
 #include "GlasgavelenBody.h"
 #include "GlasgavelenSword.h"
@@ -303,6 +305,16 @@ HRESULT CLoader::Loading_For_Town_Level()
 	//////////////////////////////////////////////////////////////GAMEOBJECT//////////////////////////////////////////////////////////////
 
 	lstrcpy(m_szLoadingText, TEXT("게임오브젝트원형를 로딩중입니다."));
+	/* Prototype_GameObject_Puppy */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Puppy"),
+		CPuppy::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Puppy_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Puppy_Body"),
+		CPuppyBody::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -342,8 +354,6 @@ HRESULT CLoader::Loading_For_Queen_Level()
 		return E_FAIL;
 
 	Loading_For_Effect("../Bin/Resources/EffectData/LoadFile/QueenEffect.json", ENUM_CLASS(LEVEL::QUEEN));
-
-
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));

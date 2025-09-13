@@ -292,4 +292,17 @@ namespace Client
 		};
 
 	}
+
+	namespace Puppy
+	{
+		enum class STATE_FLAG {
+			IDLE = 1 << 0,
+			WALK = 1 << 1,
+			RUN = 1 << 2,
+			SIT_DOWN = 1 << 3,
+			EXCITING = 1 << 4,
+			EATING = 1 << 5,
+			DIGGING = 1 << 6
+		};
+	}
 }
