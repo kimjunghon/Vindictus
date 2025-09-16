@@ -136,7 +136,7 @@ void CVIBuffer_Trail::Update(_float fTimeDelta)
 
 		_uint iPrevNode = m_iNumCurrentNode;
 
-		m_iNumCurrentNode = m_Trails.size();
+		m_iNumCurrentNode = static_cast<_uint>(m_Trails.size());
 
 		Update_TrailBuffer(fTimeDelta);
 	}
@@ -161,7 +161,7 @@ void CVIBuffer_Trail::Update_Billboard(_float fTimeDelta)
 
 		_uint iPrevNode = m_iNumCurrentNode;
 
-		m_iNumCurrentNode = m_Trails.size();
+		m_iNumCurrentNode = static_cast<_uint>(m_Trails.size());
 
 		Update_TrailBuffer_Billboard(fTimeDelta);
 	}
@@ -188,7 +188,7 @@ void CVIBuffer_Trail::Add_TrailBuffer(TRAIL_NODE Trail, _float fTimeDelta)
 	if (m_Trails.size() > m_iNumMaxNode)
 		m_Trails.pop_front();
 
-	m_iNumCurrentNode = m_Trails.size();
+	m_iNumCurrentNode = static_cast<_uint>(m_Trails.size());
 
 	Update_TrailBuffer(fTimeDelta);
 }
@@ -214,7 +214,7 @@ void CVIBuffer_Trail::Add_TrailBuffer_Billboard(TRAIL_NODE Trail, _float fTimeDe
 	if (m_Trails.size() > m_iNumMaxNode)
 		m_Trails.pop_front();
 
-	m_iNumCurrentNode = m_Trails.size();
+	m_iNumCurrentNode = static_cast<_uint>(m_Trails.size());
 
 	Update_TrailBuffer_Billboard(fTimeDelta);
 }

@@ -58,6 +58,15 @@ namespace Engine
 		float		fRange;
 	}LIGHT_DESC;
 
+	typedef struct tagShadowLightDesc
+	{
+		enum TYPE { DIRECTIONAL, POINT, END};
+		TYPE		eType;
+		XMFLOAT4	vDirection;
+		float		fDistance;
+		float		fRange;
+	}SHADOW_LIGHT_DESC;
+
 	typedef struct tagKeyFrame
 	{
 		XMFLOAT3	vScale;

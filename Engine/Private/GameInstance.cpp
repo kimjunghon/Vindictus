@@ -20,6 +20,8 @@
 #include "Controller_Manager.h"
 #include "Navigation_Manager.h"
 #include "Collider_Manager.h"
+#include "Shadow.h"
+#include "Frustum.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -95,6 +97,14 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pCollider_Manager)
         return E_FAIL;
 
+    m_pShadow = CShadow::Create();
+    if (nullptr == m_pShadow)
+        return E_FAIL;
+
+    m_pFrustum = CFrustum::Create();
+    if (nullptr == m_pFrustum)
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -109,6 +119,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
     m_pCamera_Manager->Update(fTimeDelta);
     m_pPipeLine->Update();
+    m_pFrustum->Update();
+    m_pShadow->Update();
 
     m_pObject_Manager->Update(fTimeDelta);
     m_pObject_Manager->Late_Update(fTimeDelta);
@@ -312,9 +324,9 @@ HRESULT CGameInstance::Bind_Shader_RenderTarget(const _wstring& strRTTag, CShade
 {
     return m_pRT_Manager->Bind_Shader_RenderTarget(strRTTag, pShader, pConstantName);
 }
-HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag)
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool IsClear)
 {
-    return m_pRT_Manager->Begin_MRT(strMRTTag);
+    return m_pRT_Manager->Begin_MRT(strMRTTag, pDSV, IsClear);
 }
 HRESULT CGameInstance::End_MRT()
 {
@@ -489,10 +501,34 @@ HRESULT CGameInstance::Add_ActionCollider(CGameObject* pOwner, CCollider* pActio
 }
 #pragma endregion
 
+#pragma region SHADOW
+const _float4x4* CGameInstance::Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const
+{
+    return m_pShadow->Get_Transform_Float4x4(eTransformState);
+}
+const _float* CGameInstance::Get_ShadowLight_Far() const
+{
+    return m_pShadow->Get_ShadowLight_Far();
+}
+HRESULT CGameInstance::Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowLightDesc)
+{
+    return m_pShadow->Update_ShadowLight(ShadowLightDesc);
+}
+#pragma endregion
+
+#pragma region FRUSTUM
+const _float4* CGameInstance::Get_Frustum_WorldPoints() const
+{
+    return m_pFrustum->Get_Frustum_WorldPoints();
+}
+#pragma endregion
+
 void CGameInstance::Release_Engine()
 {
     Release();
-
+       
+    Safe_Release(m_pFrustum);
+    Safe_Release(m_pShadow);
     Safe_Release(m_pGraphic_Device);
     Safe_Release(m_pInput_Device);
     Safe_Release(m_pTimer_Manager);

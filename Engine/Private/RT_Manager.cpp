@@ -61,7 +61,7 @@ HRESULT CRT_Manager::Bind_Shader_RenderTarget(const _wstring& strRTTag, CShader*
 	return pRT->Bind_ShaderResource(pShader, pConstantName);
 }
 
-HRESULT CRT_Manager::Begin_MRT(const _wstring& strMRTTag)
+HRESULT CRT_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool IsClear)
 {
 	list<CRenderTarget*>* pMRTs = Find_MRT(strMRTTag);
 	if (nullptr == pMRTs)
@@ -75,11 +75,16 @@ HRESULT CRT_Manager::Begin_MRT(const _wstring& strMRTTag)
 
 	for (auto& pRT : *pMRTs)
 	{
-		pRT->Clear();
+		if(IsClear)
+			pRT->Clear();
+
 		RenderTargets[iNumRenderTargets++] = pRT->Get_RTV();
 	}
 
-	m_pDeviceContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, m_pOriginDSV);
+	if (pDSV)
+		m_pDeviceContext->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+	m_pDeviceContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, nullptr == pDSV ? m_pOriginDSV : pDSV);
 
 	return S_OK;
 }

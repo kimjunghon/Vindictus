@@ -93,7 +93,7 @@ public:
 	HRESULT Add_RenderTarget(const _wstring& strRTTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strRTTag);
 	HRESULT Bind_Shader_RenderTarget(const _wstring& strRTTag, CShader* pShader, const _char* pConstantName);
-	HRESULT Begin_MRT(const _wstring& strMRTTag);
+	HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr, _bool IsClear = true);
 	HRESULT End_MRT();
 #ifdef _DEBUG
 	HRESULT Ready_Debug(const _wstring& strRTTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
@@ -174,6 +174,16 @@ public:
 	POINT				Get_MousePoint() { return m_ptMousePoint; }
 #pragma endregion
 
+#pragma region SHADOW
+	const _float4x4*	Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const;
+	const _float*		Get_ShadowLight_Far() const;
+	HRESULT				Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowLightDesc);
+#pragma endregion
+
+#pragma region FRUSTUM
+	const _float4*	Get_Frustum_WorldPoints() const;
+#pragma endregion
+
 private:
 	class CGraphic_Device*		m_pGraphic_Device = { nullptr };
 	class CInput_Device*		m_pInput_Device = { nullptr };
@@ -193,6 +203,8 @@ private:
 	class CController_Manager*	m_pController_Manager = { nullptr };
 	class CNavigation_Manager*	m_pNavigation_Manager = { nullptr };
 	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
+	class CShadow*				m_pShadow = { nullptr };
+	class CFrustum*				m_pFrustum = { nullptr };
 
 	POINT						m_ptMousePoint = {};
 public:

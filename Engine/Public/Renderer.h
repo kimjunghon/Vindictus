@@ -30,6 +30,11 @@ private:
 	_float4x4					m_ViewMatrix = {};
 	_float4x4					m_ProjMatrix = {};
 
+	ID3D11DepthStencilView*		m_pShadowDSV = { nullptr };
+
+	_float						m_fViewportWidth = {};
+	_float						m_fViewportHeight = {};
+
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
@@ -39,6 +44,10 @@ private:
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
+
+private:
+	HRESULT Ready_Shadow_Depth_Stencil_View();
+	HRESULT SetUp_Viewport(_float fWidth, _float fHeight);
 
 #ifdef _DEBUG
 public:

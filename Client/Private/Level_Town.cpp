@@ -60,7 +60,7 @@ HRESULT CLevel_Town::Render()
 
 HRESULT CLevel_Town::Ready_Light()
 {
-	LIGHT_DESC			LightDesc{};
+	LIGHT_DESC			LightDesc = {};
 
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
@@ -69,6 +69,14 @@ HRESULT CLevel_Town::Ready_Light()
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(TEXT("DIRECTONAL"), LightDesc)))
+		return E_FAIL;
+
+	SHADOW_LIGHT_DESC	ShadowLightDesc = {};
+	ShadowLightDesc.eType = SHADOW_LIGHT_DESC::DIRECTIONAL;
+	ShadowLightDesc.vDirection = _float4(0.f, -1.f, 1.f, 0.f);
+	ShadowLightDesc.fDistance = 1000.f;
+
+	if (FAILED(m_pGameInstance->Update_ShadowLight(ShadowLightDesc)))
 		return E_FAIL;
 
 	return S_OK;

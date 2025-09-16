@@ -1,6 +1,7 @@
 #include "Engine_Shader_Defines.hlsli"
 
 float4x4    g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+float       g_fShadowLightFar;
 
 texture2D g_DiffuseTexture;
 texture2D g_NormalTexture;
@@ -146,6 +147,62 @@ PS_OUT PS_COLOR_MASKING(PS_IN In)
     return Out;
 }
 
+/////////////////////////////////////////SHADOW/////////////////////////////////////////
+struct VS_OUT_SHADOW
+{
+    float4 vPosition : SV_POSITION;
+    float4 vProjPos : TEXCOORD0;
+};
+
+
+VS_OUT_SHADOW VS_SHADOW(VS_IN In)
+{
+    VS_OUT_SHADOW Out = (VS_OUT_SHADOW) 0;
+    
+    float fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+    
+    matrix BoneMatrix =
+        g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
+        g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
+        g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
+        g_BoneMatrices[In.vBlendIndex.w] * fWeightW;
+    
+    vector vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
+    
+    float4x4 matWV, matWVP;
+    
+    matWV = mul(g_WorldMatrix, g_ViewMatrix);
+    matWVP = mul(matWV, g_ProjMatrix);
+    
+    Out.vPosition = mul(vPosition, matWVP);
+    Out.vProjPos = Out.vPosition;
+    
+    return Out;
+}
+
+struct PS_IN_SHADOW
+{
+    float4 vPosition : SV_POSITION;
+    float4 vProjPos : TEXCOORD0;
+};
+
+struct PS_OUT_SHADOW
+{
+    float4 vLightDepth : SV_TARGET0;
+};
+
+PS_OUT_SHADOW PS_SHADOW(PS_IN_SHADOW In)
+{
+    PS_OUT_SHADOW Out = (PS_OUT_SHADOW) 0;
+
+    Out.vLightDepth = float4(In.vProjPos.z, 0.f, 0.f, 0.f);
+    
+ //   Out.vLightDepth = float4(In.vProjPos.w / g_fShadowLightFar, 0.f, 0.f, 0.f);
+    
+    return Out;
+}
+
+/////////////////////////////////////////SHADOW/////////////////////////////////////////
 technique11 DefaultTechnique
 {
     pass DefaultPass
@@ -179,5 +236,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_COLOR_MASKING();
+    }
+
+    pass ShadowPass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_SHADOW();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SHADOW();
     }
 }

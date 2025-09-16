@@ -2,6 +2,8 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix g_ViewMatrixInv, g_ProjMatrixInv;
+matrix g_ShadowLightViewMatrix, g_ShadowLightProjMatrix;
+float g_fShadowLightFar;
 
 texture2D g_Texture;
 
@@ -20,6 +22,7 @@ texture2D g_NormalTexture;
 texture2D g_DepthTexture;
 texture2D g_ShadeTexture;
 texture2D g_SpecularTexture;
+texture2D g_LightDepthTexture;
 
 struct VS_IN
 {
@@ -130,6 +133,42 @@ PS_OUT_BACKBUFFER PS_COMBINED(PS_IN In)
     vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
     
     Out.vColor = (vDiffuse * vShade) + vSpecular;
+    
+    vector vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    vector vWorldPos;
+    
+    vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
+    vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
+    vWorldPos.z = vDepthDesc.x;
+    vWorldPos.w = 1.f;
+    
+    vWorldPos = vWorldPos * vDepthDesc.y;
+    
+    vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
+    vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
+    
+    vector vPosition = mul(vWorldPos, g_ShadowLightViewMatrix);
+    vPosition = mul(vPosition, g_ShadowLightProjMatrix);
+    
+    float2 vTexcoord;
+    
+    vTexcoord.x = (vPosition.x) * 0.5f + 0.5f;
+    vTexcoord.y = (vPosition.y) * -0.5f + 0.5f;
+    
+ //   vTexcoord.x = (vPosition.x / vPosition.w) * 0.5f + 0.5f;
+ //   vTexcoord.y = (vPosition.y / vPosition.w) * -0.5f + 0.5f;
+    
+    vector vLightDepth = g_LightDepthTexture.Sample(DefaultSampler, vTexcoord);
+    float fViewZ = vLightDepth.x;// * g_fShadowLightFar;
+    
+    float fDistance = vPosition.z - fViewZ;
+    
+    if(fDistance > 0.007f)
+        Out.vColor = Out.vColor * 0.3f;
+
+//    if (vPosition.z - 0.0001f > fViewZ)
+//        Out.vColor = Out.vColor * 0.3f;
     
     return Out;
 }

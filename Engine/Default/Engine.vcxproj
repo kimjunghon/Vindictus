@@ -202,6 +202,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\Public\Event.h" />
     <ClInclude Include="..\Public\EventBus.h" />
     <ClInclude Include="..\public\Font_Manager.h" />
+    <ClInclude Include="..\public\Frustum.h" />
     <ClInclude Include="..\public\GameInstance.h" />
     <ClInclude Include="..\public\GameObject.h" />
     <ClInclude Include="..\public\GameObject_Manager.h" />
@@ -227,6 +228,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\RenderTarget.h" />
     <ClInclude Include="..\public\RT_Manager.h" />
     <ClInclude Include="..\public\Shader.h" />
+    <ClInclude Include="..\public\Shadow.h" />
     <ClInclude Include="..\public\SocketObject.h" />
     <ClInclude Include="..\public\Texture.h" />
     <ClInclude Include="..\public\TextureUI.h" />
@@ -280,6 +282,7 @@ call Copy.bat</Command>
     </ClCompile>
     <ClCompile Include="..\Private\EventBus.cpp" />
     <ClCompile Include="..\private\Font_Manager.cpp" />
+    <ClCompile Include="..\private\Frustum.cpp" />
     <ClCompile Include="..\private\GameInstance.cpp" />
     <ClCompile Include="..\private\GameObject.cpp" />
     <ClCompile Include="..\private\GameObject_Manager.cpp" />
@@ -305,6 +308,7 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\RenderTarget.cpp" />
     <ClCompile Include="..\private\RT_Manager.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
+    <ClCompile Include="..\private\Shadow.cpp" />
     <ClCompile Include="..\private\SocketObject.cpp" />
     <ClCompile Include="..\private\Texture.cpp" />
     <ClCompile Include="..\private\TextureUI.cpp" />

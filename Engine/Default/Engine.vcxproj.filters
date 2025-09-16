@@ -232,6 +232,12 @@
     <Filter Include="01.Utility\04.Component\Collider\Container">
       <UniqueIdentifier>{97faeec1-107a-4732-9185-eb08fc0a7564}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\10.Shadow">
+      <UniqueIdentifier>{36cfb714-4b23-4c06-a218-ab8ac1d6be9b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\11.Frustum">
+      <UniqueIdentifier>{ab277301-c4ce-4c0d-b780-a02f27a9f4c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -471,6 +477,12 @@
     <ClInclude Include="..\public\ColliderContainer.h">
       <Filter>01.Utility\04.Component\Collider\Container</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Shadow.h">
+      <Filter>01.Utility\10.Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Frustum.h">
+      <Filter>01.Utility\11.Frustum</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -685,6 +697,12 @@
     </ClCompile>
     <ClCompile Include="..\private\ColliderContainer.cpp">
       <Filter>01.Utility\04.Component\Collider\Container</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Shadow.cpp">
+      <Filter>01.Utility\10.Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Frustum.cpp">
+      <Filter>01.Utility\11.Frustum</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
