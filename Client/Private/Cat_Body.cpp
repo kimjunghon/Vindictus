@@ -1,25 +1,29 @@
 #include "ClientPch.h"
-#include "Vampire_Elder_Body.h"
-#include "Vampire_AnimMachine.h"
+#include "Cat_Body.h"
+#include "CatAnimMachine.h"
 
-CVampire_Elder_Body::CVampire_Elder_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
-	: CBody { pDevice, pDeviceContext }
+CCat_Body::CCat_Body(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
+	: CBody {pDevice, pDeviceContext}
 {
 }
 
-CVampire_Elder_Body::CVampire_Elder_Body(const CVampire_Elder_Body& Prototype)
-	: CBody{ Prototype }
+CCat_Body::CCat_Body(const CCat_Body& Prototype)
+	: CBody { Prototype }
 {
 }
 
-HRESULT CVampire_Elder_Body::Initialize_Prototype()
+HRESULT CCat_Body::Initialize_Prototype()
 {
+	if (FAILED(__super::Initialize_Prototype()))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
-HRESULT CVampire_Elder_Body::Initialize(void* pArg)
+HRESULT CCat_Body::Initialize(void* pArg)
 {
-	if(FAILED(__super::Initialize(pArg)))
+	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Components()))
@@ -30,29 +34,29 @@ HRESULT CVampire_Elder_Body::Initialize(void* pArg)
 	return S_OK;
 }
 
-void CVampire_Elder_Body::Priority_Update(_float fTimeDelta)
+void CCat_Body::Priority_Update(_float fTimeDelta)
 {
 }
 
-void CVampire_Elder_Body::Update(_float fTimeDelta)
+void CCat_Body::Update(_float fTimeDelta)
 {
 	m_pAnimMachine->Set_Animation(m_pModelCom, *m_pStateFlag);
 
 	m_pModelCom->Play_Animation(fTimeDelta);
 }
 
-void CVampire_Elder_Body::Late_Update(_float fTimeDelta)
+void CCat_Body::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
 }
 
-HRESULT CVampire_Elder_Body::Render()
+HRESULT CCat_Body::Render()
 {
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
+	_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
@@ -70,23 +74,22 @@ HRESULT CVampire_Elder_Body::Render()
 
 		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::DEFAULT));
 
-
 		m_pModelCom->Render(i);
 	}
 
 	return S_OK;
 }
 
-HRESULT CVampire_Elder_Body::Ready_Components()
+HRESULT CCat_Body::Ready_Components()
 {
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Vampire_Elder_Body"),
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_Cat_Body"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
 
 	ROOTMOTION_OPTION Option = {};
-	Option.PositionX = true;
+	Option.PositionX = false;
 	Option.PositionY = false;
-	Option.PositionZ = true;
+	Option.PositionZ = false;
 	Option.Rotation = false;
 	Option.RotationOnlyZ = false;
 
@@ -96,14 +99,14 @@ HRESULT CVampire_Elder_Body::Ready_Components()
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
 
-	m_pAnimMachine = CVampire_AnimMachine::Create();
+	m_pAnimMachine = CCatAnimMachine::Create();
 	if (nullptr == m_pAnimMachine)
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CVampire_Elder_Body::Bind_ShaderResources()
+HRESULT CCat_Body::Bind_ShaderResources()
 {
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pPawnMatrix)))
 		return E_FAIL;
@@ -117,31 +120,33 @@ HRESULT CVampire_Elder_Body::Bind_ShaderResources()
 	return S_OK;
 }
 
-CVampire_Elder_Body* CVampire_Elder_Body::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
+CCat_Body* CCat_Body::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 {
-    CVampire_Elder_Body* pInstance = new CVampire_Elder_Body(pDevice, pDeviceContext);
-    if (FAILED(pInstance->Initialize_Prototype()))
-    {
-        MSG_BOX(TEXT("Failed Created : CVampire_Elder_Body"));
-        Safe_Release(pInstance);
-    }
-    return pInstance;
+	CCat_Body* pInstance = new CCat_Body(pDevice, pDeviceContext);
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX(TEXT("Failed Created : CCat_Body"));
+		Safe_Release(pInstance);
+	}
+	return pInstance;
 }
 
-CGameObject* CVampire_Elder_Body::Clone(void* pArg)
+CGameObject* CCat_Body::Clone(void* pArg)
 {
-    CVampire_Elder_Body* pInstance = new CVampire_Elder_Body(*this);
-    if (FAILED(pInstance->Initialize(pArg)))
-    {
-        MSG_BOX(TEXT("Failed Cloned : CVampire_Elder_Body"));
-        Safe_Release(pInstance);
-    }
-    return pInstance;
+	CCat_Body* pInstance = new CCat_Body(*this);
+	if (FAILED(pInstance->Initialize(pArg)))
+	{
+		MSG_BOX(TEXT("Failed Cloned : CCat_Body"));
+		Safe_Release(pInstance);
+	}
+	return pInstance;
 }
 
-void CVampire_Elder_Body::Free()
+void CCat_Body::Free()
 {
-    __super::Free();
+	__super::Free();
 
 	Safe_Release(m_pAnimMachine);
+	Safe_Release(m_pModelCom);
+	Safe_Release(m_pShaderCom);
 }

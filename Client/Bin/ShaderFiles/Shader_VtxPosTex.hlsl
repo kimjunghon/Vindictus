@@ -3,7 +3,7 @@
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float g_fStartX, g_fSizeX, g_fProgressBarRatio;
 float g_Alpha = 1.f;
-
+float3 g_vColor;
 texture2D g_Texture;
 
 struct VS_IN
@@ -67,7 +67,7 @@ PS_OUT PS_MAIN(PS_DEFAULT_IN In)
 // Default Pass End ------------------------------------------------------------------------------------------------
 
 // Blend Pass Start ------------------------------------------------------------------------------------------------
-PS_OUT PS_BLEND(PS_DEFAULT_IN In)
+PS_OUT PS_ALPHABLEND(PS_DEFAULT_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
@@ -202,6 +202,24 @@ PS_OUT PS_BLENDBAR(PS_DEFAULT_IN In)
     return Out;
 }
 
+PS_OUT PS_BLEND(PS_DEFAULT_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = g_Texture.Sample(PointSampler, In.vTexcoord);
+    
+    return Out;
+}
+
+PS_OUT PS_COLOR(PS_DEFAULT_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = float4(g_vColor, 1.f);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass
@@ -223,7 +241,7 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_BLEND();
+        PixelShader = compile ps_5_0 PS_ALPHABLEND();
     }
 
     pass ProgressBarPass
@@ -268,5 +286,27 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BLENDBAR();
+    }
+
+    pass BlendPass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_BLEND();
+    }
+
+    pass ColorPass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_COLOR();
     }
 }

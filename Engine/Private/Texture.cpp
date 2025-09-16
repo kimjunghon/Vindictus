@@ -64,6 +64,28 @@ HRESULT CTexture::Bind_Shader_Texture(CShader* pShader, const _char* pConstantNa
 	return pShader->Bind_SPV(pConstantName, m_SPVs[iTextureIndex]);
 }
 
+HRESULT CTexture::Copy_Resource(_uint iTextureIndex, ID3D11Texture2D* pSourTexture)
+{
+	if (iTextureIndex >= m_iNumTextures)
+		return E_FAIL;
+	ID3D11Resource* pDestResource = {};
+	
+	m_SPVs[iTextureIndex]->GetResource(&pDestResource);
+
+	D3D11_TEXTURE2D_DESC srcDesc;
+	((ID3D11Texture2D*)pDestResource)->GetDesc(&srcDesc);
+
+	printf("Src: %dx%d Format=%d Mip=%d Array=%d Usage=%d Bind=0x%X Sample=%d\n",
+		srcDesc.Width, srcDesc.Height, srcDesc.Format, srcDesc.MipLevels, srcDesc.ArraySize,
+		srcDesc.Usage, srcDesc.BindFlags, srcDesc.SampleDesc.Count);
+
+	m_pDeviceContext->CopyResource(pSourTexture, pDestResource);
+
+	Safe_Release(pDestResource);
+
+	return S_OK;
+}
+
 CTexture* CTexture::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const _tchar* pTextureFilePath, _uint iNumTextures)
 {
 	CTexture* pInstance = new CTexture(pDevice, pDeviceContext);

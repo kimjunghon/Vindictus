@@ -161,6 +161,13 @@
     <ClInclude Include="..\public\BossHP.h" />
     <ClInclude Include="..\public\BossHPBar.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\public\Cat.h" />
+    <ClInclude Include="..\Public\CatAnimMachine.h" />
+    <ClInclude Include="..\public\Cat_Body.h" />
+    <ClInclude Include="..\public\ColorPoint.h" />
+    <ClInclude Include="..\public\Dyeing.h" />
+    <ClInclude Include="..\public\DyeingPalette.h" />
+    <ClInclude Include="..\public\DyeingSlots.h" />
     <ClInclude Include="..\public\Effect.h" />
     <ClInclude Include="..\public\Effect_Billboard.h" />
     <ClInclude Include="..\public\Effect_Prefab.h" />
@@ -198,6 +205,7 @@
     <ClInclude Include="..\public\Level_Town.h" />
     <ClInclude Include="..\public\Map.h" />
     <ClInclude Include="..\public\Monster.h" />
+    <ClInclude Include="..\public\NPCDialog.h" />
     <ClInclude Include="..\public\Puppy.h" />
     <ClInclude Include="..\public\Palette.h" />
     <ClInclude Include="..\public\Pool_Instance.h" />
@@ -316,8 +324,15 @@
     <ClCompile Include="..\private\BossHP.cpp" />
     <ClCompile Include="..\private\BossHPBar.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\private\Cat.cpp" />
+    <ClCompile Include="..\Private\CatAnimMachine.cpp" />
+    <ClCompile Include="..\private\Cat_Body.cpp" />
+    <ClCompile Include="..\private\ColorPoint.cpp" />
     <ClCompile Include="..\private\Controller_Mouse.cpp" />
     <ClCompile Include="..\private\ColliderPawn.cpp" />
+    <ClCompile Include="..\private\Dyeing.cpp" />
+    <ClCompile Include="..\private\DyeingPalette.cpp" />
+    <ClCompile Include="..\private\DyeingSlots.cpp" />
     <ClCompile Include="..\private\Effect.cpp" />
     <ClCompile Include="..\private\Effect_Billboard.cpp" />
     <ClCompile Include="..\private\Effect_Prefab.cpp" />
@@ -352,6 +367,7 @@
     <ClCompile Include="..\private\Level_Town.cpp" />
     <ClCompile Include="..\private\Map.cpp" />
     <ClCompile Include="..\private\Monster.cpp" />
+    <ClCompile Include="..\private\NPCDialog.cpp" />
     <ClCompile Include="..\private\Puppy.cpp" />
     <ClCompile Include="..\private\Palette.cpp" />
     <ClCompile Include="..\private\Pool_Instance.cpp" />

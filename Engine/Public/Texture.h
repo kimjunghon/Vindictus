@@ -16,7 +16,7 @@ public:
 
 public:
 	HRESULT Bind_Shader_Texture(class CShader* pShader, const _char* pConstantName, _uint iTextureIndex);
-
+	HRESULT	Copy_Resource(_uint iTextureIndex, ID3D11Texture2D* pSourTexture);
 private:
 	vector<ID3D11ShaderResourceView*>	m_SPVs;
 	_uint								m_iNumTextures = {};

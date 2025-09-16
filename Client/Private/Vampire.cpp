@@ -147,6 +147,9 @@ void CVampire::Compute_AnimPosition()
 	_matrix PositionMatrix = XMMatrixTranslationFromVector(vAnimPosition);
 
 	m_pTransformCom->MovePositionToMatrix(PositionMatrix, m_pNavigationCom);
+
+	m_pTransformCom->Set_State(STATE::POSITION,
+		m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
 }
 
 void CVampire::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)

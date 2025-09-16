@@ -27,12 +27,11 @@ HRESULT CStorage::Initialize_Prototype()
 	m_iNumSlotsX = g_iInventoryCount / 8;
 	m_iNumSlotsY = g_iInventoryCount / 6;
 
-	m_fSlotStartOffsetX = -107.5f;
-	m_fSlotStartOffsetY = -175.f;
+	m_fSlotStartOffsetX = -122.5f;
+	m_fSlotStartOffsetY = -190.f;
 
 	m_fSlotOffsetX = 43.5f;
 	m_fSlotOffsetY = 48.f;
-
 
 	return S_OK;
 }

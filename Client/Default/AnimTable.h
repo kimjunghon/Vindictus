@@ -305,4 +305,15 @@ namespace Client
 			DIGGING = 1 << 6
 		};
 	}
+
+	namespace Cat
+	{
+		enum class STATE_FLAG {
+			IDLE = 1<<0,
+			GROOMING = 1<<1,
+			LOVELY = 1<<2,
+			SLEEP = 1<<3,
+			REAL_SLEEP = 1<<4
+		};
+	}
 }

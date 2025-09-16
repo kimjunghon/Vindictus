@@ -5,6 +5,7 @@
 #include "Camera_Free.h"
 #include "PlayerPawn.h"
 #include "Puppy.h"
+#include "Cat.h"
 #include "Weapon.h"
 #include "Armor.h"
 #include "Effect.h"
@@ -36,18 +37,6 @@ HRESULT CLevel_Town::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Effect()))
-		return E_FAIL;
-
-
-	CUIObject::UIOBJECT_DESC Children_Desc = {};
-	Children_Desc.fX = g_iWinSizeX >> 1;
-	Children_Desc.fY = g_iWinSizeY >> 1;
-	Children_Desc.fSizeX = 256.f;
-	Children_Desc.fSizeY = 256.f;
-	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FORTH);
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Palette"),
-		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Player"), &Children_Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -191,6 +180,16 @@ HRESULT CLevel_Town::Ready_NPC(const Value& NPC_Data)
 				ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_NPC"), &PuppyDesc)))
 				return E_FAIL;
 		}
+		else if (!strcmp(strName.c_str(), "Cat"))
+		{
+			CCat::CAT_DESC CatDesc = {};
+			CatDesc.iCellIndex = iCellIndex;
+			CatDesc.vPosition = vPosition;
+
+			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Cat"),
+				ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_NPC"), &CatDesc)))
+				return E_FAIL;
+		}
 	}
 
 	return S_OK;
@@ -285,16 +284,24 @@ HRESULT CLevel_Town::Ready_DefaultWeapon()
 	WeaponDesc.strWeaponModelPrototypeTag = TEXT("Prototype_Component_Model_BastardSword");
 	WeaponDesc.pPawnMatrix = nullptr;
 	WeaponDesc.WeaponInfo = { TEXT("BastardSword"), 50.f, 0.f };
+	WeaponDesc.vOffsetPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 	WeaponDesc.vRotationQuaternion = XMQuaternionRotationRollPitchYaw(0.f, 0.f, XMConvertToRadians(90.f));
 	WeaponDesc.eWeaponType = WEAPON_TYPE::SWORD;
+	WeaponDesc.Materials[0] = DYEING_MATERIAL::WEAPON_METAL;
+	WeaponDesc.Materials[1] = DYEING_MATERIAL::WEAPON_METAL;
+	WeaponDesc.Materials[2] = DYEING_MATERIAL::LEATHER;
 
 	CGameObject* pBastardSword = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::WEAPON, pBastardSword);
 
 	WeaponDesc.strWeaponModelPrototypeTag = TEXT("Prototype_Component_Model_RoundShield");
 	WeaponDesc.WeaponInfo = { TEXT("RoundShield"), 0.f, 20.f };
-	WeaponDesc.vRotationQuaternion = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(60.f), XMConvertToRadians(90.f), XMConvertToRadians(180.f));
+	WeaponDesc.vOffsetPosition = XMVectorSet(1.5f, 0.3f, 0.f, 1.f);
+	WeaponDesc.vRotationQuaternion = XMQuaternionRotationRollPitchYaw(XMConvertToRadians(75.f), XMConvertToRadians(90.f), XMConvertToRadians(180.f));
 	WeaponDesc.eWeaponType = WEAPON_TYPE::SHILED;
+	WeaponDesc.Materials[0] = DYEING_MATERIAL::WEAPON_METAL;
+	WeaponDesc.Materials[1] = DYEING_MATERIAL::WEAPON_METAL;
+	WeaponDesc.Materials[2] = DYEING_MATERIAL::WEAPON_METAL;
 
 	CGameObject* pRoundShield = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon"), &WeaponDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::WEAPON, pRoundShield);
@@ -310,6 +317,9 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.eArmorType = ARMOR_TYPE::UPPER;
 	ArmorDesc.pPawnMatrix = nullptr;
 	ArmorDesc.ArmorInfo = { TEXT("LightMale_Upper"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
+	ArmorDesc.Materials[1] = DYEING_MATERIAL::LEATHER;
+	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
 
 	CGameObject* pLightMale_Upper = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Upper);
@@ -318,6 +328,9 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.eArmorType = ARMOR_TYPE::LOWER;
 	ArmorDesc.pPawnMatrix = nullptr;
 	ArmorDesc.ArmorInfo = { TEXT("LightMale_Lower"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
+	ArmorDesc.Materials[1] = DYEING_MATERIAL::LEATHER;
+	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
 
 	CGameObject* pLightMale_Lower = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Lower);
@@ -326,6 +339,9 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.eArmorType = ARMOR_TYPE::HEAD;
 	ArmorDesc.pPawnMatrix = nullptr;
 	ArmorDesc.ArmorInfo = { TEXT("LightMale_Head"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
+	ArmorDesc.Materials[1] = DYEING_MATERIAL::ARMOR_METAL;
+	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
 
 	CGameObject* pLightMale_Head = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Head);
@@ -334,6 +350,9 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.eArmorType = ARMOR_TYPE::HAND;
 	ArmorDesc.pPawnMatrix = nullptr;
 	ArmorDesc.ArmorInfo = { TEXT("LightMale_Hand"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
+	ArmorDesc.Materials[1] = DYEING_MATERIAL::LEATHER;
+	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
 
 	CGameObject* pLightMale_Hand = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Hand);
@@ -342,6 +361,9 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.eArmorType = ARMOR_TYPE::FOOT;
 	ArmorDesc.pPawnMatrix = nullptr;
 	ArmorDesc.ArmorInfo = { TEXT("LightMale_Foot"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
+	ArmorDesc.Materials[1] = DYEING_MATERIAL::LEATHER;
+	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
 
 	CGameObject* pLightMale_Foot = static_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Armor"), &ArmorDesc));
 	m_pPlayerInstance->Add_Item(ITEM_TYPE::ARMOR, pLightMale_Foot);

@@ -17,6 +17,9 @@ public:
 		_uint		iModelLevel;
 		_wstring	strModelTag;
 		_float4x4	WorldMatrix;
+		_bool		IsNormal = {true};
+		_bool		IsSpecular = {true};
+		_bool		IsAmbient = {true};
 	}MAP_OBJECT_DESC;
 
 private:
@@ -36,6 +39,9 @@ private:
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
 
+	_bool			m_IsNormal = { };
+	_bool			m_IsSpecular = { };
+	_bool			m_IsAmbient = { };
 private:
 	HRESULT Ready_Components(_uint iModelLevel, const _wstring& strModelTag);
 	HRESULT Bind_ShaderResources();

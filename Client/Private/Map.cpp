@@ -91,9 +91,18 @@ HRESULT CMap::Ready_MapObjects(string strMapFilePath, LEVEL eLevel)
 		_char szName[MAX_PATH] = {};
 		_float4x4 WorldMatrx = {};
 
+		_bool IsNormal = {};
+		_bool IsSpecular = {};
+		_bool IsAmbient = {};
+
 		File.read(reinterpret_cast<_char*>(&iNameLength), sizeof(size_t));
 		File.read(szName, sizeof(_char) * iNameLength);
 		File.read(reinterpret_cast<_char*>(&WorldMatrx), sizeof(_float4x4));
+
+		File.read(reinterpret_cast<_char*>(&IsNormal), sizeof(_bool));
+		File.read(reinterpret_cast<_char*>(&IsSpecular), sizeof(_bool));
+		File.read(reinterpret_cast<_char*>(&IsAmbient), sizeof(_bool));
+
 
 		_char szPrototype[MAX_PATH] = "Prototype_Component_Model_";
 		_char szPrototypeTag[MAX_PATH] = {};
@@ -108,6 +117,10 @@ HRESULT CMap::Ready_MapObjects(string strMapFilePath, LEVEL eLevel)
 		MapObjectDesc.iModelLevel = ENUM_CLASS(eLevel);
 		MapObjectDesc.strModelTag = szWidePrototypeTag;
 		MapObjectDesc.WorldMatrix = WorldMatrx;
+		MapObjectDesc.IsNormal = IsNormal;
+		MapObjectDesc.IsSpecular = IsSpecular;
+		MapObjectDesc.IsAmbient = IsAmbient;
+
 
 		CMapObject* pMapObject = static_cast<CMapObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_MapObject"), &MapObjectDesc));
 		if (nullptr == pMapObject)

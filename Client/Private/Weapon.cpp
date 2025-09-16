@@ -30,9 +30,14 @@ HRESULT CWeapon::Initialize(void* pArg)
 	m_eWeaponType = pDesc->eWeaponType;
 	m_WeaponInfo = pDesc->WeaponInfo;
 
+	m_DyeingData[0] = DYEING_DATA(pDesc->Materials[0], RandomColor(pDesc->Materials[0]));
+	m_DyeingData[1] = DYEING_DATA(pDesc->Materials[1], RandomColor(pDesc->Materials[1]));
+	m_DyeingData[2] = DYEING_DATA(pDesc->Materials[2], RandomColor(pDesc->Materials[2]));
+
 	if (FAILED(Ready_Components(pDesc->iWeaponModelPrototypeLevelIndex, pDesc->strWeaponModelPrototypeTag)))
 		return E_FAIL;
 
+	m_pTransformCom->Set_State(STATE::POSITION, pDesc->vOffsetPosition);
 	m_pTransformCom->RotateQuaternion(pDesc->vRotationQuaternion);
 
 	XMStoreFloat4x4(&m_CombinedMatrix, XMMatrixIdentity());
@@ -79,7 +84,7 @@ HRESULT CWeapon::Render()
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXMESH::DEFAULT));
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXMESH::COLOR_MASKING));
 
 		m_pModelCom->Render(i);
 
@@ -101,7 +106,13 @@ HRESULT CWeapon::RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXMESH::DEFAULT));
+		_bool hasNormal = {};
+
+		m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0, &hasNormal);
+
+		m_pShaderCom->Bind_RawValue("g_HasNormal", &hasNormal, sizeof(_bool));
+
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXMESH::COLOR_MASKING));
 
 		m_pModelCom->Render(i);
 
@@ -134,6 +145,14 @@ HRESULT CWeapon::UnEquip()
 	return S_OK;
 }
 
+void CWeapon::Dyeing(_uint iMaterialIndex, _float3 vColor)
+{
+	if (iMaterialIndex >= ENUM_CLASS(DYEING_PART::END))
+		return;
+
+	m_DyeingData[iMaterialIndex].second = vColor;
+}
+
 HRESULT CWeapon::Ready_Components(_uint iWeaponModelPrototypeLevelIndex, const _wstring& strWeaponModelPrototypeTag)
 {
 	if (FAILED(__super::Add_Component(iWeaponModelPrototypeLevelIndex, strWeaponModelPrototypeTag,
@@ -158,6 +177,13 @@ HRESULT CWeapon::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_R", &(m_DyeingData[ENUM_CLASS(DYEING_PART::R)].second), sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_G", &(m_DyeingData[ENUM_CLASS(DYEING_PART::G)].second), sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_B", &(m_DyeingData[ENUM_CLASS(DYEING_PART::B)].second), sizeof(_float3))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -172,7 +198,39 @@ HRESULT CWeapon::Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &SlotRenderDesc.ProjMatrix)))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_R", &(m_DyeingData[ENUM_CLASS(DYEING_PART::R)].second), sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_G", &(m_DyeingData[ENUM_CLASS(DYEING_PART::G)].second), sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_B", &(m_DyeingData[ENUM_CLASS(DYEING_PART::B)].second), sizeof(_float3))))
+		return E_FAIL;
+
+
 	return S_OK;
+}
+
+_float3 CWeapon::RandomColor(DYEING_MATERIAL eMaterial)
+{
+	_float3 vColor = {};
+
+	_float fMin = {};
+	_float fMax = 1.f;
+
+	switch (eMaterial)
+	{
+	case DYEING_MATERIAL::WEAPON_METAL:
+		fMin = 0.7f;
+		break;
+	case DYEING_MATERIAL::LEATHER:
+		fMin = 0.4f;
+		break;
+	}
+
+	vColor.x = m_pGameInstance->Rand(fMin, fMax);
+	vColor.y = m_pGameInstance->Rand(fMin, fMax);
+	vColor.z = m_pGameInstance->Rand(fMin, fMax);
+
+	return vColor;
 }
 
 CWeapon* CWeapon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

@@ -38,8 +38,8 @@ HRESULT CEquipment::Initialize_Prototype()
 	m_iNumSlotsX = ENUM_CLASS(EQUIPMENT::END) / 4;
 	m_iNumSlotsY = ENUM_CLASS(EQUIPMENT::END) / 3;
 
-	m_fSlotStartOffsetX = -56.5f;
-	m_fSlotStartOffsetY = -133.f;
+	m_fSlotStartOffsetX = -71.5f;
+	m_fSlotStartOffsetY = -148.f;
 
 	m_fSlotOffsetX = 56.f;
 	m_fSlotOffsetY = 55.f;
@@ -49,7 +49,6 @@ HRESULT CEquipment::Initialize_Prototype()
 
 	if (FAILED(Ready_SlotIndex()))
 		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -249,8 +248,6 @@ HRESULT CEquipment::Ready_Events()
 #pragma endregion
 
 #pragma endregion
-
-
 	return S_OK;
 }
 

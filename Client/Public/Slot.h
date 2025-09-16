@@ -35,6 +35,7 @@ public:
 	void			ClearItem();
 	void			ClearRenderSlot();
 
+
 private:
 	Shared_ITEM			m_pItem = {nullptr};
 

@@ -20,6 +20,9 @@
 
 #include "Puppy.h"
 #include "PuppyBody.h"
+#include "Cat.h"
+#include "Cat_Body.h"
+
 #include "Glasgavelen.h"
 #include "GlasgavelenBody.h"
 #include "GlasgavelenSword.h"
@@ -280,6 +283,12 @@ HRESULT CLoader::Loading_For_Town_Level()
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Npc/Puppy_Armor.dat", PreTransformMatrix))))
 		return E_FAIL;
 
+	/* Prototype_Component_Model_Cat_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_Cat_Body"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Npc/Cat.dat", PreTransformMatrix))))
+		return E_FAIL;
+
+
 	if (FAILED(Loading_For_MapModel(LEVEL::TOWN, "../Bin/Resources/Map/Town.dat")))
 		return E_FAIL;
 
@@ -313,6 +322,16 @@ HRESULT CLoader::Loading_For_Town_Level()
 	/* Prototype_GameObject_Puppy_Body */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Puppy_Body"),
 		CPuppyBody::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Puppy_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Cat"),
+		CCat::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Cat_Body */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Cat_Body"),
+		CCat_Body::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 
@@ -641,6 +660,9 @@ HRESULT CLoader::Loading_For_MapModel(LEVEL eLevel, const _char* pMapFilePath)
 		File.read(reinterpret_cast<_char*>(&iNameLength), sizeof(size_t));
 		File.read(szName, sizeof(_char) * iNameLength);
 		File.seekg(sizeof(_float4x4), ios::cur);
+		File.seekg(sizeof(_bool), ios::cur);
+		File.seekg(sizeof(_bool), ios::cur);
+		File.seekg(sizeof(_bool), ios::cur);
 
 		Names.insert(szName);
 	}

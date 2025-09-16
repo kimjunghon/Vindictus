@@ -661,7 +661,7 @@ HRESULT CPlayerPawn::Ready_Collider()
 	if (FAILED(Ready_Collider_Attack()))
 		return E_FAIL;
 
-	if (FAILED(Add_Collider_Grap()))
+	if (FAILED(Ready_Collider_Interactions()))
 		return E_FAIL;
 
 	m_pColliderContainer->SetEnableAllColliderChannel(true);
@@ -680,7 +680,6 @@ HRESULT CPlayerPawn::Ready_Collider_Bounding()
 	if(FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
 		ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &AABBDesc, nullptr)))
 		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -803,7 +802,7 @@ HRESULT CPlayerPawn::Ready_Collider_Attack()
 	return S_OK;
 }
 
-HRESULT CPlayerPawn::Add_Collider_Grap()
+HRESULT CPlayerPawn::Ready_Collider_Interactions()
 {
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
@@ -820,6 +819,10 @@ HRESULT CPlayerPawn::Add_Collider_Grap()
 
 	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, COLLIDER_STATE::END, [this](const CCollider::COLLISION_DATA& Data) {
 		this->EndCollisionGrap(Data); })))
+		return E_FAIL;
+
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::INTERACTION), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, nullptr)))
 		return E_FAIL;
 
 	return S_OK;

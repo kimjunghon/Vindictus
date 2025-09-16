@@ -110,4 +110,14 @@ namespace Client
 		_float	m_fMaxBossHP;
 		_float* m_pCurrentBossHP;
 	}EVENT_BIND_BOSSHP;
+
+	typedef struct tagEventMouseChange final : public CEvent
+	{
+		_uint iMouseIndex;
+	}EVENT_MOUSE_CHANGE;
+
+	typedef struct tagEventDyeingNPC final : public CEvent
+	{
+		_bool IsNear;
+	}EVENT_DYEING_NPC;
 }

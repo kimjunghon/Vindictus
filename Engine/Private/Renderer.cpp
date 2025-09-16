@@ -35,6 +35,7 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("RT_Specular"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
 		return E_FAIL;
 
+	///MRT_OBJECT///
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Object"), TEXT("RT_Diffuse"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Object"), TEXT("RT_Normal"))))
@@ -42,9 +43,15 @@ HRESULT CRenderer::Initialize()
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Object"), TEXT("RT_Depth"))))
 		return E_FAIL;
 
+	///MRT_LIGHT///
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Light"), TEXT("RT_Shade"))))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Light"), TEXT("RT_Specular"))))
+		return E_FAIL;
+
+
+	///MRT_SHADOW///
+	if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_Shadow"), TEXT("RT_LightDepth"))))
 		return E_FAIL;
 
 	m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext);
@@ -122,6 +129,27 @@ HRESULT CRenderer::Render_Priority()
 	}
 
 	m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_Shadow()
+{
+	if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Shadow"))))
+		return E_FAIL;
+
+	for (auto& Object : m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)])
+	{
+		if (nullptr != Object)
+			Object->Render();
+
+		Safe_Release(Object);
+	}
+
+	m_RenderObjects[ENUM_CLASS(RENDERGROUP::SHADOW)].clear();
+
+	if (FAILED(m_pGameInstance->End_MRT()))
+		return E_FAIL;
 
 	return S_OK;
 }

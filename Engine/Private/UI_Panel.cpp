@@ -76,7 +76,6 @@ HRESULT CUI_Panel::Add_Child(_uint iPrototypeLevelIndex, const _wstring& strProt
        Safe_AddRef(pUIObject);
     }
 
-
     m_Children.push_back(pUIObject);
 
     return S_OK;

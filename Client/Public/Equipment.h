@@ -57,8 +57,6 @@ private:
 	HRESULT Ready_Events();
 	HRESULT Ready_SlotIndex();
 
-
-
 	void	Event_Pick_Equip_Item(const EVENT_PICK_EQUIP_ITEM& Event);
 	void	Event_Change_Weapon(const EVENT_CHANGE_WEAPON& Event);
 	void	Event_Change_Armor(const EVENT_CHANGE_ARMOR& Event);

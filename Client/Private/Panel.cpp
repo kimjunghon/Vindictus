@@ -63,8 +63,13 @@ HRESULT CPanel::Render()
 
 	if (m_IsBlend)
 	{
-		m_pShaderCom->Bind_RawValue("g_Alpha", &m_fAlpha, sizeof(_float));	
-		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::ALPHABLEND));
+		if(m_fAlpha == 1.f)
+			m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::BLEND));
+		else
+		{
+			m_pShaderCom->Bind_RawValue("g_Alpha", &m_fAlpha, sizeof(_float));
+			m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::ALPHABLEND));
+		}
 	}
 	else
 		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::DEFAULT));

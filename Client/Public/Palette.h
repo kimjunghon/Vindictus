@@ -10,6 +10,11 @@ NS_END
 
 NS_BEGIN(Client)
 
+class CWeapon;
+class CArmor;
+class CPlayerInstance;
+class CColorPoint;
+
 class CPalette final : public CUIObject
 {
 private:
@@ -25,26 +30,46 @@ public:
 	virtual void	Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
+public:
+	void			Set_DyeingItem(pair<ITEM_TYPE, _uint>* pItemType);
+	void			Change_DyeingPart(_uint iPartIndex);
+	void			Clear();
+	void			Dyeing();
 private:
-	ID3D11Texture2D*			m_pPaletteSample = { nullptr };
+	CColorPoint*			m_pColorPoint = {nullptr};
+	CColorPoint*			m_pSelectColorPoint = { nullptr };
+	CPlayerInstance*		m_pPlayerInstance = { nullptr };
+	ID3D11Texture2D*		m_pPaletteSample = { nullptr };
 
-	CTexture*					m_pTextureCom = { nullptr };
-	CVIBuffer*					m_pVIBufferCom = { nullptr };
-	CShader*					m_pShaderCom = { nullptr };
+	CTexture*				m_pTextureCom = { nullptr };
+	CVIBuffer*				m_pVIBufferCom = { nullptr };
+	CShader*				m_pShaderCom = { nullptr };
 
-	_uint						m_iDyeMaterial = {};
+	CWeapon*				m_pDyeingWeapon = { nullptr };
+	CArmor*					m_pDyeingArmor = { nullptr };
 
-	_uint						m_iPaletteWidth = {};
-	_uint						m_iPaletteHeight = {};
+	DYEING_DATAS*			m_pDyeingDatas = { nullptr };
+
+	_uint					m_iDyeMaterial = {};
+	_uint					m_iSelectPartIndex = {};
+
+	_float3					m_vDyeColor = {};
+
+	_uint					m_iPaletteWidth = {};
+	_uint					m_iPaletteHeight = {};
+
+	_bool					m_IsMouseOn = {};
+	_uint*					m_pPixels = { nullptr };
 
 private:
 	HRESULT			Ready_Components();
 	HRESULT			Ready_Palette();
+	HRESULT			Ready_ColorPoint();
 	HRESULT			Bind_ShaderResources();
 
-	_float			Noise(_float2 vUV);
-	_float			FBM(_float2 vUV);
-	_float3			HSV_To_RGB(_float3 vHSV);
+	virtual _bool	IsPick(HWND hWnd) override;
+	void			Save_PaletteData();
+	_float3			PaletteColor(_uint iX, _uint iY);
 	
 public:
 	static CPalette*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

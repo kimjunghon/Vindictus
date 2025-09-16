@@ -123,7 +123,7 @@ private:
 	HRESULT			Ready_Collider_Hit();
 	HRESULT			Ready_Collider_Attack();
 
-	HRESULT			Add_Collider_Grap();
+	HRESULT			Ready_Collider_Interactions();
 	HRESULT			Ready_AttackNotify();
 	HRESULT			Ready_TrailNotify();
 

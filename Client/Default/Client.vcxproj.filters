@@ -469,9 +469,6 @@
     <Filter Include="03.GameObject\UIObject\GamePlay\BossHPBar\HPBar">
       <UniqueIdentifier>{57e0bee6-61e5-4e03-a5af-552ed920e0fc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="03.GameObject\UIObject\GamePlay\Palette">
-      <UniqueIdentifier>{7824d1d7-c525-4d3a-8aba-16d526ea9f71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC">
       <UniqueIdentifier>{2685ec04-e720-4401-be43-bae983ee7e05}</UniqueIdentifier>
     </Filter>
@@ -486,6 +483,36 @@
     </Filter>
     <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC\Puppy\Ai">
       <UniqueIdentifier>{e25e2035-699b-4a5c-bb8e-a9f71527715d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Dyeing">
+      <UniqueIdentifier>{ce2902a6-3c3b-4688-93ae-cdb215e6e212}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\Static\Text">
+      <UniqueIdentifier>{30afdba3-bffd-4196-92ed-df90e22f594e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Dyeing\Dyeing">
+      <UniqueIdentifier>{9e3a6b12-bcb0-4796-8f8e-df8d07e02581}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingSlot">
+      <UniqueIdentifier>{f7a51220-0e15-490c-9b3a-456264e78b93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel">
+      <UniqueIdentifier>{c1e8c03d-0285-4a22-b038-7f6201e5be70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel\Palette">
+      <UniqueIdentifier>{7824d1d7-c525-4d3a-8aba-16d526ea9f71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel\Palette\ColorPoint">
+      <UniqueIdentifier>{594ead25-9e96-45a0-aad6-ab00f1c01450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC\Cat">
+      <UniqueIdentifier>{67ec735b-876f-440c-b292-4b16d91b683c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\ColliderPawn\NPC\Cat\CatBody">
+      <UniqueIdentifier>{63483857-bedb-4ff3-8b5e-cc0d79ceaa97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\AnimMachine\CatAnimMachine">
+      <UniqueIdentifier>{9f53e4f6-2668-4090-9370-0c6470f89d8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -934,7 +961,7 @@
       <Filter>03.GameObject\UIObject\GamePlay\BossHPBar\HPBar</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Palette.h">
-      <Filter>03.GameObject\UIObject\GamePlay\Palette</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel\Palette</Filter>
     </ClInclude>
     <ClInclude Include="..\public\PuppyAnimMachine.h">
       <Filter>03.GameObject\Pawns\AnimMachine\PuppyAnimMachine</Filter>
@@ -947,6 +974,30 @@
     </ClInclude>
     <ClInclude Include="..\public\PuppyBody.h">
       <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Puppy\PuppyBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Dyeing.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\NPCDialog.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DyeingSlots.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingSlot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\DyeingPalette.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\ColorPoint.h">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel\Palette\ColorPoint</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Cat.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Cat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Cat_Body.h">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Cat\CatBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\CatAnimMachine.h">
+      <Filter>03.GameObject\Pawns\AnimMachine\CatAnimMachine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1381,7 +1432,7 @@
       <Filter>03.GameObject\UIObject\GamePlay\BossHPBar\HPBar</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Palette.cpp">
-      <Filter>03.GameObject\UIObject\GamePlay\Palette</Filter>
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel\Palette</Filter>
     </ClCompile>
     <ClCompile Include="..\private\PuppyAnimMachine.cpp">
       <Filter>03.GameObject\Pawns\AnimMachine\PuppyAnimMachine</Filter>
@@ -1394,6 +1445,30 @@
     </ClCompile>
     <ClCompile Include="..\private\PuppyBody.cpp">
       <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Puppy\PuppyBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Dyeing.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\NPCDialog.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DyeingSlots.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingSlot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DyeingPalette.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\ColorPoint.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\Dyeing\Dyeing\DyeingPanel\Palette\ColorPoint</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Cat.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Cat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Cat_Body.cpp">
+      <Filter>03.GameObject\Pawns\ColliderPawn\NPC\Cat\CatBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\CatAnimMachine.cpp">
+      <Filter>03.GameObject\Pawns\AnimMachine\CatAnimMachine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

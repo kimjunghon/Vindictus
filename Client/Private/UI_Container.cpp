@@ -40,6 +40,9 @@ HRESULT CUI_Container::Initialize(void* pArg)
 	m_pGameInstance->Subscribe<EVENT_UI_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_UI_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
+	m_pGameInstance->Subscribe<EVENT_DYEING_NPC>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_DYEING_NPC& Event) {
+		this->Eveny_DyeingNpc(Event); });
+
 	return S_OK;
 }
 
@@ -116,8 +119,8 @@ HRESULT CUI_Container::Ready_Mouse_UI()
 	Mouse_Desc.fY = g_iWinSizeY >> 1;
 	Mouse_Desc.fSizeX = 30.f;
 	Mouse_Desc.fSizeY = 30.f;
-	Mouse_Desc.fOffsetX = 10.f;
-	Mouse_Desc.fOffsetY = 10.f;
+	Mouse_Desc.fOffsetX = 15.f;
+	Mouse_Desc.fOffsetY = 15.f;
 	Mouse_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
 	Mouse_Desc.StateDesc.iUIState = &m_iUIState;
 
@@ -193,6 +196,12 @@ HRESULT CUI_Container::Ready_GamePlay_UI()
 	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_BossHP"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
 		return E_FAIL;
 
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_NPC_Dialog"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
+		return E_FAIL;
+
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Dyeing"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -243,6 +252,14 @@ void CUI_Container::Event_LevelChange(const EVENT_UI_LEVEL_CHANGE& Event)
 
 		m_iUIState = ENUM_CLASS(STATE_FLAG::LOADING) | iLoadingFlag;
 	}
+}
+
+void CUI_Container::Eveny_DyeingNpc(const EVENT_DYEING_NPC& Event)
+{
+	if (Event.IsNear)
+		m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::NPC_DIALOG);
+	else
+		m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
 }
 
 CUI_Container* CUI_Container::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

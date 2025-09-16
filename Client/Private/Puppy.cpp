@@ -163,6 +163,9 @@ void CPuppy::Compute_WorldMatrix()
 	_matrix PositionMatrix = XMMatrixTranslationFromVector(vAnimPosition);
 
 	m_pTransformCom->MovePositionToMatrix(PositionMatrix, m_pNavigationCom);
+
+	m_pTransformCom->Set_State(STATE::POSITION,
+		m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
 }
 
 CPuppy* CPuppy::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

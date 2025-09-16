@@ -37,6 +37,10 @@ HRESULT CArmor::Initialize(void* pArg)
 	m_ArmorInfo = pDesc->ArmorInfo;
 	m_ArmorInfo.fHealth = 10.f;
 
+	m_DyeingData[0] = DYEING_DATA(pDesc->Materials[0], RandomColor(pDesc->Materials[0]));
+	m_DyeingData[1] = DYEING_DATA(pDesc->Materials[1], RandomColor(pDesc->Materials[1]));
+	m_DyeingData[2] = DYEING_DATA(pDesc->Materials[2], RandomColor(pDesc->Materials[2]));
+
 	if (FAILED(Ready_Components(pDesc->iArmorModelPrototypeLevelIndex, pDesc->strArmorModelPrototypeTag)))
 		return E_FAIL;
 
@@ -90,7 +94,7 @@ HRESULT CArmor::Render()
 		if (FAILED(m_pModelCom[ENUM_CLASS(m_eArmorState)]->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i, m_ParentBones[ENUM_CLASS(m_eArmorState)])))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::DEFAULT));
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::COLOR_MASKING));
 
 		m_pModelCom[ENUM_CLASS(m_eArmorState)]->Render(i);
 	}
@@ -110,10 +114,16 @@ HRESULT CArmor::RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 		if (FAILED(m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
 
+		_bool hasNormal = {};
+
+		m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Bind_Shader_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0, &hasNormal);
+
+		m_pShaderCom->Bind_RawValue("g_HasNormal", &hasNormal, sizeof(_bool));
+
 		if (FAILED(m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Bind_PoseBoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::DEFAULT));
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::COLOR_MASKING));
 
 		m_pModelCom[ENUM_CLASS(ARMOR_STATE::DEFAULT)]->Render(i);
 
@@ -187,6 +197,14 @@ void CArmor::Reset()
 	}
 }
 
+void CArmor::Dyeing(_uint iMaterialIndex, _float3 vColor)
+{
+	if (iMaterialIndex >= ENUM_CLASS(DYEING_PART::END))
+		return;
+
+	m_DyeingData[iMaterialIndex].second = vColor;
+}
+
 HRESULT CArmor::Ready_Components(_uint iArmorNodelPrototypeLevelIndex, const _wstring& strArmorModelPrototypeTag)
 {
 	if(FAILED(CGameObject::Add_Component(iArmorNodelPrototypeLevelIndex, strArmorModelPrototypeTag,
@@ -220,6 +238,13 @@ HRESULT CArmor::Bind_ShaderResources()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_R", &(m_DyeingData[ENUM_CLASS(DYEING_PART::R)].second), sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_G", &(m_DyeingData[ENUM_CLASS(DYEING_PART::G)].second), sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_B", &(m_DyeingData[ENUM_CLASS(DYEING_PART::B)].second), sizeof(_float3))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -232,6 +257,13 @@ HRESULT CArmor::Bind_ShaderResources_RenderSlot(SLOT_RENDER_DESC SlotRenderDesc)
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &SlotRenderDesc.ProjMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_R", &(m_DyeingData[ENUM_CLASS(DYEING_PART::R)].second), sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_G", &(m_DyeingData[ENUM_CLASS(DYEING_PART::G)].second), sizeof(_float3))))
+		return E_FAIL;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vColor_B", &(m_DyeingData[ENUM_CLASS(DYEING_PART::B)].second), sizeof(_float3))))
 		return E_FAIL;
 
 	return S_OK;
@@ -317,6 +349,33 @@ _matrix CArmor::Compute_OffsetMatrix()
 	_matrix OffsetMatrix = XMMatrixTranslation(fCenterX * -1.f, fCenterZ , fCenterY * -1.f);
 
 	return OffsetMatrix;
+}
+
+_float3 CArmor::RandomColor(DYEING_MATERIAL eMaterial)
+{
+	_float3 vColor = {};
+
+	_float fMin = {};
+	_float fMax = 1.f;
+
+	switch (eMaterial)
+	{
+	case DYEING_MATERIAL::ARMOR_METAL:
+		fMin = 0.7f;
+		break;
+	case DYEING_MATERIAL::LEATHER:
+		fMin = 0.4f;
+		break;
+	case DYEING_MATERIAL::CLOTH:
+		fMin = 0.f;
+		break;
+	}
+
+	vColor.x = m_pGameInstance->Rand(fMin, fMax);
+	vColor.y = m_pGameInstance->Rand(fMin, fMax);
+	vColor.z = m_pGameInstance->Rand(fMin, fMax);
+
+	return vColor;
 }
 
 CArmor* CArmor::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

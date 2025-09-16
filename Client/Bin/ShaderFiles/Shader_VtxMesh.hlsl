@@ -5,6 +5,12 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_DiffuseTexture;
 texture2D g_NormalTexture;
 
+float3 g_vColor_R;
+float3 g_vColor_G;
+float3 g_vColor_B;
+
+bool g_IsNormal;
+
 bool g_HasNormal = false;
 
 struct VS_IN
@@ -20,6 +26,8 @@ struct VS_OUT
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
+    float3 vTangent : TANGENT;
+    float3 vBinormal : BINORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vProjPos : TEXCOORD1;
 };
@@ -35,6 +43,8 @@ VS_OUT VS_MAIN(VS_IN In)
        
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
     Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
+    Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix));
+    Out.vBinormal = normalize(mul(float4(In.vBinormal, 0.f), g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vProjPos = Out.vPosition;
     
@@ -46,6 +56,8 @@ struct PS_IN
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
+    float3 vTangent : TANGENT;
+    float3 vBinormal : BINORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vProjPos : TEXCOORD1;
 };
@@ -63,16 +75,98 @@ PS_OUT PS_MAIN(PS_IN In)
     
     vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    if (vDiffuse.a < 0.3f)
+    if (vDiffuse.a < 0.1f)
         discard;
     
     Out.vDiffuse = vDiffuse;
-    Out.vNormal = vector((In.vNormal.xyz * 0.5f) + 0.5f, 0.f);
+   
+    float3 vNormal;
+    if (g_HasNormal)
+    {
+        vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
+        vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    
+        float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
+        vNormal = mul(vNormal, WorldMatrix);
+    }
+    else
+        vNormal = In.vNormal.xyz;
+    
+    Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+    
     Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
 
     return Out;
 }
 
+PS_OUT PS_COLOR_MASKING(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    vector vDiffuseR = vDiffuse.r;
+    vector vDiffuseG = vDiffuse.g;
+    vector vDiffuseB = vDiffuse.b;
+    
+    vDiffuse = float4((vDiffuseR * g_vColor_R) + (vDiffuseG * g_vColor_G) + (vDiffuseB * g_vColor_B), 1.f);
+    
+    Out.vDiffuse = vDiffuse;
+    
+    float3 vNormal;
+    if (g_HasNormal)
+    {
+        vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
+        vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    
+        float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
+        vNormal = mul(vNormal, WorldMatrix);
+    }
+    else
+        vNormal = In.vNormal.xyz;
+    
+    Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+    
+    Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
+    
+    return Out;
+}
+
+PS_OUT PS_MAP_OBJECT(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+        
+    vector vDiffuse = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+        
+    if (vDiffuse.a < 0.1f)
+        discard;
+    
+    Out.vDiffuse = vDiffuse;
+    
+    float3 vNormal;
+    
+    if (g_IsNormal)
+    {
+        if(g_HasNormal)
+        {    
+            vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
+            vNormal = vNormalDesc.xyz * 2.f - 1.f;
+        
+            float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
+            vNormal = mul(vNormal, WorldMatrix);
+        }
+        else
+            vNormal = In.vNormal.xyz;
+        
+        Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+    }
+    else
+        Out.vNormal = 0.1f;
+    
+    Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
+    
+    return Out;
+}
 technique11 DefaultTechnique
 {
     pass DefaultPass
@@ -95,5 +189,27 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass ColorMaskingPass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_COLOR_MASKING();
+    }
+
+    pass MapObjectPass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAP_OBJECT();
     }
 }

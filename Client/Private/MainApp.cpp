@@ -32,6 +32,11 @@
 #include "BossHPBar.h"
 #include "BossHP.h"
 #include "Palette.h"
+#include "NPCDialog.h"
+#include "Dyeing.h"
+#include "DyeingSlots.h"
+#include "DyeingPalette.h"
+#include "ColorPoint.h"
 
 //Controller
 #include "Controller_KeyBoard.h"
@@ -226,7 +231,7 @@ HRESULT CMainApp::Ready_DefaultColliderChannel()
 	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_CHANNEL::BODY), COLLIDER_TYPE::BLOCK);
 	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_CHANNEL::HIT), COLLIDER_TYPE::OVERLAP);
 	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), ENUM_CLASS(COLLIDER_CHANNEL::GRAP), COLLIDER_TYPE::OVERLAP);
-	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::BODY), ENUM_CLASS(COLLIDER_CHANNEL::INTERACTION), COLLIDER_TYPE::OVERLAP);
+	m_pGameInstance->Add_Channel(ENUM_CLASS(COLLIDER_CHANNEL::INTERACTION), ENUM_CLASS(COLLIDER_CHANNEL::INTERACTION), COLLIDER_TYPE::OVERLAP);
 
 	return S_OK;
 }
@@ -269,7 +274,6 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Palette"),
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../../Client/Bin/ShaderFiles/Shader_Palette.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 		return E_FAIL;
-
 
 	/* Prototype_Component_Collider_AABB */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
@@ -467,6 +471,30 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/BossHP_Back.png"), 1))))
 		return E_FAIL;
 
+	/* Prototype_Component_Texture_GamePlay_Text_Dialog */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Text_Dialog"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/TextDialog.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_Dialog_Button */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_Dialog_Button"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/DialogButton.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_DyeingPalette */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_DyeingPalette"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/DyeingPalette%d.png"), 4))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_DyeingBack */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_DyeingBack"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/DyeingBack.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_DyeingColorBack */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_DyeingColorBack"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/DyeingColorBack.png"), 1))))
+		return E_FAIL;
 
 #pragma endregion
 
@@ -581,6 +609,32 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Palette"),
 		CPalette::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
+
+	/* Prototype_UIObject_NPC_Dialog */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_NPC_Dialog"),
+		CNPCDialog::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_NPC_Dialog */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Dyeing"),
+		CDyeing::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_DyeingSlots */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_DyeingSlots"),
+		CDyeingSlots::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_DyeingPalette */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_DyeingPalette"),
+		CDyeingPalette::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_UIObject_ColorPoint */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_ColorPoint"),
+		CColorPoint::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 
 #pragma endregion
 

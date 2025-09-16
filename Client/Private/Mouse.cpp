@@ -33,6 +33,12 @@ HRESULT CMouse::Initialize(void* pArg)
 	UI_MOUSE_DESC* pDesc = static_cast<UI_MOUSE_DESC*>(pArg);
 	m_pUIState = pDesc->StateDesc.iUIState;
 	
+	m_fSmallSizeX = 3.f;
+	m_fSmallSizeY = 3.f;
+	m_fDefaultSizeX = m_fSizeX;
+	m_fDefaultSizeY = m_fSizeY;
+
+
 	if (FAILED(Ready_Components()))
 		return E_FAIL;
 
@@ -51,26 +57,30 @@ HRESULT CMouse::Initialize(void* pArg)
 	m_pGameInstance->Subscribe<EVENT_UNEQUIP_EQUIPMENT>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_UNEQUIP_EQUIPMENT& Event) {
 		this->Event_UnEquipEquipment(Event); });
 
+	m_pGameInstance->Subscribe<EVENT_MOUSE_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_MOUSE_CHANGE& Event) {
+		this->Event_ChangeMouse(Event); });
+
 
 	return S_OK;
 }
 
 void CMouse::Priority_Update(_float fTimeDelta)
 {
-	if (*m_pUIState & ~ENUM_CLASS(STATE_FLAG::GAMEPLAY))
+	POINT	ptMouse = {};
+	GetCursorPos(&ptMouse);
+	ScreenToClient(g_hWnd, &ptMouse);
+
+	_float fMouseX = (_float)(ptMouse.x);
+	_float fMouseY = (_float)(ptMouse.y);
+
+	if(m_iMouseIndex == 1)
 	{
-		POINT	ptMouse = {};
-		GetCursorPos(&ptMouse);
-		ScreenToClient(g_hWnd, &ptMouse);
-
-		_float fMouseX = (_float)(ptMouse.x);
-		_float fMouseY = (_float)(ptMouse.y);
-
-		Set_Position(fMouseX, fMouseY);
-
-		POINT ptUIMouse = POINT{ static_cast<LONG>(m_fX), static_cast<LONG>(m_fY) };
-		m_pGameInstance->Set_MousePoint(ptUIMouse);
+		fMouseX -= m_fOffsetX;
+		fMouseY -= m_fOffsetY;
 	}
+
+	Set_Position(fMouseX, fMouseY);
+	m_pGameInstance->Set_MousePoint(ptMouse);
 }
 
 void CMouse::Update(_float fTimeDelta)
@@ -103,10 +113,10 @@ HRESULT CMouse::Render()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
-	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", 0)))
+	if (FAILED(m_pTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_Texture", m_iMouseIndex)))
 		return E_FAIL;
 
-	m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::DEFAULT));
+	m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXPOSTEX::BLEND));
 
 	m_pVIBufferCom->Bind_Resources();
 
@@ -351,6 +361,22 @@ void CMouse::Event_EquipStorage(const EVENT_EQUIP_STORAGE& Event)
 void CMouse::Event_UnEquipEquipment(const EVENT_UNEQUIP_EQUIPMENT& Event)
 {
 	UnEquip_Item(Event.eItemType, Event.eWeaponType, Event.eArmorType);
+}
+
+void CMouse::Event_ChangeMouse(const EVENT_MOUSE_CHANGE& Event)
+{
+	m_iMouseIndex = Event.iMouseIndex;
+
+	if (m_iMouseIndex == 1)
+	{
+		m_fSizeX = m_fSmallSizeX;
+		m_fSizeY = m_fSmallSizeY;
+	}
+	else
+	{
+		m_fSizeX = m_fDefaultSizeX;
+		m_fSizeY = m_fDefaultSizeY;
+	}
 }
 
 CMouse* CMouse::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

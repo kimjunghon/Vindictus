@@ -44,6 +44,16 @@ public:
 
 private:
 	CPlayerInstance*	m_pPlayerInstance = { nullptr };
+
+	_float				m_fSmallSizeX = {};
+	_float				m_fSmallSizeY = {};
+	_float				m_fDefaultSizeX = {};
+	_float				m_fDefaultSizeY = {};
+
+
+
+	_uint				m_iMouseIndex = {};
+
 	Shared_ITEM			m_pItem = {};
 	_int				m_iItemIndex = { -1};
 	_uint*				m_pUIState = { nullptr };
@@ -70,7 +80,7 @@ private:
 	void			Event_PickStorage(const EVENT_PICK_STORAGE& Event);
 	void			Event_EquipStorage(const EVENT_EQUIP_STORAGE& Event);
 	void			Event_UnEquipEquipment(const EVENT_UNEQUIP_EQUIPMENT& Event);
-
+	void			Event_ChangeMouse(const EVENT_MOUSE_CHANGE& Event);
 public:
 	static CMouse*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

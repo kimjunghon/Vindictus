@@ -25,6 +25,7 @@ HRESULT COptionMain::Initialize(void* pArg)
 
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
+
 	Ready_Children();
 
 	return S_OK;

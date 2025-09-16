@@ -65,6 +65,12 @@ HRESULT CPlayerBody::Render()
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
 
+		_bool hasNormal = {};
+
+		m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0, &hasNormal);
+
+		m_pShaderCom->Bind_RawValue("g_HasNormal", &hasNormal, sizeof(_bool));
+
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 

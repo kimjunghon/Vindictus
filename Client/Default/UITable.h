@@ -23,6 +23,8 @@ namespace Client
 			CONTROLLER =	1 << 5,
 			MOUSE =			1 << 6,
 			INVENTORY =		1 << 7,
+			NPC_DIALOG = 1 << 8,
+			DYEING = 1 << 9
 		};
 	}
 

@@ -27,6 +27,9 @@ HRESULT CMapObject::Initialize(void* pArg)
 	MAP_OBJECT_DESC* pDesc = static_cast<MAP_OBJECT_DESC*>(pArg);
 
 	m_pTransformCom->Set_WorldMatrix(pDesc->WorldMatrix);
+	m_IsNormal = pDesc->IsNormal;
+	m_IsSpecular = pDesc->IsSpecular;
+	m_IsAmbient = pDesc->IsAmbient;
 
 	if (FAILED(Ready_Components(pDesc->iModelLevel, pDesc->strModelTag)))
 		return E_FAIL;
@@ -46,7 +49,6 @@ void CMapObject::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
-
 }
 
 HRESULT CMapObject::Render()
@@ -60,14 +62,13 @@ HRESULT CMapObject::Render()
 	{
 		m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
 		
-		//_bool hasNormal = { false };
-		//
-		//m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0, &hasNormal);
-		//
-		//if (hasNormal)
-		//	m_pShaderCom->Bind_RawValue("g_HasNormal", &hasNormal, sizeof(_bool));
+		_bool hasNormal = {};
 
-		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXMESH::DEFAULT));
+		m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0, &hasNormal);
+		
+		m_pShaderCom->Bind_RawValue("g_HasNormal", &hasNormal, sizeof(_bool));
+
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXMESH::MAP_OBJECT));
 
 		m_pModelCom->Render(i);
 
@@ -98,6 +99,9 @@ HRESULT CMapObject::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_IsNormal", &m_IsNormal, sizeof(_bool))))
 		return E_FAIL;
 
 	return S_OK;

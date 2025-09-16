@@ -24,7 +24,7 @@ HRESULT CSlot::Initialize(void* pArg)
 		return E_FAIL;
 
 	_matrix ScalingMatrix = XMMatrixScaling(2.5f, 2.5f, 0.1f);	
-	_matrix TransformMatrix = XMMatrixTranslation(m_fX - (m_iWinSizeX * 0.5f) + 10.f, -m_fY + (m_iWinSizeY * 0.5f) + 5.f, (UI_FAR / (_float)m_iDepth));
+	_matrix TransformMatrix = XMMatrixTranslation(m_fX - (m_iWinSizeX * 0.5f) + 17.f, -m_fY + (m_iWinSizeY * 0.5f) - 10.f, (UI_FAR / (_float)m_iDepth));
 	_matrix WorldMatrix = ScalingMatrix * TransformMatrix;
 
 	XMStoreFloat4x4(&m_SlotRenderDesc.WorldMatrix, WorldMatrix);

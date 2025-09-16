@@ -28,6 +28,7 @@ public:
 		_wstring			strArmorModelPrototypeTag;
 		ARMOR_TYPE			eArmorType;
 		ARMOR_INFO			ArmorInfo;
+		DYEING_MATERIAL		Materials[ENUM_CLASS(DYEING_PART::END)];
 	}ARMOR_DESC;
 	
 private:
@@ -53,6 +54,9 @@ public:
 	_bool					IsBroekn() { return m_ArmorInfo.fHealth <= 0.f; }
 	void					DecreaseDurability(_float fDecreaseAmount);
 	void					Reset();
+
+	DYEING_DATAS*			Get_DyeingDatas() { return &m_DyeingData; }
+	void					Dyeing(_uint iMaterialIndex, _float3 vColor);
 private:
 	CPlayerInstance*		m_pPlayerInstance = { nullptr };
 	_bool					m_IsEquip = { false };
@@ -60,6 +64,7 @@ private:
 	ARMOR_STATE				m_eArmorState = { ARMOR_STATE::DEFAULT };
 	ARMOR_INFO				m_ArmorInfo = {};
 
+	DYEING_DATAS			m_DyeingData = {};
 	CModel*					m_pModelCom[ENUM_CLASS(ARMOR_STATE::END)] = { nullptr };
 	CShader*				m_pShaderCom = { nullptr };
 
@@ -72,6 +77,7 @@ private:
 	HRESULT					Bind_ParentBones(CModel* pParentModelCom);
 
 	_matrix					Compute_OffsetMatrix();
+	_float3					RandomColor(DYEING_MATERIAL eMaterial);
 
 public:
 	static CArmor*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

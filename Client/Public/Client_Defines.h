@@ -23,6 +23,8 @@ namespace Client
 	using Shared_ITEM = shared_ptr<ITEM>;
 
 	typedef unordered_map<_uint, vector<ATTACK_MAP>> ATTACK_MAPPING;
+	typedef pair<DYEING_MATERIAL, _float3>	DYEING_DATA;
+	typedef DYEING_DATA						DYEING_DATAS[3];
 }
 
 extern HWND g_hWnd;
