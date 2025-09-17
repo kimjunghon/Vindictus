@@ -1,7 +1,6 @@
 #include "Engine_Shader_Defines.hlsli"
 
 float4x4    g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-float       g_fShadowLightFar;
 
 texture2D g_DiffuseTexture;
 texture2D g_NormalTexture;
@@ -194,10 +193,10 @@ struct PS_OUT_SHADOW
 PS_OUT_SHADOW PS_SHADOW(PS_IN_SHADOW In)
 {
     PS_OUT_SHADOW Out = (PS_OUT_SHADOW) 0;
-
-    Out.vLightDepth = float4(In.vProjPos.z, 0.f, 0.f, 0.f);
     
- //   Out.vLightDepth = float4(In.vProjPos.w / g_fShadowLightFar, 0.f, 0.f, 0.f);
+//    Out.vLightDepth = float4(In.vProjPos.z, 0.f, 0.f, 0.f);
+    
+    Out.vLightDepth = float4(In.vProjPos.w / 2000.f, 0.f, 0.f, 0.f);
     
     return Out;
 }

@@ -21,6 +21,9 @@ protected:
 	virtual ~CCamera() = default;
 
 public:
+	_float			Get_Near() { return m_fNear; }
+	_float			Get_Far() { return m_fFar; }
+public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
 	virtual void	Priority_Update(_float fTimeDelta) override;

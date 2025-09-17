@@ -72,9 +72,11 @@ HRESULT CLevel_Town::Ready_Light()
 		return E_FAIL;
 
 	SHADOW_LIGHT_DESC	ShadowLightDesc = {};
-	ShadowLightDesc.eType = SHADOW_LIGHT_DESC::DIRECTIONAL;
-	ShadowLightDesc.vDirection = _float4(0.f, -1.f, 1.f, 0.f);
-	ShadowLightDesc.fDistance = 1000.f;
+	ShadowLightDesc.vDirection = _float4(0.2f, -1.f, 0.2f, 0.f);
+	ShadowLightDesc.fDistance = 1200.f;
+	ShadowLightDesc.fFov = XMConvertToRadians(120.f);
+	ShadowLightDesc.fFar = 1000.f;
+	ShadowLightDesc.fNear = 0.1f;
 
 	if (FAILED(m_pGameInstance->Update_ShadowLight(ShadowLightDesc)))
 		return E_FAIL;

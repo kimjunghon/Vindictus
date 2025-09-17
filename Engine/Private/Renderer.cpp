@@ -243,9 +243,6 @@ HRESULT CRenderer::Render_Combined()
 	if (FAILED(m_pShader->Bind_Matrix("g_ShadowLightProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
-	if (FAILED(m_pShader->Bind_RawValue("g_fShadowLightFar", m_pGameInstance->Get_ShadowLight_Far(), sizeof(_float))))
-		return E_FAIL;
-
 	if (FAILED(m_pGameInstance->Bind_Shader_RenderTarget(TEXT("RT_Diffuse"), m_pShader, "g_DiffuseTexture")))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Bind_Shader_RenderTarget(TEXT("RT_Shade"), m_pShader, "g_ShadeTexture")))

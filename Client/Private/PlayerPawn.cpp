@@ -144,6 +144,8 @@ void CPlayerPawn::Late_Update(_float fTimeDelta)
 	Update_HitColliderEnable();
 
 	m_pColliderContainer->Update(this, m_pTransformCom->Get_WorldMatrix());
+
+	m_pGameInstance->Update_ShadowLight(m_pTransformCom->Get_State(STATE::POSITION));
 }
 
 HRESULT CPlayerPawn::Render()

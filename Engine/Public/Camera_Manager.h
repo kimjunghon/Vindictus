@@ -22,6 +22,9 @@ public:
 	class CCamera*	Find_Camera(const _wstring& strCameraTag);
 	void			Clear();
 
+	_float			Get_CurrentCamera_Near();
+	_float			Get_CurrentCamera_Far();
+
 private:
 	class CGameInstance*	m_pGameInstance = { nullptr };
 	CAMERAS					m_Cameras;

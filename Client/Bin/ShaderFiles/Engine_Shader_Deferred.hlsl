@@ -153,18 +153,18 @@ PS_OUT_BACKBUFFER PS_COMBINED(PS_IN In)
     
     float2 vTexcoord;
     
-    vTexcoord.x = (vPosition.x) * 0.5f + 0.5f;
-    vTexcoord.y = (vPosition.y) * -0.5f + 0.5f;
+ //   vTexcoord.x = (vPosition.x) * 0.5f + 0.5f;
+ //   vTexcoord.y = (vPosition.y) * -0.5f + 0.5f;
     
- //   vTexcoord.x = (vPosition.x / vPosition.w) * 0.5f + 0.5f;
- //   vTexcoord.y = (vPosition.y / vPosition.w) * -0.5f + 0.5f;
+    vTexcoord.x = (vPosition.x / vPosition.w) * 0.5f + 0.5f;
+    vTexcoord.y = (vPosition.y / vPosition.w) * -0.5f + 0.5f;
     
     vector vLightDepth = g_LightDepthTexture.Sample(DefaultSampler, vTexcoord);
-    float fViewZ = vLightDepth.x;// * g_fShadowLightFar;
+    float fViewZ = vLightDepth.x * 1000.f;// * g_fShadowLightFar;
     
-    float fDistance = vPosition.z - fViewZ;
+    float fDistance = vPosition.w - fViewZ;
     
-    if(fDistance > 0.007f)
+    if(fDistance > 0.2f)
         Out.vColor = Out.vColor * 0.3f;
 
 //    if (vPosition.z - 0.0001f > fViewZ)

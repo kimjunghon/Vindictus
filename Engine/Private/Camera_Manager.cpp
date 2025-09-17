@@ -80,6 +80,22 @@ void CCamera_Manager::Clear()
 	m_pCurrentCamera = nullptr;
 }
 
+_float CCamera_Manager::Get_CurrentCamera_Near()
+{
+	if (nullptr == m_pCurrentCamera)
+		return 0.f;
+
+	return m_pCurrentCamera->Get_Near();
+}
+
+_float CCamera_Manager::Get_CurrentCamera_Far()
+{
+	if (nullptr == m_pCurrentCamera)
+		return 0.f;
+
+	return m_pCurrentCamera->Get_Far();
+}
+
 CCamera_Manager* CCamera_Manager::Create()
 {
 	return new CCamera_Manager();

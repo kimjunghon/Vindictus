@@ -120,7 +120,6 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
     m_pCamera_Manager->Update(fTimeDelta);
     m_pPipeLine->Update();
     m_pFrustum->Update();
-    m_pShadow->Update();
 
     m_pObject_Manager->Update(fTimeDelta);
     m_pObject_Manager->Late_Update(fTimeDelta);
@@ -396,6 +395,14 @@ HRESULT CGameInstance::Change_Camera(CCamera* pNewCamera)
 {
     return m_pCamera_Manager->Change_Camera(pNewCamera);
 }
+_float CGameInstance::Get_CurrentCamera_Near()
+{
+    return m_pCamera_Manager->Get_CurrentCamera_Near();
+}
+_float CGameInstance::Get_CurrentCamera_Far()
+{
+    return m_pCamera_Manager->Get_CurrentCamera_Far();
+}
 #pragma endregion
 
 #pragma region PIPELINE
@@ -506,14 +513,35 @@ const _float4x4* CGameInstance::Get_ShadowLight_Transform_Float4x4(D3DTS eTransf
 {
     return m_pShadow->Get_Transform_Float4x4(eTransformState);
 }
-const _float* CGameInstance::Get_ShadowLight_Far() const
-{
-    return m_pShadow->Get_ShadowLight_Far();
-}
+
 HRESULT CGameInstance::Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowLightDesc)
 {
     return m_pShadow->Update_ShadowLight(ShadowLightDesc);
 }
+void CGameInstance::Update_ShadowLight(_fvector vTargetPosition)
+{
+    m_pShadow->Update(vTargetPosition);
+}
+//const _float* CGameInstance::Get_ShadowLight_Far() const
+//{
+//    return m_pShadow->Get_ShadowLight_Far();
+//}
+//const _float4x4* CGameInstance::Get_Shadow_ViewMatrix() const
+//{
+//    return m_pShadow->Get_Shadow_ViewMatrix();
+//}
+//HRESULT CGameInstance::Bind_Shadow_ProjMatrix(CShader* pShader, const _char* pMatrixConstantName, const _char* pIndexConstantName, _fvector vWorldPosition)
+//{
+//    return m_pShadow->Bind_Shadow_ProjMatrix(pShader, pMatrixConstantName, pIndexConstantName, vWorldPosition);
+//}
+//HRESULT CGameInstance::Bind_Shadow_ProjMatrices(CShader* pShader, const _char* pConstantName)
+//{
+//    return m_pShadow->Bind_Shadow_ProjMatrices(pShader, pConstantName);
+//}
+//HRESULT CGameInstance::Bind_SplitDistance(CShader* pShader, const _char* pConstantName)
+//{
+//    return m_pShadow->Bind_SplitDistance(pShader, pConstantName);
+//}
 #pragma endregion
 
 #pragma region FRUSTUM

@@ -130,6 +130,8 @@ public:
 	HRESULT Add_CameraToManager(_uint iPrototypeIndex, const _wstring& strPrototypeTag, const _wstring& strCameraTag, class CCamera** ppOut = nullptr, void* pArg = nullptr);
 	HRESULT Change_Camera(const _wstring& strCameraTag, void* pArg = nullptr);
 	HRESULT Change_Camera(class CCamera* pNewCamera);
+	_float	Get_CurrentCamera_Near();
+	_float	Get_CurrentCamera_Far();
 #pragma endregion
 
 #pragma region PIPELINE
@@ -175,9 +177,15 @@ public:
 #pragma endregion
 
 #pragma region SHADOW
-	const _float4x4*	Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const;
-	const _float*		Get_ShadowLight_Far() const;
+	const _float4x4*	Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const;	
 	HRESULT				Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowLightDesc);
+	void				Update_ShadowLight(_fvector vTargetPosition);
+
+	//const _float*		Get_ShadowLight_Far() const;
+	//const _float4x4*	Get_Shadow_ViewMatrix() const;
+	//HRESULT				Bind_Shadow_ProjMatrix(CShader* pShader, const _char* pMatrixConstantName, const _char* pIndexConstantName, _fvector vWorldPosition);
+	//HRESULT				Bind_Shadow_ProjMatrices(CShader* pShader, const _char* pConstantName);
+	//HRESULT				Bind_SplitDistance(CShader* pShader, const _char* pConstantName);
 #pragma endregion
 
 #pragma region FRUSTUM
