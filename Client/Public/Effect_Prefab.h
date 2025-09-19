@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 class CEffect_Prefab final : public CEffect
 {
 private:
-	typedef struct tagEffectEvent {
+	typedef struct tagEffectPrefab {
 		_wstring		strEffectName;
 		_float			fSpawnTime;
 		_matrix			OffsetMatrix;

@@ -4,6 +4,7 @@
 #include "Navigation.h"
 #include "Body.h"
 #include "MonsterStateFactory.h"
+#include "Effect.h"
 
 CVampire::CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -161,6 +162,8 @@ void CVampire::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)
 
 	if (m_iHitAttackID == AttackData->iAttackID)
 		return;
+
+	SpawnHitEffect(CollisionData, AttackData->HitEffect);
 
 	m_iHitAttackID = AttackData->iAttackID;
 	

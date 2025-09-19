@@ -109,6 +109,7 @@ HRESULT CVIBuffer_Trail::Render()
 void CVIBuffer_Trail::Clear()
 {
 	m_Trails.clear();
+	m_iNumCurrentNode = 0;
 }
 
 _bool CVIBuffer_Trail::IsFinished()
@@ -119,7 +120,7 @@ _bool CVIBuffer_Trail::IsFinished()
 
 void CVIBuffer_Trail::Update(_float fTimeDelta)
 {	
-	if (false == m_Trails.empty())
+	if (false == IsFinished())
 	{
 		m_pDeviceContext->Unmap(m_pVB, 0);
 
@@ -144,7 +145,7 @@ void CVIBuffer_Trail::Update(_float fTimeDelta)
 
 void CVIBuffer_Trail::Update_Billboard(_float fTimeDelta)
 {
-	if (false == m_Trails.empty())
+	if (false == IsFinished())
 	{
 		m_pDeviceContext->Unmap(m_pVB, 0);
 

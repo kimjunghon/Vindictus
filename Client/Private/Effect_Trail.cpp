@@ -49,7 +49,7 @@ void CEffect_Trail::Update(_float fTimeDelta)
 
 void CEffect_Trail::Late_Update(_float fTimeDelta)
 {
-	if (false == *m_IsSwing)
+	if(m_IsStop)
 	{
 		if (m_pVIBufferCom->IsFinished())
 		{
@@ -63,9 +63,16 @@ void CEffect_Trail::Late_Update(_float fTimeDelta)
 			else
 				m_pVIBufferCom->Update_Billboard(fTimeDelta);
 
-			m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
+			if(m_IsEmissive)
+				m_pGameInstance->Add_RenderGroup(RENDERGROUP::EMISSIVE, this);
+			else
+				m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
 		}
 		return;
+	}
+	if (false == *m_IsSwing && false == m_IsStop)
+	{
+		m_IsStop = true;
 	}
 
 	if(m_pSocketMatrix)
@@ -98,7 +105,10 @@ void CEffect_Trail::Late_Update(_float fTimeDelta)
 			m_pVIBufferCom->Add_TrailBuffer_Billboard(Trail, fTimeDelta);
 	}
 
-	m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
+	if (m_IsEmissive)
+		m_pGameInstance->Add_RenderGroup(RENDERGROUP::EMISSIVE, this);
+	else
+		m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
 }
 
 HRESULT CEffect_Trail::Render()
@@ -106,7 +116,11 @@ HRESULT CEffect_Trail::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-	m_pShaderCom->Begin(ENUM_CLASS(SHADER_TRAIL::DEFAULT));
+
+	if (m_IsEmissive)
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_TRAIL::EMISSIVE));
+	else
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_TRAIL::DEFAULT));
 
 	m_pVIBufferCom->Bind_Resources();
 
@@ -123,13 +137,14 @@ HRESULT CEffect_Trail::Spawn(void* pArg)
 	m_pSocketMatrix = pDesc->pSocketMatrix;
 	m_pParentMatrix = pDesc->pParentMatrix;
 	m_IsSwing = pDesc->IsSwing;
+	m_IsEmissive = pDesc->IsEmissive;
 
 	m_vLeftPosition = XMLoadFloat3(&pDesc->vLeftPosition);
 	m_vRightPosition = XMLoadFloat3(&pDesc->vRightPosition);
 	m_fLifeTime = pDesc->fLifeTime;
 	m_fNodeUpdateTime = pDesc->fNodeUpdateTime;
 
-	m_pVIBufferCom->Clear();
+//	m_pVIBufferCom->Clear();
 
 	return S_OK;
 }
@@ -141,6 +156,7 @@ void CEffect_Trail::ReturnToPool()
 	m_pSocketMatrix = nullptr;
 	m_pParentMatrix = nullptr;
 	m_IsSwing = nullptr;
+	m_IsStop = false;
 
 	m_vLeftPosition = XMVectorZero();
 	m_vRightPosition = XMVectorZero();

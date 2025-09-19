@@ -29,7 +29,7 @@ public:
 public:
 	HRESULT			Initialize(const BOUNDING_DESC* pDesc);
 	virtual void	Update(_fmatrix WorldMatrix, _bool IsRotate) override;
-	virtual _bool	Intersect(COLLIDER eType, CBounding* pTarget, _float* pDisance = nullptr, _float3* pNormal = nullptr) override;
+	virtual _bool	Intersect(COLLIDER eType, CBounding* pTarget, _float* pDisance = nullptr, _float3* pNormal = nullptr, _float3* pCollisionPos = nullptr) override;
 #ifdef _DEBUG
 public:
 	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor) override;
@@ -40,7 +40,7 @@ private:
 	BoundingOrientedBox* m_pDesc{};
 
 private:
-	_bool Intersect_OBB(const CBoundingOBB* pTarget, _float* pDistance, _float3* pNormal);
+	_bool Intersect_OBB(const CBoundingOBB* pTarget, _float* pDistance, _float3* pNormal, _float3* pCollisionPos);
 	OBBDESC Compute_OBBDesc() const;
 
 public:

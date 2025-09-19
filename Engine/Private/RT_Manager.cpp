@@ -89,6 +89,17 @@ HRESULT CRT_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView
 	return S_OK;
 }
 
+HRESULT CRT_Manager::Clear_RT(const _wstring& strRTTag)
+{
+	CRenderTarget* pRenderTarget = Find_RenderTarget(strRTTag);
+	if (nullptr == pRenderTarget)
+		return E_FAIL;
+
+	pRenderTarget->Clear();
+
+	return S_OK;
+}
+
 HRESULT CRT_Manager::End_MRT()
 {
 	m_pDeviceContext->OMSetRenderTargets(1, &m_pBackBuffer, m_pOriginDSV);

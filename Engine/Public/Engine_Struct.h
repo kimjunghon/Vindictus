@@ -62,7 +62,6 @@ namespace Engine
 	{
 		XMFLOAT4 vDirection;
 		float	 fDistance;
-		float	 fFov;
 		float	 fNear;
 		float	 fFar;
 	}SHADOW_LIGHT_DESC;

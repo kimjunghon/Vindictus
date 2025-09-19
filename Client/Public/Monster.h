@@ -101,6 +101,7 @@ protected:
 
 	void			OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData);
 	virtual void	Update_AttackCoolTime(_float fTimeDelta);
+	void			SpawnHitEffect(const CCollider::COLLISION_DATA& CollisionData, const ATTACK_EFFECT_DATA& EffectData);
 
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;

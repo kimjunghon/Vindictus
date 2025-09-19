@@ -29,7 +29,7 @@ void CBoundingAABB::Update(_fmatrix WorldMatrix, _bool IsRotate)
     m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
 }
 
-_bool CBoundingAABB::Intersect(COLLIDER eType, CBounding* pTarget, _float* pDistance, _float3* pNormal)
+_bool CBoundingAABB::Intersect(COLLIDER eType, CBounding* pTarget, _float* pDistance, _float3* pNormal, _float3* pCollisionPos)
 {
     _bool		isColl = { false };
 

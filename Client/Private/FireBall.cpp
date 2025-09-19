@@ -1,5 +1,6 @@
 #include "ClientPch.h"
 #include "FireBall.h"
+#include "Effect.h"
 
 CFireBall::CFireBall(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CProjectile { pDevice, pDeviceContext }
@@ -48,13 +49,16 @@ void CFireBall::Update(_float fTimeDelta)
 	else
 		m_pTransformCom->Set_WorldMatrix(XMMatrixMultiply(XMLoadFloat4x4(m_pSocektMatrixPtr), XMLoadFloat4x4(m_pOwnerMatrixPtr)));
 
-	_matrix EffectWorldMatrix = m_pTransformCom->Get_WorldMatrix();
-
 	m_fCurrentEffectTime += fTimeDelta;
 
 	if(m_fCurrentEffectTime >= m_fEffectTime)
 	{
-		if (FAILED(m_pPoolInstance->Request_SpawnEffect(TEXT("FireBall"), &EffectWorldMatrix)))
+
+		CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
+		EffectDesc.SpawnWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+		EffectDesc.IsEmissive = true;
+
+		if (FAILED(m_pPoolInstance->Request_SpawnEffect(TEXT("FireBall"), &EffectDesc)))
 			return;
 		m_fCurrentEffectTime = 0.f;
 	}

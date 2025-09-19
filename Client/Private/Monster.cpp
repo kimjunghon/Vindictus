@@ -4,6 +4,7 @@
 #include "BehaviorTree.h"
 #include "MonsterState.h"
 #include "Pool_Instance.h"
+#include "Effect.h"
 
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CColliderPawn{ pDevice, pDeviceContext }
@@ -430,6 +431,22 @@ void CMonster::Update_AttackCoolTime(_float fTimeDelta)
 {
 	for (auto& AttackTime : m_AttackTime)
 		AttackTime += fTimeDelta;
+}
+
+void CMonster::SpawnHitEffect(const CCollider::COLLISION_DATA& CollisionData, const ATTACK_EFFECT_DATA& EffectData)
+{
+	_matrix CombinedMatrix = XMMatrixMultiply(XMLoadFloat4x4(EffectData.pBoneMatrixPtr), XMLoadFloat4x4(EffectData.pWorldMatrixPtr));
+
+	_vector vCollisionPos = XMVectorSetW(XMLoadFloat3(&CollisionData.BlockData.vCollisionPos),1.f);
+
+	CombinedMatrix.r[3] = vCollisionPos;
+
+	CEffect::EFFECT_SPAWN_DESC SpawnDesc = {};
+
+	SpawnDesc.SpawnWorldMatrix = CombinedMatrix;
+	SpawnDesc.IsEmissive = true;
+
+	m_pPool_Instance->Request_SpawnEffect(EffectData.EffectName, &SpawnDesc);
 }
 
 void CMonster::Free()

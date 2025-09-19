@@ -94,6 +94,7 @@ public:
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strRTTag);
 	HRESULT Bind_Shader_RenderTarget(const _wstring& strRTTag, CShader* pShader, const _char* pConstantName);
 	HRESULT Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV = nullptr, _bool IsClear = true);
+	HRESULT Clear_RT(const _wstring& strRTTag);
 	HRESULT End_MRT();
 #ifdef _DEBUG
 	HRESULT Ready_Debug(const _wstring& strRTTag, _float fX, _float fY, _float fSizeX, _float fSizeY);

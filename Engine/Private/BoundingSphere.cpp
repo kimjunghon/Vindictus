@@ -23,7 +23,7 @@ void CBoundingSphere::Update(_fmatrix WorldMatrix, _bool IsRotate)
 	m_pOriginalDesc->Transform(*m_pDesc, WorldMatrix);
 }
 
-_bool CBoundingSphere::Intersect(COLLIDER eType, CBounding* pTarget, _float* fDistance, _float3* pNormal)
+_bool CBoundingSphere::Intersect(COLLIDER eType, CBounding* pTarget, _float* fDistance, _float3* pNormal, _float3* pCollisionPos)
 {
 	_bool isColl = false;
 

@@ -62,6 +62,9 @@ HRESULT CPlayerBody::Render()
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
+		if (false == m_IsHair && i == 5)
+			continue;
+
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
 
@@ -87,25 +90,19 @@ HRESULT CPlayerBody::Render_Shadow()
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pPawnMatrix)))
 		return E_FAIL;
 
-	//if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Shadow_ViewMatrix())))
-	//	return E_FAIL;
-
-	/*if (FAILED(m_pGameInstance->Bind_Shadow_ProjMatrix(m_pShaderCom, "g_ProjMatrix", "g_iShadowMapIndex", m_pTransformCom->Get_State(STATE::POSITION))))
-		return E_FAIL;*/
-
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::VIEW))))
 		return E_FAIL;
 
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
 		return E_FAIL;
 
-	/*if (FAILED(m_pShaderCom->Bind_RawValue("g_fShadowLightFar", m_pGameInstance->Get_ShadowLight_Far(), sizeof(_float))))
-		return E_FAIL;*/
-
 	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+			return E_FAIL;
+
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 

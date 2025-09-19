@@ -13,7 +13,7 @@ NS_BEGIN(Client)
 class CEffect_Trail final : public CEffect
 {
 public:
-	typedef struct tagTrailDesc 
+	typedef struct tagTrailDesc : public EFFECT_SPAWN_DESC
 	{
 		const _float4x4*	pSocketMatrix;
 		const _float4x4*	pParentMatrix;
@@ -61,6 +61,7 @@ private:
 	_vector				m_vRightPosition = {};
 	_float				m_fLifeTime = {};
 	_float3				m_vColor = {};
+	_bool				m_IsStop = {};
 
 private:
 	HRESULT				Ready_Component();

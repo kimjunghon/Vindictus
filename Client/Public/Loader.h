@@ -54,7 +54,7 @@ private:
 	HRESULT Load_Billboard_Effect(const _char* pFilePath, _uint iLevel);
 	HRESULT Load_Effect_Prefab(const _char* pFilePath, _uint iLevel);
 	HRESULT Load_Effect_Trail(const _char* pFilePath, _uint iLevel);
-
+	HRESULT Load_Effect_Distortion(const _char* pFilePath, _uint iLevel);
 
 public:
 	static CLoader* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, LEVEL eNextLevelID);

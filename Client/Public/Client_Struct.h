@@ -49,12 +49,20 @@ namespace Client
 		_float2			vAttackRange;
 	}ATTACK_MAP;
 
+	typedef struct tagAttackEffectData
+	{
+		_wstring			EffectName;
+		const _float4x4* pBoneMatrixPtr;
+		const _float4x4* pWorldMatrixPtr;
+	}ATTACK_EFFECT_DATA;
+
 	typedef struct tagAttackData
 	{
-		size_t		iAttackID;
-		ATTACK_TYPE eAttackType;
-		_float		fDamage;
-		_vector		vAttackPosition;
+		size_t				iAttackID;
+		ATTACK_TYPE			eAttackType;
+		_float				fDamage;
+		_vector				vAttackPosition;
+		ATTACK_EFFECT_DATA  HitEffect;
 	}ATTACK_DATA;
 
 	typedef struct tagGrapData

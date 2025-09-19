@@ -42,10 +42,11 @@ void CEnergyBall::Update(_float fTimeDelta)
 
 	if(m_fCurrentEffectTime >= m_fEffectTime)
 	{
-		_matrix EffectWorldMatrix = {};
-		EffectWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+		CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
+		EffectDesc.SpawnWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+		EffectDesc.IsEmissive = true;
 
-		m_pPoolInstance->Request_SpawnEffect(TEXT("EnergyBall"), &EffectWorldMatrix);
+		m_pPoolInstance->Request_SpawnEffect(TEXT("EnergyBall"), &EffectDesc);
 		m_fCurrentEffectTime = 0.f;
 	}
 
@@ -109,6 +110,7 @@ HRESULT CEnergyBall::Spawn(void* pArg)
 	TrailDesc.vLeftPosition = _float3(0.f, -5.f, 0.f);
 	TrailDesc.vRightPosition = _float3(0.f, 5.f, 0.f);
 	TrailDesc.fNodeUpdateTime = 0.f;
+	TrailDesc.IsEmissive = true;
 
 	m_pPoolInstance->Request_SpawnEffect(TEXT("EnergyTrail"), &TrailDesc);
 

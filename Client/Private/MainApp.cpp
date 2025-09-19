@@ -126,11 +126,14 @@ void CMainApp::Post_Update()
 
 		m_pPool_Instance->ClearLevel();
 		m_pPlayerInstance->Reset();
+		m_pGameInstance->Clear_RT(TEXT("RT_MapLightDepth"));
 
 		EVENT_UI_LEVEL_CHANGE Event_UIChange;
 		Event_UIChange.iChange_Level = m_iChange_Level;
 		Event_UIChange.bIsLoading = m_bIsLoading;
 		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event_UIChange);
+
+
 
 		CLevel* pNextLevel = Create_NewLevel(m_iChange_Level);
 
@@ -273,6 +276,10 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Palette"),
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../../Client/Bin/ShaderFiles/Shader_Palette.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Distortion"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../../Client/Bin/ShaderFiles/Shader_Effect_Distortion.hlsl"), VTXPOINTPARTICLE::Elements, VTXPOINTPARTICLE::iNumElements))))
 		return E_FAIL;
 
 	/* Prototype_Component_Collider_AABB */

@@ -46,7 +46,10 @@ void CEffect_Static::Update(_float fTimeDelta)
 
 void CEffect_Static::Late_Update(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
+	if (m_IsEmissive)
+		m_pGameInstance->Add_RenderGroup(RENDERGROUP::EMISSIVE, this);
+	else
+		m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
 }
 
 HRESULT CEffect_Static::Render()
@@ -68,9 +71,11 @@ HRESULT CEffect_Static::Spawn(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	_matrix* pWorldMatrix = static_cast<_matrix*>(pArg);
+	EFFECT_SPAWN_DESC* pDesc = static_cast<EFFECT_SPAWN_DESC*>(pArg);
 
-	_matrix CurrentWorldMatrix = *pWorldMatrix;
+	_matrix CurrentWorldMatrix = pDesc->SpawnWorldMatrix;
+
+	m_IsEmissive = pDesc->IsEmissive;
 
 	m_pTransformCom->Set_WorldMatrix(CurrentWorldMatrix);
 

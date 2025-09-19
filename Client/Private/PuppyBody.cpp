@@ -99,6 +99,9 @@ HRESULT CPuppyBody::Render_Shadow()
 
 	for (size_t i = 0; i < iNumMeshes; i++)
 	{
+		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+			return E_FAIL;
+
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 

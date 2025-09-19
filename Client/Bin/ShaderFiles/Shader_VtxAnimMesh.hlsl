@@ -5,6 +5,9 @@ float4x4    g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_DiffuseTexture;
 texture2D g_NormalTexture;
 
+vector g_vMatrlAmbient = vector(1.0f, 1.0f, 1.0f, 1.0f);
+vector g_vMatrlSpecular = vector(0.4f, 0.4f, 0.4f, 0.4f);
+
 float3 g_vColor_R;
 float3 g_vColor_G;
 float3 g_vColor_B;
@@ -80,6 +83,8 @@ struct PS_OUT
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
+    float4 vSpecular : SV_TARGET3;
+    float4 vAmbient : SV_TARGET4;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -109,6 +114,8 @@ PS_OUT PS_MAIN(PS_IN In)
     
     Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
     
+    Out.vSpecular = g_vMatrlSpecular;
+    Out.vAmbient = g_vMatrlAmbient;
     return Out;
 }
 
@@ -143,6 +150,9 @@ PS_OUT PS_COLOR_MASKING(PS_IN In)
     
     Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
     
+    Out.vSpecular = g_vMatrlSpecular;
+    Out.vAmbient = g_vMatrlAmbient;
+    
     return Out;
 }
 
@@ -150,7 +160,8 @@ PS_OUT PS_COLOR_MASKING(PS_IN In)
 struct VS_OUT_SHADOW
 {
     float4 vPosition : SV_POSITION;
-    float4 vProjPos : TEXCOORD0;
+    float2 vTexcoord : TEXCOORD0;
+    float4 vProjPos : TEXCOORD1;
 };
 
 
@@ -174,6 +185,7 @@ VS_OUT_SHADOW VS_SHADOW(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(vPosition, matWVP);
+    Out.vTexcoord = In.vTexcoord;
     Out.vProjPos = Out.vPosition;
     
     return Out;
@@ -182,7 +194,8 @@ VS_OUT_SHADOW VS_SHADOW(VS_IN In)
 struct PS_IN_SHADOW
 {
     float4 vPosition : SV_POSITION;
-    float4 vProjPos : TEXCOORD0;
+    float2 vTexcoord : TEXCOORD0;
+    float4 vProjPos : TEXCOORD1;
 };
 
 struct PS_OUT_SHADOW
@@ -194,9 +207,13 @@ PS_OUT_SHADOW PS_SHADOW(PS_IN_SHADOW In)
 {
     PS_OUT_SHADOW Out = (PS_OUT_SHADOW) 0;
     
-//    Out.vLightDepth = float4(In.vProjPos.z, 0.f, 0.f, 0.f);
+    vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    Out.vLightDepth = float4(In.vProjPos.w / 2000.f, 0.f, 0.f, 0.f);
+    if (vDiffuse.a < 0.3f)
+        discard;
+    
+    Out.vLightDepth = float4(In.vProjPos.z, 0.f, 0.f, 0.f);    
+//    Out.vLightDepth = float4(In.vProjPos.w / 2000.f, 0.f, 0.f, 0.f);
     
     return Out;
 }

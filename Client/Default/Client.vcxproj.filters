@@ -514,6 +514,9 @@
     <Filter Include="03.GameObject\Pawns\AnimMachine\CatAnimMachine">
       <UniqueIdentifier>{9f53e4f6-2668-4090-9370-0c6470f89d8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\Effect\Distortion">
+      <UniqueIdentifier>{a6207dc1-884f-4a88-9f6b-1c83c02b4e42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -999,6 +1002,9 @@
     <ClInclude Include="..\Public\CatAnimMachine.h">
       <Filter>03.GameObject\Pawns\AnimMachine\CatAnimMachine</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Effect_Distortion.h">
+      <Filter>03.GameObject\Effect\Distortion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1470,6 +1476,9 @@
     <ClCompile Include="..\Private\CatAnimMachine.cpp">
       <Filter>03.GameObject\Pawns\AnimMachine\CatAnimMachine</Filter>
     </ClCompile>
+    <ClCompile Include="..\private\Effect_Distortion.cpp">
+      <Filter>03.GameObject\Effect\Distortion</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
@@ -1494,6 +1503,9 @@
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Palette.hlsl">
+      <Filter>97.ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Effect_Distortion.hlsl">
       <Filter>97.ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

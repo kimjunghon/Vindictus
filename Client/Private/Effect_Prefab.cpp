@@ -78,10 +78,12 @@ void CEffect_Prefab::Update(_float fTimeDelta)
 
 	while (m_Effects[m_iCurrentEffect].fSpawnTime <= m_fCurrentTime)
 	{
-		_matrix CombinedMatrix = {};
-		CombinedMatrix = XMMatrixMultiply(m_Effects[m_iCurrentEffect].OffsetMatrix, m_pTransformCom->Get_WorldMatrix());
+		EFFECT_SPAWN_DESC EffectDesc = {};
 
-		m_pPool_Instance->Request_SpawnEffect(m_Effects[m_iCurrentEffect].strEffectName, &CombinedMatrix);
+		EffectDesc.SpawnWorldMatrix = XMMatrixMultiply(m_Effects[m_iCurrentEffect].OffsetMatrix, m_pTransformCom->Get_WorldMatrix());
+		EffectDesc.IsEmissive = m_IsEmissive;
+
+		m_pPool_Instance->Request_SpawnEffect(m_Effects[m_iCurrentEffect].strEffectName, &EffectDesc);
 
 		m_iCurrentEffect++;
 
@@ -107,9 +109,11 @@ HRESULT CEffect_Prefab::Spawn(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	_matrix* pWorldMatrix = static_cast<_matrix*>(pArg);
+	EFFECT_SPAWN_DESC* pDesc = static_cast<EFFECT_SPAWN_DESC*>(pArg);
 
-	_matrix CurrentWorldMatrix = *pWorldMatrix;
+	_matrix CurrentWorldMatrix = pDesc->SpawnWorldMatrix;
+
+	m_IsEmissive = pDesc->IsEmissive;
 
 	m_pTransformCom->Set_WorldMatrix(CurrentWorldMatrix);
 

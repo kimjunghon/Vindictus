@@ -38,7 +38,7 @@ public:
 	CModel*				Get_ParentModelPtr() const { return m_pModelCom; }
 	_float				Get_CurrentAnimSpeed() { return m_pModelCom->Get_CurrentAnimSpeed(); }
 	virtual const _matrix Get_BodyCombinedMatrix() const { return XMMatrixIdentity(); }
-
+	const MODEL_BOUNDING& Get_ModelBounding() const { return m_pModelCom->Get_ModelBounding(); }
 public:
 	virtual HRESULT		Initialize_Prototype() override;
 	virtual HRESULT		Initialize(void* pArg) override;

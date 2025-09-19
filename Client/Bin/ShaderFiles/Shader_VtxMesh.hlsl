@@ -5,6 +5,9 @@ float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_DiffuseTexture;
 texture2D g_NormalTexture;
 
+vector g_vMatrlAmbient = vector(1.0f, 1.0f, 1.0f, 1.0f);
+vector g_vMatrlSpecular = vector(0.1f, 0.1f, 0.1f, 0.1f);
+
 float3 g_vColor_R;
 float3 g_vColor_G;
 float3 g_vColor_B;
@@ -67,6 +70,8 @@ struct PS_OUT
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
     float4 vDepth : SV_TARGET2;
+    float4 vSpecular : SV_TARGET3;
+    float4 vAmbient : SV_TARGET4;
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -95,7 +100,10 @@ PS_OUT PS_MAIN(PS_IN In)
     Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
     
     Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
-
+    
+    Out.vSpecular = g_vMatrlSpecular;
+    Out.vAmbient = g_vMatrlAmbient;
+    
     return Out;
 }
 
@@ -129,6 +137,8 @@ PS_OUT PS_COLOR_MASKING(PS_IN In)
     
     Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
     
+    Out.vSpecular = g_vMatrlSpecular;
+    Out.vAmbient = g_vMatrlAmbient;
     return Out;
 }
 
@@ -165,8 +175,63 @@ PS_OUT PS_MAP_OBJECT(PS_IN In)
     
     Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
     
+    Out.vSpecular = g_vMatrlSpecular;
+    Out.vAmbient = g_vMatrlAmbient;
+    
     return Out;
 }
+
+
+struct VS_OUT_SHADOW
+{
+    float4 vPosition : SV_POSITION;
+    float2 vTexcoord : TEXCOORD0;
+    float4 vProjPos : TEXCOORD1;
+};
+
+
+VS_OUT_SHADOW VS_SHADOW(VS_IN In)
+{
+    VS_OUT_SHADOW Out = (VS_OUT_SHADOW) 0;
+   
+    float4x4 matWV, matWVP;
+    
+    matWV = mul(g_WorldMatrix, g_ViewMatrix);
+    matWVP = mul(matWV, g_ProjMatrix);
+       
+    Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
+    Out.vTexcoord = In.vTexcoord;
+    Out.vProjPos = Out.vPosition;
+    
+    return Out;
+}
+
+struct PS_IN_SHADOW
+{
+    float4 vPosition : SV_POSITION;
+    float2 vTexcoord : TEXCOORD0;
+    float4 vProjPos : TEXCOORD1;
+};
+
+struct PS_OUT_SHADOW
+{
+    float4 vLightDepth : SV_TARGET0;
+};
+
+PS_OUT_SHADOW PS_SHADOW(PS_IN_SHADOW In)
+{
+    PS_OUT_SHADOW Out = (PS_OUT_SHADOW) 0;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (vDiffuse.a < 0.3f)
+        discard;
+    
+    Out.vLightDepth = float4(In.vProjPos.z, 0.f, 0.f, 0.f);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass
@@ -211,5 +276,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAP_OBJECT();
+    }
+
+    pass ShadowPass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_SHADOW();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_SHADOW();
     }
 }

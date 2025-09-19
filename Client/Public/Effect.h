@@ -15,6 +15,11 @@ public:
 		_wstring strEffectName;
 	}EFFECT_DESC;
 
+	typedef struct tagEffectSpawnDesc {
+		_bool	IsEmissive = {};
+		_matrix SpawnWorldMatrix;
+	}EFFECT_SPAWN_DESC;
+
 protected:
 	CEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CEffect(const CEffect& Prototype);
@@ -37,6 +42,7 @@ protected:
 	_wstring				m_strEffectName = {};
 	_uint					m_iPassIndex = {};
 	_uint					m_iCurrentLevel = {};
+	_bool					m_IsEmissive = {};
 
 public:
 	virtual CGameObject* Clone(void* pArg) PURE;

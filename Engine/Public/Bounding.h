@@ -19,7 +19,7 @@ protected:
 public:
 	virtual HRESULT Initialize();
 	virtual void	Update(_fmatrix WorldMatrix, _bool IsRotate) {}
-	virtual _bool	Intersect(COLLIDER eType, CBounding* pTarget, _float* pDistance = nullptr, _float3* pNormal = nullptr) PURE;
+	virtual _bool	Intersect(COLLIDER eType, CBounding* pTarget, _float* pDistance = nullptr, _float3* pNormal = nullptr, _float3* pCollisionPos = nullptr) PURE;
 
 #ifdef _DEBUG
 public:

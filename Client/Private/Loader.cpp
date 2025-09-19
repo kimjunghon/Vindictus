@@ -13,6 +13,7 @@
 #include "Effect_Static.h"
 #include "Effect_Billboard.h"
 #include "Effect_Prefab.h"
+#include "Effect_Distortion.h"
 
 #include "FireBall.h"
 #include "EnergyBall.h"
@@ -370,6 +371,10 @@ HRESULT CLoader::Loading_For_Queen_Level()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_Effect_Billboard"),
 		CEffect_Billboard::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_Effect_Distortion"),
+		CEffect_Distortion::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	Loading_For_Effect("../Bin/Resources/EffectData/LoadFile/QueenEffect.json", ENUM_CLASS(LEVEL::QUEEN));
@@ -914,6 +919,9 @@ HRESULT CLoader::Loading_For_Effect(const _char* pFilePath, _uint iLevel)
 			case EFFECT_TYPE::TRAIL:
 				Load_Effect_Trail(strFilePath.c_str(), iLevel);
 				break;
+			case EFFECT_TYPE::DISTORTION:
+				Load_Effect_Distortion(strFilePath.c_str(), iLevel);
+				break;
 			}
 		}
 	}
@@ -1335,6 +1343,180 @@ HRESULT CLoader::Load_Effect_Trail(const _char* pFilePath, _uint iLevel)
 			return E_FAIL;
 
 	}
+	return S_OK;
+}
+
+HRESULT CLoader::Load_Effect_Distortion(const _char* pFilePath, _uint iLevel)
+{
+	ifstream File(pFilePath);
+
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("Effect") && Doc["Effect"].IsObject())
+	{
+		const Value& Effect = Doc["Effect"];
+
+		_tchar EffectName[MAX_PATH] = {};
+
+		if (Effect.HasMember("Name") && Effect["Name"].IsString())
+		{
+			string Name = Effect["Name"].GetString();
+
+			MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), EffectName, static_cast<_int>(Name.size()));
+		}
+
+		string strTexturePath = {};
+		_uint iNumTextures = {};
+
+		if (Effect.HasMember("Texture") && Effect["Texture"].IsString())
+			strTexturePath = Effect["Texture"].GetString();
+
+		if (Effect.HasMember("NumTextures") && Effect["NumTextures"].IsInt())
+			iNumTextures = Effect["NumTextures"].GetInt();
+
+		_wstring TextureTag = TEXT("Prototype_Component_Texture_");
+		_tchar TextureFilePath[MAX_PATH] = {};
+
+		MultiByteToWideChar(CP_UTF8, 0, strTexturePath.c_str(), static_cast<_int>(strTexturePath.size()), TextureFilePath, static_cast<_int>(strTexturePath.size()));
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, TextureTag + EffectName,
+			CTexture::Create(m_pDevice, m_pDeviceContext, TextureFilePath, iNumTextures))))
+			return E_FAIL;
+
+		_bool IsMasking = {};
+
+		if (Effect.HasMember("IsMask") && Effect["IsMask"].IsBool())
+			IsMasking = Effect["IsMask"].GetBool();
+
+		if (IsMasking)
+		{
+			_wstring MaskName = {};
+
+			if (Effect.HasMember("MaskEffectName") && Effect["MaskEffectName"].IsString())
+			{
+				string MaskEffectName = Effect["MaskEffectName"].GetString();
+
+				_tchar MaskEffectNameW[MAX_PATH] = {};
+
+				MultiByteToWideChar(CP_UTF8, 0, &MaskEffectName[0], MaskEffectName.size(), MaskEffectNameW, MaskEffectName.size());
+				MaskName = MaskEffectNameW;
+			}
+
+			string strMaskTexturePath = {};
+
+			if (Effect.HasMember("MaskTexture") && Effect["MaskTexture"].IsString())
+				strMaskTexturePath = Effect["MaskTexture"].GetString();
+
+			_wstring MaskTextureTag = TEXT("Prototype_Component_Mask_Texture_");
+
+			_tchar MaskTextureFilePath[MAX_PATH] = {};
+
+			MultiByteToWideChar(CP_UTF8, 0, strMaskTexturePath.c_str(), strMaskTexturePath.size(), MaskTextureFilePath, strMaskTexturePath.size());
+
+			if (FAILED(m_pGameInstance->Add_Prototype(iLevel, MaskTextureTag + MaskName,
+				CTexture::Create(m_pDevice, m_pDeviceContext, MaskTextureFilePath, 1))))
+				return E_FAIL;
+		}
+
+		CVIBuffer_Point_Instance::POINT_INSTANCE_DESC PointDesc = {};
+
+		if (Effect.HasMember("ColorR") && Effect["ColorR"].IsFloat() &&
+			Effect.HasMember("ColorG") && Effect["ColorG"].IsFloat() &&
+			Effect.HasMember("ColorB") && Effect["ColorB"].IsFloat())
+		{
+			PointDesc.vSourceColor.x = Effect["ColorR"].GetFloat();
+			PointDesc.vSourceColor.y = Effect["ColorG"].GetFloat();
+			PointDesc.vSourceColor.z = Effect["ColorB"].GetFloat();
+		}
+
+		if (Effect.HasMember("NumInstance") && Effect["NumInstance"].IsInt())
+			PointDesc.iNumInstance = Effect["NumInstance"].GetInt();
+
+		if (Effect.HasMember("CenterX") && Effect["CenterX"].IsFloat() &&
+			Effect.HasMember("CenterY") && Effect["CenterY"].IsFloat() &&
+			Effect.HasMember("CenterZ") && Effect["CenterZ"].IsFloat())
+		{
+			PointDesc.vCenter.x = Effect["CenterX"].GetFloat();
+			PointDesc.vCenter.y = Effect["CenterY"].GetFloat();
+			PointDesc.vCenter.z = Effect["CenterZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("RangeX") && Effect["RangeX"].IsFloat() &&
+			Effect.HasMember("RangeY") && Effect["RangeY"].IsFloat() &&
+			Effect.HasMember("RangeZ") && Effect["RangeZ"].IsFloat())
+		{
+			PointDesc.vRange.x = Effect["RangeX"].GetFloat();
+			PointDesc.vRange.y = Effect["RangeY"].GetFloat();
+			PointDesc.vRange.z = Effect["RangeZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("SizeX") && Effect["SizeX"].IsFloat() &&
+			Effect.HasMember("SizeY") && Effect["SizeY"].IsFloat())
+		{
+			PointDesc.vSize.x = Effect["SizeX"].GetFloat();
+			PointDesc.vSize.y = Effect["SizeY"].GetFloat();
+		}
+
+		if (Effect.HasMember("PivotX") && Effect["PivotX"].IsFloat() &&
+			Effect.HasMember("PivotY") && Effect["PivotY"].IsFloat() &&
+			Effect.HasMember("PivotZ") && Effect["PivotZ"].IsFloat())
+		{
+			PointDesc.vPivot.x = Effect["PivotX"].GetFloat();
+			PointDesc.vPivot.y = Effect["PivotY"].GetFloat();
+			PointDesc.vPivot.z = Effect["PivotZ"].GetFloat();
+		}
+
+		if (Effect.HasMember("SpeedX") && Effect["SpeedX"].IsFloat() &&
+			Effect.HasMember("SpeedY") && Effect["SpeedY"].IsFloat())
+		{
+			PointDesc.vSpeed.x = Effect["SpeedX"].GetFloat();
+			PointDesc.vSpeed.y = Effect["SpeedY"].GetFloat();
+		}
+
+		if (Effect.HasMember("LifeTimeX") && Effect["LifeTimeX"].IsFloat() &&
+			Effect.HasMember("LifeTimeY") && Effect["LifeTimeY"].IsFloat())
+		{
+			PointDesc.vLifeTime.x = Effect["LifeTimeX"].GetFloat();
+			PointDesc.vLifeTime.y = Effect["LifeTimeY"].GetFloat();
+		}
+
+		if (Effect.HasMember("Loop") && Effect["Loop"].IsBool())
+			PointDesc.IsLoop = Effect["Loop"].GetBool();
+
+
+		if (Effect.HasMember("Circle") && Effect["Circle"].IsBool())
+			PointDesc.IsCircle = Effect["Circle"].GetBool();
+
+		if (Effect.HasMember("AngleX") && Effect["AngleX"].IsFloat() &&
+			Effect.HasMember("AngleY") && Effect["AngleY"].IsFloat())
+		{
+			PointDesc.vAngle.x = Effect["AngleX"].GetFloat();
+			PointDesc.vAngle.y = Effect["AngleY"].GetFloat();
+		}
+
+
+		_wstring VIBufferTag = TEXT("Prototype_Component_EffectBuffer_");
+
+		if (FAILED(m_pGameInstance->Add_Prototype(iLevel, VIBufferTag + EffectName,
+			CVIBuffer_Point_Instance::Create(m_pDevice, m_pDeviceContext, &PointDesc))))
+			return E_FAIL;
+	}
+
 	return S_OK;
 }
 

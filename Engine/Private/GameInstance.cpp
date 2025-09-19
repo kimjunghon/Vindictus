@@ -97,7 +97,7 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pCollider_Manager)
         return E_FAIL;
 
-    m_pShadow = CShadow::Create();
+    m_pShadow = CShadow::Create(static_cast<_float>(EngineDesc.iWinSizeX), static_cast<_float>(EngineDesc.iWinSizeY));
     if (nullptr == m_pShadow)
         return E_FAIL;
 
@@ -326,6 +326,10 @@ HRESULT CGameInstance::Bind_Shader_RenderTarget(const _wstring& strRTTag, CShade
 HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool IsClear)
 {
     return m_pRT_Manager->Begin_MRT(strMRTTag, pDSV, IsClear);
+}
+HRESULT CGameInstance::Clear_RT(const _wstring& strRTTag)
+{
+    return m_pRT_Manager->Clear_RT(strRTTag);
 }
 HRESULT CGameInstance::End_MRT()
 {

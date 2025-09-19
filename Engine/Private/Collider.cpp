@@ -105,12 +105,12 @@ void CCollider::EraseCollisionCollider(CCollider* pCollider)
 		m_CollisionColliders.erase(iter);
 }
 
-_bool CCollider::Intersect(CCollider* pOtherCollider, _float* pDistance, _float3* pNormal)
+_bool CCollider::Intersect(CCollider* pOtherCollider, _float* pDistance, _float3* pNormal, _float3* pCollisionPos)
 {
 #ifdef _DEBUG
-	return m_IsColl = m_pBounding->Intersect(pOtherCollider->m_eType, pOtherCollider->m_pBounding, pDistance, pNormal);
+	return m_IsColl = m_pBounding->Intersect(pOtherCollider->m_eType, pOtherCollider->m_pBounding, pDistance, pNormal, pCollisionPos);
 #else
-	return m_pBounding->Intersect(pOtherCollider->m_eType, pOtherCollider->m_pBounding, pDistance, pNormal);
+	return m_pBounding->Intersect(pOtherCollider->m_eType, pOtherCollider->m_pBounding, pDistance, pNormal, pCollisionPos);
 #endif
 }
 
@@ -135,16 +135,19 @@ void CCollider::Check_Collision(COLLISION_DATA& Data)
 
 	_float  fDistance = {};
 	_float3 vNormal = {};
+	_float3 vCollisionPos = {};
 
-	if (Intersect(Data.pCollider, &fDistance, &vNormal))
+	if (Intersect(Data.pCollider, &fDistance, &vNormal, &vCollisionPos))
 	{
 		Data.BlockData.fDistance = fDistance;
 		Data.BlockData.vNormal = vNormal;
-
+		Data.BlockData.vCollisionPos = vCollisionPos;
+		 
 		if (false == IsColliding(Data.pCollider))
 		{
 			m_CollisionColliders.insert(Data.pCollider);
 			OnCollision(COLLIDER_STATE::BEGIN, Data);
+			
 		}
 		else
 			OnCollision(COLLIDER_STATE::DURING, Data);

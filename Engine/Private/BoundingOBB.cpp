@@ -36,7 +36,7 @@ void CBoundingOBB::Update(_fmatrix WorldMatrix, _bool IsRotate)
 	m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
 }
 
-_bool CBoundingOBB::Intersect(COLLIDER eType, CBounding* pTarget, _float* pDisance, _float3* pNormal)
+_bool CBoundingOBB::Intersect(COLLIDER eType, CBounding* pTarget, _float* pDisance, _float3* pNormal, _float3* pCollisionPos)
 {
 	_bool		isColl = { false };
 
@@ -46,13 +46,12 @@ _bool CBoundingOBB::Intersect(COLLIDER eType, CBounding* pTarget, _float* pDisan
 		isColl = m_pDesc->Intersects(*static_cast<CBoundingAABB*>(pTarget)->Get_Desc());
 		break;
 	case COLLIDER::OBB:
-		isColl = Intersect_OBB(static_cast<CBoundingOBB*>(pTarget), pDisance, pNormal);
+		isColl = Intersect_OBB(static_cast<CBoundingOBB*>(pTarget), pDisance, pNormal, pCollisionPos);
 		break;
 	case COLLIDER::SPHERE:
 		isColl = m_pDesc->Intersects(*static_cast<CBoundingSphere*>(pTarget)->Get_Desc());
 		break;
 	}
-
 	return isColl;
 }
 
@@ -67,7 +66,7 @@ HRESULT CBoundingOBB::Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvect
 
 #endif
 
-_bool CBoundingOBB::Intersect_OBB(const CBoundingOBB* pTarget, _float* pDisance, _float3* pNormal)
+_bool CBoundingOBB::Intersect_OBB(const CBoundingOBB* pTarget, _float* pDisance, _float3* pNormal, _float3* pCollisionPos)
 {
 	OBBDESC			OBBDesc[2];
 
@@ -178,6 +177,12 @@ _bool CBoundingOBB::Intersect_OBB(const CBoundingOBB* pTarget, _float* pDisance,
 		XMStoreFloat3(pNormal, XMLoadFloat3(pNormal) * -1.f);
 
 	*pDisance = fMinDistance;
+
+	_vector vCenter = XMVectorScale(XMVectorAdd(XMLoadFloat3(&m_pDesc->Center), XMLoadFloat3(&pTarget->m_pDesc->Center)), 0.5f);
+	_vector vDistance = XMVectorScale(XMLoadFloat3(pNormal), fMinDistance * 0.5f);
+	_vector vPosition = XMVectorAdd(vCenter, vDistance);
+
+	XMStoreFloat3(pCollisionPos, vPosition);
 
 	return true;
 }

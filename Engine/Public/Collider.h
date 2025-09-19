@@ -26,6 +26,7 @@ public:
 	{
 		_float fDistance = 0.f;
 		_float3 vNormal = _float3(0.f, 0.f, 0.f);
+		_float3 vCollisionPos = _float3(0.f, 0.f, 0.f);
 	}BLOCK_COLLISION_DATA;
 
 	typedef struct tagCollisionData
@@ -84,7 +85,7 @@ private:
 #endif
 
 private:
-	_bool			Intersect(CCollider* pOtherCollider, _float* pDistance = nullptr, _float3* pNormal = nullptr);
+	_bool			Intersect(CCollider* pOtherCollider, _float* pDistance = nullptr, _float3* pNormal = nullptr, _float3* pCollisionPos = nullptr);
 	void			OnCollision(COLLIDER_STATE eState, const COLLISION_DATA& Data);
 	_bool			IsColliding(CCollider* pCollider);
 	void			EraseCollisionCollider(CCollider* pCollider);

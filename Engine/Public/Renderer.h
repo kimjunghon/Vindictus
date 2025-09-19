@@ -38,11 +38,16 @@ private:
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_Shadow();
+	HRESULT Render_MapShadow();
 	HRESULT Render_NonBlend();
 	HRESULT Render_Light();
 	HRESULT Render_Combined();
 	HRESULT Render_NonLight();
+	HRESULT Render_Emissive();
+	HRESULT Render_DistortionObject();
+	HRESULT Render_Blur();
 	HRESULT Render_Blend();
+	HRESULT Render_Distortion();
 	HRESULT Render_UI();
 
 private:

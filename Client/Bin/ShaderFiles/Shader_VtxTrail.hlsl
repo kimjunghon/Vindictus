@@ -50,6 +50,11 @@ struct PS_OUT
     
 };
 
+struct PS_EMISSIVE_OUT
+{
+    float4 vEmissiveColor : SV_TARGET0;
+    float4 vBackBufferColor : SV_TARGET1;
+};
 
 PS_OUT PS_MAIN(PS_IN In)
 {
@@ -73,6 +78,42 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
+
+PS_EMISSIVE_OUT PS_EMISSIVE(PS_IN In)
+{
+    PS_EMISSIVE_OUT Out = (PS_EMISSIVE_OUT) 0;
+    
+    vector vMask = g_Texture.Sample(PointSampler, In.vTexcoord);
+    
+    vector vSourColor = float4(g_vSourceColor, 1.f) * vMask;
+    
+    vector vFinalColor = vSourColor * vMask;
+    
+    vFinalColor.a = 1.f * vMask.x;
+    
+    float fDecreaseAlpha = (In.vLifeTime.x / In.vLifeTime.y);
+    
+    vFinalColor.a -= fDecreaseAlpha;
+    
+    if (vFinalColor.a <= 0.f)
+        discard;
+    
+    Out.vBackBufferColor = vFinalColor;
+    
+    float fLuminance = Luminance(vFinalColor.rgb);
+    
+    vector vEmissiveColor = 0.f;
+    
+    if(fLuminance > 0.4)
+    {
+      vEmissiveColor = vector(vFinalColor.rgb * 3.f, vFinalColor.a);
+    }
+
+    Out.vEmissiveColor = vEmissiveColor;
+  
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     pass DefaultPass
@@ -85,5 +126,17 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
+
+    pass EmissivePass
+    {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_EMISSIVE();
+    }
+
 
 }

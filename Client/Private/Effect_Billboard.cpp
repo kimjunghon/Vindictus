@@ -46,7 +46,10 @@ void CEffect_Billboard::Update(_float fTimeDelta)
 
 void CEffect_Billboard::Late_Update(_float fTimeDelta)
 {
-	m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
+	if(m_IsEmissive)
+		m_pGameInstance->Add_RenderGroup(RENDERGROUP::EMISSIVE, this);
+	else
+		m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
 }
 
 HRESULT CEffect_Billboard::Render()
@@ -69,11 +72,15 @@ HRESULT CEffect_Billboard::Spawn(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
+	EFFECT_SPAWN_DESC* pDesc = static_cast<EFFECT_SPAWN_DESC*>(pArg);
+
 	_matrix* pWorldMatrix = static_cast<_matrix*>(pArg);
 
-	_matrix CurrentWorldMatrix = *pWorldMatrix;
+	_matrix CurrentWorldMatrix = pDesc->SpawnWorldMatrix;
 
 	m_pTransformCom->Set_WorldMatrix(CurrentWorldMatrix);
+
+	m_IsEmissive = pDesc->IsEmissive;
 
 	m_IsActive = true;
 
@@ -119,6 +126,9 @@ HRESULT CEffect_Billboard::Bind_ShaderResources()
 		return E_FAIL;
 
 	if (FAILED(m_pVIBufferCom->Bind_Shader_Color(m_pShaderCom, "g_vSourceColor")))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_IsEmissive", &m_IsEmissive, sizeof(_bool))))
 		return E_FAIL;
 
 	return S_OK;

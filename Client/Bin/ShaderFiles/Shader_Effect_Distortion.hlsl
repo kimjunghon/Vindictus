@@ -1,13 +1,10 @@
 #include "Engine_Shader_Defines.hlsli"
 
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-texture2D g_DiffuseTexture;
+texture2D g_MaskTexture;
 texture2D g_DistortionTexture;
 
-float3 g_vSourceColor = float3(1.f, 1.f, 1.f);
-
 vector g_vCamPosition;
-bool g_IsEmissive;
 
 struct VS_IN
 {
@@ -170,53 +167,6 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
     Vertices.RestartStrip();
 }
 
-[maxvertexcount(6)]
-void GS_SPRITE(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
-{
-    GS_OUT Out[4];
-    
-    vector vRight;
-    vector vUp;
-    vector vLook;
-    
-    vLook = g_vCamPosition - In[0].vPosition;
-    vRight = normalize(vector(cross(float3(0.f, 1.f, 0.f), vLook.xyz), 0.f)) * In[0].fSize * 0.5f;
-    vUp = normalize(vector(cross(vLook.xyz, vRight.xyz), 0.f)) * In[0].fSize * 0.5f;
-    
-    matrix matrVP = mul(g_ViewMatrix, g_ProjMatrix);
-        
-    int iCurrentTime = (In[0].vLifeTime.x / In[0].vLifeTime.y) * 25;
-    
-    float fU = (iCurrentTime % 5) * 0.2f;
-    float fV = (iCurrentTime / 5) * 0.2f;
-    
-    Out[0].vPosition = mul(In[0].vPosition + vRight + vUp, matrVP);
-    Out[0].vTexcoord = float2(fU, fV);
-    Out[0].vLifeTime = In[0].vLifeTime;
-    
-    Out[1].vPosition = mul(In[0].vPosition - vRight + vUp, matrVP);
-    Out[1].vTexcoord = float2(fU + 0.2f, fV);
-    Out[1].vLifeTime = In[0].vLifeTime;
-    
-    Out[2].vPosition = mul(In[0].vPosition - vRight - vUp, matrVP);
-    Out[2].vTexcoord = float2(fU + 0.2f, fV + 0.2f);
-    Out[2].vLifeTime = In[0].vLifeTime;
-    
-    Out[3].vPosition = mul(In[0].vPosition + vRight - vUp, matrVP);
-    Out[3].vTexcoord = float2(fU, fV + 0.2f);
-    Out[3].vLifeTime = In[0].vLifeTime;
-    
-    Vertices.Append(Out[0]);
-    Vertices.Append(Out[1]);
-    Vertices.Append(Out[2]);
-    Vertices.RestartStrip();
-    
-    Vertices.Append(Out[0]);
-    Vertices.Append(Out[2]);
-    Vertices.Append(Out[3]);
-    Vertices.RestartStrip();
-}
-
 struct GS_ROTATE_IN
 {
     float4 vPosition : SV_POSITION;
@@ -276,105 +226,41 @@ struct PS_DEFAULT_IN
 
 struct PS_OUT
 {
-    float4 vBackBufferColor : SV_TARGET0;
-    float4 vEmissiveColor : SV_TARGET1;
-};
-
-struct PS_DISTORTION_OUT
-{
     float4 vDistortionColor : SV_TARGET0;
 };
 
 PS_OUT PS_MAIN(PS_DEFAULT_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-
-    vector vMask = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
     
-    vector vSourColor = float4(g_vSourceColor, 1.f) * vMask;
-    
-    vector vFinalColor = vSourColor * vMask;
-    
-    float vDestAlpha = max(max(vMask.r, vMask.g), vMask.b);
-    
-    vFinalColor.a = 1.f * vDestAlpha;
+    vector vDistortion = g_DistortionTexture.Sample(DefaultSampler, In.vTexcoord);
     
     float fDecreaseAlpha = (In.vLifeTime.x / In.vLifeTime.y);
     
-    vFinalColor.a -= fDecreaseAlpha;
+    vDistortion.a -= fDecreaseAlpha;
     
-    if (vFinalColor.a <= 0.f)
+    if (vDistortion.a <= 0.f)
         discard;
     
-    Out.vBackBufferColor = vFinalColor;
-    
-    if(g_IsEmissive)
-    {
-        float fLuminance = Luminance(vFinalColor.rgb);
-    
-        vector vEmissiveColor = 0.f;
-    
-        if (fLuminance > 0.3f)
-        {
-            vEmissiveColor = vector(vFinalColor.rgb * 3.f, vFinalColor.a);
-        }
-
-        Out.vEmissiveColor = vEmissiveColor;
-    }
+    Out.vDistortionColor = vDistortion;
     
     return Out;
 }
 
-PS_OUT PS_RIGHTLOOP(PS_DEFAULT_IN In)
+PS_OUT PS_MASK(PS_DEFAULT_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    vector vMask = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
-    
-    vector vSourColor = float4(g_vSourceColor, 1.f) * vMask;
-    
-    vector vFinalColor = vSourColor * vMask;
-    
-    float vDestAlpha = max(max(vMask.r, vMask.g), vMask.b);
-    
-    vFinalColor.a = 1.f * vDestAlpha;
-    
-    float fDecreaseAlpha = min((In.vLifeTime.x / In.vLifeTime.y), 0.5f);
-    
-    vFinalColor.a -= fDecreaseAlpha;
-    
-    if(vFinalColor.a <= 0.f)
-        discard;
-    
-    Out.vBackBufferColor = vFinalColor;
-    
-    if (g_IsEmissive)
-    {
-        float fLuminance = Luminance(vFinalColor.rgb);
-    
-        vector vEmissiveColor = 0.f;
-    
-        if (fLuminance > 0.4f)
-        {
-            vEmissiveColor = vector(vFinalColor.rgb * 3.f, vFinalColor.a);
-        }
-
-        Out.vEmissiveColor = vEmissiveColor;
-    }
-    
-    return Out;
-}
-PS_DISTORTION_OUT PS_DISTORTION(PS_DEFAULT_IN In)
-{
-    PS_DISTORTION_OUT Out = (PS_DISTORTION_OUT) 0;
-    
-    vector vMask = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord);
     
     vector vDistortion = g_DistortionTexture.Sample(DefaultSampler, In.vTexcoord);
     
     float fDecreaseAlpha = (In.vLifeTime.x / In.vLifeTime.y);
     
     float vFinalAlpha = vMask.a - fDecreaseAlpha;
+    
+    if(vFinalAlpha <= 0.f)
+        discard;
     
     vector vFinal = vDistortion * vFinalAlpha;
 
@@ -389,21 +275,10 @@ technique11 DefaultTechnique
     {
         SetRasterizerState(RS_CULL_NONE);
         SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_MAIN();
-        PixelShader = compile ps_5_0 PS_MAIN();
-    }
-
-    pass SpritePass
-    {
-        SetRasterizerState(RS_CULL_NONE);
-        SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = compile gs_5_0 GS_SPRITE();
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
@@ -411,65 +286,32 @@ technique11 DefaultTechnique
     {
         SetRasterizerState(RS_CULL_NONE);
         SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_ROTATE();
         GeometryShader = compile gs_5_0 GS_ROTATE();
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass LoopPass
-    {
-        SetRasterizerState(RS_CULL_NONE);
-        SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = compile gs_5_0 GS_MAIN();
-        PixelShader = compile ps_5_0 PS_RIGHTLOOP();
-    }
-
-    pass SamllSpritePass
-    {
-        SetRasterizerState(RS_CULL_NONE);
-        SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_SMALL();
-        GeometryShader = compile gs_5_0 GS_SPRITE();
-        PixelShader = compile ps_5_0 PS_MAIN();
-    }
-
-    pass SamllPass
-    {
-        SetRasterizerState(RS_CULL_NONE);
-        SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_SMALL();
-        GeometryShader = compile gs_5_0 GS_MAIN();
-        PixelShader = compile ps_5_0 PS_MAIN();
-    }
-
-    pass SlashPointPass
-    {
-        SetRasterizerState(RS_CULL_NONE);
-        SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_BIG();
-        GeometryShader = compile gs_5_0 GS_ROTATE();
-        PixelShader = compile ps_5_0 PS_MAIN();
-    }
-
-    pass DistortionPass
+    pass DefaultMaskPass
     {
         SetRasterizerState(RS_CULL_NONE);
         SetDepthStencilState(DSS_DEFAULT, 0);
         SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-        VertexShader = compile vs_5_0 VS_BIG();
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_MAIN();
+        PixelShader = compile ps_5_0 PS_MASK();
+    }
+
+    pass RotateMaskPass
+    {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_ROTATE();
         GeometryShader = compile gs_5_0 GS_ROTATE();
-        PixelShader = compile ps_5_0 PS_DISTORTION();
+        PixelShader = compile ps_5_0 PS_MASK();
     }
 }

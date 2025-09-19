@@ -12,6 +12,13 @@ sampler PointSampler = sampler_state
     AddressV = wrap;
 };
 
+sampler ClampSampler = sampler_state
+{
+    filter = min_mag_mip_linear;
+    AddressU = clamp;
+    AddressV = clamp;
+};
+
 RasterizerState RS_DEFAULT
 {
     FillMode = Solid;
@@ -50,6 +57,16 @@ DepthStencilState DSS_ZDISABLE
 BlendState BS_DEFAULT
 {
     BlendEnable[0] = false;
+};
+
+BlendState BS_BLEND
+{
+    BlendEnable[0] = true;
+    BlendEnable[1] = true;
+    
+    SrcBlend = ONE;
+    DestBlend = ONE;
+    BlendOp = Add;
 };
 
 BlendState BS_ALPHABLEND
@@ -100,4 +117,13 @@ float FBM(float2 St)
     
     return v;
 
+}
+
+float Luminance(float3 vColor)
+{
+    float fWeight;
+    
+    fWeight = (vColor.r * 0.216f) + (vColor.g * 0.7152f) + (vColor.b * 0.0722f);
+    
+    return fWeight;
 }

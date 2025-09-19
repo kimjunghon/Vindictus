@@ -99,13 +99,18 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 
 	//TEST
 	m_pPlayerBody->Add_AnimNotify("Smash_04", 40.f, [this]() {
-		_matrix CombinedMatrix = {};
-		CombinedMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Foot")), m_pTransformCom->Get_WorldMatrix());
+		CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
+		EffectDesc.SpawnWorldMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Foot")), m_pTransformCom->Get_WorldMatrix());
+		EffectDesc.IsEmissive = false;
 
-		m_pPool_Instance->Request_SpawnEffect(TEXT("Smash04_Prefab"), &CombinedMatrix);
+		m_pPool_Instance->Request_SpawnEffect(TEXT("Smash04_Prefab"), &EffectDesc);
+
+		m_pPool_Instance->Request_SpawnEffect(TEXT("Blunt_Distortion"), &EffectDesc);
+
 		});
 
 
+	//m_pGameInstance->Update_ShadowLight(m_pTransformCom->Get_State(STATE::POSITION));
 
 	return S_OK;
 }
@@ -145,7 +150,7 @@ void CPlayerPawn::Late_Update(_float fTimeDelta)
 
 	m_pColliderContainer->Update(this, m_pTransformCom->Get_WorldMatrix());
 
-	m_pGameInstance->Update_ShadowLight(m_pTransformCom->Get_State(STATE::POSITION));
+//	m_pGameInstance->Update_ShadowLight(m_pTransformCom->Get_State(STATE::POSITION));
 }
 
 HRESULT CPlayerPawn::Render()
@@ -349,6 +354,26 @@ void CPlayerPawn::OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_D
 		return;
 }
 
+void CPlayerPawn::OnCollisionSwordAttack(const CCollider::COLLISION_DATA& CollisionData)
+{
+	_matrix CombinedMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH")), m_pTransformCom->Get_WorldMatrix());
+
+	_vector vNormal = XMVector3Normalize(XMVectorScale(XMLoadFloat3(&CollisionData.BlockData.vNormal), -1.f));
+
+	_vector vOffset = XMVectorScale(vNormal, CollisionData.BlockData.fDistance);
+	
+	_matrix OffsetMatrix = XMMatrixTranslationFromVector(vOffset);
+
+	CombinedMatrix = XMMatrixMultiply(OffsetMatrix, CombinedMatrix);
+
+	CEffect::EFFECT_SPAWN_DESC SpawnDesc = {};
+
+	SpawnDesc.SpawnWorldMatrix = CombinedMatrix;
+	SpawnDesc.IsEmissive = true;
+
+	m_pPool_Instance->Request_SpawnEffect(TEXT("Sword_Slash"), &SpawnDesc);
+}
+
 void CPlayerPawn::OnCollisionGrap(const CCollider::COLLISION_DATA& CollisionData)
 {
 	if (nullptr == CollisionData.pDesc)
@@ -531,7 +556,7 @@ HRESULT CPlayerPawn::Ready_Camera()
 	CameraDesc.fSpeedPerSec = 0.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 
-	CameraDesc.fDistance = 50.f;
+	CameraDesc.fDistance = 200.f;
 	CameraDesc.fHeight = 30.f;
 	CameraDesc.TargetMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 
@@ -800,7 +825,7 @@ HRESULT CPlayerPawn::Ready_Collider_Attack()
 	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
 		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::PLAYER), &OBBDesc, m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_Calf"))))
 		return E_FAIL;
-	
+
 	return S_OK;
 }
 
@@ -880,7 +905,22 @@ HRESULT CPlayerPawn::Ready_AttackNotify()
 			if (Notify.HasMember("OffTrackPosition") && Notify["OffTrackPosition"].IsFloat())
 				vTrackPositionRange.y = Notify["OffTrackPosition"].GetFloat();
 
-			if (FAILED(Add_AttackCollisionInfo(strAnimName, iColliderIndex, eType, fDamageRatio, vTrackPositionRange)))
+			_tchar strEffectName[MAX_PATH] = {};
+
+			string strBoneName = {};
+
+			if (Notify.HasMember("EffectName") && Notify["EffectName"].IsString())
+			{
+				string Name = Notify["EffectName"].GetString();
+				
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), strEffectName, static_cast<_int>(Name.size()));
+			}
+
+			if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
+				strBoneName = Notify["BoneName"].GetString();
+
+
+			if (FAILED(Add_AttackCollisionInfo(strAnimName, iColliderIndex, eType, fDamageRatio, strEffectName, strBoneName, vTrackPositionRange)))
 				return E_FAIL;
 		}
 	}
@@ -935,9 +975,10 @@ HRESULT CPlayerPawn::Ready_TrailNotify()
 					TrailDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
 					TrailDesc.IsSwing = &m_IsSwing;
 					TrailDesc.vLeftPosition = _float3(0.f, 0.f, 0.f);
-					TrailDesc.vRightPosition = _float3(0.f, 20.f, 0.f);
+					TrailDesc.vRightPosition = _float3(0.f, 25.f, 0.f);
 					TrailDesc.fLifeTime = 0.5f;
 					TrailDesc.fNodeUpdateTime = 0.f;
+					TrailDesc.IsEmissive = true;
 
 					m_pPool_Instance->Request_SpawnEffect(TEXT("SwordTrail"), &TrailDesc);
 
@@ -955,14 +996,18 @@ HRESULT CPlayerPawn::Ready_TrailNotify()
 	return S_OK;
 }
 
-HRESULT CPlayerPawn::Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+HRESULT CPlayerPawn::Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _wstring strEffectName, string strBoneName, _float2 vTrackPosition)
 {
-	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
+	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio, strEffectName, strBoneName]() {
 		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 		m_CurrentAttackData.eAttackType = eType;
 		m_CurrentAttackData.fDamage = m_pStatus->fAttackDamage * fAttackRatio;
 		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+		m_CurrentAttackData.HitEffect.EffectName = strEffectName;
+		m_CurrentAttackData.HitEffect.pBoneMatrixPtr = m_pPlayerBody->SocketCombinedMatrixPtr(strBoneName);
+		m_CurrentAttackData.HitEffect.pWorldMatrixPtr = m_pTransformCom->Get_WorldMatrixPtr();
+
 		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, &m_CurrentAttackData);
 		})))
 		return E_FAIL;

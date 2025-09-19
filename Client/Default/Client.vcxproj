@@ -170,6 +170,7 @@
     <ClInclude Include="..\public\DyeingSlots.h" />
     <ClInclude Include="..\public\Effect.h" />
     <ClInclude Include="..\public\Effect_Billboard.h" />
+    <ClInclude Include="..\public\Effect_Distortion.h" />
     <ClInclude Include="..\public\Effect_Prefab.h" />
     <ClInclude Include="..\Public\Effect_Static.h" />
     <ClInclude Include="..\public\EnergyBall.h" />
@@ -335,6 +336,7 @@
     <ClCompile Include="..\private\DyeingSlots.cpp" />
     <ClCompile Include="..\private\Effect.cpp" />
     <ClCompile Include="..\private\Effect_Billboard.cpp" />
+    <ClCompile Include="..\private\Effect_Distortion.cpp" />
     <ClCompile Include="..\private\Effect_Prefab.cpp" />
     <ClCompile Include="..\Private\Effect_Static.cpp" />
     <ClCompile Include="..\private\EnergyBall.cpp" />
@@ -481,6 +483,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_Effect_Distortion.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Palette.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl" />

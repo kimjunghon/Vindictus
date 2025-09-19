@@ -41,6 +41,14 @@ CShadow::CShadow()
 //    return S_OK;
 //}
 
+HRESULT CShadow::Initialize(_float fViewportWidth, _float fViewportHeight)
+{
+    m_fWidth = fViewportWidth * 2.f;
+    m_fHeight = fViewportHeight * 2.f;
+
+    return S_OK;
+}
+
 HRESULT CShadow::Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowLightDesc)
 {
     m_ShadowLightDesc = ShadowLightDesc;
@@ -55,37 +63,38 @@ void CShadow::Update(_fvector vTargetPosition)
 {
     _vector vAt = vTargetPosition;
 
-    _vector vEye = XMVectorSubtract(vAt, XMVectorScale(m_vDirection, m_fDistance));
+    _vector vLightPos = XMVectorAdd(XMVectorScale(m_vDirection, m_fDistance), vAt);
+
+    _vector vEye = XMVectorSubtract(vAt, vLightPos);
 
     XMStoreFloat4x4(&m_Matrices[ENUM_CLASS(D3DTS::VIEW)], XMMatrixLookAtLH(vEye, vAt, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-    //XMStoreFloat4x4(&m_Matrices[ENUM_CLASS(D3DTS::PROJ)], XMMatrixOrthographicLH(1600.f, 900.f, m_ShadowLightDesc.fNear, m_ShadowLightDesc.fFar));
-    XMStoreFloat4x4(&m_Matrices[ENUM_CLASS(D3DTS::PROJ)], XMMatrixPerspectiveFovLH(m_ShadowLightDesc.fFov, 1600.f / 900.f, m_ShadowLightDesc.fNear, m_ShadowLightDesc.fFar));
+    XMStoreFloat4x4(&m_Matrices[ENUM_CLASS(D3DTS::PROJ)], XMMatrixOrthographicLH(m_fWidth, m_fHeight, m_ShadowLightDesc.fNear, m_ShadowLightDesc.fFar));
 }
-
-void CShadow::Update()
-{
-    const _float4* pWorldPoints = m_pGameInstance->Get_Frustum_WorldPoints();
-    m_CameraViewMatrix = m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW);
-
-    _vector vAt = {};
-    _vector vEye = {};
-    _vector vLightDir = {};
-    
-    vAt = Compute_Center(pWorldPoints);
-
-    vLightDir = XMVector3Normalize(XMLoadFloat4(&m_ShadowLightDesc.vDirection));
-    
-    vEye = XMVectorSubtract(vAt, XMVectorScale(vLightDir, m_ShadowLightDesc.fDistance));
-    
-    if (XMVector3Equal(vEye, vAt))
-        return;
-
-    XMStoreFloat4x4(&m_ShadowViewMatrix, XMMatrixLookAtLH(vEye, vAt, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-
-    Make_ShadowLight_SplitProj(pWorldPoints);
-
-    //XMStoreFloat4x4(&m_Matrices[ENUM_CLASS(D3DTS::PROJ)], Compute_ShadowLight_Proj(pWorldPoints));
-}
+//
+//void CShadow::Update()
+//{
+//    const _float4* pWorldPoints = m_pGameInstance->Get_Frustum_WorldPoints();
+//    m_CameraViewMatrix = m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW);
+//
+//    _vector vAt = {};
+//    _vector vEye = {};
+//    _vector vLightDir = {};
+//    
+//    vAt = Compute_Center(pWorldPoints);
+//
+//    vLightDir = XMVector3Normalize(XMLoadFloat4(&m_ShadowLightDesc.vDirection));
+//    
+//    vEye = XMVectorSubtract(vAt, XMVectorScale(vLightDir, m_ShadowLightDesc.fDistance));
+//    
+//    if (XMVector3Equal(vEye, vAt))
+//        return;
+//
+//    XMStoreFloat4x4(&m_ShadowViewMatrix, XMMatrixLookAtLH(vEye, vAt, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
+//
+//    Make_ShadowLight_SplitProj(pWorldPoints);
+//
+//    //XMStoreFloat4x4(&m_Matrices[ENUM_CLASS(D3DTS::PROJ)], Compute_ShadowLight_Proj(pWorldPoints));
+//}
 
 //_vector CShadow::Compute_Center(const _float4* pWorldPoints)          
 //{
@@ -253,9 +262,15 @@ void CShadow::Update()
 ////
 ////}
 
-CShadow* CShadow::Create()
+CShadow* CShadow::Create(_float fViewportWidth, _float fViewportHeight)
 {
-    return new CShadow();
+    CShadow* pInstance = new CShadow();
+    if (FAILED(pInstance->Initialize(fViewportWidth, fViewportHeight)))
+    {
+        MSG_BOX(TEXT("Failed Created : CShadow"));
+        Safe_Release(pInstance);
+    }
+    return pInstance;
 }
 
 void CShadow::Free()
