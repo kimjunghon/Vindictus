@@ -200,7 +200,7 @@ HRESULT CVampire_Basic::Ready_Collider_Attack()
 {
     CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
     OBBDesc.vAngles = _float3(XMConvertToRadians(60.f), XMConvertToRadians(90.f), XMConvertToRadians(90.f));
-    OBBDesc.vExtents = _float3(40.f, 40.f, 90.f);
+    OBBDesc.vExtents = _float3(60.f, 60.f, 60.f);
     OBBDesc.vCenter = _float3(0.f, OBBDesc.vExtents.y, 0.f);
 
     if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
@@ -208,7 +208,7 @@ HRESULT CVampire_Basic::Ready_Collider_Attack()
         return E_FAIL;
 
     OBBDesc.vAngles = _float3(XMConvertToRadians(60.f), XMConvertToRadians(90.f), 0.f);
-    OBBDesc.vExtents = _float3(40.f, 40.f, 90.f);
+    OBBDesc.vExtents = _float3(60.f, 60.f, 60.f);
     OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
     if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),

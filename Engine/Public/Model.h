@@ -27,6 +27,7 @@ public:
 	_float4x4				Get_PreTransformMatrix() const { return m_PreTransformMatrix; }
 	void					Set_PreTransformMatrix(_fmatrix PreTransformMatrix) { XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix); }
 	_float					Get_CurrentAnimSpeed();
+	_float					Get_CurrentAnimRatio();
 public:
 	virtual HRESULT			Initialize_Prototype(MODEL_TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix);
 	virtual HRESULT			Initialize(void* pArg);

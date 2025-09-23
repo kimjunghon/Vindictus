@@ -40,6 +40,8 @@ private:
 	CShader*				m_pShaderCom = { nullptr };
 	_float4x4				m_CombinedMatrix = {};
 
+	_vector					m_vRotateQuat = {};
+
 	_bool*					m_pIsSwing = {};
 	_bool					m_IsMove = {};
 	const _float4x4*		m_pSocektMatrixPtr = { nullptr };
@@ -49,7 +51,7 @@ private:
 	HRESULT					Bind_ShaderResources();
 	HRESULT					Ready_Component();
 	void					Update_Bezier();
-
+	_vector					ComputeRandomRotateQuat();
 public:
 	static CGavelenRock*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

@@ -64,7 +64,7 @@ HRESULT CAnimation::Initialize(ifstream& File, const vector<class CBone*>& Bones
 	return S_OK;
 }
 
-void CAnimation::Update_TransformationMatricesLerp(const vector<class CBone*>& Bones, _bool* pFinished, _float fTimeDelta)
+void CAnimation::Update_TransformationMatricesLerp(const vector<class CBone*>& Bones, _bool IsRootMotionRotate, _bool* pFinished, _float fTimeDelta)
 {
 	m_fAnimChangeTime += fTimeDelta;
 
@@ -80,7 +80,7 @@ void CAnimation::Update_TransformationMatricesLerp(const vector<class CBone*>& B
 	}
 
 	for (auto& pChannel : m_Channels)
-		pChannel->Update_AnimChangeTransformationMatrix(Bones, fRatio, &m_bAnimChangeFirstCall);
+		pChannel->Update_AnimChangeTransformationMatrix(Bones, fRatio, IsRootMotionRotate, &m_bAnimChangeFirstCall);
 
 	if (m_bAnimChangeFirstCall)
 		m_bAnimChangeFirstCall = false;

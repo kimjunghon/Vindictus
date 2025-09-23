@@ -267,6 +267,55 @@ void GS_ROTATE(point GS_ROTATE_IN In[1], inout TriangleStream<GS_OUT> Vertices)
     Vertices.RestartStrip();
 }
 
+[maxvertexcount(6)]
+void GS_BLOOD_SPRITE(point GS_ROTATE_IN In[1], inout TriangleStream<GS_OUT> Vertices)
+{
+    GS_OUT Out[4];
+    
+    vector vRight;
+    vector vUp;
+    vector vLook;
+    
+    vLook = g_vCamPosition - In[0].vPosition;
+    vRight = normalize(vector(cross(In[0].vUp.xyz, vLook.xyz), 0.f)) * In[0].fSize * 0.5f;
+    vUp = normalize(vector(cross(vLook.xyz, vRight.xyz), 0.f)) * In[0].fSize * 0.5f;
+    
+    matrix matrVP = mul(g_ViewMatrix, g_ProjMatrix);
+    
+    int iCurrentTime = (In[0].vLifeTime.x / In[0].vLifeTime.y) * 16;
+    
+    int iX = (iCurrentTime % 4);
+    int iY = (iCurrentTime / 4);
+    float fU = iX * 0.25f;
+    float fV = iY * 0.25f;
+    
+    Out[0].vPosition = mul(In[0].vPosition + vRight + vUp, matrVP);
+    Out[0].vTexcoord = float2(fU, fV);
+    Out[0].vLifeTime = In[0].vLifeTime;
+    
+    Out[1].vPosition = mul(In[0].vPosition - vRight + vUp, matrVP);
+    Out[1].vTexcoord = float2(fU + 0.25f, fV);
+    Out[1].vLifeTime = In[0].vLifeTime;
+    
+    Out[2].vPosition = mul(In[0].vPosition - vRight - vUp, matrVP);
+    Out[2].vTexcoord = float2(fU + 0.25f, fV + 0.25f);
+    Out[2].vLifeTime = In[0].vLifeTime;
+    
+    Out[3].vPosition = mul(In[0].vPosition + vRight - vUp, matrVP);
+    Out[3].vTexcoord = float2(fU, fV + 0.25f);
+    Out[3].vLifeTime = In[0].vLifeTime;
+    
+    Vertices.Append(Out[0]);
+    Vertices.Append(Out[1]);
+    Vertices.Append(Out[2]);
+    Vertices.RestartStrip();
+    
+    Vertices.Append(Out[0]);
+    Vertices.Append(Out[2]);
+    Vertices.Append(Out[3]);
+    Vertices.RestartStrip();
+}
+
 struct PS_DEFAULT_IN
 {
     float4 vPosition : SV_POSITION;
@@ -291,7 +340,7 @@ PS_OUT PS_MAIN(PS_DEFAULT_IN In)
 
     vector vMask = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
     
-    vector vSourColor = float4(g_vSourceColor, 1.f) * vMask;
+    vector vSourColor = float4(g_vSourceColor, 1.f);
     
     vector vFinalColor = vSourColor * vMask;
     
@@ -331,7 +380,7 @@ PS_OUT PS_RIGHTLOOP(PS_DEFAULT_IN In)
     
     vector vMask = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
     
-    vector vSourColor = float4(g_vSourceColor, 1.f) * vMask;
+    vector vSourColor = float4(g_vSourceColor, 1.f);
     
     vector vFinalColor = vSourColor * vMask;
     
@@ -364,24 +413,94 @@ PS_OUT PS_RIGHTLOOP(PS_DEFAULT_IN In)
     
     return Out;
 }
-PS_DISTORTION_OUT PS_DISTORTION(PS_DEFAULT_IN In)
+
+PS_OUT PS_DUST(PS_DEFAULT_IN In)
 {
-    PS_DISTORTION_OUT Out = (PS_DISTORTION_OUT) 0;
-    
+    PS_OUT Out = (PS_OUT) 0;
+
     vector vMask = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
     
-    vector vDistortion = g_DistortionTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vSourColor = float4(g_vSourceColor, 1.f);
+    
+    vector vFinalColor = vSourColor * vMask;
+    
+    float vDestAlpha = max(max(vMask.r, vMask.g), vMask.b);
+    
+    vFinalColor.a = 1.f * vDestAlpha;
     
     float fDecreaseAlpha = (In.vLifeTime.x / In.vLifeTime.y);
     
-    float vFinalAlpha = vMask.a - fDecreaseAlpha;
+    vFinalColor.a -= fDecreaseAlpha;
     
-    vector vFinal = vDistortion * vFinalAlpha;
+    if (vFinalColor.a <= 0.f)
+        discard;
+    
+    vFinalColor.a = min(vFinalColor.a, 0.5f);
+    
+    Out.vBackBufferColor = vFinalColor;
+    
+    if (g_IsEmissive)
+    {
+        float fLuminance = Luminance(vFinalColor.rgb);
+    
+        vector vEmissiveColor = 0.f;
+    
+        if (fLuminance > 0.3f)
+        {
+            vEmissiveColor = vector(vFinalColor.rgb * 3.f, vFinalColor.a);
+        }
 
-    Out.vDistortionColor = vFinal;
+        Out.vEmissiveColor = vEmissiveColor;
+    }
     
     return Out;
 }
+
+PS_OUT PS_BLOOD(PS_DEFAULT_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    vector vMask = g_DiffuseTexture.Sample(PointSampler, In.vTexcoord);
+    
+    vector vSourColor = float4(g_vSourceColor, 1.f);
+    
+    vector vFinalColor = vSourColor * vMask;
+    
+    float vDestAlpha = vMask.a; //max(max(vMask.r, vMask.g), vMask.b);
+    
+    vFinalColor.a = 1.f * vDestAlpha;
+    
+    float fDecreaseAlpha = (In.vLifeTime.x / In.vLifeTime.y);
+    
+    if (fDecreaseAlpha >= 0.75f)
+    {   
+        float fLastAlpha = 1.f - fDecreaseAlpha;
+        
+        vFinalColor.a -= (fLastAlpha * 4.f);
+    }
+    
+    if (vFinalColor.a <= 0.f)
+        discard;
+    
+    Out.vBackBufferColor = vFinalColor;
+    
+    if (g_IsEmissive)
+    {
+        float fLuminance = Luminance(vFinalColor.rgb);
+    
+        vector vEmissiveColor = 0.f;
+    
+        if (fLuminance > 0.3f)
+        {
+            vEmissiveColor = vector(vFinalColor.rgb * 3.f, vFinalColor.a);
+        }
+
+        Out.vEmissiveColor = vEmissiveColor;
+    }
+    
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -461,15 +580,26 @@ technique11 DefaultTechnique
         GeometryShader = compile gs_5_0 GS_ROTATE();
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-
-    pass DistortionPass
+        
+    pass DustPass
     {
         SetRasterizerState(RS_CULL_NONE);
         SetDepthStencilState(DSS_DEFAULT, 0);
-        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_BIG();
         GeometryShader = compile gs_5_0 GS_ROTATE();
-        PixelShader = compile ps_5_0 PS_DISTORTION();
+        PixelShader = compile ps_5_0 PS_DUST();
+    }
+
+    pass BloodPass
+    {
+        SetRasterizerState(RS_CULL_NONE);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_ROTATE();
+        GeometryShader = compile gs_5_0 GS_BLOOD_SPRITE();
+        PixelShader = compile ps_5_0 PS_BLOOD();
     }
 }

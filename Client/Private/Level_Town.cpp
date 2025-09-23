@@ -8,7 +8,7 @@
 #include "Cat.h"
 #include "Weapon.h"
 #include "Armor.h"
-#include "Effect.h"
+#include "Effect_Distortion.h"
 
 CLevel_Town::CLevel_Town(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
@@ -232,9 +232,6 @@ HRESULT CLevel_Town::Ready_Effect()
 
 		for (auto& Effect : Effects)
 		{
-
-			CEffect::EFFECT_DESC EffectDesc = {};
-
 			_tchar EffectName[MAX_PATH] = {};
 
 			if (Effect.HasMember("Name") && Effect["Name"].IsString())
@@ -243,12 +240,14 @@ HRESULT CLevel_Town::Ready_Effect()
 
 				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), EffectName, static_cast<_int>(Name.size()));
 			}
-			
+
 			_wstring strEffectTag = {};
+
+			EFFECT_TYPE eType = {};
 
 			if (Effect.HasMember("Type") && Effect["Type"].IsInt())
 			{
-				EFFECT_TYPE eType = static_cast<EFFECT_TYPE>(Effect["Type"].GetInt());
+				eType = static_cast<EFFECT_TYPE>(Effect["Type"].GetInt());
 				switch (eType)
 				{
 				case EFFECT_TYPE::STATIC:
@@ -265,26 +264,68 @@ HRESULT CLevel_Town::Ready_Effect()
 					strEffectTag = TEXT("Prototype_Effect_Trail_");
 					strEffectTag = strEffectTag + EffectName;
 					break;
+				case EFFECT_TYPE::DISTORTION:
+					strEffectTag = TEXT("Prototype_Effect_Distortion");
+					break;
 				}
+
 			}
 
-			EffectDesc.strEffectName = EffectName;
+			_uint iPassIndex = {};
+			_uint iNumPool = {};
 
 			if (Effect.HasMember("Pass") && Effect["Pass"].IsInt())
-				EffectDesc.iPassIndex = Effect["Pass"].GetInt();
-
-			_uint iNumPool = {};
+				iPassIndex = Effect["Pass"].GetInt();
 
 			if (Effect.HasMember("NumPool") && Effect["NumPool"].IsInt())
 				iNumPool = Effect["NumPool"].GetInt();
 
-			EffectDesc.iLevel = ENUM_CLASS(LEVEL::TOWN);
 
-			for(_uint i = 0; i<iNumPool; i++)
-				m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::TOWN), EffectName, strEffectTag, &EffectDesc);
+			if (eType == EFFECT_TYPE::DISTORTION)
+			{
+				CEffect_Distortion::DISTORTION_DESC DistortionDesc = {};
+				DistortionDesc.strEffectName = EffectName;
+				DistortionDesc.iLevel = ENUM_CLASS(LEVEL::TOWN);
+				DistortionDesc.iPassIndex = iPassIndex;
+
+				_bool IsMask = {};
+
+				if (Effect.HasMember("IsMask") && Effect["IsMask"].IsBool())
+					IsMask = Effect["IsMask"].GetBool();
+
+				if (IsMask)
+				{
+					_tchar MaskTextureName[MAX_PATH] = {};
+
+					if (Effect.HasMember("MaskEffectName") && Effect["MaskEffectName"].IsString())
+					{
+						string MaskName = Effect["MaskEffectName"].GetString();
+
+						MultiByteToWideChar(CP_UTF8, 0, MaskName.c_str(), static_cast<_int>(MaskName.size()), MaskTextureName, static_cast<_int>(MaskName.size()));
+					}
+					DistortionDesc.strMaskTextureName = MaskTextureName;
+				}
+
+				DistortionDesc.Is_Masking = IsMask;
+
+				for (_uint i = 0; i < iNumPool; i++)
+					m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::TOWN), EffectName, strEffectTag, &DistortionDesc);
+
+			}
+			else
+			{
+				CEffect::EFFECT_DESC EffectDesc = {};
+
+				EffectDesc.strEffectName = EffectName;
+				EffectDesc.iPassIndex = iPassIndex;
+				EffectDesc.iLevel = ENUM_CLASS(LEVEL::TOWN);
+
+				for (_uint i = 0; i < iNumPool; i++)
+					m_pPool_Instance->Add_EffectToPool(ENUM_CLASS(LEVEL::TOWN), EffectName, strEffectTag, &EffectDesc);
+			}
 		}
 	}
-	
+
 	return S_OK;
 }
 

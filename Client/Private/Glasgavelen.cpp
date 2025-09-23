@@ -7,6 +7,7 @@
 #include "GlasgavelenAI.h"
 #include "EnergyBall.h"
 #include "GavelenRock.h"
+#include "Effect_Trail.h"
 
 CGlasgavelen::CGlasgavelen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -108,6 +109,14 @@ HRESULT CGlasgavelen::Initialize(void* pArg)
 
 	if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Gavelen_AnimData.json")))
 		return E_FAIL;
+
+	if (FAILED(Ready_TrailNotify()))
+		return E_FAIL;
+
+	if (FAILED(CMonster::Ready_EffectNotify("../Bin/Resources/AnimDatas/Gavelen_Effect_AnimDats.json")))
+		return E_FAIL;
+	//if (FAILED(Ready_EffectNotify()))
+	//	return E_FAIL;
 
 	EVENT_BIND_BOSSHP Event = {};
 	Event.m_fLineHP = 200.f;
@@ -230,6 +239,23 @@ BT_STATE CGlasgavelen::Turn()
 	return BT_STATE::SUCCESS;
 }
 
+BT_STATE CGlasgavelen::CanAttack()
+{
+	if (m_IsRage)
+		return BT_STATE::FAILED;
+
+	for (_uint i = 0; i < m_iNumAttacks; i++)
+	{
+		if (m_AttackTime[i] >= m_AttackCoolTime[i])
+		{
+			m_iCurrentAttack = i;
+			return BT_STATE::SUCCESS;
+		}
+	}
+
+	return BT_STATE::FAILED;
+}
+
 BT_STATE CGlasgavelen::Is_Rage()
 {
 	if (m_IsRage)
@@ -244,7 +270,7 @@ BT_STATE CGlasgavelen::CanRageAttack()
 	{
 		if (m_RageAttackTime[i] >= m_RageAttackCoolTime[i])
 		{
-			if (m_IsBroken && m_iCurrentAttack == ENUM_CLASS(RAGE_ATTACK::DESEND))
+			if (m_IsBroken && m_iCurrentAttack == ENUM_CLASS(RAGE_ATTACK::DESEND) || m_iCurrentAttack == ENUM_CLASS(RAGE_ATTACK::HANG))
 				continue;
 
 			m_iCurrentAttack = i;
@@ -520,16 +546,15 @@ HRESULT CGlasgavelen::Ready_Collider_Attack()
 	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
 
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(100.f, 70.f, 70.f);
-	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * -1.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(150.f, 70.f, 70.f);
+	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x * -1.f + 20.f, 0.f, 0.f);
 
 	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::ATTACK, &OBBDesc, "ValveBiped.Anim_Attachment_LH")))
 		return E_FAIL;
 
-
 	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
-	OBBDesc.vExtents = _float3(100.f, 70.f, 70.f);
-	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(150.f, 70.f, 70.f);
+	OBBDesc.vCenter = _float3(OBBDesc.vExtents.x - 20.f, 0.f, 0.f);
 	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::ATTACK, &OBBDesc, "ValveBiped.Anim_Attachment_RH")))
 		return E_FAIL;
 
@@ -538,7 +563,6 @@ HRESULT CGlasgavelen::Ready_Collider_Attack()
 	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 	if (FAILED(Add_Bone_Collider(COLLIDER_CHANNEL::GRAP, &OBBDesc, "ValveBiped.Bip01_R_2_Hand")))
 		return E_FAIL;
-
 
 	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
 		this->OnCollisionGrap(Data); })))
@@ -549,12 +573,12 @@ HRESULT CGlasgavelen::Ready_Collider_Attack()
 
 void CGlasgavelen::CreateStone(ATTACK_TYPE eType, _float fAttackRatio)
 {
-	m_IsSwing = false;
+	m_IsSwing_R = false;
 
 	CGavelenRock::GAVELEN_ROCK_DESC GavelenRock_Desc = {};
 	GavelenRock_Desc.eType = eType;
 	GavelenRock_Desc.fDamage = m_Status.fAttackDamage * fAttackRatio;
-	GavelenRock_Desc.pIsSwing = &m_IsSwing;
+	GavelenRock_Desc.pIsSwing = &m_IsSwing_R;
 	GavelenRock_Desc.pSocketMatrixPtr = m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_2_Hand");
 	GavelenRock_Desc.pOwnerMatrixPtr = m_pTransformCom->Get_WorldMatrixPtr();
 	GavelenRock_Desc.pTargetTransform = m_pTargetTransform;
@@ -574,13 +598,19 @@ void CGlasgavelen::CreateEneryBall(ATTACK_TYPE eType, _float fAttackRatio)
 	EnergyBallDesc.fDamage = m_Status.fAttackDamage * fAttackRatio;
 	EnergyBallDesc.StartPosition = vPosition;
 	EnergyBallDesc.pTargetTransform = m_pTargetTransform;
+	EnergyBallDesc.fDir = -1;
+	m_pPool_Instance->Request_SpawnProjectile(TEXT("EnergyBall"), &EnergyBallDesc);
 
+	EnergyBallDesc.fDir = 0;
+	m_pPool_Instance->Request_SpawnProjectile(TEXT("EnergyBall"), &EnergyBallDesc);
+
+	EnergyBallDesc.fDir = 1;
 	m_pPool_Instance->Request_SpawnProjectile(TEXT("EnergyBall"), &EnergyBallDesc);
 }
 
 void CGlasgavelen::ThrowStone()
 {
-	m_IsSwing = true;
+	m_IsSwing_R = true;
 }
 
 HRESULT CGlasgavelen::Add_StoneNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
@@ -602,6 +632,7 @@ HRESULT CGlasgavelen::Add_StoneNotify(const string& strAnimName, ATTACK_TYPE eTy
 HRESULT CGlasgavelen::Add_GrapNotify(const string& strAnimName, _float2 vTrackPosition)
 {
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this]() {
+		m_IsGrap = false;
 		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, true);
 		m_GrapData.WorldMatrixPtr = m_pTransformCom->Get_WorldMatrixPtr();
 		m_GrapData.SocketMatrixPtr = m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_2_Finger2");
@@ -613,7 +644,6 @@ HRESULT CGlasgavelen::Add_GrapNotify(const string& strAnimName, _float2 vTrackPo
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this]() {
 		if(false == m_IsGrap)
 		{
-			cout << "²¨Áü" << endl;
 			this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, false);
 			this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, nullptr);
 		}
@@ -626,9 +656,7 @@ HRESULT CGlasgavelen::Add_GrapNotify(const string& strAnimName, _float2 vTrackPo
 HRESULT CGlasgavelen::Add_GrapEndNotify(const string& strAnimName,  _float fAttackRatio, _float fTrackPosition)
 {
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, fAttackRatio]() {
-		cout << "²¨Áü" << endl;
 		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, false);
-//		this->m_Colliders[COLLIDER_CHANNEL::ATTACK][iAttackColliderIndex]->SetEnable(false);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
 		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, &m_CurrentAttackData);
@@ -680,6 +708,155 @@ HRESULT CGlasgavelen::Add_AttackCollisionNotify(const string& strAnimName, _uint
 	return S_OK;
 }
 
+
+HRESULT CGlasgavelen::Ready_TrailNotify()
+{
+	ifstream File("../Bin/Resources/AnimDatas/Gavelen_Trail_AnimDatas.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Gavelen_Trail_AnimDatas Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
+
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_float fTrackPosition = {};
+			NOTIFY_TYPE eType = {};
+
+			string strBoneName = "";
+
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+
+			if (Notify.HasMember("TrackPosition") && Notify["TrackPosition"].IsFloat())
+				fTrackPosition = Notify["TrackPosition"].GetFloat();
+
+			if (Notify.HasMember("NotifyType") && Notify["NotifyType"].IsInt())
+				eType = static_cast<NOTIFY_TYPE>(Notify["NotifyType"].GetInt());
+
+			if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
+				strBoneName = Notify["BoneName"].GetString();
+
+			_bool* pSwing = {};
+			pSwing = strcmp(strBoneName.c_str(), "ValveBiped.Anim_Attachment_LH") ? &m_IsSwing_R : &m_IsSwing_L;
+
+			if (eType == NOTIFY_TYPE::ON)
+			{
+				m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, strBoneName, pSwing]() {
+					Request_SpawnTrail(strBoneName, pSwing); });
+			}
+			else
+			{
+				m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, pSwing]() {
+					*pSwing = false; });
+			}
+
+		}
+	}
+
+	return S_OK;
+}
+
+void CGlasgavelen::Request_SpawnTrail(const string& strBoneName, _bool* pSwing)
+{
+	CEffect_Trail::TRAIL_DESC TrailDesc = {};
+
+	TrailDesc.pSocketMatrix = m_pBody->SocketCombinedMatrixPtr(strBoneName);
+	TrailDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	TrailDesc.IsSwing = pSwing;
+	TrailDesc.vLeftPosition = _float3(0.f, 0.f, 0.f);
+	TrailDesc.vRightPosition = _float3(0.f, 100.f, 0.f);
+	TrailDesc.fLifeTime = 0.5f;
+	TrailDesc.fNodeUpdateTime = 0.f;
+	TrailDesc.IsEmissive = false;
+
+	*pSwing = true;
+
+	m_pPool_Instance->Request_SpawnEffect(TEXT("SwordTrail"), &TrailDesc);
+}
+
+HRESULT CGlasgavelen::Ready_EffectNotify()
+{
+	ifstream File("../Bin/Resources/AnimDatas/Gavelen_Effect_AnimDats.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Gavelen_Effect_AnimDats Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
+
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_float fTrackPosition = {};
+
+			string strBoneName = "";
+
+
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+
+			if (Notify.HasMember("TrackPosition") && Notify["TrackPosition"].IsFloat())
+				fTrackPosition = Notify["TrackPosition"].GetFloat();
+
+			if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
+				strBoneName = Notify["BoneName"].GetString();
+
+			_tchar strEffectName[MAX_PATH] = {};
+
+			if (Notify.HasMember("EffectName") && Notify["EffectName"].IsString())
+			{
+				string Name = Notify["EffectName"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), strEffectName, static_cast<_int>(Name.size()));
+			}
+
+			m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, strBoneName, strEffectName]() {
+				CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
+				if (false == strcmp(strBoneName.c_str(), "NONE"))
+					EffectDesc.SpawnWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				else
+					EffectDesc.SpawnWorldMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pBody->SocketCombinedMatrixPtr(strBoneName)), m_pTransformCom->Get_WorldMatrix());
+
+				EffectDesc.IsEmissive = false;
+
+				m_pPool_Instance->Request_SpawnEffect(strEffectName, &EffectDesc);
+				});
+		}
+	}
+
+	return S_OK;
+}
 
 void CGlasgavelen::Change_ColliderSocketMatrix()
 {

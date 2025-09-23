@@ -72,7 +72,7 @@ namespace Engine
 
 #define UI_FAR		1.f
 #define PI			DirectX::XM_PI
-
+#define GRAVITY		9.8f
 #define MAX_BONES	512
 
 #ifdef _DEBUG

@@ -48,8 +48,6 @@ void CEffect_Distortion::Priority_Update(_float fTimeDelta)
 
 void CEffect_Distortion::Update(_float fTimeDelta)
 {
-
-    
     m_pVIBufferCom->Update(fTimeDelta, &m_IsFinished);
 }
 
@@ -140,11 +138,14 @@ HRESULT CEffect_Distortion::Bind_ShaderResources()
     if (FAILED(m_pDistortionTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_DistortionTexture", 0)))
         return E_FAIL;
 
-    if (FAILED(m_pMaskTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_MaskTexture", 0)))
-        return E_FAIL;
-
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
+
+    if (m_IsMasking)
+    {
+        if (FAILED(m_pMaskTextureCom->Bind_Shader_Texture(m_pShaderCom, "g_MaskTexture", 0)))
+            return E_FAIL;
+    }
 
     return S_OK;
 }
@@ -176,7 +177,10 @@ void CEffect_Distortion::Free()
     __super::Free();
 
     Safe_Release(m_pDistortionTextureCom);
-    Safe_Release(m_pMaskTextureCom);
+
+    if(m_IsMasking)
+        Safe_Release(m_pMaskTextureCom);
+    
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
 }

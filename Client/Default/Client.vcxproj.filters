@@ -517,6 +517,9 @@
     <Filter Include="03.GameObject\Effect\Distortion">
       <UniqueIdentifier>{a6207dc1-884f-4a88-9f6b-1c83c02b4e42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\Camera\CS_Camera">
+      <UniqueIdentifier>{3dbf9136-81a8-47ea-b2e4-052f174ab301}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -1005,6 +1008,9 @@
     <ClInclude Include="..\public\Effect_Distortion.h">
       <Filter>03.GameObject\Effect\Distortion</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\Camera_CS.h">
+      <Filter>03.GameObject\Camera\CS_Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1478,6 +1484,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Effect_Distortion.cpp">
       <Filter>03.GameObject\Effect\Distortion</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\Camera_CS.cpp">
+      <Filter>03.GameObject\Camera\CS_Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

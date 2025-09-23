@@ -6,7 +6,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CVIBuffer_Point_Instance final : public CVIBuffer_Instance
 {
 public:
-	enum class FX_POINT_TYPE { SPREAD, DROP, LOOP, END };
+	enum class FX_POINT_TYPE { SPREAD, DROP, LOOP, FX_GRAVITY, END };
 
 	typedef struct tagPointInstanceDesc : public INSTANCE_DESC
 	{
@@ -43,12 +43,17 @@ public:
 	void Spread(_float fTimeDelta, _bool* pIsFinished);
 	void Drop(_float fTimeDelta, _bool* pIsFinished);
 	void Loop(_float fTimeDelta, _bool* pIsFinished);
+	void Gravity(_float fTimeDelta, _bool* pIsFinished);
 	void Circle(_float fTimeDelta, _bool* pIsFinished = nullptr);
+
+	void Sort(_fmatrix WorldMatrix);
 
 private:
 	FX_POINT_TYPE			m_eType = {};
 	_float3					m_vPivot = {};
 	_float*					m_pSpeeds = {};
+	_float					m_fCurrentGravity = {};
+	_float					m_fCurrentTime = {};
 	_bool					m_IsLoop = {};
 	_uint					m_iNumCurrentInstance = {};
 

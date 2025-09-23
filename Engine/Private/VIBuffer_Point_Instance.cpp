@@ -102,10 +102,6 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 		_float		fLifeTime = m_pGameInstance->Rand(pPointDesc->vLifeTime.x, pPointDesc->vLifeTime.y);
 		m_pSpeeds[i] = m_pGameInstance->Rand(pPointDesc->vSpeed.x, pPointDesc->vSpeed.y);
 
-		pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
-		pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
-		pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
-
 		if (m_IsCircle)
 		{
 			_float fRadian = XMConvertToRadians(m_pGameInstance->Rand(m_vAngle.x, m_vAngle.y));
@@ -125,6 +121,29 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 				1.f
 			);
 		}
+
+
+		_vector vDir = XMVectorSetW(XMVector3Normalize(XMVectorSubtract(XMLoadFloat4(&pInstanceVertices[i].vPosition), XMLoadFloat3(&m_vPivot))),0.f);
+
+		pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
+		pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
+		pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
+		
+		if (XMVectorGetX(XMVector3Length(vDir)) >= 0.1f)
+		{
+			_vector vLook = XMVector3Normalize(XMVectorSetW(XMVectorSubtract(XMLoadFloat4(m_pGameInstance->Get_CamPosition()), XMLoadFloat4(&pInstanceVertices[i].vPosition)), 0.f));
+
+			XMStoreFloat4(&pInstanceVertices[i].vUp, XMVectorScale(vDir, fScale));
+			XMStoreFloat4(&pInstanceVertices[i].vRight, XMVectorScale(XMVector3Normalize(XMVector3Cross(XMVector3Normalize(XMLoadFloat4(&pInstanceVertices[i].vUp)), vLook)), fScale));
+			XMStoreFloat4(&pInstanceVertices[i].vLook, XMVectorScale(XMVector3Normalize(XMVector3Cross(XMVector3Normalize(XMLoadFloat4(&pInstanceVertices[i].vUp)), XMLoadFloat4(&pInstanceVertices[i].vRight))), fScale));
+		}
+
+
+		//pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
+		//pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
+		//
+		//pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
+
 
 		pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
 
@@ -184,6 +203,9 @@ void CVIBuffer_Point_Instance::Update(_float fTimeDelta, _bool* pIsFinshed)
 		break;
 	case FX_POINT_TYPE::LOOP:
 		Loop(fTimeDelta, pIsFinshed);
+		break;
+	case FX_POINT_TYPE::FX_GRAVITY:
+		Gravity(fTimeDelta, pIsFinshed);
 		break;
 	}
 }
@@ -283,10 +305,79 @@ void CVIBuffer_Point_Instance::Loop(_float fTimeDelta, _bool* pIsFinished)
 	m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
 
+void CVIBuffer_Point_Instance::Gravity(_float fTimeDelta, _bool* pIsFinished)
+{
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
+
+	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+	m_pDeviceContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
+
+	m_fCurrentGravity -= (GRAVITY * fTimeDelta);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		_vector	vMoveDir = XMVector3Normalize(XMVectorSetW(XMLoadFloat4(&pVertices[i].vPosition) - XMLoadFloat3(&m_vPivot), 0.f));
+
+		XMStoreFloat4(&pVertices[i].vPosition, XMLoadFloat4(&pVertices[i].vPosition) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
+
+		pVertices[i].vPosition.y += (m_pSpeeds[i] + m_fCurrentGravity) * fTimeDelta;
+		
+
+		pVertices[i].vLifeTime.x += fTimeDelta;
+		if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
+		{
+			if (m_IsLoop)
+			{
+				pVertices[i].vLifeTime.x = 0.f;
+				pVertices[i].vPosition = pInstanceVertices[i].vPosition;
+				m_fCurrentGravity = 0.f;
+			}
+			else
+			{
+				if(pIsFinished)
+					*pIsFinished = true;			
+				m_fCurrentGravity = 0.f;
+			}
+
+		}
+	}
+
+	m_pDeviceContext->Unmap(m_pVBInstance, 0);
+
+}
+
 void CVIBuffer_Point_Instance::Circle(_float fTimeDelta, _bool* pIsFinished)
 {
 
+}
 
+void CVIBuffer_Point_Instance::Sort(_fmatrix WorldMatrix)
+{
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
+
+	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+	m_pDeviceContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
+
+	sort(pVertices, pVertices + m_iNumInstance, [&](const VTXINSTANCE_PARTICLE& Sour, const VTXINSTANCE_PARTICLE& Dest){
+		
+		_vector vSourPosition = XMVector3TransformCoord(XMLoadFloat4(&Sour.vPosition), WorldMatrix);
+		_vector vDestPosition = XMVector3TransformCoord(XMLoadFloat4(&Dest.vPosition), WorldMatrix);
+		vSourPosition = XMVector3TransformCoord(vSourPosition, m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW));
+		vDestPosition = XMVector3TransformCoord(vDestPosition, m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW));
+
+		_float fSourDepth = XMVectorGetZ(vSourPosition);
+		_float fDestDepth = XMVectorGetZ(vDestPosition);
+		
+		return fSourDepth > fDestDepth;
+		});
+
+	m_pDeviceContext->Unmap(m_pVBInstance, 0);
 }
 
 CVIBuffer_Point_Instance* CVIBuffer_Point_Instance::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, const INSTANCE_DESC* pDesc)

@@ -145,7 +145,9 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Blur"), 1400.0f, 100.0f, 200.f, 200.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_MapLightDepth"), 1400.0f, 350.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_BlurEnd"), 1400.0f, 350.0f, 200.f, 200.f)))
+		return E_FAIL;
+	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Distortion"), 1400.0f, 600.0f, 200.f, 200.f)))
 		return E_FAIL;
 #endif
 
@@ -182,11 +184,11 @@ HRESULT CRenderer::Draw()
 		return E_FAIL;
 	if (FAILED(Render_Emissive()))
 		return E_FAIL;
-	if (FAILED(Render_DistortionObject()))
-		return E_FAIL;
 	if (FAILED(Render_Blur()))
 		return E_FAIL;
 	if (FAILED(Render_Blend()))
+		return E_FAIL;
+	if (FAILED(Render_DistortionObject()))
 		return E_FAIL;
 	if (FAILED(Render_Distortion()))
 		return E_FAIL;
@@ -506,7 +508,7 @@ HRESULT CRenderer::Render_Blend()
 		return E_FAIL;
 
 	sort(m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)].begin(), m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)].end(), [&](CGameObject* pSour, CGameObject* pDest) {
-		return pSour->Get_Depth() < pDest->Get_Depth();
+		return pSour->Get_Depth() > pDest->Get_Depth();
 		});
 
 	for (auto& Object : m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)])
@@ -534,9 +536,15 @@ HRESULT CRenderer::Render_Distortion()
 	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
 		return E_FAIL;
 
+	if (FAILED(m_pShader->Bind_RawValue("g_fWinSizeX", &m_fViewportWidth, sizeof(_float))))
+		return E_FAIL;
+
+	if (FAILED(m_pShader->Bind_RawValue("g_fWinSizeY", &m_fViewportWidth, sizeof(_float))))
+		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Bind_Shader_RenderTarget(TEXT("RT_Distortion"), m_pShader, "g_DistortionTexture")))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Bind_Shader_RenderTarget(TEXT("RT_BlurEnd"), m_pShader, "g_BackBufferTexture")))
+	if (FAILED(m_pGameInstance->Bind_Shader_RenderTarget(TEXT("RT_BlurEnd"), m_pShader, "g_BlurEndTexture")))
 		return E_FAIL;
 
 	m_pShader->Begin(ENUM_CLASS(SHADER_DEFFERRED::DISTORTION));

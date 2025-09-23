@@ -26,10 +26,9 @@ CGameObject::CGameObject(const CGameObject& Prototype)
 _float CGameObject::Get_Depth()
 {
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
-	_vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+	vPosition = XMVector3TransformCoord(vPosition, m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW));
 
-//	_float fDepth = XMVectorGetX(XMVector3Length((XMVectorSubtract(vPosition, vCamPos))));
-	_float fDepth = XMVectorGetZ(XMVectorSubtract(vPosition, vCamPos));
+	_float fDepth = XMVectorGetZ(vPosition);
 
 	return fDepth;
 }

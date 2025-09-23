@@ -29,6 +29,7 @@ texture2D g_MapLightDepthTexture;
 texture2D g_EmissiveTexture;
 texture2D g_BlurTexture;
 texture2D g_BackBufferTexture;
+texture2D g_BlurEndTexture;
 texture2D g_DistortionTexture;
 
 struct VS_IN
@@ -211,8 +212,6 @@ PS_OUT_BLUR PS_BLUR_X(PS_IN In)
         vColor += g_fWeights[i + 6] * g_EmissiveTexture.Sample(ClampSampler, vTexcoord);
     }
     
-    //vColor.a = g_EmissiveTexture.Sample(DefaultSampler, In.vTexcoord);
-    
     Out.vBlur = vColor;
     
     return Out;
@@ -237,10 +236,6 @@ PS_OUT_BACKBUFFER PS_BLUR_Y(PS_IN In)
     
     vector vFinalColor = g_BackBufferTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    //Out.vColor.rgb = (vFinalColor.rgb * (1.f - vColor.a)) + (vColor.rgb * vColor.a);
-    //
-    //Out.vColor.a = 1.f;
-    
     Out.vColor = vFinalColor + vColor;
     
     return Out;
@@ -256,13 +251,16 @@ PS_OUT_BACKBUFFER PS_DISTORTION(PS_IN In)
     vector vNormal;
     vector vNormalData;
     
-    vNormalData = g_DistortionTexture.Sample(DefaultSampler, In.vTexcoord);
-    vNormalData = vector((vNormalData.xyz * 2.f) - 1.f, 0.f);
-    vWeight = float2((vNormalData.x * vNormalData.z), (vNormalData.y * vNormalData.z));
+    vNormalData = g_DistortionTexture.Sample(PointSampler, In.vTexcoord);
+    
+    vNormalData = vector((vNormalData.xy * 2.f) - 1.f, vNormalData.z, vNormalData.a);
+    vWeight = (vNormalData.xy * vNormalData.z) * vNormalData.a;
+    
+    vWeight *= 0.12f;
     
     vTexcoord = In.vTexcoord + vWeight;
     
-    vector vFinalColor = g_BackBufferTexture.Sample(DefaultSampler, vTexcoord);
+    vector vFinalColor = g_BlurEndTexture.Sample(ClampSampler, vTexcoord);
     
     Out.vColor = vFinalColor;
     

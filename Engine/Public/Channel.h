@@ -15,7 +15,7 @@ public:
 	HRESULT Initialize(const aiNodeAnim* pAIChannel, const vector<CBone*>& Bones);
 	HRESULT Initialize(ifstream& File, const vector<CBone*>& Bones);
 	void	Update_TransformationMatrix(const vector<CBone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex);
-	void	Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones, _float fRatio, _bool* pFirstCall);
+	void	Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones, _float fRatio,_bool IsRootMotionRotate, _bool* pFirstCall);
 private:
 	_char				m_szName[MAX_PATH] = {};
 	_uint				m_iBoneIndex = {};

@@ -122,10 +122,12 @@ private:
 	HRESULT			Ready_Collider_Body();
 	HRESULT			Ready_Collider_Hit();
 	HRESULT			Ready_Collider_Attack();
-
 	HRESULT			Ready_Collider_Interactions();
+
 	HRESULT			Ready_AttackNotify();
 	HRESULT			Ready_TrailNotify();
+	void			Request_SpawnTrail(const string& strBoneName, _uint iTrailType);
+	HRESULT			Ready_EffectNotify();
 
 	HRESULT			Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _wstring strEffectName, string strBoneName, _float2 vTrackPosition);
 
@@ -144,12 +146,13 @@ private:
 	void			Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event);
 
 	void			OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_DATA& CollisionData);
+	void			Request_HitEffect(ATTACK_TYPE eType, const CCollider::COLLISION_DATA& CollisionData);
 	void			OnCollisionSwordAttack(const CCollider::COLLISION_DATA& CollisionData);
 
 	void			OnCollisionGrap(const CCollider::COLLISION_DATA& CollisionData);
 	void			EndCollisionGrap(const CCollider::COLLISION_DATA& CollisionData);
 
-	void			Change_HitState(ATTACK_TYPE eAttackType, _fvector vPosition, _fvector vAttackPosition);
+	void			Change_HitState(_uint iArmorIndex, const CCollider::COLLISION_DATA& CollisionData);
 
 	void			Update_HitColliderEnable();
 

@@ -116,7 +116,6 @@ HRESULT CEffect_Trail::Render()
 	if (FAILED(Bind_ShaderResources()))
 		return E_FAIL;
 
-
 	if (m_IsEmissive)
 		m_pShaderCom->Begin(ENUM_CLASS(SHADER_TRAIL::EMISSIVE));
 	else

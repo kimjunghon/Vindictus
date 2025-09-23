@@ -28,6 +28,10 @@ HRESULT CProjectile::Initialize(void* pArg)
 	if (FAILED(__super::Initialize(pArg)))
 		return E_FAIL;
 
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Container"),
+		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderContainer))))
+		return E_FAIL;
+
 	GAMEOBJECT_DESC* pDesc = static_cast<GAMEOBJECT_DESC*>(pArg);
 
 	m_fSpeed = pDesc->fSpeedPerSec;
@@ -209,10 +213,15 @@ void CProjectile::Move_Curve(_float fTimeDelta)
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
 }
 
+void CProjectile::OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData)
+{
+	ReturnToPool();
+}
+
 void CProjectile::Free()
 {
 	__super::Free();
 
 	Safe_Release(m_pPoolInstance);
-	Safe_Release(m_pColliderCom);
+	Safe_Release(m_pColliderContainer);
 }

@@ -45,6 +45,7 @@ public:
 	BT_STATE				IsLook();
 	BT_STATE				Turn();
 
+	virtual BT_STATE		CanAttack() override;
 	BT_STATE				Is_Rage();
 	BT_STATE				CanRageAttack();
 	BT_STATE				Rage_Attack();
@@ -58,7 +59,8 @@ private:
 	_bool						m_IsBroken = {};
 	_bool						m_IsRage = {};
 	_bool						m_IsGrap = {};
-	_bool						m_IsSwing = {};
+	_bool						m_IsSwing_R = {};
+	_bool						m_IsSwing_L = {};
 
 	GAVELEN_STATUS				m_GavelenStatus = {};
 	GRAP_DATA					m_GrapData = {};
@@ -76,6 +78,9 @@ private:
 	HRESULT				Ready_PawnObjects();
 	HRESULT				Ready_AI();
 	HRESULT				Ready_GavelenStates();
+	HRESULT				Ready_TrailNotify();
+	void				Request_SpawnTrail(const string& strBoneName, _bool* pSwing);
+	HRESULT				Ready_EffectNotify();
 
 	HRESULT				Ready_Collider();
 	HRESULT				Ready_Collider_Bounding();
@@ -91,6 +96,8 @@ private:
 	HRESULT				Add_GrapEndNotify(const string& strAnimName, _float fAttackRatio, _float fTrackPosition);
 	HRESULT				Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float fTrackPosition);
 	virtual HRESULT		Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition) override;
+	
+	
 
 	void				Change_ColliderSocketMatrix();
 	void				Compute_WorldMatrix();

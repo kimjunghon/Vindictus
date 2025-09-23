@@ -11,6 +11,7 @@ NS_END
 NS_BEGIN(Client)
 
 class CPlayerInstance;
+class CPool_Instance;
 
 class CArmor final : public CPawnObject
 {
@@ -59,6 +60,7 @@ public:
 	void					Dyeing(_uint iMaterialIndex, _float3 vColor);
 private:
 	CPlayerInstance*		m_pPlayerInstance = { nullptr };
+	CPool_Instance*			m_pPool_Instance = { nullptr };
 	_bool					m_IsEquip = { false };
 	ARMOR_TYPE				m_eArmorType = { ARMOR_TYPE::END };
 	ARMOR_STATE				m_eArmorState = { ARMOR_STATE::DEFAULT };

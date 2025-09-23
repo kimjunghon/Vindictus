@@ -50,6 +50,8 @@ void CEffect_Billboard::Late_Update(_float fTimeDelta)
 		m_pGameInstance->Add_RenderGroup(RENDERGROUP::EMISSIVE, this);
 	else
 		m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
+
+	m_pVIBufferCom->Sort(m_pTransformCom->Get_WorldMatrix());
 }
 
 HRESULT CEffect_Billboard::Render()

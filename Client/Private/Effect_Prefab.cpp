@@ -83,6 +83,8 @@ void CEffect_Prefab::Update(_float fTimeDelta)
 		EffectDesc.SpawnWorldMatrix = XMMatrixMultiply(m_Effects[m_iCurrentEffect].OffsetMatrix, m_pTransformCom->Get_WorldMatrix());
 		EffectDesc.IsEmissive = m_IsEmissive;
 
+		if (m_Effects[m_iCurrentEffect].strEffectName == TEXT("Shiled_Particle"))
+			int a = 10;
 		m_pPool_Instance->Request_SpawnEffect(m_Effects[m_iCurrentEffect].strEffectName, &EffectDesc);
 
 		m_iCurrentEffect++;

@@ -185,6 +185,9 @@ HRESULT CLoader::Loading_For_Town_Level()
 		CEffect_Billboard::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Effect_Distortion"),
+		CEffect_Distortion::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 	Loading_For_Effect("../Bin/Resources/EffectData/LoadFile/TownEffect.json", ENUM_CLASS(LEVEL::TOWN));
 
 
@@ -527,6 +530,10 @@ HRESULT CLoader::Loading_For_Gavelen_Level()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Effect_Billboard"),
 		CEffect_Billboard::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("Prototype_Effect_Distortion"),
+		CEffect_Distortion::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	Loading_For_Effect("../Bin/Resources/EffectData/LoadFile/GavelenEffect.json", ENUM_CLASS(LEVEL::GLASGAVELEN));
@@ -906,21 +913,25 @@ HRESULT CLoader::Loading_For_Effect(const _char* pFilePath, _uint iLevel)
 			switch (eType)
 			{
 			case EFFECT_TYPE::STATIC:
-				Load_Static_Effect(strFilePath.c_str(), iLevel);
+				if(FAILED(Load_Static_Effect(strFilePath.c_str(), iLevel)))
+					return E_FAIL;
 				break;
 
 			case EFFECT_TYPE::BILLBAORD:
-				Load_Billboard_Effect(strFilePath.c_str(), iLevel);
+				if (FAILED(Load_Billboard_Effect(strFilePath.c_str(), iLevel)))
+					return E_FAIL;
 				break;
-
 			case EFFECT_TYPE::PREFAB:
-				Load_Effect_Prefab(strFilePath.c_str(), iLevel);
+				if (FAILED(Load_Effect_Prefab(strFilePath.c_str(), iLevel)))
+					return E_FAIL;
 				break;
 			case EFFECT_TYPE::TRAIL:
-				Load_Effect_Trail(strFilePath.c_str(), iLevel);
+				if (FAILED(Load_Effect_Trail(strFilePath.c_str(), iLevel)))
+					return E_FAIL;
 				break;
 			case EFFECT_TYPE::DISTORTION:
-				Load_Effect_Distortion(strFilePath.c_str(), iLevel);
+				if (FAILED(Load_Effect_Distortion(strFilePath.c_str(), iLevel)))
+					return E_FAIL;
 				break;
 			}
 		}

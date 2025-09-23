@@ -15,6 +15,7 @@ public:
 	typedef struct tagEnergyBallDesc : public PROJECTILE_DESC
 	{
 		_vector StartPosition;
+		_float	fDir;
 	}ENERGYBALL_DESC;
 
 private:
@@ -39,6 +40,7 @@ private:
 	CTexture*					m_pTextureCom = { nullptr };
 	CVIBuffer_Point_Instance*	m_pVIBufferCom = { nullptr };
 	CShader*					m_pShaderCom = { nullptr };
+	_float						m_fDir;
 	_float						m_fEffectTime = {};
 	_float						m_fCurrentEffectTime = {};
 

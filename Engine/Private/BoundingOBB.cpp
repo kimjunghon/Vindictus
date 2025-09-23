@@ -176,13 +176,14 @@ _bool CBoundingOBB::Intersect_OBB(const CBoundingOBB* pTarget, _float* pDisance,
 	if (XMVectorGetX(XMVector3Dot(XMLoadFloat3(&OBBDesc[1].vCenter) - XMLoadFloat3(&OBBDesc[0].vCenter), XMLoadFloat3(pNormal))) > 0.f)
 		XMStoreFloat3(pNormal, XMLoadFloat3(pNormal) * -1.f);
 
-	*pDisance = fMinDistance;
+	//*pDisance = fMinDistance;
 
-	_vector vCenter = XMVectorScale(XMVectorAdd(XMLoadFloat3(&m_pDesc->Center), XMLoadFloat3(&pTarget->m_pDesc->Center)), 0.5f);
-	_vector vDistance = XMVectorScale(XMLoadFloat3(pNormal), fMinDistance * 0.5f);
-	_vector vPosition = XMVectorAdd(vCenter, vDistance);
+	//_vector vCenter = XMVectorScale(XMVectorAdd(XMLoadFloat3(&m_pDesc->Center), XMLoadFloat3(&pTarget->m_pDesc->Center)), 0.5f);
+	//_vector vDistance = XMVectorScale(XMLoadFloat3(pNormal), fMinDistance * 0.5f);
+	//_vector vPosition = XMVectorAdd(vCenter, vDistance);
 
-	XMStoreFloat3(pCollisionPos, vPosition);
+	//XMStoreFloat3(pCollisionPos, vPosition);
+	XMStoreFloat3(pCollisionPos, XMLoadFloat3(&m_pDesc->Center));
 
 	return true;
 }

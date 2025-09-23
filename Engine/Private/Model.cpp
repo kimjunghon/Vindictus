@@ -48,6 +48,14 @@ _float CModel::Get_CurrentAnimSpeed()
     return fSpeed;
 }
 
+_float CModel::Get_CurrentAnimRatio()
+{
+    if (nullptr == m_pCurrentAnimation)
+        return 0.f;
+
+    return m_pCurrentAnimation->Get_AnimRatio();;
+}
+
 HRESULT CModel::Initialize_Prototype(MODEL_TYPE eModelType, const _char* pModelFilePath, _fmatrix PreTransformMatrix)
 {
     XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
@@ -256,7 +264,7 @@ _bool CModel::Play_Animation(_float fTimeDelta)
         m_IsFinished = false;
 
         if (m_IsAnimChange)
-            m_pCurrentAnimation->Update_TransformationMatricesLerp(m_Bones, &m_IsAnimChange, fTimeDelta * m_CurrentAnimData.fAnimSpeed);
+            m_pCurrentAnimation->Update_TransformationMatricesLerp(m_Bones, m_RootMotionOption.Rotation, &m_IsAnimChange, fTimeDelta * m_CurrentAnimData.fAnimSpeed);
         else
         {
             m_pCurrentAnimation->Update_TransformationMatrices(m_Bones, m_CurrentAnimData.IsLoop, &m_IsFinished, fTimeDelta * m_CurrentAnimData.fAnimSpeed, &m_IsAnimStart);

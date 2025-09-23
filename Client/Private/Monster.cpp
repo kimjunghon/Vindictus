@@ -184,6 +184,74 @@ HRESULT CMonster::Ready_Status(const string& strFilePath)
 	return S_OK;
 }
 
+HRESULT CMonster::Ready_EffectNotify(const string& strFilePath)
+{
+	ifstream File(strFilePath);
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Effect_AnimDats Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
+
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_float fTrackPosition = {};
+
+			string strBoneName = "";
+
+
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+
+			if (Notify.HasMember("TrackPosition") && Notify["TrackPosition"].IsFloat())
+				fTrackPosition = Notify["TrackPosition"].GetFloat();
+
+			if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
+				strBoneName = Notify["BoneName"].GetString();
+
+			_tchar strEffectName[MAX_PATH] = {};
+
+			if (Notify.HasMember("EffectName") && Notify["EffectName"].IsString())
+			{
+				string Name = Notify["EffectName"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), strEffectName, static_cast<_int>(Name.size()));
+			}
+
+			if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, strBoneName, strEffectName]() {
+				CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
+				if (false == strcmp(strBoneName.c_str(), "NONE"))
+					EffectDesc.SpawnWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				else
+					EffectDesc.SpawnWorldMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pBody->SocketCombinedMatrixPtr(strBoneName)), m_pTransformCom->Get_WorldMatrix());
+
+				EffectDesc.IsEmissive = false;
+
+				m_pPool_Instance->Request_SpawnEffect(strEffectName, &EffectDesc);
+				})))
+				return E_FAIL;
+		}
+	}
+
+	return S_OK;
+}
+
 HRESULT CMonster::Add_ReadyAttackNotify(const string& strAnimName, _float2 vTrackPosition)
 {
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this]() {

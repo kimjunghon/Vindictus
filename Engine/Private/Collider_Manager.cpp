@@ -172,18 +172,19 @@ void CCollider_Manager::Intersect_Actions(const vector<CCollider*>& SrcColliders
 
 void CCollider_Manager::Check_Collision(CCollider* pSrcCollider, CCollider* pDstCollider)
 {
-	CCollider::COLLISION_DATA Data = {};
-	Data.IsEnable = pDstCollider->IsEnable();
-	Data.pCollider = pDstCollider;
-	Data.pDesc = pDstCollider->Get_Desc();
+	CCollider::COLLISION_DATA DstData = {};
+	DstData.IsEnable = pDstCollider->IsEnable();
+	DstData.pCollider = pDstCollider;
+	DstData.pDesc = pDstCollider->Get_Desc();
 
-	pSrcCollider->Check_Collision(Data);
+	CCollider::COLLISION_DATA SrcData = {};
 
-	Data.IsEnable = pSrcCollider->IsEnable();
-	Data.pCollider = pSrcCollider;
-	Data.pDesc = pSrcCollider->Get_Desc();
+	SrcData.IsEnable = pSrcCollider->IsEnable();
+	SrcData.pCollider = pSrcCollider;
+	SrcData.pDesc = pSrcCollider->Get_Desc();
 
-	pDstCollider->Check_Collision(Data);
+	pSrcCollider->Check_Collision(DstData);
+	pDstCollider->Check_Collision(SrcData);
 }
 
 const CCollider* CCollider_Manager::Find_BoundingCollider(CGameObject* pOwner)

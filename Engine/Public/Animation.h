@@ -31,12 +31,12 @@ public:
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CBone*>& Bones);
 	HRESULT Initialize(ifstream& File, const vector<class CBone*>& Bones);
-	void	Update_TransformationMatricesLerp(const vector<class CBone*>& Bones, _bool* pFinished, _float fTimeDelta);
+	void	Update_TransformationMatricesLerp(const vector<class CBone*>& Bones, _bool IsRootMotionRotate, _bool* pFinished, _float fTimeDelta);
 	void	Update_TransformationMatrices(const vector<class CBone*>& Bones, _bool IsLoop, _bool* pFinished, _float fTimeDelta, _bool* IsAnimStart);
 
 	_bool	IsAnimChanging() { return m_bAnimChange; }
 	_float	Get_AnimTickPerSecond() { return m_fTickPerSecond; }
-
+	_float	Get_AnimRatio() { return m_fCurrentTrackPosition / m_fDuration; }
 public:
 	HRESULT Add_Notify(_float fTrackPosition, function<void()> Callback);
 	void	Check_Notify(_float fCurrentTrackPosition);

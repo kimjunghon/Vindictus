@@ -116,7 +116,7 @@ void CChannel::Update_TransformationMatrix(const vector<CBone*>& Bones, _float f
 	Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }
 
-void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones, _float fRatio, _bool* pFirstCall)
+void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones, _float fRatio, _bool IsRootMotionRotate, _bool* pFirstCall)
 {
 	_vector vScale, vRotation, vPosition;
 
@@ -130,7 +130,8 @@ void CChannel::Update_AnimChangeTransformationMatrix(const vector<CBone*>& Bones
 		{
 			m_vChangePrevPosition = XMVectorSetX(m_vChangePrevPosition, m_KeyFrames[0].vPosition.x);
 			m_vChangePrevPosition = XMVectorSetY(m_vChangePrevPosition, m_KeyFrames[0].vPosition.y);
-			m_vChangePrevRotation = XMLoadFloat4(&m_KeyFrames[0].vRotation);
+			if(IsRootMotionRotate)
+				m_vChangePrevRotation = XMLoadFloat4(&m_KeyFrames[0].vRotation);
 		}
 	}
 

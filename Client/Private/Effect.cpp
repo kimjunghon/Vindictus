@@ -62,7 +62,6 @@ void CEffect::ReturnToPool()
 	m_IsActive = false;
 
 	m_pPool_Instance->ReturnPool(m_strEffectName, this);
-
 }
 
 void CEffect::Free()

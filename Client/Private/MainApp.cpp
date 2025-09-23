@@ -108,7 +108,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::TOWN)))
+	if (FAILED(Start_Level(LEVEL::QUEEN)))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {

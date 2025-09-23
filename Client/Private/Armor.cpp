@@ -3,19 +3,25 @@
 #include "Model.h"
 #include "Bone.h"
 #include "PlayerInstance.h"
+#include "Pool_Instance.h"
+#include "Effect.h"
 
 CArmor::CArmor(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CPawnObject { pDevice, pDeviceContext }
 	, m_pPlayerInstance { CPlayerInstance::GetInstance()}
+	, m_pPool_Instance { CPool_Instance::GetInstance()}
 {
 	Safe_AddRef(m_pPlayerInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 CArmor::CArmor(const CArmor& Prototype)
 	: CPawnObject { Prototype }
 	, m_pPlayerInstance{ Prototype.m_pPlayerInstance }
+	, m_pPool_Instance{ Prototype.m_pPool_Instance }
 {
 	Safe_AddRef(m_pPlayerInstance);
+	Safe_AddRef(m_pPool_Instance);
 }
 
 HRESULT CArmor::Initialize_Prototype()
@@ -170,6 +176,19 @@ void CArmor::DecreaseDurability(_float fDecreaseAmount)
 
 	if (m_ArmorInfo.fHealth <= 0.f)
 	{
+		CEffect::EFFECT_SPAWN_DESC SpawnDesc = {};
+
+		_float4 vCollisionPos = {};
+
+		memcpy(&vCollisionPos, m_pPawnMatrix->m[3], sizeof(_float4));
+
+		_matrix CollisionMatrix = XMMatrixTranslationFromVector(XMLoadFloat4(&vCollisionPos));
+
+		SpawnDesc.SpawnWorldMatrix = CollisionMatrix;
+		SpawnDesc.IsEmissive = true;
+
+		m_pPool_Instance->Request_SpawnEffect(TEXT("Armor_Broken_Prefab"), &SpawnDesc);
+
 		m_eArmorState = ARMOR_STATE::BROKEN;
 		if (m_eArmorType == ARMOR_TYPE::HEAD)
 		{
@@ -403,8 +422,9 @@ CGameObject* CArmor::Clone(void* pArg)
 void CArmor::Free()
 {
 	__super::Free();
-
+	
 	Safe_Release(m_pPlayerInstance);
+	Safe_Release(m_pPool_Instance);
 
 	for (_uint i = 0; i < ENUM_CLASS(ARMOR_STATE::END); i++)
 	{

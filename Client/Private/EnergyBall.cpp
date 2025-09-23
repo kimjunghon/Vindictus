@@ -56,6 +56,8 @@ void CEnergyBall::Update(_float fTimeDelta)
 
 	m_pVIBufferCom->Update(fTimeDelta);
 
+	m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
+
 	//Test
 	if (XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)) <= 0.f)
 		ReturnToPool();
@@ -63,6 +65,8 @@ void CEnergyBall::Update(_float fTimeDelta)
 
 void CEnergyBall::Late_Update(_float fTimeDelta)
 {
+	m_pColliderContainer->Update(this, m_pTransformCom->Get_WorldMatrix());
+
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
 		return;
 }
@@ -89,9 +93,14 @@ HRESULT CEnergyBall::Spawn(void* pArg)
 
 	ENERGYBALL_DESC* pDesc = static_cast<ENERGYBALL_DESC*>(pArg);
 
-	m_eType = pDesc->eType;
-	m_fDamage = pDesc->fDamage;
+	m_CurrentAttackData.eAttackType = pDesc->eType;
+	m_CurrentAttackData.fDamage = pDesc->fDamage;
+
+	m_pColliderContainer->SetEnableAllColliderChannel(true);
+	m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), 0, &m_CurrentAttackData);
+
 	m_pTargetTransformCom = pDesc->pTargetTransform;
+	m_fDir = pDesc->fDir;
 
 	m_pTransformCom->Set_State(STATE::POSITION, pDesc->StartPosition);
 	
@@ -119,6 +128,16 @@ HRESULT CEnergyBall::Spawn(void* pArg)
 
 void CEnergyBall::ReturnToPool()
 {
+	CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
+	EffectDesc.SpawnWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+	EffectDesc.IsEmissive = false;
+
+	if (FAILED(m_pPoolInstance->Request_SpawnEffect(TEXT("Energy_Explosion_Prefab"), &EffectDesc)))
+		return;
+
+	m_pColliderContainer->SetEnableAllColliderChannel(false);
+	m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), 0, nullptr);
+
 	m_IsActive = false;
 
 	m_pPoolInstance->ReturnPool(TEXT("EnergyBall"), this);
@@ -138,6 +157,28 @@ HRESULT CEnergyBall::Ready_Component()
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_PointParitlce"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
 		return E_FAIL;
+
+	CBoundingAABB::BOUNDING_AABB_DESC  AABBDesc = {};
+	AABBDesc.vExtents = _float3(20.f, 20.f, 20.f);
+	AABBDesc.vCenter = _float3(0.f, 0.f, 0.f);
+
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &AABBDesc, nullptr)))
+		return E_FAIL;
+
+	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
+	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(15.f, 15.f, 15.f);
+	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
+
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, nullptr)))
+		return E_FAIL;
+
+	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
+		this->OnCollisionAttack(Data); })))
+		return E_FAIL;
+
 
 	return S_OK;
 }
@@ -174,6 +215,8 @@ void CEnergyBall::Init_Bezier()
 	_vector vRight = XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vDir);
 	_vector vUp = XMVector3Normalize(XMVector3Cross(vDir, vRight));
 
+	vRight = XMVectorScale(XMVector3Normalize(vRight), m_fDir);
+
 	vFinishPosition = vFinishPosition + (XMVectorSet(0.f, 1.f, 0.f, 0.f) * 10.f);
 
 	_float fLength = XMVectorGetX(XMVector3Length(XMVectorSubtract(vFinishPosition, vStartPosition)));
@@ -182,8 +225,8 @@ void CEnergyBall::Init_Bezier()
 	_float fUpWieght = fLength * 0.5f;
 
 	m_vMovePoints[0] = vStartPosition;
-	m_vMovePoints[1] = vStartPosition + (vDir * fLookWieght) + (XMVectorSet(0.f, 1.f, 0.f,0.f) * 150);
-	m_vMovePoints[2] = vFinishPosition - (vDir * fLookWieght) + (XMVectorSet(0.f, 1.f, 0.f, 0.f) * 50);
+	m_vMovePoints[1] = vStartPosition + (vDir * fLookWieght) + (vRight * fUpWieght) + (XMVectorSet(0.f, 1.f, 0.f,0.f) * 150);
+	m_vMovePoints[2] = vFinishPosition - (vDir * fLookWieght) + (vRight * fUpWieght) + (XMVectorSet(0.f, 1.f, 0.f, 0.f) * 50);
 	m_vMovePoints[3] = vFinishPosition;
 
 	m_fMinDistance = XMVectorGetX(XMVector3Length(XMVectorSubtract(m_vMovePoints[1], m_vMovePoints[0])));

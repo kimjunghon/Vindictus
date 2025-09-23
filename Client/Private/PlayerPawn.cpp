@@ -95,20 +95,11 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	if (FAILED(Ready_TrailNotify()))
 		return E_FAIL;
 
+	if (FAILED(Ready_EffectNotify()))
+		return E_FAIL;
+
 	m_pStatus = m_pPlayerInstance->GetPlayerStatusPtr();
-
-	//TEST
-	m_pPlayerBody->Add_AnimNotify("Smash_04", 40.f, [this]() {
-		CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
-		EffectDesc.SpawnWorldMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_L_Foot")), m_pTransformCom->Get_WorldMatrix());
-		EffectDesc.IsEmissive = false;
-
-		m_pPool_Instance->Request_SpawnEffect(TEXT("Smash04_Prefab"), &EffectDesc);
-
-		m_pPool_Instance->Request_SpawnEffect(TEXT("Blunt_Distortion"), &EffectDesc);
-
-		});
-
+	
 
 	//m_pGameInstance->Update_ShadowLight(m_pTransformCom->Get_State(STATE::POSITION));
 
@@ -334,24 +325,30 @@ void CPlayerPawn::OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_D
 
 	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::HIT), false);
 	
-	ATTACK_DATA* AttackData = static_cast<ATTACK_DATA*>(CollisionData.pDesc);
-
-	if (!(m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD)))
-	{
-		DecreaseArmorDurability(iArmorIndex, AttackData->fDamage);
-		m_pStatus->fHealth -= AttackData->fDamage;
-	}
-
-	ATTACK_TYPE eAttackType = AttackData->eAttackType;
-	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
-	_vector vAttackPosition = AttackData->vAttackPosition;
-
-	Change_HitState(eAttackType, vPosition, vAttackPosition);
+	Change_HitState(iArmorIndex, CollisionData);
 
 	m_pCurrentState->Bind_StateFlag(m_iStateFlag);
 
 	if (FAILED(m_pPlayerBody->Forcing_Play_Animation()))
 		return;
+}
+
+void CPlayerPawn::Request_HitEffect(ATTACK_TYPE eType, const CCollider::COLLISION_DATA& CollisionData)
+{
+	_wstring strEffectName = {};
+
+	strEffectName = eType == ATTACK_TYPE::STRONG ? TEXT("Strong_Hit_Prefab") : TEXT("Normal_Hit_Prefab");
+
+	_vector vCollisionPos = XMVectorSetW(XMLoadFloat3(&CollisionData.BlockData.vCollisionPos), 1.f);
+
+	_matrix CollisionMatrix = XMMatrixTranslationFromVector(vCollisionPos);
+	
+	CEffect::EFFECT_SPAWN_DESC SpawnDesc = {};
+
+	SpawnDesc.SpawnWorldMatrix = CollisionMatrix;
+	SpawnDesc.IsEmissive = true;
+
+	m_pPool_Instance->Request_SpawnEffect(strEffectName, &SpawnDesc);
 }
 
 void CPlayerPawn::OnCollisionSwordAttack(const CCollider::COLLISION_DATA& CollisionData)
@@ -378,7 +375,6 @@ void CPlayerPawn::OnCollisionGrap(const CCollider::COLLISION_DATA& CollisionData
 {
 	if (nullptr == CollisionData.pDesc)
 		return;
-
 
 	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::HIT), false);
 	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::BODY), false);
@@ -410,8 +406,20 @@ void CPlayerPawn::EndCollisionGrap(const CCollider::COLLISION_DATA& CollisionDat
 	ATTACK_DATA* AttackData = static_cast<ATTACK_DATA*>(CollisionData.pDesc);
 }
 
-void CPlayerPawn::Change_HitState(ATTACK_TYPE eAttackType, _fvector vPosition, _fvector vAttackPosition)
+void CPlayerPawn::Change_HitState(_uint iArmorIndex, const CCollider::COLLISION_DATA& CollisionData)
 {
+	ATTACK_DATA* AttackData = static_cast<ATTACK_DATA*>(CollisionData.pDesc);
+
+	if (!(m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD)))
+	{
+		DecreaseArmorDurability(iArmorIndex, AttackData->fDamage);
+		m_pStatus->fHealth -= AttackData->fDamage;
+	}
+
+	ATTACK_TYPE eAttackType = AttackData->eAttackType;
+	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+	_vector vAttackPosition = AttackData->vAttackPosition;
+
 	_bool IsRotate = false;
 
 	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD))
@@ -449,6 +457,8 @@ void CPlayerPawn::Change_HitState(ATTACK_TYPE eAttackType, _fvector vPosition, _
 			break;
 		}
 		}
+
+		Request_HitEffect(eAttackType, CollisionData);
 	}
 
 	if (IsRotate)
@@ -512,6 +522,114 @@ void CPlayerPawn::DecreaseArmorDurability(_uint iArmorIndex, _float fDamage)
 	_uint iRandomIndex = OtherIndices[rand() % OtherIndices.size()];
 
 	DecreaseArmorDurability(iRandomIndex, fTestDamage);
+}
+
+void CPlayerPawn::Request_SpawnTrail(const string& strBoneName, _uint iTrailType)
+{
+	_float2 vSize = {};
+	_bool IsEmissive = {};
+	_wstring strTrailName = {};
+	_float fLifeTime = {};
+
+	switch (iTrailType)
+	{
+	case 0:
+	{
+		vSize = _float2(0.f, 25.f);
+		IsEmissive = false;
+		strTrailName = TEXT("SwordTrail");
+		fLifeTime = 0.5f;
+	}
+		break;
+	case 1:
+	{
+		vSize = _float2(-20.f, 20.f);
+		IsEmissive = false;
+		strTrailName = TEXT("KickTrail");
+		fLifeTime = 1.f;
+	}
+		break;
+	}
+
+	CEffect_Trail::TRAIL_DESC TrailDesc = {};
+
+	TrailDesc.pSocketMatrix = m_pPlayerBody->SocketCombinedMatrixPtr(strBoneName);
+	TrailDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	TrailDesc.IsSwing = &m_IsSwing;
+	TrailDesc.vLeftPosition = _float3(0.f, vSize.x, 0.f);
+	TrailDesc.vRightPosition = _float3(0.f, vSize.y, 0.f);
+	TrailDesc.fLifeTime = fLifeTime;
+	TrailDesc.fNodeUpdateTime = 0.f;
+	TrailDesc.IsEmissive = IsEmissive;
+
+	m_pPool_Instance->Request_SpawnEffect(strTrailName, &TrailDesc);
+}
+
+HRESULT CPlayerPawn::Ready_EffectNotify()
+{
+	ifstream File("../Bin/Resources/AnimDatas/Player_Effect_AnimDatas.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Player_Effect_AnimDatas Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
+
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_float fTrackPosition = {};
+			
+			string strBoneName = "";
+
+
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+
+			if (Notify.HasMember("TrackPosition") && Notify["TrackPosition"].IsFloat())
+				fTrackPosition = Notify["TrackPosition"].GetFloat();
+
+			if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
+				strBoneName = Notify["BoneName"].GetString();
+
+			_tchar strEffectName[MAX_PATH] = {};
+
+			if (Notify.HasMember("EffectName") && Notify["EffectName"].IsString())
+			{
+				string Name = Notify["EffectName"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), strEffectName, static_cast<_int>(Name.size()));
+			}
+
+			m_pPlayerBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, strBoneName, strEffectName]() {
+				CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
+				if(false == strcmp(strBoneName.c_str(), "NONE"))
+					EffectDesc.SpawnWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+				else
+					EffectDesc.SpawnWorldMatrix = XMMatrixMultiply(XMLoadFloat4x4(m_pPlayerBody->SocketCombinedMatrixPtr(strBoneName)), m_pTransformCom->Get_WorldMatrix());
+
+				EffectDesc.IsEmissive = true;
+
+				m_pPool_Instance->Request_SpawnEffect(strEffectName, &EffectDesc);
+				});
+		}
+	}
+
+	return S_OK;
 }
 
 
@@ -957,6 +1075,10 @@ HRESULT CPlayerPawn::Ready_TrailNotify()
 			_float fTrackPosition = {};
 			NOTIFY_TYPE eType = {};
 
+			string strBoneName = "";
+			_uint iTrailType = {};
+			
+
 			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
 				strAnimName = Notify["AnimName"].GetString();
 
@@ -968,20 +1090,14 @@ HRESULT CPlayerPawn::Ready_TrailNotify()
 
 			if(eType == NOTIFY_TYPE::ON)
 			{
-				m_pPlayerBody->Add_AnimNotify(strAnimName, fTrackPosition, [this]() {
-					CEffect_Trail::TRAIL_DESC TrailDesc = {};
-					
-					TrailDesc.pSocketMatrix = m_pPlayerBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH");
-					TrailDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-					TrailDesc.IsSwing = &m_IsSwing;
-					TrailDesc.vLeftPosition = _float3(0.f, 0.f, 0.f);
-					TrailDesc.vRightPosition = _float3(0.f, 25.f, 0.f);
-					TrailDesc.fLifeTime = 0.5f;
-					TrailDesc.fNodeUpdateTime = 0.f;
-					TrailDesc.IsEmissive = true;
+				if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
+					strBoneName = Notify["BoneName"].GetString();
 
-					m_pPool_Instance->Request_SpawnEffect(TEXT("SwordTrail"), &TrailDesc);
+				if (Notify.HasMember("TrailType") && Notify["TrailType"].IsInt())
+					iTrailType = Notify["TrailType"].GetInt();
 
+				m_pPlayerBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, strBoneName, iTrailType]() {
+					Request_SpawnTrail(strBoneName, iTrailType);
 					m_IsSwing = true; });
 			}
 			else

@@ -39,13 +39,17 @@ void CFireBall::Update(_float fTimeDelta)
 {
 	if (*m_pIsSwing)
 	{
+		m_pColliderContainer->SetEnableAllColliderChannel(true);
 		m_IsMove = true;
 		Update_Bezier();
 		*m_pIsSwing = false;
 	}
 
 	if (m_IsMove)
+	{
+		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
 		CProjectile::Move(fTimeDelta);
+	}
 	else
 		m_pTransformCom->Set_WorldMatrix(XMMatrixMultiply(XMLoadFloat4x4(m_pSocektMatrixPtr), XMLoadFloat4x4(m_pOwnerMatrixPtr)));
 
@@ -66,11 +70,12 @@ void CFireBall::Update(_float fTimeDelta)
 	//test
 	if (XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION)) <= 0.f)
 		ReturnToPool();
+	
 }
 
 void CFireBall::Late_Update(_float fTimeDelta)
 {
-//	m_pGameInstance->Add_ActionCollider()
+	m_pColliderContainer->Update(this, m_pTransformCom->Get_WorldMatrix());
 }
 
 HRESULT CFireBall::Render()
@@ -84,8 +89,11 @@ HRESULT CFireBall::Spawn(void* pArg)
 
 	m_IsActive = true;
 
-	m_eType = pDesc->eType;
-	m_fDamage = pDesc->fDamage;
+	m_CurrentAttackData.eAttackType = pDesc->eType;
+	m_CurrentAttackData.fDamage = pDesc->fDamage;
+	
+	m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), 0, &m_CurrentAttackData);
+
 	m_pTargetTransformCom = pDesc->pTargetTransform;
 
 	m_pIsSwing = pDesc->pIsSwing;
@@ -104,6 +112,16 @@ HRESULT CFireBall::Spawn(void* pArg)
 
 void CFireBall::ReturnToPool()
 {
+	CEffect::EFFECT_SPAWN_DESC EffectDesc = {};
+	EffectDesc.SpawnWorldMatrix = m_pTransformCom->Get_WorldMatrix();
+	EffectDesc.IsEmissive = false;
+
+	if (FAILED(m_pPoolInstance->Request_SpawnEffect(TEXT("Explosion_Prefab"), &EffectDesc)))
+		return;
+
+	m_pColliderContainer->SetEnableAllColliderChannel(false);
+	m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), 0, nullptr);
+
 	m_pPoolInstance->ReturnPool(TEXT("FireBall"), this);
 	m_IsMove = false;
 	m_IsActive = false;
@@ -115,17 +133,25 @@ void CFireBall::ReturnToPool()
 
 HRESULT CFireBall::Ready_Component()
 {
-	CBoundingSphere::BOUNDING_SPHERE_DESC BoundingDesc = {};
-	BoundingDesc.fRadius = 10.f;
-	BoundingDesc.vCenter = _float3(0.f, 0.f, 0.f);
+	CBoundingAABB::BOUNDING_AABB_DESC  AABBDesc = {};
+	AABBDesc.vExtents = _float3(20.f, 20.f, 20.f);
+	AABBDesc.vCenter = _float3(0.f, 0.f, 0.f);
 
-	CCollider::COLLIDER_DESC ColliderDesc = {};
-	ColliderDesc.iChannel = ENUM_CLASS(COLLIDER_CHANNEL::ATTACK);
-	ColliderDesc.iOwner = ENUM_CLASS(COLLIDER_OWNER::MONSTER);
-	ColliderDesc.BoundingDesc = &BoundingDesc;
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &AABBDesc, nullptr)))
+		return E_FAIL;
 
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_Sphere"),
-		TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &ColliderDesc)))
+	CBoundingOBB::BOUNDING_OBB_DESC OBBDesc = {};
+	OBBDesc.vAngles = _float3(0.f, 0.f, 0.f);
+	OBBDesc.vExtents = _float3(15.f, 15.f, 15.f);
+	OBBDesc.vCenter = _float3(0.f, 0.f, 0.f);
+
+	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_OBB"),
+		ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &OBBDesc, nullptr)))
+		return E_FAIL;
+	
+	if (FAILED(m_pColliderContainer->Bind_Collision_Callback(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), 0, COLLIDER_STATE::BEGIN, [this](const CCollider::COLLISION_DATA& Data) {
+		this->OnCollisionAttack(Data); })))
 		return E_FAIL;
 
 	return S_OK;

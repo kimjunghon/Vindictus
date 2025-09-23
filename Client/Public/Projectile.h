@@ -3,7 +3,7 @@
 #include "GameObject.h"
 
 NS_BEGIN(Engine)
-class CCollider;
+class CColliderContainer;
 class CTransform;
 NS_END
 
@@ -50,12 +50,12 @@ public:
 
 protected:
 	CPool_Instance*			m_pPoolInstance = { nullptr };
-	CCollider*				m_pColliderCom = { nullptr };
+	CColliderContainer*		m_pColliderContainer = { nullptr };
 	CTransform*				m_pTargetTransformCom = { nullptr };
 	
-	_float					m_fDamage = {};
-	ATTACK_TYPE				m_eType = {};
 
+	ATTACK_DATA				m_CurrentAttackData = {};
+	
 	vector<BEZIER_POINT>	m_Points;
 	vector<LUT_DATA>		m_LUT;
 	_float					m_fCurrentDistance = {};
@@ -75,6 +75,8 @@ protected:
 	virtual void	Move(_float fTimeDelta);
 	void			Move_Directional(_float fTimeDelta);
 	void			Move_Curve(_float fTimeDelta);
+
+	void			OnCollisionAttack(const CCollider::COLLISION_DATA& CollisionData);
 
 public:
 	virtual CGameObject*	Clone(void* pArg) PURE;

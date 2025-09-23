@@ -16,7 +16,9 @@ CGlasgavelenBody::CGlasgavelenBody(const CGlasgavelenBody& Prototype)
 
 HRESULT CGlasgavelenBody::Add_AnimNotify(const string& strAnimName, _float fTrackPosition, function<void()> Callback)
 {
-	m_pBrokenModelCom->Add_AnimNotify(strAnimName, fTrackPosition, Callback);
+	if (FAILED(m_pBrokenModelCom->Add_AnimNotify(strAnimName, fTrackPosition, Callback)))
+		return E_FAIL;
+
 	return m_pModelCom->Add_AnimNotify(strAnimName, fTrackPosition, Callback);
 }
 
