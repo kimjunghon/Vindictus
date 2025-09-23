@@ -55,9 +55,6 @@ void CCat::Priority_Update(_float fTimeDelta)
 
 void CCat::Update(_float fTimeDelta)
 {
-    /*if (m_pBody->AnimCanChange() || m_pBody->AnimIsFinished())
-        UpdateAnimFlag();*/
-
     for (auto& Pair : m_PawnObjects)
         Pair.second->Update(fTimeDelta);
 }

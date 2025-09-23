@@ -24,7 +24,8 @@ namespace Client
 			MOUSE =			1 << 6,
 			INVENTORY =		1 << 7,
 			NPC_DIALOG = 1 << 8,
-			DYEING = 1 << 9
+			DYEING = 1 << 9,
+			WORLD_MAP = 1<<10
 		};
 	}
 

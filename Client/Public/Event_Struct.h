@@ -120,4 +120,13 @@ namespace Client
 	{
 		_bool IsNear;
 	}EVENT_DYEING_NPC;
+
+	typedef struct tagEventBoardNPC final : public CEvent
+	{
+		_bool IsNear;
+	}EVENT_BOARD_NPC;
+
+	typedef struct tagEventGavelenCutscene final : public CEvent
+	{
+	}EVENT_GAVELEN_CUTSCENE;
 }

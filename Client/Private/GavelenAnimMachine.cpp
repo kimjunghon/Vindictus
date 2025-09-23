@@ -22,7 +22,7 @@ void CGavelenAnimMachine::Initialize_SPAWN()
 {
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::SPAWN);
 
-	m_AnimDatas[iFlag | ENUM_CLASS(SPAWN_FLAG::STAY)] =		{ "CutSean_Idle", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag | ENUM_CLASS(SPAWN_FLAG::STAY)] =		{ "CutSean_Idle", true, _float2(1.f, 1.f), 2.f };
 	m_AnimDatas[iFlag | ENUM_CLASS(SPAWN_FLAG::START)] =	{ "CutSean", false, _float2(1.f, 1.f), 1.5f };
 }
 

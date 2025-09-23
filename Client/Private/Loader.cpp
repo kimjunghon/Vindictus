@@ -23,6 +23,7 @@
 #include "PuppyBody.h"
 #include "Cat.h"
 #include "Cat_Body.h"
+#include "WorldBoard.h"
 
 #include "Glasgavelen.h"
 #include "GlasgavelenBody.h"
@@ -292,6 +293,11 @@ HRESULT CLoader::Loading_For_Town_Level()
 		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Npc/Cat.dat", PreTransformMatrix))))
 		return E_FAIL;
 
+	/* Prototype_Component_Model_WorldBoard */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Model_WorldBoard"),
+		CModel::Create(m_pDevice, m_pDeviceContext, MODEL_TYPE::INFILE, "../Bin/Resources/Models/Npc/WorldBoard.dat", PreTransformMatrix))))
+		return E_FAIL;
+
 
 	if (FAILED(Loading_For_MapModel(LEVEL::TOWN, "../Bin/Resources/Map/Town.dat")))
 		return E_FAIL;
@@ -338,6 +344,10 @@ HRESULT CLoader::Loading_For_Town_Level()
 		CCat_Body::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_GameObject_WorldBoard */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_WorldBoard"),
+		CWorldBoard::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);

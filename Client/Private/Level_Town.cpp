@@ -6,6 +6,7 @@
 #include "PlayerPawn.h"
 #include "Puppy.h"
 #include "Cat.h"
+#include "WorldBoard.h"
 #include "Weapon.h"
 #include "Armor.h"
 #include "Effect_Distortion.h"
@@ -199,6 +200,20 @@ HRESULT CLevel_Town::Ready_NPC(const Value& NPC_Data)
 
 			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_Cat"),
 				ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_NPC"), &CatDesc)))
+				return E_FAIL;
+		}
+		else if (!strcmp(strName.c_str(), "WorldBoard"))
+		{
+			CMapObject::MAP_OBJECT_DESC BoardDesc = {};
+			BoardDesc.IsNormal = false;
+			BoardDesc.IsAmbient = false;
+			BoardDesc.IsSpecular = false;
+			BoardDesc.iModelLevel = ENUM_CLASS(LEVEL::TOWN);
+			BoardDesc.strModelTag = TEXT("Prototype_Component_Model_WorldBoard");
+			XMStoreFloat4x4(&BoardDesc.WorldMatrix, XMMatrixTranslationFromVector(XMVectorSetW(XMLoadFloat3(&vPosition),1.f)));
+
+			if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_GameObject_WorldBoard"),
+				ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_NPC"), &BoardDesc)))
 				return E_FAIL;
 		}
 	}

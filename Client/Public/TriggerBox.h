@@ -3,7 +3,7 @@
 #include "GameObject.h"
 
 NS_BEGIN(Engine)
-class CCollider_Container;
+class CColliderContainer;
 NS_END
 
 NS_BEGIN(Client)
@@ -12,6 +12,8 @@ class CTriggerBox final : public CGameObject
 {
 public:
 	typedef struct tagTriggerDesc : public GAMEOBJECT_DESC {
+		_vector vPosition;
+		_float3 vSize;
 		function<void()> Callback;
 	}TRIGGER_DESC;
 
@@ -29,11 +31,11 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	CCollider_Container*	m_pCollider_Container = { nullptr };
+	CColliderContainer*		m_pColliderContainer = { nullptr };
 	function<void()>		m_Callback;
 
 private:
-	HRESULT Ready_Component();
+	HRESULT Ready_Component(_float3 vSize);
 
 public:
 	static CTriggerBox* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

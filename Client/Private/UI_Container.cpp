@@ -41,7 +41,11 @@ HRESULT CUI_Container::Initialize(void* pArg)
 		this->Event_LevelChange(Event); });
 
 	m_pGameInstance->Subscribe<EVENT_DYEING_NPC>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_DYEING_NPC& Event) {
-		this->Eveny_DyeingNpc(Event); });
+		this->Event_DyeingNpc(Event); });
+
+	m_pGameInstance->Subscribe<EVENT_BOARD_NPC>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_BOARD_NPC& Event) {
+		this->Event_BoardNPC(Event); });
+
 
 	return S_OK;
 }
@@ -201,7 +205,9 @@ HRESULT CUI_Container::Ready_GamePlay_UI()
 
 	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Dyeing"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
 		return E_FAIL;
-
+	
+	if (FAILED(Add_UIObject(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_WorldMap"), ENUM_CLASS(UI_LEVEL::GAMEPLAY), &Panel_Desc)))
+		return E_FAIL;
 	return S_OK;
 }
 
@@ -254,10 +260,18 @@ void CUI_Container::Event_LevelChange(const EVENT_UI_LEVEL_CHANGE& Event)
 	}
 }
 
-void CUI_Container::Eveny_DyeingNpc(const EVENT_DYEING_NPC& Event)
+void CUI_Container::Event_DyeingNpc(const EVENT_DYEING_NPC& Event)
 {
 	if (Event.IsNear)
 		m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::NPC_DIALOG);
+	else
+		m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
+}
+
+void CUI_Container::Event_BoardNPC(const EVENT_BOARD_NPC& Event)
+{
+	if (Event.IsNear)
+		m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::WORLD_MAP);
 	else
 		m_iUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
 }

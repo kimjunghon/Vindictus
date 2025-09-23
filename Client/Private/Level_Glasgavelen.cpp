@@ -6,6 +6,7 @@
 #include "Pool_Instance.h"
 #include "Effect_Distortion.h"
 #include "Camera_CS.h"
+#include "TriggerBox.h"
 
 CLevel_Glasgavelen::CLevel_Glasgavelen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
@@ -37,17 +38,16 @@ HRESULT CLevel_Glasgavelen::Initialize()
 	if (FAILED(Ready_Camera()))
 		return E_FAIL;
 
+	if (FAILED(Ready_TriggerBox()))
+		return E_FAIL;
+
+	m_pPool_Instance->SpawnRoom(0, 0);	
+
 	return S_OK;
 }
 
 void CLevel_Glasgavelen::Update(_float fTimeDelta)
 {
-#ifdef _DEBUG
-	if (m_pGameInstance->Get_KeyDown(DIK_F1))
-	{
-		m_pPool_Instance->SpawnRoom(0, 0);
-	}
-#endif
 
 }
 
@@ -67,6 +67,21 @@ HRESULT CLevel_Glasgavelen::Ready_Light()
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(TEXT("DIRECTONAL"), LightDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Glasgavelen::Ready_TriggerBox()
+{
+	CTriggerBox::TRIGGER_DESC Trigger_Desc = {};
+
+	Trigger_Desc.vPosition = XMVectorSet(10.f, 0.f, 10.f, 1.f);
+	Trigger_Desc.vSize = _float3(20.f, 20.f, 20.f);
+	Trigger_Desc.Callback = [this]() { EVENT_GAVELEN_CUTSCENE Event = {}; m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event); };
+	
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_TriggerBox"),
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_TriggerBox"), &Trigger_Desc)))
 		return E_FAIL;
 
 	return S_OK;

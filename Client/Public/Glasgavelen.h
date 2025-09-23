@@ -28,6 +28,7 @@ public:
 	_bool					IsGrap() { return m_IsGrap; }
 	void					WingBreak();
 	void					Change_BrokenModel();
+	void					End_Cutscene();
 
 public:
 	virtual HRESULT Initialize_Prototype() override;
@@ -97,13 +98,15 @@ private:
 	HRESULT				Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float fTrackPosition);
 	virtual HRESULT		Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition) override;
 	
-	HRESULT				Change_Camera();
 
 	void				Change_ColliderSocketMatrix();
 	void				Compute_WorldMatrix();
 	void				OnCollisionGrap(const CCollider::COLLISION_DATA& CollisionData);
 	void				OnCollisionHit(_uint HitColliderIndex, const CCollider::COLLISION_DATA& CollisionData);
 	void				DecreaseHealth(_float fDamage);
+
+	void				Event_Cutscene(const EVENT_GAVELEN_CUTSCENE& Event);
+	HRESULT				Change_Camera();
 
 public:
 	static CGlasgavelen*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

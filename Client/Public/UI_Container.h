@@ -40,7 +40,8 @@ private:
 	HRESULT			Ready_GamePlay_UI();
 
 	void			Event_LevelChange(const EVENT_UI_LEVEL_CHANGE& Event);
-	void			Eveny_DyeingNpc(const EVENT_DYEING_NPC& Event);
+	void			Event_DyeingNpc(const EVENT_DYEING_NPC& Event);
+	void			Event_BoardNPC(const EVENT_BOARD_NPC& Event);
 
 public:
 	static CUI_Container*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

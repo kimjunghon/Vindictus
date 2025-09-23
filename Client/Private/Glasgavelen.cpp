@@ -116,15 +116,8 @@ HRESULT CGlasgavelen::Initialize(void* pArg)
 
 	if (FAILED(CMonster::Ready_EffectNotify("../Bin/Resources/AnimDatas/Gavelen_Effect_AnimDats.json")))
 		return E_FAIL;
-	//if (FAILED(Ready_EffectNotify()))
-	//	return E_FAIL;
 
-	EVENT_BIND_BOSSHP Event = {};
-	Event.m_fLineHP = 200.f;
-	Event.m_fMaxBossHP = m_Status.fFullHealth;
-	Event.m_pCurrentBossHP = &m_Status.fHealth;
-
-	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+	m_pGameInstance->Subscribe<EVENT_GAVELEN_CUTSCENE>(ENUM_CLASS(EVENT_TYPE::NONSTATIC), [this](const EVENT_GAVELEN_CUTSCENE& Event) { this->Event_Cutscene(Event); });
 
 	return S_OK;
 }
@@ -187,25 +180,24 @@ HRESULT CGlasgavelen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 {
 	m_IsActive = true;
 
-	LookAtTarget();
-
 	ChangeState(ENUM_CLASS(GAVELEN_STATE::SPAWN));
+
 	Bind_StateFlag();
 
 	m_pBody->Forcing_Play_Animation();
 
 	m_pNavigationCom = m_pGameInstance->Clone_CurrentNavigation(SpawnData.iCellIndex);
 
+	_vector vRotate = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(180.f));
+
 	_vector vPosition = XMVectorSetW(XMLoadFloat3(&SpawnData.vPosition), 1.f);
 
 	m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+	m_pTransformCom->RotateQuaternion(vRotate);
 
 	m_pColliderContainer->SetEnableAllColliderChannel(true);
 
 	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), false);
-
-	if (FAILED(Change_Camera()))
-		return E_FAIL;
 
 	return S_OK;
 }
@@ -398,6 +390,7 @@ HRESULT CGlasgavelen::Ready_GavelenStates()
 	CMonsterStateFactory* pStateFactory = CMonsterStateFactory::GetInstance();
 
 	m_States[ENUM_CLASS(GAVELEN_STATE::SPAWN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::SPAWN));
+	m_States[ENUM_CLASS(GAVELEN_STATE::CUTSCENE)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::CUTSCENE));
 	m_States[ENUM_CLASS(GAVELEN_STATE::IDLE)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::IDLE));
 	m_States[ENUM_CLASS(GAVELEN_STATE::MOVE)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::MOVE));
 	m_States[ENUM_CLASS(GAVELEN_STATE::TURN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::TURN));
@@ -442,7 +435,6 @@ HRESULT CGlasgavelen::Ready_Collider_Bounding()
 	if (FAILED(m_pColliderContainer->Add_Collider(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Collider_AABB"),
 		ENUM_CLASS(COLLIDER_CHANNEL::BOUNDING), ENUM_CLASS(COLLIDER_OWNER::MONSTER), &AABBDesc, nullptr)))
 		return E_FAIL;
-
 
 	return S_OK;
 }
@@ -712,6 +704,18 @@ HRESULT CGlasgavelen::Add_AttackCollisionNotify(const string& strAnimName, _uint
 	return S_OK;
 }
 
+void CGlasgavelen::Event_Cutscene(const EVENT_GAVELEN_CUTSCENE& Event)
+{
+	ChangeState(ENUM_CLASS(GAVELEN_STATE::CUTSCENE));
+
+	Bind_StateFlag();
+
+	m_pBody->Forcing_Play_Animation();
+
+	if (FAILED(Change_Camera()))
+		MSG_BOX(TEXT("Failed Change Gavelen Cutscene"));
+}
+
 HRESULT CGlasgavelen::Change_Camera()
 {
 	_vector vOffsetPosition = XMVectorSet(0.f, 0.f, -20.f, 1.f);
@@ -724,6 +728,16 @@ HRESULT CGlasgavelen::Change_Camera()
 		return E_FAIL;
 
 	return S_OK;
+}
+
+void CGlasgavelen::End_Cutscene()
+{
+	EVENT_BIND_BOSSHP Event = {};
+	Event.m_fLineHP = 200.f;
+	Event.m_fMaxBossHP = m_Status.fFullHealth;
+	Event.m_pCurrentBossHP = &m_Status.fHealth;
+
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 }
 
 

@@ -9,7 +9,7 @@ NS_END
 
 NS_BEGIN(Client)
 
-class CMapObject final : public CGameObject
+class CMapObject : public CGameObject
 {
 public:
 	typedef struct tagMapObjectDesc : public GAMEOBJECT_DESC
@@ -22,7 +22,7 @@ public:
 		_bool		IsAmbient = {true};
 	}MAP_OBJECT_DESC;
 
-private:
+protected:
 	CMapObject(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CMapObject(const CMapObject& Prototype);
 	virtual ~CMapObject() = default;
@@ -36,16 +36,18 @@ public:
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Shadow() override;
 
-private:
+protected:
 	CModel*			m_pModelCom = { nullptr };
 	CShader*		m_pShaderCom = { nullptr };
 
 	_bool			m_IsNormal = { };
 	_bool			m_IsSpecular = { };
 	_bool			m_IsAmbient = { };
+
 private:
 	HRESULT Ready_Components(_uint iModelLevel, const _wstring& strModelTag);
 	HRESULT Bind_ShaderResources();
+
 public:
 	static CMapObject*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg);

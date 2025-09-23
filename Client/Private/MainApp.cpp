@@ -37,6 +37,7 @@
 #include "DyeingSlots.h"
 #include "DyeingPalette.h"
 #include "ColorPoint.h"
+#include "WorldMap.h"
 
 //Controller
 #include "Controller_KeyBoard.h"
@@ -52,11 +53,11 @@
 #include "PlayerBody.h"
 #include "Armor.h"
 #include "Weapon.h"
-#include "Camera_CS.h"
 //Map
 #include "Map.h"
 #include "MapObject.h"
-
+#include "TriggerBox.h"
+#include "Camera_CS.h"
 //Effect
 #include "Effect_Static.h"
 
@@ -108,7 +109,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::GLASGAVELEN)))
+	if (FAILED(Start_Level(LEVEL::TOWN)))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
@@ -324,12 +325,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CCamera_Target::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Prototype_GameObject_Camera_CS */
+	/* Prototype_GameObject_Camera_Cutscene */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Cutscene"),
 		CCamera_CS::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-	/* Prototype_GameObject_MapObject */
+	/* Prototype_GameObject_Map */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Map"),
 		CMap::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
@@ -337,6 +338,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	/* Prototype_GameObject_MapObject */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_MapObject"),
 		CMapObject::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_TriggerBox */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_TriggerBox"),
+		CTriggerBox::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_ForStatic_UI()))
@@ -508,6 +514,16 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/DyeingColorBack.png"), 1))))
 		return E_FAIL;
 
+	/* Prototype_Component_Texture_GamePlay_WorldMap */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_WorldMap"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/WorldMap.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_GamePlay_QueenMap */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_QueenMap"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/_usa_wharf_ship3_icon.png"), 1))))
+		return E_FAIL;
+
 #pragma endregion
 
 	return S_OK;
@@ -647,7 +663,9 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_UI()
 		CColorPoint::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
-
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_WorldMap"),
+		CWorldMap::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 #pragma endregion
 
 #pragma endregion

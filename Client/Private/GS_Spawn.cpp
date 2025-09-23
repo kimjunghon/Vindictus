@@ -14,7 +14,7 @@ HRESULT CGS_Spawn::Initialize()
 
 void CGS_Spawn::Enter(CMonster* pMonster)
 {
-	ChangeActionFlag(ENUM_CLASS(SPAWN_FLAG::START));
+	ChangeActionFlag(ENUM_CLASS(SPAWN_FLAG::STAY));
 }
 
 void CGS_Spawn::Update(CMonster* pMonster, _float fTimeDelta)

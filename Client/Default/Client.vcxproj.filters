@@ -523,6 +523,15 @@
     <Filter Include="03.GameObject\TriggerBox">
       <UniqueIdentifier>{6dca8c91-1531-4cdd-920a-17fe7f23c952}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\WorldMap">
+      <UniqueIdentifier>{8d8e53fb-4ec4-4376-bcf4-207b3805a902}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Map\MapObject\WorldBoard">
+      <UniqueIdentifier>{d7460b2e-fd99-42ba-961f-e71b2a79061e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\SkyBox">
+      <UniqueIdentifier>{d819caee-c087-4170-8e4e-c9d0696238d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -1017,6 +1026,18 @@
     <ClInclude Include="..\public\TriggerBox.h">
       <Filter>03.GameObject\TriggerBox</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\GS_Cutscene.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Spawn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WorldMap.h">
+      <Filter>03.GameObject\UIObject\GamePlay\WorldMap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\WorldBoard.h">
+      <Filter>03.GameObject\Map\MapObject\WorldBoard</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\SkyBox.h">
+      <Filter>03.GameObject\SkyBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1496,6 +1517,18 @@
     </ClCompile>
     <ClCompile Include="..\private\TriggerBox.cpp">
       <Filter>03.GameObject\TriggerBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Cutscene.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Spawn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WorldMap.cpp">
+      <Filter>03.GameObject\UIObject\GamePlay\WorldMap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\WorldBoard.cpp">
+      <Filter>03.GameObject\Map\MapObject\WorldBoard</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\SkyBox.cpp">
+      <Filter>03.GameObject\SkyBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
