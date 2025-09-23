@@ -52,7 +52,7 @@
 #include "PlayerBody.h"
 #include "Armor.h"
 #include "Weapon.h"
-
+#include "Camera_CS.h"
 //Map
 #include "Map.h"
 #include "MapObject.h"
@@ -108,7 +108,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::QUEEN)))
+	if (FAILED(Start_Level(LEVEL::GLASGAVELEN)))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
@@ -322,6 +322,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	/* Prototype_GameObject_Camera_Target */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Target"),
 		CCamera_Target::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_Camera_CS */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Cutscene"),
+		CCamera_CS::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	/* Prototype_GameObject_MapObject */

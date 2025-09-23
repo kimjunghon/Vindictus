@@ -231,6 +231,7 @@
     <ClInclude Include="..\public\QS_Turn.h" />
     <ClInclude Include="..\public\State_Grap.h" />
     <ClInclude Include="..\public\Effect_Trail.h" />
+    <ClInclude Include="..\public\TriggerBox.h" />
     <ClInclude Include="..\Public\VS_Attack.h" />
     <ClInclude Include="..\public\VS_Dead.h" />
     <ClInclude Include="..\public\VS_DeadStrong.h" />
@@ -395,6 +396,7 @@
     <ClCompile Include="..\private\QS_Turn.cpp" />
     <ClCompile Include="..\private\State_Grap.cpp" />
     <ClCompile Include="..\private\Effect_Trail.cpp" />
+    <ClCompile Include="..\private\TriggerBox.cpp" />
     <ClCompile Include="..\Private\VS_Attack.cpp" />
     <ClCompile Include="..\private\VS_Dead.cpp" />
     <ClCompile Include="..\private\VS_DeadStrong.cpp" />

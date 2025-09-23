@@ -8,6 +8,7 @@
 #include "EnergyBall.h"
 #include "GavelenRock.h"
 #include "Effect_Trail.h"
+#include "Camera_CS.h"
 
 CGlasgavelen::CGlasgavelen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -202,6 +203,9 @@ HRESULT CGlasgavelen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	m_pColliderContainer->SetEnableAllColliderChannel(true);
 
 	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), false);
+
+	if (FAILED(Change_Camera()))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -704,6 +708,20 @@ HRESULT CGlasgavelen::Add_AttackCollisionNotify(const string& strAnimName, _uint
 			})))
 			return E_FAIL;
 	}
+
+	return S_OK;
+}
+
+HRESULT CGlasgavelen::Change_Camera()
+{
+	_vector vOffsetPosition = XMVectorSet(0.f, 0.f, -20.f, 1.f);
+	
+	CCamera_CS::CAMERA_CS_RESET_DESC CS_Reset_Desc = {};
+	CS_Reset_Desc.pOwnerWorldMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	CS_Reset_Desc.OffsetMatrix = XMMatrixTranslationFromVector(vOffsetPosition);
+
+	if (FAILED(m_pGameInstance->Change_Camera(TEXT("Gavelen_CS_Camera"), &CS_Reset_Desc)))
+		return E_FAIL;
 
 	return S_OK;
 }

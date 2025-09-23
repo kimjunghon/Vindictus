@@ -5,6 +5,7 @@
 #include "PlayerPawn.h"
 #include "Pool_Instance.h"
 #include "Effect_Distortion.h"
+#include "Camera_CS.h"
 
 CLevel_Glasgavelen::CLevel_Glasgavelen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
@@ -31,6 +32,9 @@ HRESULT CLevel_Glasgavelen::Initialize()
 		return E_FAIL;
 	
 	if (FAILED(Ready_Map(TEXT("Layer_GameObject"))))
+		return E_FAIL;
+
+	if (FAILED(Ready_Camera()))
 		return E_FAIL;
 
 	return S_OK;
@@ -130,6 +134,24 @@ HRESULT CLevel_Glasgavelen::Ready_Player(const Value& Player)
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_PlayerPawn"),
 		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Player"), &PlayerDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Glasgavelen::Ready_Camera()
+{
+	CCamera_CS::CAMERA_CS_DESC CS_Desc = {};
+	CS_Desc.vEye = _float4(0.f, 30.f, -150.f, 1.f);
+	CS_Desc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CS_Desc.fFov = XMConvertToRadians(60.0f);
+	CS_Desc.fNear = 0.1f;
+	CS_Desc.fFar = 3000.f;
+	CS_Desc.fSpeedPerSec = 0.f;
+	CS_Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CS_Desc.pFilePath = "../Bin/Resources/Cutscene/realrealreal.dat";
+	
+	if (FAILED(m_pGameInstance->Add_CameraToManager(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Cutscene"), TEXT("Gavelen_CS_Camera"), nullptr, &CS_Desc)))
 		return E_FAIL;
 
 	return S_OK;

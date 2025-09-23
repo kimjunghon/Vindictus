@@ -520,6 +520,9 @@
     <Filter Include="03.GameObject\Camera\CS_Camera">
       <UniqueIdentifier>{3dbf9136-81a8-47ea-b2e4-052f174ab301}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\TriggerBox">
+      <UniqueIdentifier>{6dca8c91-1531-4cdd-920a-17fe7f23c952}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -1011,6 +1014,9 @@
     <ClInclude Include="..\public\Camera_CS.h">
       <Filter>03.GameObject\Camera\CS_Camera</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\TriggerBox.h">
+      <Filter>03.GameObject\TriggerBox</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1487,6 +1493,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Camera_CS.cpp">
       <Filter>03.GameObject\Camera\CS_Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\TriggerBox.cpp">
+      <Filter>03.GameObject\TriggerBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

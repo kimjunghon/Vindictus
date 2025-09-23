@@ -97,7 +97,7 @@ private:
 	HRESULT				Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float fTrackPosition);
 	virtual HRESULT		Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition) override;
 	
-	
+	HRESULT				Change_Camera();
 
 	void				Change_ColliderSocketMatrix();
 	void				Compute_WorldMatrix();
