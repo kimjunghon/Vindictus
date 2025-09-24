@@ -4,8 +4,8 @@
 #include "Map.h"
 #include "PlayerPawn.h"
 #include "Pool_Instance.h"
-#include "Effect.h"
 #include "Effect_Distortion.h"
+#include "SkyBox.h"
 
 CLevel_Queen::CLevel_Queen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
@@ -17,6 +17,9 @@ CLevel_Queen::CLevel_Queen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceCo
 HRESULT CLevel_Queen::Initialize()
 {
 	if (FAILED(Ready_Light()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Sky()))
 		return E_FAIL;
 
 	if (FAILED(Ready_GameObjectToJson()))
@@ -99,6 +102,19 @@ HRESULT CLevel_Queen::Ready_Light()
 		return E_FAIL;
 
 	m_pGameInstance->Update_ShadowLight(XMVectorSet(0.f, 0.f, 0.f, 1.f));
+
+	return S_OK;
+}
+
+HRESULT CLevel_Queen::Ready_Sky()
+{
+	CSkyBox::SKYBOX_DESC SkyDesc = {};
+	SkyDesc.iTextureLevel = ENUM_CLASS(LEVEL::QUEEN);
+	SkyDesc.strTextureTag = TEXT("Prototype_Component_Texture_Battle_Sky");
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkyBox"),
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Sky"), &SkyDesc)))
+		return E_FAIL;
 
 	return S_OK;
 }

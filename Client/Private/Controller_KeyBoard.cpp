@@ -7,7 +7,7 @@ CController_KeyBoard::CController_KeyBoard()
 
 HRESULT CController_KeyBoard::Initialize()
 {
-    m_fSensor = 1.f;
+    m_fSensor = 1.5f;
 
     return S_OK;
 }

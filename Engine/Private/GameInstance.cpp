@@ -22,6 +22,7 @@
 #include "Collider_Manager.h"
 #include "Shadow.h"
 #include "Frustum.h"
+#include "Font_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -103,6 +104,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 
     m_pFrustum = CFrustum::Create();
     if (nullptr == m_pFrustum)
+        return E_FAIL;
+
+    m_pFont_Manager = CFont_Manager::Create(*ppDevice, *ppDeviceContext);
+    if (nullptr == m_pFont_Manager)
         return E_FAIL;
 
     return S_OK;
@@ -555,6 +560,17 @@ const _float4* CGameInstance::Get_Frustum_WorldPoints() const
 }
 #pragma endregion
 
+#pragma region FONT_MANAGER
+HRESULT CGameInstance::Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath)
+{
+    return m_pFont_Manager->Add_Font(strFontTag, pFontFilePath);
+}
+void CGameInstance::DrawFont(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRadian, const _float2& vOrigin, const _float2& vScale)
+{
+    m_pFont_Manager->DrawFont(strFontTag, pText, vPosition, vColor, fRadian, vOrigin, vScale);
+}
+#pragma endregion
+
 void CGameInstance::Release_Engine()
 {
     Release();
@@ -577,6 +593,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pController_Manager);
     Safe_Release(m_pNavigation_Manager);
     Safe_Release(m_pCollider_Manager);
+    Safe_Release(m_pFont_Manager);
 }
 
 void CGameInstance::Free()

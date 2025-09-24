@@ -57,7 +57,7 @@ PS_OUT PS_MAIN(PS_DEFAULT_IN In)
     
     Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
     
-    if(Out.vColor.a <= 0.5f)
+    if(Out.vColor.a <= 0.3f)
         discard;
     
     return Out;

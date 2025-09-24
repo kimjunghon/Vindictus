@@ -498,6 +498,7 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Effect_Distortion.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_Palette.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />

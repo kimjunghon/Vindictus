@@ -240,6 +240,7 @@ call Copy.bat</Command>
     <ClInclude Include="..\public\UI_Slot.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
     <ClInclude Include="..\public\VIBuffer_Cell.h" />
+    <ClInclude Include="..\public\VIBuffer_Cube.h" />
     <ClInclude Include="..\public\VIBuffer_Instance.h" />
     <ClInclude Include="..\public\VIBuffer_Point_Instance.h" />
     <ClInclude Include="..\public\VIBuffer_Rect.h" />
@@ -320,6 +321,7 @@ call Copy.bat</Command>
     <ClCompile Include="..\private\UI_Slot.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
     <ClCompile Include="..\private\VIBuffer_Cell.cpp" />
+    <ClCompile Include="..\private\VIBuffer_Cube.cpp" />
     <ClCompile Include="..\private\VIBuffer_Instance.cpp" />
     <ClCompile Include="..\private\VIBuffer_Point_Instance.cpp" />
     <ClCompile Include="..\private\VIBuffer_Rect.cpp" />

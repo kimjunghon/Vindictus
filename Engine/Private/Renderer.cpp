@@ -141,7 +141,7 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_LightDepth"), 900.0f, 100.0f, 200.f, 200.f)))
 		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Emissive"), 1150.0f, 100.0f, 200.f, 200.f)))
+	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_MapLightDepth"), 1150.0f, 100.0f, 200.f, 200.f)))
 		return E_FAIL;
 	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Blur"), 1400.0f, 100.0f, 200.f, 200.f)))
 		return E_FAIL;

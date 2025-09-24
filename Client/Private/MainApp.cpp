@@ -58,6 +58,8 @@
 #include "MapObject.h"
 #include "TriggerBox.h"
 #include "Camera_CS.h"
+#include "SkyBox.h"
+
 //Effect
 #include "Effect_Static.h"
 
@@ -115,6 +117,11 @@ HRESULT CMainApp::Initialize()
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
+
+	//TEst
+	m_pGameInstance->Add_Font(TEXT("MainFont"), TEXT("../Bin/Resources/Font/MabinogiHeros.spritefont"));
+
+
 	return S_OK;
 }
 
@@ -133,8 +140,6 @@ void CMainApp::Post_Update()
 		Event_UIChange.iChange_Level = m_iChange_Level;
 		Event_UIChange.bIsLoading = m_bIsLoading;
 		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event_UIChange);
-
-
 
 		CLevel* pNextLevel = Create_NewLevel(m_iChange_Level);
 
@@ -156,6 +161,8 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Render_Begin(&vClearColor);
 	m_pGameInstance->Draw();
+	//TEST
+	m_pGameInstance->DrawFont(TEXT("MainFont"), TEXT("¹è°íÆÄ"), _float2(640.f, 320.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, _float2(0.f, 0.f), _float2(1.f, 1.f));
 	m_pGameInstance->Render_End();
 
 	return S_OK;
@@ -248,6 +255,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 		return E_FAIL;
 
+	/* Prototype_Component_Shader_VtxCube */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxCube"),
+		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
+		return E_FAIL;
+
 	/* Prototype_Component_Shader_VtxNorTex */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
@@ -309,6 +321,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CVIBuffer_Rect::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
+	/* Prototype_Component_VIBuffer_Cube*/
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Cube"),
+		CVIBuffer_Cube::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
 	/* Prototype_Component_VIBuffer_Sphere */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Sphere"),
 		CVIBuffer_Sphere::Create(m_pDevice, m_pDeviceContext, 32, 32))))
@@ -343,6 +360,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	/* Prototype_GameObject_TriggerBox */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_TriggerBox"),
 		CTriggerBox::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_SkyBox */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkyBox"),
+		CSkyBox::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_ForStatic_UI()))

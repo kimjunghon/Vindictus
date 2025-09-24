@@ -72,12 +72,14 @@ HRESULT CTexture::Copy_Resource(_uint iTextureIndex, ID3D11Texture2D* pSourTextu
 	
 	m_SPVs[iTextureIndex]->GetResource(&pDestResource);
 
+
+#ifdef _DEBUG
 	D3D11_TEXTURE2D_DESC srcDesc;
 	((ID3D11Texture2D*)pDestResource)->GetDesc(&srcDesc);
-
 	printf("Src: %dx%d Format=%d Mip=%d Array=%d Usage=%d Bind=0x%X Sample=%d\n",
 		srcDesc.Width, srcDesc.Height, srcDesc.Format, srcDesc.MipLevels, srcDesc.ArraySize,
 		srcDesc.Usage, srcDesc.BindFlags, srcDesc.SampleDesc.Count);
+#endif
 
 	m_pDeviceContext->CopyResource(pSourTexture, pDestResource);
 

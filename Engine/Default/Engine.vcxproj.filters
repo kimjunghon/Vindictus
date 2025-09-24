@@ -238,6 +238,9 @@
     <Filter Include="01.Utility\11.Frustum">
       <UniqueIdentifier>{ab277301-c4ce-4c0d-b780-a02f27a9f4c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\04.Component\VIBuffer\Cube">
+      <UniqueIdentifier>{b031f31e-96af-4d0a-affc-a858f1e6c745}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -483,6 +486,9 @@
     <ClInclude Include="..\public\Frustum.h">
       <Filter>01.Utility\11.Frustum</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Cube.h">
+      <Filter>01.Utility\04.Component\VIBuffer\Cube</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -703,6 +709,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Frustum.cpp">
       <Filter>01.Utility\11.Frustum</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Cube.cpp">
+      <Filter>01.Utility\04.Component\VIBuffer\Cube</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

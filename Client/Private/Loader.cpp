@@ -189,16 +189,16 @@ HRESULT CLoader::Loading_For_Town_Level()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Effect_Distortion"),
 		CEffect_Distortion::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
+	
 	Loading_For_Effect("../Bin/Resources/EffectData/LoadFile/TownEffect.json", ENUM_CLASS(LEVEL::TOWN));
-
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
 
-	///* Prototype_Component_Texture_SwordTrail */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SwordTrail"),
-	//	CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Effect/heroes_effect_blade_trail_longsword.png"), 1))))
-	//	return E_FAIL;
+	/* Prototype_Component_Texture_Town_Sky */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::TOWN), TEXT("Prototype_Component_Texture_Town_Sky"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/SkyBox/TownSkyBox.dds"), 1))))
+		return E_FAIL;
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
@@ -394,6 +394,11 @@ HRESULT CLoader::Loading_For_Queen_Level()
 
 	//////////////////////////////////////////////////////////////TEXTURE//////////////////////////////////////////////////////////////
 	lstrcpy(m_szLoadingText, TEXT("텍스쳐를 로딩중입니다."));
+
+	/* Prototype_Component_Texture_Battle_Sky */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_Component_Texture_Battle_Sky"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/SkyBox/BattleSkyBox.dds"), 1))))
+		return E_FAIL;
 
 	Event.fRatio += 0.2f;
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);

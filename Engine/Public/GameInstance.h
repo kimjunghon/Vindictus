@@ -193,6 +193,12 @@ public:
 	const _float4*	Get_Frustum_WorldPoints() const;
 #pragma endregion
 
+#pragma region FONT_MANAGER
+	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath);
+	void	DrawFont(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRadian, const _float2& vOrigin, const _float2& vScale);
+
+#pragma endregion
+
 private:
 	class CGraphic_Device*		m_pGraphic_Device = { nullptr };
 	class CInput_Device*		m_pInput_Device = { nullptr };
@@ -214,6 +220,7 @@ private:
 	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
 	class CShadow*				m_pShadow = { nullptr };
 	class CFrustum*				m_pFrustum = { nullptr };
+	class CFont_Manager*		m_pFont_Manager = { nullptr };
 
 	POINT						m_ptMousePoint = {};
 public:

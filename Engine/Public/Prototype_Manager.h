@@ -17,6 +17,7 @@
 #include "Navigation.h"
 #include "Collider.h"
 #include "ColliderContainer.h"
+#include "VIBuffer_Cube.h"
 
 NS_BEGIN(Engine)
 
