@@ -31,7 +31,6 @@ public:
 	virtual HRESULT Render();
 	virtual HRESULT Render_Shadow() { return S_OK; }
 
-
 protected:
 	_bool							m_IsActive = { true };
 	ID3D11Device*					m_pDevice = { nullptr };

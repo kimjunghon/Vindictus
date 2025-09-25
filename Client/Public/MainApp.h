@@ -38,7 +38,7 @@ private:
 	CStateFactory*			m_pStateFactory = {nullptr};
 	CMonsterStateFactory*	m_pMonsterStateFactory = { nullptr };
 	CPlayerInstance*		m_pPlayerInstance = { nullptr };
-	CPool_Instance*		m_pPool_Instance = { nullptr };
+	CPool_Instance*			m_pPool_Instance = { nullptr };
 
 private:
 	void	Event_LevelChange(const EVENT_LEVEL_CHANGE& Event);
@@ -53,7 +53,7 @@ private:
 	HRESULT Ready_UI_Container();
 	HRESULT Ready_Controller();
 	HRESULT Ready_Navigations();
-	
+	HRESULT Ready_Sounds(const string& strFolderPath);
 	HRESULT Start_Level(LEVEL eStartLevelID);
 	
 

@@ -44,6 +44,9 @@ HRESULT CVampire_Basic::Initialize(void* pArg)
     if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Vampire_Basic_AnimData.json")))
         return E_FAIL;
 
+    if (FAILED(CMonster::Ready_SoundNotify("../Bin/Resources/AnimDatas/Vampire_Basic_Sound_AnimData.json")))
+        return E_FAIL;
+
     return S_OK;
 }
 

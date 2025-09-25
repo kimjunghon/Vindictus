@@ -84,7 +84,11 @@ HRESULT CQueen::Initialize(void* pArg)
 	if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Queen_AnimData.json")))
 		return E_FAIL;
 
-	if(FAILED(CMonster::Ready_EffectNotify("../Bin/Resources/AnimDatas/Queen_Effect_AnimDatas.json")))
+	if (FAILED(CMonster::Ready_EffectNotify("../Bin/Resources/AnimDatas/Queen_Effect_AnimDatas.json")))
+		return E_FAIL;
+
+	if (FAILED(CMonster::Ready_SoundNotify("../Bin/Resources/AnimDatas/Queen_Sound_AnimData.json")))
+		return E_FAIL;
 
 	return S_OK;
 }

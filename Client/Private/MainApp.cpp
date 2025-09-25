@@ -111,15 +111,17 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Controller()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Sounds("../Bin/Resources/Sounds/")))
+		return E_FAIL;
+
 	if (FAILED(Start_Level(LEVEL::TOWN)))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
-
 	//TEst
-	m_pGameInstance->Add_Font(TEXT("MainFont"), TEXT("../Bin/Resources/Font/MabinogiHeros.spritefont"));
+	m_pGameInstance->Add_Font(TEXT("MainFont"), TEXT("../Bin/Resources/Font/MiddleFont.spritefont"));
 
 
 	return S_OK;
@@ -543,7 +545,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 
 	/* Prototype_Component_Texture_GamePlay_QueenMap */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_QueenMap"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/_usa_wharf_ship3_icon.png"), 1))))
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/wharf_battleCombat_V2_Icon.png"), 1))))
 		return E_FAIL;
 
 #pragma endregion
@@ -768,6 +770,60 @@ HRESULT CMainApp::Ready_Navigations()
 	
 	if (FAILED(m_pGameInstance->Add_Navigation(ENUM_CLASS(LEVEL::GLASGAVELEN), TEXT("../Bin/Resources/Map/GavelenMap_Navigation.dat"))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Sounds(const string& strFolderPath)
+{
+	string strSearchFolder = strFolderPath + "*";
+
+	WIN32_FIND_DATAA FileData;
+
+	HANDLE hdFile = FindFirstFileA(strSearchFolder.c_str(), &FileData);
+
+	while (true)
+	{
+		if (hdFile != INVALID_HANDLE_VALUE)
+		{
+			string strName = FileData.cFileName;
+
+			if (strName == "." || strName == "..")
+			{
+				FindNextFileA(hdFile, &FileData);
+				continue;
+			}
+
+			if (FileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{					
+				string strSubFolderPath = strFolderPath + strName + "/";
+				
+				Ready_Sounds(strSubFolderPath);
+			}
+			else
+			{
+				if (strName.find(".wav") != string::npos)
+				{
+					string strFullFilePath = strFolderPath + strName;
+
+					_char szFileName[MAX_PATH] = {};
+					_splitpath_s(strName.c_str(), nullptr, 0, nullptr, 0, szFileName, MAX_PATH, nullptr, 0);
+
+
+					_tchar szSoundName[MAX_PATH] = {};
+
+					MultiByteToWideChar(CP_UTF8, 0, szFileName, strlen(szFileName), szSoundName, MAX_PATH);
+
+					if (FAILED(m_pGameInstance->Add_Sounds(szSoundName, strFullFilePath.c_str())))
+						return E_FAIL;
+				}
+			}
+			
+		}
+
+		if (!FindNextFileA(hdFile, &FileData))
+			break;
+	}
 
 	return S_OK;
 }

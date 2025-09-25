@@ -43,6 +43,9 @@ HRESULT CVampire_Royal::Initialize(void* pArg)
 	if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Vampire_Royal_AnimData.json")))
 		return E_FAIL;
 
+	if (FAILED(CMonster::Ready_SoundNotify("../Bin/Resources/AnimDatas/Vampire_Royal_Sound_AnimData.json")))
+		return E_FAIL;
+
 	return S_OK;
 }
 

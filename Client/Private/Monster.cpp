@@ -84,7 +84,16 @@ HRESULT CMonster::Ready_AnimNotify(const string& strFilePath)
 			if (Notify.HasMember("OffTrackPosition") && Notify["OffTrackPosition"].IsFloat())
 				vTrackPositionRange.y = Notify["OffTrackPosition"].GetFloat();
 
-			if (FAILED(Add_AttackCollisionNotify(strAnimName, iColliderIndex, eType, fDamageRatio, vTrackPositionRange)))
+			_tchar strHitSoundName[MAX_PATH] = {};
+
+			if (Notify.HasMember("HitSoundName") && Notify["HitSoundName"].IsString())
+			{
+				string Name = Notify["HitSoundName"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), strHitSoundName, static_cast<_int>(Name.size()));
+			}
+
+			if (FAILED(Add_AttackCollisionNotify(strAnimName, iColliderIndex, eType, strHitSoundName, fDamageRatio, vTrackPositionRange)))
 				return E_FAIL;
 			
 		}
@@ -252,6 +261,70 @@ HRESULT CMonster::Ready_EffectNotify(const string& strFilePath)
 	return S_OK;
 }
 
+HRESULT CMonster::Ready_SoundNotify(const _char* pFilePath)
+{
+	ifstream File(pFilePath);
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Sound_AnimDatas Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
+
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_float fTrackPosition = {};
+			_float fVolume = {};
+			_tchar szSoundName[MAX_PATH] = {};
+			_tchar szVoiceName[MAX_PATH] = {};
+			_bool  IsVoice = { false };
+
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+
+			if (Notify.HasMember("TrackPosition") && Notify["TrackPosition"].IsFloat())
+				fTrackPosition = Notify["TrackPosition"].GetFloat();
+
+			if (Notify.HasMember("Volume") && Notify["Volume"].IsFloat())
+				fVolume = Notify["Volume"].GetFloat();
+
+			if (Notify.HasMember("SoundName") && Notify["SoundName"].IsString())
+			{
+				string Name = Notify["SoundName"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), szSoundName, static_cast<_int>(Name.size()));
+			}
+
+			if (Notify.HasMember("SoundVoice") && Notify["SoundVoice"].IsString())
+			{
+				IsVoice = true;
+				string Name = Notify["SoundVoice"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), szVoiceName, static_cast<_int>(Name.size()));
+			}
+
+			if (FAILED(Add_SoundNotify(strAnimName, fTrackPosition, fVolume, szSoundName, IsVoice, szVoiceName)))
+				return E_FAIL;
+		}
+	}
+	return S_OK;
+}
+
 HRESULT CMonster::Add_ReadyAttackNotify(const string& strAnimName, _float2 vTrackPosition)
 {
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this]() {
@@ -267,13 +340,14 @@ HRESULT CMonster::Add_ReadyAttackNotify(const string& strAnimName, _float2 vTrac
 	return S_OK;
 }
 
-HRESULT CMonster::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+HRESULT CMonster::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition)
 {
-	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, strHitSoundName, fAttackRatio]() {
 		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 		m_CurrentAttackData.eAttackType = eType;
-		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
+		m_CurrentAttackData.fDamage = (m_pGameInstance->Rand(m_Status.fAttackDamage - 10.f, m_Status.fAttackDamage + 10.f)) * fAttackRatio;
+		m_CurrentAttackData.HitEffect.strSoundName = strHitSoundName;
 		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
 		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, &m_CurrentAttackData);
 		})))
@@ -282,6 +356,18 @@ HRESULT CMonster::Add_AttackCollisionNotify(const string& strAnimName, _uint iAt
 	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.y, [this, iAttackColliderIndex]() {
 		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, false);
 		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, nullptr);
+		})))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMonster::Add_SoundNotify(const string& strAnimName, _float fTrackPosition, _float fVolume, const _wstring& strSoundName, _bool IsVoice, const _wstring& strVoiceName)
+{
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, fVolume, strSoundName, IsVoice, strVoiceName]() {
+		m_pGameInstance->Play_Sound_AnyChannel(ENUM_CLASS(SOUND_CHANNEL::OTHERS), strSoundName, fVolume);
+		if (IsVoice)
+			m_pGameInstance->Play_Sound_AnyChannel(ENUM_CLASS(SOUND_CHANNEL::OTHERS), strVoiceName, fVolume);
 		})))
 		return E_FAIL;
 
@@ -514,7 +600,12 @@ void CMonster::SpawnHitEffect(const CCollider::COLLISION_DATA& CollisionData, co
 	SpawnDesc.SpawnWorldMatrix = CombinedMatrix;
 	SpawnDesc.IsEmissive = true;
 
-	m_pPool_Instance->Request_SpawnEffect(EffectData.EffectName, &SpawnDesc);
+	_wstring strEffectName = EffectData.strEffectName;
+	_wstring strHitSoundName = EffectData.strSoundName;
+
+	m_pPool_Instance->Request_SpawnEffect(strEffectName, &SpawnDesc);
+
+	m_pGameInstance->Play_Sound_AnyChannel(ENUM_CLASS(SOUND_CHANNEL::OTHERS), strHitSoundName, 0.5f);
 }
 
 void CMonster::Free()

@@ -3,6 +3,7 @@
 float4x4 g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 float g_fStartX, g_fSizeX, g_fProgressBarRatio;
 float g_Alpha = 1.f;
+int   g_iDamage;
 float3 g_vColor;
 texture2D g_Texture;
 
@@ -220,6 +221,25 @@ PS_OUT PS_COLOR(PS_DEFAULT_IN In)
     return Out;
 }
 
+
+// DAMAGE Pass     ---------------------------------------------------------------------------
+
+
+PS_OUT PS_DAMAGE(PS_DEFAULT_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    
+    
+    Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (Out.vColor.a <= 0.3f)
+        discard;
+    
+    return Out;
+}
+
+// DAMAGE Pass End ---------------------------------------------------------------------------
 technique11 DefaultTechnique
 {
     pass DefaultPass
@@ -308,5 +328,17 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_COLOR();
+    }
+
+    pass DamagePass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_ALPHABLEND, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DAMAGE();
+
     }
 }

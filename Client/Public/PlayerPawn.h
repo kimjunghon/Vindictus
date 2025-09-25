@@ -128,8 +128,10 @@ private:
 	HRESULT			Ready_TrailNotify();
 	void			Request_SpawnTrail(const string& strBoneName, _uint iTrailType);
 	HRESULT			Ready_EffectNotify();
+	HRESULT			Ready_SoundNotify();
 
-	HRESULT			Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _wstring strEffectName, string strBoneName, _float2 vTrackPosition);
+	HRESULT			Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, 
+		const _wstring& strEffectName, const _wstring& strHitSoundName, const string& strBoneName, _float2 vTrackPosition);
 
 	void			Compute_WorldMatrix();
 	void			Bind_InputData(_float fTimeDelta);
@@ -146,7 +148,7 @@ private:
 	void			Event_ChangeArmor(const EVENT_CHANGE_ARMOR& Event);
 
 	void			OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_DATA& CollisionData);
-	void			Request_HitEffect(ATTACK_TYPE eType, const CCollider::COLLISION_DATA& CollisionData);
+	void			Request_HitEffect(ATTACK_TYPE eType, const _wstring& strHitSoundName, const CCollider::COLLISION_DATA& CollisionData);
 	void			OnCollisionSwordAttack(const CCollider::COLLISION_DATA& CollisionData);
 
 	void			OnCollisionGrap(const CCollider::COLLISION_DATA& CollisionData);

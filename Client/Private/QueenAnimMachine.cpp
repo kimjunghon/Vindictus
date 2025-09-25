@@ -93,7 +93,7 @@ void CQueenAnimMachine::Initialize_Dead()
 {
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::DEAD);
 
-	m_AnimDatas[iFlag] = { "Dying", false, _float2(1.f, 1.f), 2.f };
+	m_AnimDatas[iFlag] = { "Dying", false, _float2(1.f, 1.f), 2.4f };
 }
 
 CQueenAnimMachine* CQueenAnimMachine::Create()

@@ -41,7 +41,10 @@ HRESULT CLevel_Glasgavelen::Initialize()
 	if (FAILED(Ready_TriggerBox()))
 		return E_FAIL;
 
-	m_pPool_Instance->SpawnRoom(0, 0);	
+	m_pPool_Instance->BeginRoomSpawn(0);
+
+	if (FAILED(m_pGameInstance->Play_Sound(TEXT("Gavelen_Bgm"), ENUM_CLASS(SOUND_CHANNEL::BGM), 0.3f, true)))
+		return E_FAIL;
 
 	return S_OK;
 }

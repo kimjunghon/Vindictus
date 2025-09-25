@@ -158,12 +158,14 @@ public:
 #pragma endregion
 
 #pragma region NAVIGATION
+public:
 	HRESULT				Add_Navigation(_uint iNavigationLevel, const _tchar* pNavigationFilePath);
 	HRESULT				Change_Navigation(_uint iNavigationLevel);
 	class CNavigation*	Clone_CurrentNavigation(_int iCellIndex);
 #pragma endregion
 
 #pragma region COLLIDER
+public:
 	void				Set_BoudingChannel(_uint iBoundingChannel);
 	HRESULT				Add_Channel(_uint iSrcChannel, _uint iDstChannel, COLLIDER_TYPE eType);
 	HRESULT				Add_Collider(_uint iChannel, CGameObject* pOwner, CCollider* pCollider);
@@ -173,11 +175,13 @@ public:
 #pragma endregion
 
 #pragma region MOUSE_POINT
+public:
 	void				Set_MousePoint(POINT ptMouse) { m_ptMousePoint = ptMouse; }
 	POINT				Get_MousePoint() { return m_ptMousePoint; }
 #pragma endregion
 
 #pragma region SHADOW
+public:
 	const _float4x4*	Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const;	
 	HRESULT				Update_ShadowLight(const SHADOW_LIGHT_DESC& ShadowLightDesc);
 	void				Update_ShadowLight(_fvector vTargetPosition);
@@ -190,13 +194,25 @@ public:
 #pragma endregion
 
 #pragma region FRUSTUM
+public:
 	const _float4*	Get_Frustum_WorldPoints() const;
 #pragma endregion
 
 #pragma region FONT_MANAGER
+public:
 	HRESULT Add_Font(const _wstring& strFontTag, const _tchar* pFontFilePath);
-	void	DrawFont(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRadian, const _float2& vOrigin, const _float2& vScale);
+	void	DrawFont(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor = XMVectorSet(1.f, 1.f, 1.f, 1.f), 
+		_float fRadian = 0.f, const _float2& vOrigin = _float2(0.f, 0.f), const _float2& vScale = _float2(1.f, 1.f));
+#pragma endregion
 
+#pragma region SOUND_MANAGER
+public:
+	HRESULT Add_Sounds(const _wstring& strSoundTag, const _char* pFilePath);
+	HRESULT Play_Sound(const _wstring& strSoundTag, _uint iChannelIndex, _float fVolume, _bool IsLoop = false);
+	HRESULT Play_Sound_AnyChannel(_uint iMinChannelIndex, const _wstring& strSoundTag, _float fVolume);
+	HRESULT Stop_Sound(_uint iChannelIndex);
+	HRESULT Stop_Sound_All();
+	HRESULT Change_Volume(_uint iChannelIndex, _float fVolume);
 #pragma endregion
 
 private:
@@ -221,6 +237,7 @@ private:
 	class CShadow*				m_pShadow = { nullptr };
 	class CFrustum*				m_pFrustum = { nullptr };
 	class CFont_Manager*		m_pFont_Manager = { nullptr };
+	class CSound_Manager*		m_pSound_Manager = { nullptr };
 
 	POINT						m_ptMousePoint = {};
 public:

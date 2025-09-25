@@ -532,6 +532,9 @@
     <Filter Include="03.GameObject\SkyBox">
       <UniqueIdentifier>{d819caee-c087-4170-8e4e-c9d0696238d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\UIObject\DamageFont">
+      <UniqueIdentifier>{8ff240fd-fbe1-4764-b036-046b4acdb6a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -1038,6 +1041,9 @@
     <ClInclude Include="..\public\SkyBox.h">
       <Filter>03.GameObject\SkyBox</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\DamageFont.h">
+      <Filter>03.GameObject\UIObject\DamageFont</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1529,6 +1535,9 @@
     </ClCompile>
     <ClCompile Include="..\private\SkyBox.cpp">
       <Filter>03.GameObject\SkyBox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\DamageFont.cpp">
+      <Filter>03.GameObject\UIObject\DamageFont</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

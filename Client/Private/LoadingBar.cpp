@@ -104,7 +104,15 @@ HRESULT CLoadingBar::Ready_Children()
 void CLoadingBar::Event_ProgressBar(const EVENT_PROGRESSBAR& Event)
 {
 	if (Event.eType == m_eType)
+	{
 		m_fRatio = Event.fRatio;
+
+		if (m_IsLoadingEnd)
+		{
+			m_IsLoadingEnd = false;
+			m_fBarRatio = 0.f;
+		}
+	}
 }
 
 void CLoadingBar::Update_BarRatio(_float fTimeDelta)
@@ -117,11 +125,12 @@ void CLoadingBar::Update_BarRatio(_float fTimeDelta)
 
 	m_pBar->Set_Ratio(m_fBarRatio);
 
-	if (m_fBarRatio >= 1.f)
+	if (m_fBarRatio >= 1.f && m_fRatio >= 1.f && false == m_IsLoadingEnd)
 	{
 		EVENT_LOADING_COMPLETE Event;
 		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
-		m_fBarRatio = 0.f;
+		m_fRatio = 0.f;
+		m_IsLoadingEnd = true;
 	}
 }
 

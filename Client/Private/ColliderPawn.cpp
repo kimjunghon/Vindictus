@@ -60,7 +60,6 @@ void CColliderPawn::OnCollisionBlock(const CCollider::COLLISION_DATA& ColliderDa
 		m_pTransformCom->MovePositionToVector(vDir, m_pNavigationCom);
 	else
 		m_pTransformCom->Sliding(vDir, vNormal, m_pNavigationCom);
-
 }
 
 DIR CColliderPawn::Compute_HitDir(_fvector vHitPosition, _fvector vAttackPosition, _float fDegree)

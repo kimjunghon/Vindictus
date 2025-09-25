@@ -90,6 +90,7 @@ HRESULT CFireBall::Spawn(void* pArg)
 	m_IsActive = true;
 
 	m_CurrentAttackData.eAttackType = pDesc->eType;
+	m_CurrentAttackData.HitEffect.strSoundName = pDesc->strHitSoundName;
 	m_CurrentAttackData.fDamage = pDesc->fDamage;
 	
 	m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), 0, &m_CurrentAttackData);
@@ -117,6 +118,9 @@ void CFireBall::ReturnToPool()
 	EffectDesc.IsEmissive = false;
 
 	if (FAILED(m_pPoolInstance->Request_SpawnEffect(TEXT("Explosion_Prefab"), &EffectDesc)))
+		return;
+
+	if (FAILED(m_pGameInstance->Play_Sound_AnyChannel(ENUM_CLASS(SOUND_CHANNEL::OTHERS), TEXT("effect_fireball_crash"), 0.3f)))
 		return;
 
 	m_pColliderContainer->SetEnableAllColliderChannel(false);

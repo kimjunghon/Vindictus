@@ -30,6 +30,8 @@ private:
 	class CBar*				m_pBar = { nullptr };
 	class CLoadingPoint*	m_pLoadingPoint = { nullptr };
 
+	_bool					m_IsLoadingEnd = {};
+
 private:
 	HRESULT			Ready_Children();
 	void			Event_ProgressBar(const EVENT_PROGRESSBAR& Event);

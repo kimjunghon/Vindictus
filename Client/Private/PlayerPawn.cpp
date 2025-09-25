@@ -98,11 +98,11 @@ HRESULT CPlayerPawn::Initialize(void* pArg)
 	if (FAILED(Ready_EffectNotify()))
 		return E_FAIL;
 
+	if (FAILED(Ready_SoundNotify()))
+		return E_FAIL;
+
 	m_pStatus = m_pPlayerInstance->GetPlayerStatusPtr();
 	
-
-	//m_pGameInstance->Update_ShadowLight(m_pTransformCom->Get_State(STATE::POSITION));
-
 	return S_OK;
 }
 
@@ -333,7 +333,7 @@ void CPlayerPawn::OnCollisionHit(_uint iArmorIndex, const CCollider::COLLISION_D
 		return;
 }
 
-void CPlayerPawn::Request_HitEffect(ATTACK_TYPE eType, const CCollider::COLLISION_DATA& CollisionData)
+void CPlayerPawn::Request_HitEffect(ATTACK_TYPE eType, const _wstring& strHitSoundName, const CCollider::COLLISION_DATA& CollisionData)
 {
 	_wstring strEffectName = {};
 
@@ -349,6 +349,8 @@ void CPlayerPawn::Request_HitEffect(ATTACK_TYPE eType, const CCollider::COLLISIO
 	SpawnDesc.IsEmissive = true;
 
 	m_pPool_Instance->Request_SpawnEffect(strEffectName, &SpawnDesc);
+
+	m_pGameInstance->Play_Sound(strHitSoundName, ENUM_CLASS(SOUND_CHANNEL::PLAYER_VOICE), 0.5f);
 }
 
 void CPlayerPawn::OnCollisionSwordAttack(const CCollider::COLLISION_DATA& CollisionData)
@@ -458,7 +460,7 @@ void CPlayerPawn::Change_HitState(_uint iArmorIndex, const CCollider::COLLISION_
 		}
 		}
 
-		Request_HitEffect(eAttackType, CollisionData);
+		Request_HitEffect(eAttackType, AttackData->HitEffect.strSoundName, CollisionData);
 	}
 
 	if (IsRotate)
@@ -625,6 +627,73 @@ HRESULT CPlayerPawn::Ready_EffectNotify()
 				EffectDesc.IsEmissive = true;
 
 				m_pPool_Instance->Request_SpawnEffect(strEffectName, &EffectDesc);
+				});
+		}
+	}
+
+	return S_OK;
+}
+
+HRESULT CPlayerPawn::Ready_SoundNotify()
+{
+	ifstream File("../Bin/Resources/AnimDatas/Player_Sound_AnimDatas.json");
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Player_Sound_AnimDatas Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
+
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_float fTrackPosition = {};
+			_float fVolume = {};
+			_tchar szSoundName[MAX_PATH] = {};
+			_tchar szVoiceName[MAX_PATH] = {};
+			_bool  IsVoice = { false };
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+
+			if (Notify.HasMember("TrackPosition") && Notify["TrackPosition"].IsFloat())
+				fTrackPosition = Notify["TrackPosition"].GetFloat();
+
+			if (Notify.HasMember("Volume") && Notify["Volume"].IsFloat())
+				fVolume = Notify["Volume"].GetFloat();
+
+			if (Notify.HasMember("SoundName") && Notify["SoundName"].IsString())
+			{
+				string Name = Notify["SoundName"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), szSoundName, static_cast<_int>(Name.size()));
+			}
+
+			if (Notify.HasMember("SoundVoice") && Notify["SoundVoice"].IsString())
+			{
+				IsVoice = true;
+				string Name = Notify["SoundVoice"].GetString();
+
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), szVoiceName, static_cast<_int>(Name.size()));
+			}
+
+			m_pPlayerBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, szSoundName, szVoiceName, fVolume, IsVoice]() {
+				m_pGameInstance->Play_Sound(szSoundName, ENUM_CLASS(SOUND_CHANNEL::PLAYER_ATTACK), fVolume);
+				if (IsVoice)
+					m_pGameInstance->Play_Sound(szVoiceName, ENUM_CLASS(SOUND_CHANNEL::PLAYER_VOICE), fVolume);
 				});
 		}
 	}
@@ -1023,10 +1092,12 @@ HRESULT CPlayerPawn::Ready_AttackNotify()
 			if (Notify.HasMember("OffTrackPosition") && Notify["OffTrackPosition"].IsFloat())
 				vTrackPositionRange.y = Notify["OffTrackPosition"].GetFloat();
 
-			_tchar strEffectName[MAX_PATH] = {};
-
 			string strBoneName = {};
+			if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
+				strBoneName = Notify["BoneName"].GetString();
 
+			_tchar strEffectName[MAX_PATH] = {};
+			_tchar strHitSoundName[MAX_PATH] = {};
 			if (Notify.HasMember("EffectName") && Notify["EffectName"].IsString())
 			{
 				string Name = Notify["EffectName"].GetString();
@@ -1034,11 +1105,14 @@ HRESULT CPlayerPawn::Ready_AttackNotify()
 				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), strEffectName, static_cast<_int>(Name.size()));
 			}
 
-			if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
-				strBoneName = Notify["BoneName"].GetString();
+			if (Notify.HasMember("HitSoundName") && Notify["HitSoundName"].IsString())
+			{
+				string Name = Notify["HitSoundName"].GetString();
 
+				MultiByteToWideChar(CP_UTF8, 0, Name.c_str(), static_cast<_int>(Name.size()), strHitSoundName, static_cast<_int>(Name.size()));
+			}
 
-			if (FAILED(Add_AttackCollisionInfo(strAnimName, iColliderIndex, eType, fDamageRatio, strEffectName, strBoneName, vTrackPositionRange)))
+			if (FAILED(Add_AttackCollisionInfo(strAnimName, iColliderIndex, eType, fDamageRatio, strEffectName, strHitSoundName, strBoneName, vTrackPositionRange)))
 				return E_FAIL;
 		}
 	}
@@ -1112,15 +1186,20 @@ HRESULT CPlayerPawn::Ready_TrailNotify()
 	return S_OK;
 }
 
-HRESULT CPlayerPawn::Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _wstring strEffectName, string strBoneName, _float2 vTrackPosition)
+HRESULT CPlayerPawn::Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, 
+	const _wstring& strEffectName, const _wstring& strHitSoundName, const string& strBoneName, _float2 vTrackPosition)
 {
-	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio, strEffectName, strBoneName]() {
+
+
+
+	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio, strEffectName, strHitSoundName, strBoneName]() {
 		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 		m_CurrentAttackData.eAttackType = eType;
-		m_CurrentAttackData.fDamage = m_pStatus->fAttackDamage * fAttackRatio;
+		m_CurrentAttackData.fDamage = (m_pGameInstance->Rand(m_pStatus->fAttackDamage - 10.f, m_pStatus->fAttackDamage + 10.f)) * fAttackRatio;
 		m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
-		m_CurrentAttackData.HitEffect.EffectName = strEffectName;
+		m_CurrentAttackData.HitEffect.strEffectName = strEffectName;
+		m_CurrentAttackData.HitEffect.strSoundName = strHitSoundName;
 		m_CurrentAttackData.HitEffect.pBoneMatrixPtr = m_pPlayerBody->SocketCombinedMatrixPtr(strBoneName);
 		m_CurrentAttackData.HitEffect.pWorldMatrixPtr = m_pTransformCom->Get_WorldMatrixPtr();
 

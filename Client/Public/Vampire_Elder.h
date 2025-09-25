@@ -33,11 +33,11 @@ private:
 	HRESULT				Ready_Collider_Hit();
 	HRESULT				Ready_Collider_Attack();
 
-	void				CreateFireBall(ATTACK_TYPE eType, _float fAttackRatio);
+	void				CreateFireBall(ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio);
 	void				ThrowFireBall();
 
-	virtual HRESULT		Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition) override;
-	HRESULT				Add_FireBallNotify(ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition);
+	virtual HRESULT		Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition) override;
+	HRESULT				Add_FireBallNotify(ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition);
 public:
 	static CVampire_Elder*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	virtual CGameObject*	Clone(void* pArg) override;

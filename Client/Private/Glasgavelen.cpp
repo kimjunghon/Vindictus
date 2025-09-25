@@ -53,7 +53,7 @@ HRESULT CGlasgavelen::Initialize_Prototype()
 	m_AttackCoolTime.resize(m_iNumAttacks, 0.f);
 	m_AttackTime.resize(m_iNumAttacks, 50.f);
 
-	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DESEND)] = 5000.f;
+	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DESEND)] = 0.f;
 	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::BLAZE)] = 5000.f;
 	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DOUBLE)] = 5000.f;
 	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::GRAP)] = 5000.f;
@@ -115,6 +115,9 @@ HRESULT CGlasgavelen::Initialize(void* pArg)
 		return E_FAIL;
 
 	if (FAILED(CMonster::Ready_EffectNotify("../Bin/Resources/AnimDatas/Gavelen_Effect_AnimDats.json")))
+		return E_FAIL;
+
+	if (FAILED(CMonster::Ready_SoundNotify("../Bin/Resources/AnimDatas/Gavelen_Sound_AnimData.json")))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_GAVELEN_CUTSCENE>(ENUM_CLASS(EVENT_TYPE::NONSTATIC), [this](const EVENT_GAVELEN_CUTSCENE& Event) { this->Event_Cutscene(Event); });
@@ -567,12 +570,13 @@ HRESULT CGlasgavelen::Ready_Collider_Attack()
 	return S_OK;
 }
 
-void CGlasgavelen::CreateStone(ATTACK_TYPE eType, _float fAttackRatio)
+void CGlasgavelen::CreateStone(ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio)
 {
 	m_IsSwing_R = false;
 
 	CGavelenRock::GAVELEN_ROCK_DESC GavelenRock_Desc = {};
 	GavelenRock_Desc.eType = eType;
+	GavelenRock_Desc.strHitSoundName = strHitSoundName;
 	GavelenRock_Desc.fDamage = m_Status.fAttackDamage * fAttackRatio;
 	GavelenRock_Desc.pIsSwing = &m_IsSwing_R;
 	GavelenRock_Desc.pSocketMatrixPtr = m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_R_2_Hand");
@@ -582,7 +586,7 @@ void CGlasgavelen::CreateStone(ATTACK_TYPE eType, _float fAttackRatio)
 	m_pPool_Instance->Request_SpawnProjectile(TEXT("GavelenRock"), &GavelenRock_Desc);
 }
 
-void CGlasgavelen::CreateEneryBall(ATTACK_TYPE eType, _float fAttackRatio)
+void CGlasgavelen::CreateEneryBall(ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio)
 {
 	_matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
 	_matrix SocketMatrix = XMLoadFloat4x4(m_pBody->SocketCombinedMatrixPtr("ValveBiped.Bip01_Head1"));
@@ -591,6 +595,7 @@ void CGlasgavelen::CreateEneryBall(ATTACK_TYPE eType, _float fAttackRatio)
 
 	CEnergyBall::ENERGYBALL_DESC EnergyBallDesc = {};
 	EnergyBallDesc.eType = eType;
+	EnergyBallDesc.strHitSoundName = strHitSoundName;
 	EnergyBallDesc.fDamage = m_Status.fAttackDamage * fAttackRatio;
 	EnergyBallDesc.StartPosition = vPosition;
 	EnergyBallDesc.pTargetTransform = m_pTargetTransform;
@@ -609,11 +614,11 @@ void CGlasgavelen::ThrowStone()
 	m_IsSwing_R = true;
 }
 
-HRESULT CGlasgavelen::Add_StoneNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+HRESULT CGlasgavelen::Add_StoneNotify(const string& strAnimName, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition)
 {
 
-	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, eType, fAttackRatio]() {
-		this->CreateStone(eType, fAttackRatio);
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, eType, strHitSoundName, fAttackRatio]() {
+		this->CreateStone(eType, strHitSoundName, fAttackRatio);
 		})))
 		return E_FAIL;
 
@@ -649,12 +654,13 @@ HRESULT CGlasgavelen::Add_GrapNotify(const string& strAnimName, _float2 vTrackPo
 	return S_OK;
 }
 
-HRESULT CGlasgavelen::Add_GrapEndNotify(const string& strAnimName,  _float fAttackRatio, _float fTrackPosition)
+HRESULT CGlasgavelen::Add_GrapEndNotify(const string& strAnimName, const _wstring& strHitSoundName, _float fAttackRatio, _float fTrackPosition)
 {
-	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, fAttackRatio]() {
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, strHitSoundName, fAttackRatio]() {
 		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, false);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 		m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
+		m_CurrentAttackData.HitEffect.strSoundName = strHitSoundName;
 		this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::GRAP), 0, &m_CurrentAttackData);
 		})))
 		return E_FAIL;
@@ -662,33 +668,34 @@ HRESULT CGlasgavelen::Add_GrapEndNotify(const string& strAnimName,  _float fAtta
 	return S_OK;
 }
 
-HRESULT CGlasgavelen::Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float fTrackPosition)
+HRESULT CGlasgavelen::Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float fTrackPosition)
 {
-	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, eType, fAttackRatio]() {
-		this->CreateEneryBall(eType, fAttackRatio);
+	if (FAILED(m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, eType, strHitSoundName, fAttackRatio]() {
+		this->CreateEneryBall(eType, strHitSoundName, fAttackRatio);
 		})))
 		return E_FAIL;
 
 	return S_OK;
 }
 
-HRESULT CGlasgavelen::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+HRESULT CGlasgavelen::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition)
 {
 	if (!strcmp(strAnimName.c_str(), "Hang_During"))
-		Add_StoneNotify(strAnimName, eType, fAttackRatio, vTrackPosition);
+		Add_StoneNotify(strAnimName, eType, strHitSoundName, fAttackRatio, vTrackPosition);
 	else if (!strcmp(strAnimName.c_str(), "Grappling_Try"))
 		Add_GrapNotify(strAnimName, vTrackPosition);
 	else if (!strcmp(strAnimName.c_str(), "Grappling_Success"))
-		Add_GrapEndNotify(strAnimName, fAttackRatio, vTrackPosition.y);
+		Add_GrapEndNotify(strAnimName, strHitSoundName, fAttackRatio, vTrackPosition.y);
 	else if (!strcmp(strAnimName.c_str(), "Blaze"))
-		Add_EnergyBallNotify(strAnimName, eType, fAttackRatio, vTrackPosition.x);
+		Add_EnergyBallNotify(strAnimName, eType, strHitSoundName, fAttackRatio, vTrackPosition.x);
 	else
 	{
-		if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
+		if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, strHitSoundName, fAttackRatio]() {
 			this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 			m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 			m_CurrentAttackData.eAttackType = eType;
-			m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
+			m_CurrentAttackData.HitEffect.strSoundName = strHitSoundName;
+			m_CurrentAttackData.fDamage = (m_pGameInstance->Rand(m_Status.fAttackDamage - 10.f, m_Status.fAttackDamage + 10.f)) * fAttackRatio;
 			m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
 			this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, &m_CurrentAttackData);
 			})))

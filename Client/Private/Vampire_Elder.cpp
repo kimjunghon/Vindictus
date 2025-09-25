@@ -44,6 +44,9 @@ HRESULT CVampire_Elder::Initialize(void* pArg)
 	if (FAILED(CMonster::Ready_AnimNotify("../Bin/Resources/AnimDatas/Vampire_Elder_AnimData.json")))
 		return E_FAIL;
 
+	if (FAILED(CMonster::Ready_SoundNotify("../Bin/Resources/AnimDatas/Vampire_Elder_Sound_AnimData.json")))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -221,12 +224,13 @@ HRESULT CVampire_Elder::Ready_Collider_Attack()
 	return S_OK;
 }
 
-void CVampire_Elder::CreateFireBall(ATTACK_TYPE eType, _float fAttackRatio)
+void CVampire_Elder::CreateFireBall(ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio)
 {
 	m_IsSwing = false;
 
 	CFireBall::FIREBALL_DESC Fireball_Desc = {};
 	Fireball_Desc.eType = eType;
+	Fireball_Desc.strHitSoundName = strHitSoundName;
 	Fireball_Desc.fDamage = m_Status.fAttackDamage * fAttackRatio;
 	Fireball_Desc.pIsSwing = &m_IsSwing;
 	Fireball_Desc.pSocketMatrixPtr = m_pBody->SocketCombinedMatrixPtr("ValveBiped.Anim_Attachment_RH");
@@ -241,17 +245,18 @@ void CVampire_Elder::ThrowFireBall()
 	m_IsSwing = true;
 }
 
-HRESULT CVampire_Elder::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+HRESULT CVampire_Elder::Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition)
 {
 	if (!strcmp(strAnimName.c_str(), "Attack_FireBall"))
-		Add_FireBallNotify(eType, fAttackRatio, vTrackPosition);
+		Add_FireBallNotify(eType, strHitSoundName, fAttackRatio, vTrackPosition);
 	else
 	{
-		if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio]() {
+		if (FAILED(m_pBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, strHitSoundName, fAttackRatio]() {
 			this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 			m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);
 			m_CurrentAttackData.eAttackType = eType;
-			m_CurrentAttackData.fDamage = m_Status.fAttackDamage * fAttackRatio;
+			m_CurrentAttackData.HitEffect.strSoundName = strHitSoundName;
+			m_CurrentAttackData.fDamage = (m_pGameInstance->Rand(m_Status.fAttackDamage - 10.f, m_Status.fAttackDamage + 10.f)) * fAttackRatio;
 			m_CurrentAttackData.vAttackPosition = m_pTransformCom->Get_State(STATE::POSITION);
 			this->m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, &m_CurrentAttackData);
 			})))
@@ -267,10 +272,10 @@ HRESULT CVampire_Elder::Add_AttackCollisionNotify(const string& strAnimName, _ui
 	return S_OK;
 }
 
-HRESULT CVampire_Elder::Add_FireBallNotify(ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition)
+HRESULT CVampire_Elder::Add_FireBallNotify(ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition)
 {
-	if (FAILED(m_pBody->Add_AnimNotify("Attack_FireBall", vTrackPosition.x, [this, eType, fAttackRatio]() {
-		this->CreateFireBall(eType, fAttackRatio);
+	if (FAILED(m_pBody->Add_AnimNotify("Attack_FireBall", vTrackPosition.x, [this, eType, strHitSoundName, fAttackRatio]() {
+		this->CreateFireBall(eType, strHitSoundName, fAttackRatio);
 		})))
 		return E_FAIL;
 

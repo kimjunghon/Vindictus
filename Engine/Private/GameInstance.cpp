@@ -23,6 +23,7 @@
 #include "Shadow.h"
 #include "Frustum.h"
 #include "Font_Manager.h"
+#include "Sound_Manager.h"
 
 IMPLEMENT_SINGLETON(CGameInstance)
 
@@ -110,6 +111,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pFont_Manager)
         return E_FAIL;
 
+    m_pSound_Manager = CSound_Manager::Create();
+    if (nullptr == m_pSound_Manager)
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -128,7 +133,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
     m_pObject_Manager->Update(fTimeDelta);
     m_pObject_Manager->Late_Update(fTimeDelta);
-
+    m_pSound_Manager->Update();
     m_pCollider_Manager->Update();
 
     m_pLevel_Manager->Update(fTimeDelta);
@@ -141,6 +146,7 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
     m_pObject_Manager->Clear();
     m_pCamera_Manager->Clear();
     m_pLight_Manager->Clear();
+    m_pSound_Manager->Clear_Resource();
 
     return S_OK;
 }
@@ -571,6 +577,34 @@ void CGameInstance::DrawFont(const _wstring& strFontTag, const _tchar* pText, co
 }
 #pragma endregion
 
+#pragma region SOUND_MANAGER
+
+HRESULT CGameInstance::Add_Sounds(const _wstring& strSoundTag, const _char* pFilePath)
+{
+    return m_pSound_Manager->Add_Sounds(strSoundTag, pFilePath);
+}
+HRESULT CGameInstance::Play_Sound(const _wstring& strSoundTag, _uint iChannelIndex, _float fVolume, _bool IsLoop)
+{
+    return m_pSound_Manager->Play_Sound(strSoundTag, iChannelIndex, fVolume, IsLoop);
+}
+HRESULT CGameInstance::Play_Sound_AnyChannel(_uint iMinChannelIndex, const _wstring& strSoundTag, _float fVolume)
+{
+    return m_pSound_Manager->Play_Sound_AnyChannel(iMinChannelIndex, strSoundTag, fVolume);
+}
+HRESULT CGameInstance::Stop_Sound(_uint iChannelIndex)
+{
+    return m_pSound_Manager->Stop_Sound(iChannelIndex);
+}
+HRESULT CGameInstance::Stop_Sound_All()
+{
+    return m_pSound_Manager->Stop_Sound_All();
+}
+HRESULT CGameInstance::Change_Volume(_uint iChannelIndex, _float fVolume)
+{
+    return m_pSound_Manager->Change_Volume(iChannelIndex, fVolume);
+}
+#pragma endregion
+
 void CGameInstance::Release_Engine()
 {
     Release();
@@ -594,6 +628,7 @@ void CGameInstance::Release_Engine()
     Safe_Release(m_pNavigation_Manager);
     Safe_Release(m_pCollider_Manager);
     Safe_Release(m_pFont_Manager);
+    Safe_Release(m_pSound_Manager);
 }
 
 void CGameInstance::Free()

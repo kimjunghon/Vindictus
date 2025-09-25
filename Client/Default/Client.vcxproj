@@ -166,6 +166,7 @@
     <ClInclude Include="..\Public\CatAnimMachine.h" />
     <ClInclude Include="..\public\Cat_Body.h" />
     <ClInclude Include="..\public\ColorPoint.h" />
+    <ClInclude Include="..\public\DamageFont.h" />
     <ClInclude Include="..\public\Dyeing.h" />
     <ClInclude Include="..\public\DyeingPalette.h" />
     <ClInclude Include="..\public\DyeingSlots.h" />
@@ -338,6 +339,7 @@
     <ClCompile Include="..\private\ColorPoint.cpp" />
     <ClCompile Include="..\private\Controller_Mouse.cpp" />
     <ClCompile Include="..\private\ColliderPawn.cpp" />
+    <ClCompile Include="..\private\DamageFont.cpp" />
     <ClCompile Include="..\private\Dyeing.cpp" />
     <ClCompile Include="..\private\DyeingPalette.cpp" />
     <ClCompile Include="..\private\DyeingSlots.cpp" />

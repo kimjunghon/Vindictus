@@ -51,7 +51,8 @@ namespace Client
 
 	typedef struct tagAttackEffectData
 	{
-		_wstring			EffectName;
+		_wstring		strEffectName;
+		_wstring		strSoundName;
 		const _float4x4* pBoneMatrixPtr;
 		const _float4x4* pWorldMatrixPtr;
 	}ATTACK_EFFECT_DATA;

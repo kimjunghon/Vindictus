@@ -104,6 +104,7 @@ void CAnimation::Update_TransformationMatrices(const vector<class CBone*>& Bones
 		{
 			*IsAnimStart = true;
 			m_fCurrentTrackPosition = 0.f;
+			Reset_Notify();
 		}
 	}
 

@@ -94,6 +94,7 @@ HRESULT CGavelenRock::Spawn(void* pArg)
 	m_IsActive = true;
 
 	m_CurrentAttackData.eAttackType = pDesc->eType;
+	m_CurrentAttackData.HitEffect.strSoundName = pDesc->strHitSoundName;
 	m_CurrentAttackData.fDamage = pDesc->fDamage;
 
 	m_pTargetTransformCom = pDesc->pTargetTransform;

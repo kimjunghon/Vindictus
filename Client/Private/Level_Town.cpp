@@ -44,6 +44,9 @@ HRESULT CLevel_Town::Initialize()
 	if (FAILED(Ready_Effect()))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Play_Sound(TEXT("Town_Bgm"), ENUM_CLASS(SOUND_CHANNEL::BGM), 0.5f, true)))
+		return E_FAIL;
+
 	return S_OK;
 }
 

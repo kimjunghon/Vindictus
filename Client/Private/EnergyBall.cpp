@@ -94,6 +94,7 @@ HRESULT CEnergyBall::Spawn(void* pArg)
 	ENERGYBALL_DESC* pDesc = static_cast<ENERGYBALL_DESC*>(pArg);
 
 	m_CurrentAttackData.eAttackType = pDesc->eType;
+	m_CurrentAttackData.HitEffect.strSoundName = pDesc->strHitSoundName;
 	m_CurrentAttackData.fDamage = pDesc->fDamage;
 
 	m_pColliderContainer->SetEnableAllColliderChannel(true);

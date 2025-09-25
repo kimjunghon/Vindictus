@@ -37,6 +37,9 @@ HRESULT CLevel_Queen::Initialize()
 	if (FAILED(Ready_Map(TEXT("Layer_GameObject"))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Play_Sound(TEXT("Queen_Bgm"), ENUM_CLASS(SOUND_CHANNEL::BGM), 0.2f, true)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -50,7 +53,7 @@ void CLevel_Queen::Update(_float fTimeDelta)
 	}
 	if (m_pGameInstance->Get_KeyDown(DIK_F2))
 	{
-		m_pPool_Instance->SpawnRoom(0, 0);
+		m_pPool_Instance->SpawnRoom(1, 2);
 		//		m_pPool_Instance->BeginRoomSpawn(0);
 	}
 	if (m_pGameInstance->Get_KeyDown(DIK_F3))

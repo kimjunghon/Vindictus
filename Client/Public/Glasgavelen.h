@@ -89,14 +89,14 @@ private:
 	HRESULT				Ready_Collider_Hit();
 	HRESULT				Ready_Collider_Attack();
 
-	void				CreateStone(ATTACK_TYPE eType, _float fAttackRatio);
-	void				CreateEneryBall(ATTACK_TYPE eType, _float fAttackRatio);
+	void				CreateStone(ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio);
+	void				CreateEneryBall(ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio);
 	void				ThrowStone();
-	HRESULT				Add_StoneNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition);
+	HRESULT				Add_StoneNotify(const string& strAnimName, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition);
 	HRESULT				Add_GrapNotify(const string& strAnimName, _float2 vTrackPosition);
-	HRESULT				Add_GrapEndNotify(const string& strAnimName, _float fAttackRatio, _float fTrackPosition);
-	HRESULT				Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, _float fAttackRatio, _float fTrackPosition);
-	virtual HRESULT		Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, _float2 vTrackPosition) override;
+	HRESULT				Add_GrapEndNotify(const string& strAnimName, const _wstring& strHitSoundName, _float fAttackRatio, _float fTrackPosition);
+	HRESULT				Add_EnergyBallNotify(const string& strAnimName, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float fTrackPosition);
+	virtual HRESULT		Add_AttackCollisionNotify(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, const _wstring& strHitSoundName, _float fAttackRatio, _float2 vTrackPosition) override;
 	
 
 	void				Change_ColliderSocketMatrix();

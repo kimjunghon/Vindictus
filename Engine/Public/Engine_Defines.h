@@ -35,6 +35,9 @@
 #include <RapidJson//istreamwrapper.h>
 #include "Json/json.hpp"
 
+#include "Fmod/fmod.hpp"
+
+
 using Json = nlohmann::json;
 using namespace rapidjson;
 using namespace DirectX;

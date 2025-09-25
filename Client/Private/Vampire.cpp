@@ -197,6 +197,7 @@ void CVampire::ChangeHitState(ATTACK_TYPE eAttackType)
 	case ATTACK_TYPE::STRONG:
 	{
 		ChangeState(ENUM_CLASS(VAMPIRE_STATE::HIT_STRONG));
+		m_pGameInstance->Play_Sound_AnyChannel(ENUM_CLASS(SOUND_CHANNEL::OTHERS), TEXT("vampire_hurt1"), 0.3f);
 		break;
 	}
 	}

@@ -17,6 +17,7 @@ public:
 	typedef struct tagProjectileDesc
 	{
 		ATTACK_TYPE eType;
+		_wstring	strHitSoundName;
 		_float		fDamage;
 		CTransform* pTargetTransform;
 	}PROJECTILE_DESC;
