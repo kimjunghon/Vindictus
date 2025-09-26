@@ -9,6 +9,7 @@ class CSpawn_Manager;
 class CMonster;
 class CEffect;
 class CProjectile;
+class CDamageFont;
 
 class CPool_Instance final : public CBase
 {
@@ -40,6 +41,11 @@ public:
 	HRESULT			Add_EffectToPool(_uint iPrototypeLevelIndex, const _wstring& strEffectName, const _wstring& strEffectTag, void* pArg = nullptr);
 	void			ReturnPool(const _wstring& strEffect, CEffect* pEffect);
 	HRESULT			Request_SpawnEffect(const _wstring& strEffect, void* pSpawnData = nullptr);
+
+
+	HRESULT			Add_DamageFont(_uint iPrototypeLevelIndex, const _wstring& strFontTag, const _wstring& strFontName, void* pArg = nullptr);
+	void			ReturnPool(const _wstring& strFont, CDamageFont* pFont);
+	HRESULT			Request_SpawnFont(const _wstring& strFont, void* pSpawnData = nullptr);
 	
 #ifdef _DEBUG
 	HRESULT		SpawnRoom(_uint iRoomIndex, _uint iMonsterIndex);

@@ -1,6 +1,10 @@
 #pragma once
 #include "Body.h"
 
+NS_BEGIN(Engine)
+class CTexture;
+NS_END
+
 NS_BEGIN(Client)
 
 class CQueen_Body final : public CBody
@@ -18,7 +22,8 @@ private:
 	virtual ~CQueen_Body() = default;
 
 public:
-	virtual const _matrix Get_BodyCombinedMatrix() const override { return XMLoadFloat4x4(&m_CombinedMatrix); }
+	virtual const _matrix	Get_BodyCombinedMatrix() const override { return XMLoadFloat4x4(&m_CombinedMatrix); }
+	virtual const _float4x4* Get_BodyCombinedMatrixPtr() const override { return &m_CombinedMatrix; }
 
 public:
 	virtual HRESULT		Initialize_Prototype() override;
@@ -27,17 +32,19 @@ public:
 	virtual void		Update(_float fTimeDelta) override;
 	virtual void		Late_Update(_float fTimeDelta) override;
 	virtual HRESULT		Render() override;
-
+	virtual HRESULT		Render_Shadow() override;
 private:
 	_bool*			m_pIsBrokenLeg = { nullptr };
 	_uint			m_iMeshLegIndex = {};
 	_float4x4		m_CombinedMatrix = { };
+	CTexture*		m_pDissolveTexture = { nullptr };
 
 
 private:
 	_bool	IsBroken(_uint iMeshIndex);
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
+	HRESULT Bind_ShaderResources_Dissolve();
 
 public:
 	static CQueen_Body*		Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

@@ -1,6 +1,10 @@
 #pragma once
 #include "Body.h"
 
+NS_BEGIN(Engine)
+class CTexture;
+NS_END
+
 
 NS_BEGIN(Client)
 
@@ -38,11 +42,13 @@ private:
 	CModel*				m_pBrokenModelCom = {};
 
 	_bool				m_IsBrokenWing = {};
+	CTexture*			m_pDissolveTexture = { nullptr };
 
 private:
 	void	Update_BrokenWing(_float fTimeDelta);
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
+	HRESULT Bind_ShaderResources_Dissolve();
 
 public:
 	static CGlasgavelenBody*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

@@ -1,5 +1,6 @@
 #include "ClientPch.h"
 #include "QS_Spawn.h"
+#include "Queen.h"
 
 CQS_Spawn::CQS_Spawn()
 {
@@ -24,6 +25,9 @@ void CQS_Spawn::Update(CMonster* pMonster, _float fTimeDelta)
 void CQS_Spawn::Exit(CMonster* pMonster)
 {
 	m_iStateFlag = ENUM_CLASS(STATE_FLAG::CUTSEAN);
+	
+	CQueen* pQueen = static_cast<CQueen*>(pMonster);
+	pQueen->End_CutScene();
 }
 
 CQS_Spawn* CQS_Spawn::Create()

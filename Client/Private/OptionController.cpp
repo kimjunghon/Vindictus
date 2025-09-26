@@ -116,6 +116,9 @@ HRESULT COptionController::Ready_Children()
 		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::OPTION);
 		};
 
+	Button_Desc.IsButtonText = true;
+	Button_Desc.strButtonText = TEXT("설정하기");
+
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 

@@ -63,6 +63,10 @@ HRESULT CRT_Manager::Bind_Shader_RenderTarget(const _wstring& strRTTag, CShader*
 
 HRESULT CRT_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool IsClear)
 {
+	ID3D11ShaderResourceView* pSRV[D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT] = { nullptr };
+
+	m_pDeviceContext->PSSetShaderResources(0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT, pSRV);
+
 	list<CRenderTarget*>* pMRTs = Find_MRT(strMRTTag);
 	if (nullptr == pMRTs)
 		return E_FAIL;

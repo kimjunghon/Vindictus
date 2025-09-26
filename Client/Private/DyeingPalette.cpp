@@ -124,17 +124,26 @@ HRESULT CDyeingPalette::Ready_Children()
 
 	Button_Desc.Callback = [this]() {m_pPalette->Change_DyeingPart(0);	};
 
+	Button_Desc.IsButtonText = true;
+	Button_Desc.strButtonText = TEXT("ÆÄÃ÷ A");
+
+	Button_Desc.vScale = _float2(0.5f, 0.5f);
+	Button_Desc.vOffset = _float2(-16.f, -5.5f);
+
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 
 	Button_Desc.fOffsetX = -40.f;
 	Button_Desc.Callback = [this]() {m_pPalette->Change_DyeingPart(1);	};
 
+	Button_Desc.strButtonText = TEXT("ÆÄÃ÷ B");
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 
 	Button_Desc.fOffsetX = 30.f;
 	Button_Desc.Callback = [this]() {m_pPalette->Change_DyeingPart(2);	};
+	
+	Button_Desc.strButtonText = TEXT("ÆÄÃ÷ C");
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
@@ -146,6 +155,10 @@ HRESULT CDyeingPalette::Ready_Children()
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_OptionButton");
 	Button_Desc.Callback = [this]() { m_pPalette->Dyeing();	};
 	
+	Button_Desc.strButtonText = TEXT("¿°»ö");
+	Button_Desc.vScale = _float2(1.f, 1.f);
+	Button_Desc.vOffset = _float2(-20.f, -8.5f);
+
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 
@@ -153,7 +166,11 @@ HRESULT CDyeingPalette::Ready_Children()
 	Button_Desc.fOffsetX = 90.f;
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_OptionButton");
 	Button_Desc.Callback = [this]() {*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);	};
-	
+
+	Button_Desc.strButtonText = TEXT("µ¹¾Æ°¡±â");
+	Button_Desc.vScale = _float2(0.6f, 0.6f);
+	Button_Desc.vOffset = _float2(-20.f, -7.5f);
+
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 

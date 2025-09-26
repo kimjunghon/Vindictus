@@ -5,6 +5,9 @@
 #include "Queen_Body.h"
 #include "MonsterStateFactory.h"
 #include "MonsterState.h"
+#include "Camera_CS.h"
+#include "Effect_Trail.h"
+#include "DamageFont.h"
 
 CQueen::CQueen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -26,36 +29,18 @@ HRESULT CQueen::Initialize_Prototype()
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
-	if (FAILED(Ready_AttackMapping()))
-		return E_FAIL;
-
 	m_iNumAttacks = ENUM_CLASS(QUEEN_ATTACK::END);
 
-	m_AttackCoolTime.resize(m_iNumAttacks, 0.f);
-	m_AttackTime.resize(m_iNumAttacks, 10.f);
+	CMonster::Ready_Status("../Bin/Resources/StatusData/Queen_Status.json");
 
-	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::SWOOP)] = 40.f;
-	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::DOUBLE)] = 30.f;
-	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::JUMP)] = 25.f;
-	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::LEFTHAND)] = 15.f;
-	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::RIGHTHAND)] = 15.f;
-	m_AttackCoolTime[ENUM_CLASS(QUEEN_ATTACK::MELEE)] = 15.f;
-	
 	m_fNearAttackCoolTime = 5.f;
-
-	m_fAttackRange = 80.f;
-	m_fChaseRange = 60.f;
-	m_fMinDistance = 80.f;
 
 	m_fBurrowTime = 200.f;
 	m_fBurrowCoolTime = 200.f;
 	
-	m_Status.fFullHealth = 500.f;
-	m_Status.fHealth = m_Status.fFullHealth;
-
-	m_QueenStatus.fStunDamage = 50.f;
+	m_QueenStatus.fStunDamage = 300.f;
 	m_QueenStatus.fCurrentDamage = 0.f;
-	m_QueenStatus.fFullLegDurabillity = 100.f;
+	m_QueenStatus.fFullLegDurabillity = 500.f;
 	m_QueenStatus.fLegDurabillity = m_QueenStatus.fFullLegDurabillity;
 	m_QueenStatus.IsBrokenLeg = false;
 
@@ -134,9 +119,26 @@ HRESULT CQueen::Render()
 	return S_OK;
 }
 
+void CQueen::End_CutScene()
+{
+	EVENT_BIND_BOSSHP Event = {};
+	Event.fLineHP = m_Status.fFullHealth / 6.f;
+	Event.fMaxBossHP = m_Status.fFullHealth;
+	Event.pCurrentBossHP = &m_Status.fHealth;
+	Event.strBossName = TEXT("Äý");
+
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+}
+
 HRESULT CQueen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 {
 	m_IsActive = true;
+
+	if (FAILED(Change_Camera()))
+		return E_FAIL;
+
+	if (FAILED(Request_SpawnEyeTrail()))
+		return E_FAIL;
 
 	ChangeState(ENUM_CLASS(QUEEN_STATE::SPAWN));
 
@@ -154,6 +156,13 @@ HRESULT CQueen::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), false);
 
 	return S_OK;
+}
+
+void CQueen::Dead()
+{
+	m_IsActive = false;
+	EVENT_QUEEN_DEAD Event = {};
+	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event);
 }
 
 BT_STATE CQueen::Attack()
@@ -311,8 +320,6 @@ HRESULT CQueen::Ready_QueenStates()
 	m_States[ENUM_CLASS(QUEEN_STATE::DOWN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::DOWN));
 	m_States[ENUM_CLASS(QUEEN_STATE::DEAD)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::QUEEN), ENUM_CLASS(QUEEN_STATE::DEAD));
 
-	m_pCurrentState = m_States[ENUM_CLASS(QUEEN_STATE::SPAWN)];
-
 	return S_OK;
 }
 
@@ -466,12 +473,6 @@ HRESULT CQueen::Ready_Collider_Attack()
 	return S_OK;
 }
 
-HRESULT CQueen::Ready_AttackMapping()
-{
-	return S_OK;
-}
-
-
 void CQueen::Compute_WorldMatrix()
 {
 	_vector vAnimPosition = *m_pAnimMovement;//XMVectorSetY(*m_pAnimMovement, 0.f);
@@ -508,20 +509,37 @@ void CQueen::OnCollisionHit(_uint HitColliderIndex, const CCollider::COLLISION_D
 
 	m_iHitAttackID = AttackData->iAttackID;
 
-	m_Status.fHealth -= AttackData->fDamage;
+	_float fFinalDamage = AttackData->fDamage - m_Status.fDefense;
 
-	if (m_Status.fHealth <= (m_Status.fFullHealth) && false == m_IsBurrow)
+	m_Status.fHealth -= fFinalDamage;
+
+	CDamageFont::DAMAGE_DESC DamageDesc = {};
+	DamageDesc.eOwner = COLLIDER_OWNER::MONSTER;
+	DamageDesc.iDamage = fFinalDamage;
+	DamageDesc.vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+
+	m_pPool_Instance->Request_SpawnFont(TEXT("DamageFont"), &DamageDesc);
+
+	SpawnHitEffect(CollisionData, AttackData->HitEffect);
+
+	if (m_Status.fHealth <= 0.f)
+	{
+		Dying();
+		return;
+	}
+
+	if ((m_Status.fHealth / m_Status.fFullHealth) < 0.5f && false == m_IsBurrow)
 		m_IsBurrow = true;
 
 	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::BURROW))
 		return;
 
-	DecreaseDurabillity(HitColliderIndex, AttackData->fDamage);
+	DecreaseDurabillity(HitColliderIndex, fFinalDamage);
 
 	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::HIT))
 		return;
 
-	m_QueenStatus.fCurrentDamage += AttackData->fDamage;
+	m_QueenStatus.fCurrentDamage += fFinalDamage;
 
 	if (m_QueenStatus.fCurrentDamage >= m_QueenStatus.fStunDamage)
 	{
@@ -574,6 +592,60 @@ void CQueen::Check_Near(_float fTimeDelta)
 
 	if (fabs(fDistance) <= m_fMinDistance)
 		m_fNearAttackTime += fTimeDelta;
+}
+
+HRESULT CQueen::Change_Camera()
+{
+	_vector vOffsetPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+
+	CCamera_CS::CAMERA_CS_RESET_DESC CS_Reset_Desc = {};
+	CS_Reset_Desc.pOwnerWorldMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	CS_Reset_Desc.OffsetMatrix = XMMatrixTranslationFromVector(vOffsetPosition);
+
+	if (FAILED(m_pGameInstance->Change_Camera(TEXT("Queen_CS_Camera"), &CS_Reset_Desc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CQueen::Request_SpawnEyeTrail()
+{
+	m_IsEyeLight = true;
+
+	CEffect_Trail::TRAIL_DESC TrailDesc = {};
+
+	TrailDesc.pSocketMatrix = m_pBody->SocketCombinedMatrixPtr("root");
+	TrailDesc.pParentMatrix = m_pBody->Get_BodyCombinedMatrixPtr();
+	TrailDesc.IsSwing = &m_IsEyeLight;
+	TrailDesc.vLeftPosition = _float3(-5.f, 5.f, 8.f);
+	TrailDesc.vRightPosition = _float3(5.f, 5.f, 8.f);
+	TrailDesc.fLifeTime = 1.5f;
+	TrailDesc.fNodeUpdateTime = 0.f;
+	TrailDesc.IsEmissive = true;
+
+	if (FAILED(m_pPool_Instance->Request_SpawnEffect(TEXT("EyeTrail"), &TrailDesc)))
+		return E_FAIL;
+
+	TrailDesc.vLeftPosition = _float3(-5.f, 5.f, -8.f);
+	TrailDesc.vRightPosition = _float3(5.f, 5.f, -8.f);
+
+	if (FAILED(m_pPool_Instance->Request_SpawnEffect(TEXT("EyeTrail"), &TrailDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void CQueen::Dying()
+{
+	m_pColliderContainer->SetEnableAllColliderChannel(false);
+
+	ChangeState(ENUM_CLASS(QUEEN_STATE::DEAD));
+
+	Bind_StateFlag();
+
+	m_pBody->Forcing_Play_Animation();
+
+	m_IsEyeLight = false;
 }
 
 CQueen* CQueen::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)

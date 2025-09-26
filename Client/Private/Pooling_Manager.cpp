@@ -4,6 +4,7 @@
 #include "Monster.h"
 #include "Projectile.h"
 #include "Effect.h"
+#include "DamageFont.h"
 
 CPooling_Manager::CPooling_Manager()
 	: m_pPool_Instance{ CPool_Instance::GetInstance()}
@@ -64,6 +65,17 @@ HRESULT CPooling_Manager::Add_EffectToPool(_uint iPrototypeLevelIndex, const _ws
 	return S_OK;
 }
 
+HRESULT CPooling_Manager::Add_DamageFont(_uint iPrototypeLevelIndex, const _wstring& strFontTag, const _wstring& strFontName, void* pArg)
+{
+	CDamageFont* pFont = static_cast<CDamageFont*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strFontTag, pArg));
+	if (nullptr == pFont)
+		return E_FAIL;
+
+	m_Font_Pool[strFontName].push(pFont);
+
+	return S_OK;
+}
+
 void CPooling_Manager::Clear_Pool()
 {
 	for (auto& Pair : m_Monster_Pool)
@@ -110,6 +122,21 @@ void CPooling_Manager::Clear_Pool()
 		Safe_Release(Pair.second);
 
 	m_Active_Effects.clear();
+
+	for (auto& Pair : m_Font_Pool)
+	{
+		while (false == Pair.second.empty())
+		{
+			Safe_Release(Pair.second.front());
+			Pair.second.pop();
+		}
+	}
+	m_Font_Pool.clear();
+
+	for (auto& Pair : m_Active_Font)
+		Safe_Release(Pair.second);
+
+	m_Active_Font.clear();
 }
 
 void CPooling_Manager::ReturnPool(MONSTER_TYPE eMonsterType, CMonster* pMonster)
@@ -210,6 +237,38 @@ HRESULT CPooling_Manager::Request_SpawnEffect(const _wstring& strEffect, void* p
 	m_Active_Effects.push_back(make_pair(strEffect, pEffect));
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Effect"), pEffect)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void CPooling_Manager::ReturnPool(const _wstring& strFont, CDamageFont* pFont)
+{
+	for (auto iter = m_Active_Font.begin(); iter != m_Active_Font.end();)
+	{
+		if ((iter->second) == pFont)
+		{
+			m_Font_Pool[strFont].push(iter->second);
+			iter = m_Active_Font.erase(iter);
+			break;
+		}
+		else
+			iter++;
+	}
+}
+
+HRESULT CPooling_Manager::Request_SpawnFont(const _wstring& strFont, void* pSpawnData)
+{
+	if (m_Font_Pool[strFont].empty())
+		return E_FAIL;
+
+	CDamageFont* pFont = m_Font_Pool[strFont].front();
+	pFont->Spawn(pSpawnData);
+
+	m_Font_Pool[strFont].pop();
+	m_Active_Font.push_back(make_pair(strFont, pFont));
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_Font"), pFont)))
 		return E_FAIL;
 
 	return S_OK;

@@ -41,6 +41,9 @@ HRESULT CLevel_Glasgavelen::Initialize()
 	if (FAILED(Ready_TriggerBox()))
 		return E_FAIL;
 
+	if (FAILED(Ready_DamageFont()))
+		return E_FAIL;
+
 	m_pPool_Instance->BeginRoomSpawn(0);
 
 	if (FAILED(m_pGameInstance->Play_Sound(TEXT("Gavelen_Bgm"), ENUM_CLASS(SOUND_CHANNEL::BGM), 0.3f, true)))
@@ -79,13 +82,31 @@ HRESULT CLevel_Glasgavelen::Ready_TriggerBox()
 {
 	CTriggerBox::TRIGGER_DESC Trigger_Desc = {};
 
-	Trigger_Desc.vPosition = XMVectorSet(10.f, 0.f, 10.f, 1.f);
-	Trigger_Desc.vSize = _float3(20.f, 20.f, 20.f);
+	Trigger_Desc.vPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	Trigger_Desc.vSize = _float3(200.f, 20.f, 20.f);
 	Trigger_Desc.Callback = [this]() { EVENT_GAVELEN_CUTSCENE Event = {}; m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::NONSTATIC), Event); };
 	
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_TriggerBox"),
 		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_TriggerBox"), &Trigger_Desc)))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Glasgavelen::Ready_DamageFont()
+{
+	CUIObject::UIOBJECT_DESC UI_Desc = {};
+	UI_Desc .fX = 0.f;
+	UI_Desc .fY = 0.f;
+	UI_Desc .fSizeX = 0.f;
+	UI_Desc .fSizeY = 0.f;
+	UI_Desc .iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
+
+	for (_uint i = 0; i < 5; i++)
+	{
+		if (FAILED(m_pPool_Instance->Add_DamageFont(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_DamageFont"), TEXT("DamageFont"), &UI_Desc)))
+			return E_FAIL;
+	}
 
 	return S_OK;
 }

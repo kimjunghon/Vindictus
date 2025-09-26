@@ -12,6 +12,7 @@ class CPool_Instance;
 class CMonster;
 class CProjectile;
 class CEffect;
+class CDamageFont;
 
 class CPooling_Manager final : public CBase
 {
@@ -24,18 +25,20 @@ private:
 	typedef list<pair<_wstring, CProjectile*>>				ACTIVE_PROJECTILE;
 
 	typedef unordered_map<_wstring, queue<CEffect*>>		EFFECT_POOL;
-	typedef list<pair<_wstring, CEffect*>>				ACTIVE_EFFECT;
+	typedef list<pair<_wstring, CEffect*>>					ACTIVE_EFFECT;
+
+	typedef unordered_map<_wstring, queue<CDamageFont*>>		FONT_POOL;
+	typedef list<pair<_wstring, CDamageFont*>>					ACTIVE_FONT;
 
 private:
 	CPooling_Manager();
 	virtual ~CPooling_Manager() = default;
 
-
 public:
 	HRESULT		Ready_MonsterPool(const Value& MonsterPool);
 	HRESULT		Add_ProjectilePool(_uint iPrototypeLevelIndex, const _wstring& strProjectileTag, const _wstring& strProjectileName, void* pArg = nullptr);
 	HRESULT		Add_EffectToPool(_uint iPrototypeLevelIndex, const _wstring& strEffectName, const _wstring& strEffectTag, void* pArg = nullptr);
-
+	HRESULT		Add_DamageFont(_uint iPrototypeLevelIndex, const _wstring& strFontTag, const _wstring& strFontName, void* pArg = nullptr);
 public:
 	void		Clear_Pool();
 
@@ -49,6 +52,9 @@ public:
 	void		ReturnPool(const _wstring& strEffect, CEffect* pEffect);
 	HRESULT		Request_SpawnEffect(const _wstring& strEffect, void* pSpawnData = nullptr);
 
+	void		ReturnPool(const _wstring& strFont, CDamageFont* pFont);
+	HRESULT		Request_SpawnFont(const _wstring& strFont, void* pSpawnData = nullptr);
+
 private:
 	CPool_Instance*			m_pPool_Instance = { nullptr };
 	CGameInstance*			m_pGameInstance = { nullptr };
@@ -61,6 +67,10 @@ private:
 
 	EFFECT_POOL				m_Effect_Pool;
 	ACTIVE_EFFECT			m_Active_Effects;
+
+	FONT_POOL				m_Font_Pool;
+	ACTIVE_FONT				m_Active_Font;
+
 
 private:
 	HRESULT		Add_MonsterToPool(MONSTER_TYPE eMonsterType, void* pArg = nullptr);

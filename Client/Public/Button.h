@@ -15,6 +15,10 @@ class CButton final : public CTextureUI
 public:
 	typedef struct tagButtonObjectDesc : public TEXTURE_UI_DESC {
 		function<void()> Callback;
+		_bool			IsButtonText;
+		_wstring		strButtonText;
+		_float2			vOffset;
+		_float2			vScale = { 1.f, 1.f };
 	}BUTTON_DESC;
 
 private:
@@ -33,6 +37,10 @@ public:
 private:
 	CVIBuffer*			m_pVIBufferCom = { nullptr };
 	CShader*			m_pShaderCom = { nullptr };
+	_bool				m_IsButtonText = {};
+	_float2				m_vTextScale = {};
+	_wstring			m_strButtonText = {};
+	_float2				m_vTextOffset = {};
 	function<void()>	m_Callback;
 
 private:

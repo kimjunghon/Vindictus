@@ -9,6 +9,7 @@
 #include "GavelenRock.h"
 #include "Effect_Trail.h"
 #include "Camera_CS.h"
+#include "DamageFont.h"
 
 CGlasgavelen::CGlasgavelen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -41,6 +42,19 @@ void CGlasgavelen::Change_BrokenModel()
 
 	if (FAILED(m_pSword->Bind_ParentBones(m_pBody->Get_ParentModelPtr())))
 		return;
+
+	m_IsEyeLight = false;
+
+	if (FAILED(Request_SpawnEyeTrail(&m_IsBrokenEyeLight)))
+		return;
+
+	for (auto& AttackTime : m_RageAttackTime)
+		AttackTime = AttackTime * 0.5f;
+	
+	for (auto& AttackCTime : m_RageAttackCoolTime)
+		AttackCTime = 100.f;
+
+	
 }
 
 HRESULT CGlasgavelen::Initialize_Prototype()
@@ -48,42 +62,45 @@ HRESULT CGlasgavelen::Initialize_Prototype()
 	if (FAILED(__super::Initialize_Prototype()))
 		return E_FAIL;
 
-	m_iNumAttacks = ENUM_CLASS(NORMAL_ATTACK::END);
+	//m_iNumAttacks = ENUM_CLASS(NORMAL_ATTACK::END);
 
-	m_AttackCoolTime.resize(m_iNumAttacks, 0.f);
-	m_AttackTime.resize(m_iNumAttacks, 50.f);
+	//m_AttackCoolTime.resize(m_iNumAttacks, 0.f);
+	//m_AttackTime.resize(m_iNumAttacks, 50.f);
 
-	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DESEND)] = 0.f;
-	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::BLAZE)] = 5000.f;
-	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DOUBLE)] = 5000.f;
-	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::GRAP)] = 5000.f;
-	m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::HANG)] = 5000.f;
-	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DESEND)] = 30.f;
-	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::BLAZE)] = 20.f;
-	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DOUBLE)] = 25.f;
-	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::GRAP)] = 40.f;
-	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::HANG)] = 40.f;
+	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DESEND)] =5000.f;
+	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::BLAZE)] = 5000.f;
+	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DOUBLE)] = 5000.f;
+	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::GRAP)] = 0;
+	//m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::HANG)] = 5000.f;
+	////m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DESEND)] = 30.f;
+	////m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::BLAZE)] = 20.f;
+	////m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::DOUBLE)] = 25.f;
+	////m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::GRAP)] = 40.f;
+	////m_AttackCoolTime[ENUM_CLASS(NORMAL_ATTACK::HANG)] = 40.f;
 
-	m_iNumRageAttack = ENUM_CLASS(RAGE_ATTACK::END);
+	//m_iNumRageAttack = ENUM_CLASS(RAGE_ATTACK::END);
 
-	m_RageAttackCoolTime.resize(m_iNumRageAttack, 0.f);
-	m_RageAttackTime.resize(m_iNumRageAttack, 50.f);
+	//m_RageAttackCoolTime.resize(m_iNumRageAttack, 0.f);
+	//m_RageAttackTime.resize(m_iNumRageAttack, 50.f);
 
-	m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::DESEND)] = 35.f;
-	m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::COMBO)] = 35.f;
-	m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::DOUBLE)] = 25.f;
-	m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::BLAZE)] = 20.f;
-	m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::GRAP)] = 40.f;
-	m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::HANG)] = 40.f;
+	//m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::DESEND)] = 35.f;
+	//m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::COMBO)] = 35.f;
+	//m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::DOUBLE)] = 25.f;
+	//m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::BLAZE)] = 20.f;
+	//m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::GRAP)] = 40.f;
+	//m_RageAttackCoolTime[ENUM_CLASS(RAGE_ATTACK::HANG)] = 40.f;
 
-	m_fAttackRange = 150.f;
-	m_fChaseRange = 140.f;
-	m_fMinDistance = 80.f;
+	//m_fAttackRange = 150.f;
+	//m_fChaseRange = 140.f;
+	//m_fMinDistance = 80.f;
 
-	m_Status.fFullHealth = 500.f;
-	m_Status.fHealth = m_Status.fFullHealth;
+	//m_Status.fFullHealth = 500.f;
+	//m_Status.fHealth = m_Status.fFullHealth;
 
-	m_GavelenStatus.fStunDamage = 100.f;
+	if (FAILED(Ready_Status("../Bin/Resources/StatusData/Gavelen_Status.json")))
+		return E_FAIL;
+
+	m_GavelenStatus.fStunDamage = 400.f;
 	m_GavelenStatus.fCurrentDamage = 0.f;
 	m_GavelenStatus.fRagePercent = 0.5f;
 	m_GavelenStatus.fWingBrokenPercent = 0.3f;
@@ -136,6 +153,7 @@ void CGlasgavelen::Priority_Update(_float fTimeDelta)
 	if (m_pGameInstance->Get_KeyDown(DIK_2))
 	{
 		m_AttackTime[ENUM_CLASS(NORMAL_ATTACK::HANG)] = 5000.f;
+		m_RageAttackTime[ENUM_CLASS(RAGE_ATTACK::HANG)] = 5000.f;
 	}
 
 	if (m_pGameInstance->Get_KeyDown(DIK_3))
@@ -151,6 +169,16 @@ void CGlasgavelen::Priority_Update(_float fTimeDelta)
 
 void CGlasgavelen::Update(_float fTimeDelta)
 {
+	if (m_iStateFlag & ENUM_CLASS(STATE_FLAG::DEAD))
+	{
+		m_pCurrentState->Update(this, fTimeDelta);
+
+		for (auto& Pair : m_PawnObjects)
+			Pair.second->Update(fTimeDelta);
+
+		return;
+	}
+
 	Update_AttackCoolTime(fTimeDelta);
 
 	m_pAI->Update();
@@ -170,6 +198,10 @@ void CGlasgavelen::Late_Update(_float fTimeDelta)
 	for (auto& Pair : m_PawnObjects)
 		Pair.second->Late_Update(fTimeDelta);
 	
+	if (false == m_IsActive)
+		return;
+
+
 	m_pColliderContainer->Update(this, m_pTransformCom->Get_WorldMatrix());
 }
 
@@ -344,6 +376,97 @@ HRESULT CGlasgavelen::Add_Bone_Collider(COLLIDER_CHANNEL eChannel, CBoundingOBB:
 	return S_OK;
 }
 
+HRESULT CGlasgavelen::Ready_Status(const string& strFilePath)
+{
+	ifstream File(strFilePath);
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed MonsterStatus Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("Status") && Doc["Status"].IsObject())
+	{
+		const Value& Status = Doc["Status"];
+
+		if (Status.HasMember("HP") && Status["HP"].IsFloat())
+		{
+			m_Status.fFullHealth = Status["HP"].GetFloat();
+			m_Status.fHealth = m_Status.fFullHealth;
+		}
+
+		if (Status.HasMember("DEF") && Status["DEF"].IsFloat())
+			m_Status.fDefense = Status["DEF"].GetFloat();
+
+		if (Status.HasMember("ATK") && Status["ATK"].IsFloat())
+			m_Status.fAttackDamage = Status["ATK"].GetFloat();
+
+		if (Status.HasMember("AttackRange") && Status["AttackRange"].IsFloat())
+			m_fAttackRange = Status["AttackRange"].GetFloat();
+
+		if (Status.HasMember("ChaseRange") && Status["ChaseRange"].IsFloat())
+			m_fChaseRange = Status["ChaseRange"].GetFloat();
+
+		if (Status.HasMember("MinDistance") && Status["MinDistance"].IsFloat())
+			m_fMinDistance = Status["MinDistance"].GetFloat();
+
+		if (Status.HasMember("NumAttack") && Status["NumAttack"].IsInt())
+			m_iNumAttacks = Status["NumAttack"].GetInt();
+
+		m_AttackCoolTime.resize(m_iNumAttacks, 0.f);
+		m_AttackTime.resize(m_iNumAttacks, 0.f);
+
+		if (Status.HasMember("AttackTime") && Status["AttackTime"].IsArray())
+		{
+			const auto& AttackTimes = Status["AttackTime"].GetArray();
+
+			_uint iIndex = 0;
+			for (auto& AttackTime : AttackTimes)
+			{
+				if (AttackTime.HasMember("Time") && AttackTime["Time"].IsFloat())
+				{
+					_float fTime = AttackTime["Time"].GetFloat();
+					m_AttackTime[iIndex] = fTime;
+					m_AttackCoolTime[iIndex++] = fTime;
+				}
+			}
+		}
+		
+		m_iNumRageAttack = Status["NumRageAttack"].GetInt();
+		m_RageAttackCoolTime.resize(m_iNumRageAttack, 0.f);
+		m_RageAttackTime.resize(m_iNumRageAttack, 0.f);
+
+		if (Status.HasMember("NumRageAttack") && Status["NumRageAttack"].IsInt())
+		{
+			const auto& AttackTimes = Status["RageAttackTime"].GetArray();
+
+			_uint iIndex = 0;
+			for (auto& AttackTime : AttackTimes)
+			{
+				if (AttackTime.HasMember("Time") && AttackTime["Time"].IsFloat())
+				{
+					_float fTime = AttackTime["Time"].GetFloat();
+					m_RageAttackTime[iIndex] = fTime;
+					m_RageAttackCoolTime[iIndex++] = fTime;
+				}
+			}
+		}
+	}
+
+	return S_OK;
+}
+
 HRESULT CGlasgavelen::Ready_PawnObjects()
 {
 	CBody::BODY_DESC BodyObjectDesc = {};
@@ -407,7 +530,7 @@ HRESULT CGlasgavelen::Ready_GavelenStates()
 	m_States[ENUM_CLASS(GAVELEN_STATE::HIT)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::HIT));
 	m_States[ENUM_CLASS(GAVELEN_STATE::DOWN)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::DOWN));
 	m_States[ENUM_CLASS(GAVELEN_STATE::WINGBREAK)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::WINGBREAK));
-//	m_States[ENUM_CLASS(GAVELEN_STATE::DEAD)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::DEAD));
+	m_States[ENUM_CLASS(GAVELEN_STATE::DEAD)] = pStateFactory->Create(ENUM_CLASS(MONSTER_STATE_TYPE::GLASGAVELEN), ENUM_CLASS(GAVELEN_STATE::DEAD));
 
 	return S_OK;
 }
@@ -721,6 +844,9 @@ void CGlasgavelen::Event_Cutscene(const EVENT_GAVELEN_CUTSCENE& Event)
 
 	if (FAILED(Change_Camera()))
 		MSG_BOX(TEXT("Failed Change Gavelen Cutscene"));
+
+	if (FAILED(Request_SpawnEyeTrail(&m_IsEyeLight)))
+		return;
 }
 
 HRESULT CGlasgavelen::Change_Camera()
@@ -737,14 +863,62 @@ HRESULT CGlasgavelen::Change_Camera()
 	return S_OK;
 }
 
+HRESULT CGlasgavelen::Request_SpawnEyeTrail(_bool* pIsEyeLight)
+{
+	m_IsEyeLight = true;
+
+	CEffect_Trail::TRAIL_DESC TrailDesc = {};
+
+	TrailDesc.pSocketMatrix = m_pBody->SocketCombinedMatrixPtr("bone_r_eye");
+	TrailDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	TrailDesc.IsSwing = pIsEyeLight;
+	TrailDesc.vLeftPosition = _float3(0.f, 0.f, 0.f);
+	TrailDesc.vRightPosition = _float3(0.f, 0.f, -5.f);
+	TrailDesc.fLifeTime = 1.0f;
+	TrailDesc.fNodeUpdateTime = 0.f;
+	TrailDesc.IsEmissive = true;
+
+	if (FAILED(m_pPool_Instance->Request_SpawnEffect(TEXT("GavelenEyeTrail"), &TrailDesc)))
+		return E_FAIL;
+
+	TrailDesc.pSocketMatrix = m_pBody->SocketCombinedMatrixPtr("bone_l_eye");
+	TrailDesc.vLeftPosition = _float3(0.f, 0.f, 0.f);
+	TrailDesc.vRightPosition = _float3(0.f, 0.f, 5.f);
+
+	if (FAILED(m_pPool_Instance->Request_SpawnEffect(TEXT("GavelenEyeTrail"), &TrailDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+void CGlasgavelen::Dying()
+{
+	m_pColliderContainer->SetEnableAllColliderChannel(false);
+
+	m_IsEyeLight = false;
+
+	ChangeState(ENUM_CLASS(GAVELEN_STATE::DEAD));
+	
+	Bind_StateFlag();
+
+	m_pBody->Forcing_Play_Animation();
+
+}
+
 void CGlasgavelen::End_Cutscene()
 {
 	EVENT_BIND_BOSSHP Event = {};
-	Event.m_fLineHP = 200.f;
-	Event.m_fMaxBossHP = m_Status.fFullHealth;
-	Event.m_pCurrentBossHP = &m_Status.fHealth;
+	Event.fLineHP = m_Status.fFullHealth / 10.f;
+	Event.fMaxBossHP = m_Status.fFullHealth;
+	Event.pCurrentBossHP = &m_Status.fHealth;
+	Event.strBossName = TEXT("글라스기브넨");
 
 	m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
+}
+
+void CGlasgavelen::Dead()
+{
+	m_IsActive = false;
 }
 
 
@@ -950,19 +1124,37 @@ void CGlasgavelen::OnCollisionHit(_uint HitColliderIndex, const CCollider::COLLI
 
 	m_iHitAttackID = AttackData->iAttackID;
 
-	DecreaseHealth(AttackData->fDamage);
+	_float fFinalDamage = AttackData->fDamage - m_Status.fDefense;
+
+	DecreaseHealth(fFinalDamage);
+	
+	SpawnHitEffect(CollisionData, AttackData->HitEffect);
+
 }
 
 void CGlasgavelen::DecreaseHealth(_float fDamage)
 {
 	m_Status.fHealth -= fDamage;
 	
+	CDamageFont::DAMAGE_DESC DamageDesc = {};
+	DamageDesc.eOwner = COLLIDER_OWNER::MONSTER;
+	DamageDesc.iDamage = fDamage;
+	DamageDesc.vPosition = m_pTransformCom->Get_State(STATE::POSITION);
+
+	m_pPool_Instance->Request_SpawnFont(TEXT("DamageFont"), &DamageDesc);
+
+	if (m_Status.fHealth <= 0.f)
+	{
+		Dying();
+		return;
+	}
+
 	if (false == CanChangeState() && (m_iStateFlag & ENUM_CLASS(STATE_FLAG::HIT)))
 		return;
 	
 	m_GavelenStatus.fCurrentDamage += fDamage;
 
-	if (m_Status.fHealth <= (m_Status.fFullHealth * m_GavelenStatus.fWingBrokenPercent) && false == m_IsBroken)
+	/*if (m_Status.fHealth <= (m_Status.fFullHealth * m_GavelenStatus.fWingBrokenPercent) && false == m_IsBroken)
 	{
 		m_IsBroken = true;
 
@@ -973,8 +1165,8 @@ void CGlasgavelen::DecreaseHealth(_float fDamage)
 		Bind_StateFlag();
 
 		m_pBody->Forcing_Play_Animation();
-	}
-	else if (m_Status.fHealth <= (m_Status.fFullHealth * m_GavelenStatus.fRagePercent) && false == m_IsRage)
+	}*/
+	if (m_Status.fHealth <= (m_Status.fFullHealth * m_GavelenStatus.fRagePercent) && false == m_IsRage)
 	{
 		m_IsRage = true;
 

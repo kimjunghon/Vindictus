@@ -24,6 +24,7 @@
 #include "Cat.h"
 #include "Cat_Body.h"
 #include "WorldBoard.h"
+#include "QueenDoor.h"
 
 #include "Glasgavelen.h"
 #include "GlasgavelenBody.h"
@@ -507,6 +508,10 @@ HRESULT CLoader::Loading_For_Queen_Level()
 	/* Prototype_Projectile_FireBall */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_Projectile_FireBall"),
 		CFireBall::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_GameObject_QueenDoor"),
+		CQueenDoor::Create(m_pDevice, m_pDeviceContext))))
 		return E_FAIL;
 
 	Event.fRatio += 0.2f;

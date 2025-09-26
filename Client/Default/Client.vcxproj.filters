@@ -535,6 +535,15 @@
     <Filter Include="03.GameObject\UIObject\DamageFont">
       <UniqueIdentifier>{8ff240fd-fbe1-4764-b036-046b4acdb6a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03.GameObject\Map\MapObject\QueenDoor">
+      <UniqueIdentifier>{6dc61004-faa6-4a6a-a13e-5392b38cfd30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\UIObject\GamePlay\BossHPBar\LineNumber">
+      <UniqueIdentifier>{d668144c-26ae-4a4e-93fc-1eb1c6492176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03.GameObject\Pawns\State\MonsterState\Glasgavelen\Dead">
+      <UniqueIdentifier>{6284ab1b-df39-4054-b12d-36c92ce7396f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -1044,6 +1053,12 @@
     <ClInclude Include="..\public\DamageFont.h">
       <Filter>03.GameObject\UIObject\DamageFont</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\QueenDoor.h">
+      <Filter>03.GameObject\Map\MapObject\QueenDoor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\GS_Dead.h">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Dead</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1538,6 +1553,12 @@
     </ClCompile>
     <ClCompile Include="..\private\DamageFont.cpp">
       <Filter>03.GameObject\UIObject\DamageFont</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\QueenDoor.cpp">
+      <Filter>03.GameObject\Map\MapObject\QueenDoor</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\GS_Dead.cpp">
+      <Filter>03.GameObject\Pawns\State\MonsterState\Glasgavelen\Dead</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

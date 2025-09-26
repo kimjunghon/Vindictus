@@ -106,9 +106,10 @@ namespace Client
 
 	typedef struct tagEventBindBossHP final : public CEvent
 	{
-		_float	m_fLineHP;
-		_float	m_fMaxBossHP;
-		_float* m_pCurrentBossHP;
+		_float		fLineHP;
+		_float		fMaxBossHP;
+		_float*		pCurrentBossHP;
+		_wstring	strBossName;
 	}EVENT_BIND_BOSSHP;
 
 	typedef struct tagEventMouseChange final : public CEvent
@@ -129,4 +130,7 @@ namespace Client
 	typedef struct tagEventGavelenCutscene final : public CEvent
 	{
 	}EVENT_GAVELEN_CUTSCENE;
+
+	typedef struct tagEventQueenDead final : public CEvent
+	{ }EVENT_QUEEN_DEAD;
 }

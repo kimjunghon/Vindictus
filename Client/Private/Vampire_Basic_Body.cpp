@@ -46,31 +46,78 @@ void CVampire_Basic_Body::Late_Update(_float fTimeDelta)
 {
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
 		return;
+	
+	if (*m_pStateFlag & ENUM_CLASS(STATE_FLAG::DEAD))
+		return;
+
+	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
+		return;
 }
 
 HRESULT CVampire_Basic_Body::Render()
 {
-	if (FAILED(Bind_ShaderResources()))
-		return E_FAIL;
+	_uint iShaderIndex = {};
 
+	if (*m_pStateFlag & ENUM_CLASS(STATE_FLAG::DEAD))
+	{
+		iShaderIndex = ENUM_CLASS(SHADER_VTXANIMMESH::DISSOLVE);
+		if (FAILED(Bind_ShaderResources_Dissolve()))
+			return E_FAIL;
+	}
+	else
+	{
+		iShaderIndex = ENUM_CLASS(SHADER_VTXANIMMESH::DEFAULT);
+		if (FAILED(Bind_ShaderResources()))
+			return E_FAIL;
+	}
+	
 	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
-
+	
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
 		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
 			return E_FAIL;
-
+	
 		_bool hasNormal = {};
-
+	
 		m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0, &hasNormal);
-
+	
 		m_pShaderCom->Bind_RawValue("g_HasNormal", &hasNormal, sizeof(_bool));
+	
+		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+			return E_FAIL;
+	
+		m_pShaderCom->Begin(iShaderIndex);
+	
+		m_pModelCom->Render(i);
+	}
+	
+
+	return S_OK;
+}
+
+HRESULT CVampire_Basic_Body::Render_Shadow()
+{
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pPawnMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
+		return E_FAIL;
+
+	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (size_t i = 0; i < iNumMeshes; i++)
+	{
+		if (FAILED(m_pModelCom->Bind_Shader_Material(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+			return E_FAIL;
 
 		if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
 			return E_FAIL;
 
-		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::DEFAULT));
-
+		m_pShaderCom->Begin(ENUM_CLASS(SHADER_VTXANIMMESH::SHADOW));
 
 		m_pModelCom->Render(i);
 	}
@@ -80,6 +127,10 @@ HRESULT CVampire_Basic_Body::Render()
 
 HRESULT CVampire_Basic_Body::Ready_Components()
 {
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+		TEXT("Com_DissolveTexture"), reinterpret_cast<CComponent**>(&m_pDissolveTexture))))
+		return E_FAIL;
+
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Vampire_Basic_Body"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom))))
 		return E_FAIL;
@@ -118,6 +169,28 @@ HRESULT CVampire_Basic_Body::Bind_ShaderResources()
 	return S_OK;
 }
 
+HRESULT CVampire_Basic_Body::Bind_ShaderResources_Dissolve()
+{
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pPawnMatrix)))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+		return E_FAIL;
+
+	if(FAILED(m_pDissolveTexture->Bind_Shader_Texture(m_pShaderCom, "g_DissolveTexture", 3)))
+		return E_FAIL;
+
+	_float fRatio = m_pModelCom->Get_CurrentAnimRatio();
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveRatio", &fRatio, sizeof(_float))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 CVampire_Basic_Body* CVampire_Basic_Body::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 {
     CVampire_Basic_Body* pInstance = new CVampire_Basic_Body(pDevice, pDeviceContext);
@@ -144,5 +217,5 @@ void CVampire_Basic_Body::Free()
 {
     __super::Free();
 
-	Safe_Release(m_pAnimMachine);
+	Safe_Release(m_pDissolveTexture);
 }

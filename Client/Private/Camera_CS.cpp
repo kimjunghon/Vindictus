@@ -242,6 +242,9 @@ void CCamera_CS::Update_Shake(_float fTimeDelta)
 {
 	m_fCurrentEffectTime += fTimeDelta;
 
+	if (m_iCurrentIndex + 1 >= m_iNumNodes)
+		return;
+
 	_float fTimeDiff = m_CS_Datas[m_iCurrentIndex + 1].fTime - m_CS_Datas[m_iCurrentIndex].fTime;
 
 	_float fTimeRatio = 1.f - (m_fCurrentEffectTime / fTimeDiff);

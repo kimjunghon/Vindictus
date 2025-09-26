@@ -66,7 +66,7 @@ HRESULT CLogoScreen::Ready_Children()
 	Children_Desc.fOffsetY = 0.f;
 	Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIRST);
 	Children_Desc.iTexturePrototypeLevelIndex = ENUM_CLASS(LEVEL::STATIC);
-	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_SkyBox");
+	Children_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_Logo");
 	Children_Desc.IsBlend = false;
 	Children_Desc.fAlpha = 1.f;
 
@@ -109,10 +109,15 @@ HRESULT CLogoScreen::Ready_Button()
 
 	Button_Desc.Callback = [&]() {
 		EVENT_LEVEL_CHANGE Event;
-		Event.iChange_Level = ENUM_CLASS(LEVEL::GAMEPLAY);
+		Event.iChange_Level = ENUM_CLASS(LEVEL::TOWN);
 		Event.bIsLoading = false;
 		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 		};
+
+	Button_Desc.IsButtonText = true;
+	Button_Desc.strButtonText = TEXT("게임 시작");
+	Button_Desc.vScale = _float2(1.f, 1.f);
+	Button_Desc.vOffset = _float2(-40.f, -7.5f);
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
@@ -121,6 +126,9 @@ HRESULT CLogoScreen::Ready_Button()
 	Button_Desc.Callback = []() {
 			DestroyWindow(g_hWnd);
 		};
+
+	Button_Desc.strButtonText = TEXT("게임 종료");
+
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;

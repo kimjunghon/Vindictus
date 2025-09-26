@@ -8,6 +8,7 @@
 #include "Armor.h"
 #include "Weapon.h"
 #include "Effect_Trail.h"
+#include "DamageFont.h"
 
 CPlayerPawn::CPlayerPawn(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CColliderPawn{ pDevice, pDeviceContext }
@@ -228,9 +229,6 @@ HRESULT CPlayerPawn::EquipWeapon(CWeapon* pWeapon)
 
 	Safe_AddRef(pWeapon);
 
-//	m_Status.fAttackDamage += pWeapon->Get_ATK();
-//	m_pPlayerInstance->UpdatePlayerStatus(m_Status);
-
 	return S_OK;
 }
 
@@ -412,12 +410,6 @@ void CPlayerPawn::Change_HitState(_uint iArmorIndex, const CCollider::COLLISION_
 {
 	ATTACK_DATA* AttackData = static_cast<ATTACK_DATA*>(CollisionData.pDesc);
 
-	if (!(m_iStateFlag & ENUM_CLASS(STATE_FLAG::GUARD)))
-	{
-		DecreaseArmorDurability(iArmorIndex, AttackData->fDamage);
-		m_pStatus->fHealth -= AttackData->fDamage;
-	}
-
 	ATTACK_TYPE eAttackType = AttackData->eAttackType;
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vAttackPosition = AttackData->vAttackPosition;
@@ -460,6 +452,18 @@ void CPlayerPawn::Change_HitState(_uint iArmorIndex, const CCollider::COLLISION_
 		}
 		}
 
+		_float fFinalDamage = AttackData->fDamage - m_pStatus->fDefense;
+
+		DecreaseArmorDurability(iArmorIndex, fFinalDamage);
+		m_pStatus->fHealth -= fFinalDamage;
+
+		CDamageFont::DAMAGE_DESC DamageDesc = {};
+		DamageDesc.eOwner = COLLIDER_OWNER::PLAYER;
+		DamageDesc.iDamage = fFinalDamage;
+		DamageDesc.vPosition = vPosition;
+
+		m_pPool_Instance->Request_SpawnFont(TEXT("DamageFont"), &DamageDesc);
+
 		Request_HitEffect(eAttackType, AttackData->HitEffect.strSoundName, CollisionData);
 	}
 
@@ -499,11 +503,9 @@ void CPlayerPawn::DecreaseArmorDurability(_uint iArmorIndex, _float fDamage)
 {
 	_uint iIndex = iArmorIndex;
 	
-	_float fTestDamage = 10.f;// CollisionData.AttackData.fDamage;// - m_Status.fDefense;
-
 	if (nullptr != m_pEquipArmors[iIndex] && false == m_pEquipArmors[iIndex]->IsBroekn())
 	{
-		m_pEquipArmors[iIndex]->DecreaseDurability(fTestDamage);
+		m_pEquipArmors[iIndex]->DecreaseDurability(fDamage);
 		return;
 	}
 
@@ -523,7 +525,7 @@ void CPlayerPawn::DecreaseArmorDurability(_uint iArmorIndex, _float fDamage)
 
 	_uint iRandomIndex = OtherIndices[rand() % OtherIndices.size()];
 
-	DecreaseArmorDurability(iRandomIndex, fTestDamage);
+	DecreaseArmorDurability(iRandomIndex, fDamage);
 }
 
 void CPlayerPawn::Request_SpawnTrail(const string& strBoneName, _uint iTrailType)
@@ -551,6 +553,13 @@ void CPlayerPawn::Request_SpawnTrail(const string& strBoneName, _uint iTrailType
 		fLifeTime = 1.f;
 	}
 		break;
+	case 2:
+	{
+		vSize = _float2(-10.f, 25.f);
+		IsEmissive = false;
+		strTrailName = TEXT("Sword2Trail");
+		fLifeTime = 0.5f;
+	}
 	}
 
 	CEffect_Trail::TRAIL_DESC TrailDesc = {};
@@ -1189,9 +1198,6 @@ HRESULT CPlayerPawn::Ready_TrailNotify()
 HRESULT CPlayerPawn::Add_AttackCollisionInfo(const string& strAnimName, _uint iAttackColliderIndex, ATTACK_TYPE eType, _float fAttackRatio, 
 	const _wstring& strEffectName, const _wstring& strHitSoundName, const string& strBoneName, _float2 vTrackPosition)
 {
-
-
-
 	if (FAILED(m_pPlayerBody->Add_AnimNotify(strAnimName, vTrackPosition.x, [this, iAttackColliderIndex, eType, fAttackRatio, strEffectName, strHitSoundName, strBoneName]() {
 		this->m_pColliderContainer->SetEnable(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), iAttackColliderIndex, true);
 		m_CurrentAttackData.iAttackID = m_iStateFlag + (reinterpret_cast<size_t>(this) << 1);

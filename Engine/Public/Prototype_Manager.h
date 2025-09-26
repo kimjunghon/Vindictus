@@ -7,6 +7,7 @@
 #include "VIBuffer_Rect_Instance.h"
 #include "VIBuffer_Trail.h"
 #include "VIBuffer_Cell.h"
+#include "VIBuffer_Dynamic.h"
 #include "Transform.h"
 #include "Shader.h"
 #include "Texture.h"

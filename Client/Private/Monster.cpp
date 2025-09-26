@@ -184,7 +184,11 @@ HRESULT CMonster::Ready_Status(const string& strFilePath)
 			for (auto& AttackTime : AttackTimes)
 			{
 				if(AttackTime.HasMember("Time") && AttackTime["Time"].IsFloat())
-					m_AttackCoolTime[iIndex++] = AttackTime["Time"].GetFloat();
+				{
+					_float fTime = AttackTime["Time"].GetFloat();
+					m_AttackTime[iIndex] = fTime;
+					m_AttackCoolTime[iIndex++] = fTime;
+				}
 			}
 		}
 	}
@@ -566,7 +570,7 @@ BT_STATE CMonster::CanOtherAction()
 	if(CanChangeState())
 		return BT_STATE::FAILED;
 
-	return BT_STATE::RUN;
+	return BT_STATE::SUCCESS;
 }
 
 BT_STATE CMonster::CanAttackRange()

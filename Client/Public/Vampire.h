@@ -31,8 +31,15 @@ public:
 	virtual BT_STATE		Chase() override;
 	virtual BT_STATE		Patrol() override;
 
+private:
+	_bool				m_IsSwing_L = {};
+	_bool				m_IsSwing_R = {};
+
 protected:
 	HRESULT				Ready_VampireState(MONSTER_TYPE eType);
+	HRESULT				Ready_VampireTrailNotifY(const _char* pFilePath);
+	void				Request_SpawnTrail(const string& strBoneName, _bool* pSwing);
+
 	HRESULT				Ready_AI();
 	void				Compute_AnimPosition();
 	void				OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData);

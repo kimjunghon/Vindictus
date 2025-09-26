@@ -21,17 +21,19 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	_float	m_fLerpSpeed = {};
+	_float		m_fLerpSpeed = {};
 
-	_bool	m_IsChangeLine = {};
-	_uint	m_iNumMaxLine = {};
-	_uint	m_iNumLine = {};
-	_float	m_fBarRatio = {};
-	_float	m_fLineRatio = {};
-	_float	m_fLineHP = {};
+	_bool		m_IsChangeLine = {};
+	_uint		m_iNumMaxLine = {};
+	_uint		m_iNumLine = {};
+	_float		m_fBarRatio = {};
+	_float		m_fLineRatio = {};
+	_float		m_fLineHP = {};
 	
-	_float	m_fMaxBossHP = {};
-	_float* m_pCurrentBossHP = { nullptr };
+	_float		m_fMaxBossHP = {};
+	_float*		m_pCurrentBossHP = { nullptr };
+	_wstring	m_strBossName = {};
+	_float2		m_vFontOffset = {};
 
 	CBossHPBar*	m_pHpBar = { nullptr };
 	

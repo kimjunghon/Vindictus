@@ -4,7 +4,8 @@
 #include "Navigation.h"
 #include "Body.h"
 #include "MonsterStateFactory.h"
-#include "Effect.h"
+#include "Effect_Trail.h"
+#include "DamageFont.h"
 
 CVampire::CVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CMonster { pDevice, pDeviceContext }
@@ -58,6 +59,8 @@ HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
 
 	ChangeState(ENUM_CLASS(VAMPIRE_STATE::SPAWN));
 
+	LookAtTarget();
+
 	Bind_StateFlag();
 
 	m_pBody->Forcing_Play_Animation();
@@ -71,6 +74,8 @@ HRESULT CVampire::Spawn(MONSTER_SPAWN_DATA SpawnData)
 	m_pColliderContainer->SetEnableAllColliderChannel(true);
 	m_pColliderContainer->SetEnableColliderChannel(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), false);
 	
+	m_Status.fHealth = m_Status.fFullHealth;
+
 	return S_OK;
 }
 
@@ -139,6 +144,88 @@ HRESULT CVampire::Ready_VampireState(MONSTER_TYPE eType)
 	return S_OK;
 }
 
+HRESULT CVampire::Ready_VampireTrailNotifY(const _char* pFilePath)
+{
+	ifstream File(pFilePath);
+
+	if (!File.is_open())
+	{
+		MSG_BOX(TEXT("Failed Trail_AnimDatas Open"));
+		return E_FAIL;
+	}
+
+	IStreamWrapper FileWrap(File);
+
+	Document Doc;
+	Doc.ParseStream(FileWrap);
+
+	if (Doc.HasParseError())
+	{
+		MSG_BOX(TEXT("Failed ParseStream"));
+		return E_FAIL;
+	}
+
+	if (Doc.HasMember("AnimNotify") && Doc["AnimNotify"].IsArray())
+	{
+		const Value& AnimNotify = Doc["AnimNotify"];
+
+		for (auto& Notify : AnimNotify.GetArray())
+		{
+			string strAnimName = "";
+			_float fTrackPosition = {};
+			NOTIFY_TYPE eType = {};
+
+			string strBoneName = "";
+
+			if (Notify.HasMember("AnimName") && Notify["AnimName"].IsString())
+				strAnimName = Notify["AnimName"].GetString();
+
+			if (Notify.HasMember("TrackPosition") && Notify["TrackPosition"].IsFloat())
+				fTrackPosition = Notify["TrackPosition"].GetFloat();
+
+			if (Notify.HasMember("NotifyType") && Notify["NotifyType"].IsInt())
+				eType = static_cast<NOTIFY_TYPE>(Notify["NotifyType"].GetInt());
+
+			if (Notify.HasMember("BoneName") && Notify["BoneName"].IsString())
+				strBoneName = Notify["BoneName"].GetString();
+
+			_bool* pSwing = {};
+			pSwing = strcmp(strBoneName.c_str(), "ValveBiped.Bip01_L_Hand") ? &m_IsSwing_R : &m_IsSwing_L;
+
+			if (eType == NOTIFY_TYPE::ON)
+			{
+				m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, strBoneName, pSwing]() {
+					Request_SpawnTrail(strBoneName, pSwing); });
+			}
+			else
+			{
+				m_pBody->Add_AnimNotify(strAnimName, fTrackPosition, [this, pSwing]() {
+					*pSwing = false; });
+			}
+		}
+	}
+
+	return S_OK;
+}
+
+void CVampire::Request_SpawnTrail(const string& strBoneName, _bool* pSwing)
+{
+	CEffect_Trail::TRAIL_DESC TrailDesc = {};
+
+	TrailDesc.pSocketMatrix = m_pBody->SocketCombinedMatrixPtr(strBoneName);
+	TrailDesc.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+	TrailDesc.IsSwing = pSwing;
+	TrailDesc.vLeftPosition = _float3(0.f, 0.f, 0.f);
+	TrailDesc.vRightPosition = _float3(0.f, 20.f, 0.f);
+	TrailDesc.fLifeTime = 1.f;
+	TrailDesc.fNodeUpdateTime = 0.f;
+	TrailDesc.IsEmissive = false;
+
+	*pSwing = true;
+
+	m_pPool_Instance->Request_SpawnEffect(TEXT("VampireTrail"), &TrailDesc);
+}
+
 void CVampire::Compute_AnimPosition()
 {
 	_vector vAnimPosition = XMVectorSetY(*m_pAnimMovement, 0.f);
@@ -171,7 +258,15 @@ void CVampire::OnCollisionHit(const CCollider::COLLISION_DATA& CollisionData)
 	_vector vPosition = m_pTransformCom->Get_State(STATE::POSITION);
 	_vector vAttackPosition = AttackData->vAttackPosition;
 
-	m_Status.fHealth -= AttackData->fDamage;
+	_float fFinalDamage = AttackData->fDamage - m_Status.fDefense;
+	m_Status.fHealth -= fFinalDamage;
+
+	CDamageFont::DAMAGE_DESC DamageDesc = {};
+	DamageDesc.eOwner = COLLIDER_OWNER::MONSTER;
+	DamageDesc.iDamage = fFinalDamage;
+	DamageDesc.vPosition = vPosition;
+
+	m_pPool_Instance->Request_SpawnFont(TEXT("DamageFont"), &DamageDesc);
 
 	if (m_Status.fHealth <= 0.f)
 		ChangeDeadState(eAttackType);

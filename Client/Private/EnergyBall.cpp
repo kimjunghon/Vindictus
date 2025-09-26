@@ -136,6 +136,9 @@ void CEnergyBall::ReturnToPool()
 	if (FAILED(m_pPoolInstance->Request_SpawnEffect(TEXT("Energy_Explosion_Prefab"), &EffectDesc)))
 		return;
 
+	if (FAILED(m_pGameInstance->Play_Sound_AnyChannel(ENUM_CLASS(SOUND_CHANNEL::OTHERS), TEXT("hit_common_mana_03_blade"), 0.3f)))
+		return;
+
 	m_pColliderContainer->SetEnableAllColliderChannel(false);
 	m_pColliderContainer->SetDesc(ENUM_CLASS(COLLIDER_CHANNEL::ATTACK), 0, nullptr);
 

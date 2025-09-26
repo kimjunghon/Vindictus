@@ -6,6 +6,9 @@
 #include "Pool_Instance.h"
 #include "Effect_Distortion.h"
 #include "SkyBox.h"
+#include "MapObject.h"
+#include "TriggerBox.h"
+#include "Camera_CS.h"
 
 CLevel_Queen::CLevel_Queen(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 	: CLevel{ pDevice, pDeviceContext }
@@ -22,6 +25,9 @@ HRESULT CLevel_Queen::Initialize()
 	if (FAILED(Ready_Sky()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Camera()))
+		return E_FAIL;
+
 	if (FAILED(Ready_GameObjectToJson()))
 		return E_FAIL;
 
@@ -34,11 +40,26 @@ HRESULT CLevel_Queen::Initialize()
 	if (FAILED(Ready_PoolingProjectile()))
 		return E_FAIL;
 
+	if (FAILED(Ready_TriggerBox()))
+		return E_FAIL;
+
 	if (FAILED(Ready_Map(TEXT("Layer_GameObject"))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Play_Sound(TEXT("Queen_Bgm"), ENUM_CLASS(SOUND_CHANNEL::BGM), 0.2f, true)))
 		return E_FAIL;
+
+	for (_uint i = 0; i < 5; i++)
+	{
+		CUIObject::UIOBJECT_DESC Children_Desc = {};
+		Children_Desc.fX = 0.f;
+		Children_Desc.fY = 0.f;
+		Children_Desc.fSizeX = 0.f;
+		Children_Desc.fSizeY = 0.f;
+		Children_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
+
+		m_pPool_Instance->Add_DamageFont(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_DamageFont"), TEXT("DamageFont"), &Children_Desc);
+	}
 
 	return S_OK;
 }
@@ -66,6 +87,7 @@ void CLevel_Queen::Update(_float fTimeDelta)
 		m_pPool_Instance->WaveEnd();
 	}
 #endif
+
 	if (m_pGameInstance->Get_KeyDown(DIK_RETURN))
 	{
 		EVENT_LEVEL_CHANGE Event;
@@ -162,6 +184,42 @@ HRESULT CLevel_Queen::Ready_GameObjectToJson()
 
 	File.close();
 	
+	return S_OK;
+}
+
+HRESULT CLevel_Queen::Ready_Camera()
+{
+	CCamera_CS::CAMERA_CS_DESC CS_Desc = {};
+	CS_Desc.vEye = _float4(0.f, 30.f, -150.f, 1.f);
+	CS_Desc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CS_Desc.fFov = XMConvertToRadians(60.0f);
+	CS_Desc.fNear = 0.1f;
+	CS_Desc.fFar = 3000.f;
+	CS_Desc.fSpeedPerSec = 0.f;
+	CS_Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CS_Desc.pFilePath = "../Bin/Resources/Cutscene/TestTest.dat";
+
+	if (FAILED(m_pGameInstance->Add_CameraToManager(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Camera_Cutscene"), TEXT("Queen_CS_Camera"), nullptr, &CS_Desc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Queen::Ready_DamageFont()
+{
+	CUIObject::UIOBJECT_DESC UI_Desc = {};
+	UI_Desc.fX = 0.f;
+	UI_Desc.fY = 0.f;
+	UI_Desc.fSizeX = 0.f;
+	UI_Desc.fSizeY = 0.f;
+	UI_Desc.iDepth = ENUM_CLASS(UI_DEPTH::FIFTH);
+
+	for (_uint i = 0; i < 5; i++)
+	{		
+		if (FAILED(m_pPool_Instance->Add_DamageFont(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_DamageFont"), TEXT("DamageFont"), &UI_Desc)))
+			return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -367,6 +425,34 @@ HRESULT CLevel_Queen::Ready_PoolingProjectile()
 	return S_OK;
 }
 
+HRESULT CLevel_Queen::Ready_TriggerBox()
+{
+	CTriggerBox::TRIGGER_DESC Trigger_Desc = {};
+
+	Trigger_Desc.vPosition = XMVectorSet(0.f, 5.f, 550.f, 1.f);
+	Trigger_Desc.vSize = _float3(40.f, 40.f, 20.f);
+	Trigger_Desc.Callback = [this]() { 
+		EVENT_LEVEL_CHANGE Event;
+		Event.iChange_Level = ENUM_CLASS(LEVEL::GLASGAVELEN);
+		Event.bIsLoading = false;
+		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event); };
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_TriggerBox"),
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_TriggerBox"), &Trigger_Desc)))
+		return E_FAIL;
+
+	Trigger_Desc.vPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	Trigger_Desc.vSize = _float3(200.f, 40.f, 200.f);
+	Trigger_Desc.Callback = [this]() {
+		m_pPool_Instance->BeginRoomSpawn(0); };
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_TriggerBox"),
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), TEXT("Layer_TriggerBox"), &Trigger_Desc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CLevel_Queen::Ready_Map(const _wstring& strLayerTag)
 {
 	CMap::MAP_DESC MapDesc = {};
@@ -375,6 +461,22 @@ HRESULT CLevel_Queen::Ready_Map(const _wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Map"),
 		ENUM_CLASS(LAYER_TYPE::NONSTATIC), strLayerTag, &MapDesc)))
+		return E_FAIL;
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	_matrix		TransmationMatrix = XMMatrixTranslationFromVector(XMVectorSet(0.f, 5.f, 490.f, 1.f));
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * TransmationMatrix;
+
+	CMapObject::MAP_OBJECT_DESC MapObjectDesc = {};
+	MapObjectDesc.iModelLevel = ENUM_CLASS(LEVEL::QUEEN);
+	MapObjectDesc.strModelTag = TEXT("Prototype_Component_Model_Metal_Rail");
+	XMStoreFloat4x4(&MapObjectDesc.WorldMatrix, PreTransformMatrix);
+	MapObjectDesc.IsNormal = true;
+	MapObjectDesc.IsSpecular = false;
+	MapObjectDesc.IsAmbient = false;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::QUEEN), TEXT("Prototype_GameObject_QueenDoor"),
+		ENUM_CLASS(LAYER_TYPE::NONSTATIC), strLayerTag, &MapObjectDesc)))
 		return E_FAIL;
 
 	return S_OK;

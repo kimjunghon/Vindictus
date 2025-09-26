@@ -32,6 +32,8 @@ void CState_Hit_Guard::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveI
     {
         if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::SMASH))
             pPlayerPawn->Change_State(ENUM_CLASS(PLAYER_STATE::GUARD_COUNTER));
+        else if(pPlayerPawn->AnimCanChange())
+            Change_OtherState(pPlayerPawn, MoveInput, ActionInput);
     }
     else if(pPlayerPawn->AnimIsFinished())
         Change_OtherState(pPlayerPawn, MoveInput, ActionInput);

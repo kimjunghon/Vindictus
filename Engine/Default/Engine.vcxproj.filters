@@ -244,6 +244,9 @@
     <Filter Include="01.Utility\12.Sound">
       <UniqueIdentifier>{1b1086ae-d77c-4197-9536-8d110fe3b010}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\04.Component\VIBuffer\Dynamic">
+      <UniqueIdentifier>{c9a6c063-fec4-4406-b350-a237f7d421b8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -495,6 +498,9 @@
     <ClInclude Include="..\public\Sound_Manager.h">
       <Filter>01.Utility\12.Sound</Filter>
     </ClInclude>
+    <ClInclude Include="..\public\VIBuffer_Dynamic.h">
+      <Filter>01.Utility\04.Component\VIBuffer\Dynamic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\Base.cpp">
@@ -721,6 +727,9 @@
     </ClCompile>
     <ClCompile Include="..\private\Sound_Manager.cpp">
       <Filter>01.Utility\12.Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\private\VIBuffer_Dynamic.cpp">
+      <Filter>01.Utility\04.Component\VIBuffer\Dynamic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -86,6 +86,11 @@ HRESULT CNPCDialog::Ready_Children()
 		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::DYEING);
 		};
 
+	Button_Desc.IsButtonText = true;
+	Button_Desc.strButtonText = TEXT("염색하기");
+	Button_Desc.vScale = _float2(0.5f, 0.5f);
+	Button_Desc.vOffset = _float2(-20.f, -8.5f);
+
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 
@@ -96,6 +101,8 @@ HRESULT CNPCDialog::Ready_Children()
 	Button_Desc.Callback = [this]() {
 		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
 		};
+
+	Button_Desc.strButtonText = TEXT("돌아가기");
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;

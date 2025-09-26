@@ -23,7 +23,7 @@ public:
 	_uint			Get_AttackIndex() { return m_iCurrentAttack; }
 	_float			Get_MinDistance() { return m_fMinDistance; }
 	_float			Get_AttackRange() { return m_fAttackRange; }
-	void			Dead();
+	virtual void	Dead();
 	_bool			IsAnimationInRangeTrackPosition(_float2 vRange);
 	_bool			IsAnimationPassToTrackPosition(_float fTrackPosition);
 	_bool			IsReadyAttack() { return m_IsReadyAttack; }

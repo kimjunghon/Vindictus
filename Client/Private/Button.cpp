@@ -29,6 +29,15 @@ HRESULT CButton::Initialize(void* pArg)
 
     BUTTON_DESC* pDesc = static_cast<BUTTON_DESC*>(pArg);
     m_Callback = pDesc->Callback;
+    m_IsButtonText = pDesc->IsButtonText;
+    m_vTextScale = pDesc->vScale;
+
+    if(m_IsButtonText)
+    {
+        m_strButtonText = pDesc->strButtonText;
+
+        m_vTextOffset = pDesc->vOffset;
+    }
 
     return S_OK;
 }
@@ -84,6 +93,11 @@ HRESULT CButton::Render()
 
     m_pVIBufferCom->Render();
 
+    if (m_IsButtonText)
+    {
+        m_pGameInstance->DrawFont(TEXT("MainFont"), m_strButtonText.c_str(), _float2(m_fX + m_vTextOffset.x, m_fY + m_vTextOffset.y), 
+            XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, _float2(0.f, 0.f), m_vTextScale);
+    }
     return S_OK;
 }
 

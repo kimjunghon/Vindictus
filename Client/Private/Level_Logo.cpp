@@ -14,6 +14,9 @@ HRESULT CLevel_Logo::Initialize()
 	if (FAILED(Ready_Layer(TEXT("Layer"))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Play_Sound(TEXT("Logo_Bgm"), ENUM_CLASS(SOUND_CHANNEL::BGM), 0.3f, true)))
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -22,7 +25,7 @@ void CLevel_Logo::Update(_float fTimeDleta)
 	if (GetKeyState(VK_RETURN) & 0x8000)
 	{
 		EVENT_LEVEL_CHANGE Event;
-		Event.iChange_Level = ENUM_CLASS(LEVEL::GAMEPLAY);
+		Event.iChange_Level = ENUM_CLASS(LEVEL::TOWN);
 		Event.bIsLoading = false;
 
 		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);

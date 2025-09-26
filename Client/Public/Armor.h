@@ -32,6 +32,7 @@ public:
 		DYEING_MATERIAL		Materials[ENUM_CLASS(DYEING_PART::END)];
 	}ARMOR_DESC;
 	
+
 private:
 	CArmor(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	CArmor(const CArmor& Prototype);

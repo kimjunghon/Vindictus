@@ -194,6 +194,8 @@ HRESULT CRenderer::Draw()
 		return E_FAIL;
 	if (FAILED(Render_UI()))
 		return E_FAIL;
+	if (FAILED(Render_FONT()))
+		return E_FAIL;
 
 #ifdef _DEBUG
 	if (FAILED(Render_Debug()))
@@ -570,6 +572,21 @@ HRESULT CRenderer::Render_UI()
 	}
 
 	m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)].clear();
+
+	return S_OK;
+}
+
+HRESULT CRenderer::Render_FONT()
+{
+	for (auto& Object : m_RenderObjects[ENUM_CLASS(RENDERGROUP::FONT)])
+	{
+		if (nullptr != Object)
+			Object->Render();
+
+		Safe_Release(Object);
+	}
+
+	m_RenderObjects[ENUM_CLASS(RENDERGROUP::FONT)].clear();
 
 	return S_OK;
 }

@@ -1,6 +1,10 @@
 #pragma once
 #include "Body.h"
 
+NS_BEGIN(Engine)
+class CTexture;
+NS_END
+
 NS_BEGIN(Client)
 
 class CVampire_Elder_Body final : public CBody
@@ -17,11 +21,15 @@ public:
 	virtual void		Update(_float fTimeDelta) override;
 	virtual void		Late_Update(_float fTimeDelta) override;
 	virtual HRESULT		Render() override;
+	virtual HRESULT		Render_Shadow() override;
 
+private:
+	CTexture* m_pDissolveTexture = { nullptr };
 
 private:
 	HRESULT Ready_Components();
 	HRESULT Bind_ShaderResources();
+	HRESULT Bind_ShaderResources_Dissolve();
 
 public:
 	static CVampire_Elder_Body* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

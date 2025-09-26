@@ -81,7 +81,6 @@ HRESULT CWorldMap::Ready_Children()
 	Button_Desc.strTexturePrototypeTag = TEXT("Prototype_Component_Texture_GamePlay_QueenMap");
 	Button_Desc.IsBlend = false;
 	Button_Desc.fAlpha = 1.f;
-
 	Button_Desc.Callback = [this]() {
 		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
 		EVENT_LEVEL_CHANGE Event = {};

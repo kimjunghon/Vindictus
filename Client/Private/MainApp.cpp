@@ -62,6 +62,7 @@
 
 //Effect
 #include "Effect_Static.h"
+#include "DamageFont.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance { CGameInstance::GetInstance()}
@@ -114,15 +115,15 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Ready_Sounds("../Bin/Resources/Sounds/")))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::TOWN)))
+	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;
 
 	m_pGameInstance->Subscribe<EVENT_LEVEL_CHANGE>(ENUM_CLASS(EVENT_TYPE::STATIC), [this](const EVENT_LEVEL_CHANGE& Event) {
 		this->Event_LevelChange(Event); });
 
-	//TEst
 	m_pGameInstance->Add_Font(TEXT("MainFont"), TEXT("../Bin/Resources/Font/MiddleFont.spritefont"));
-
+	m_pGameInstance->Add_Font(TEXT("BigFont"), TEXT("../Bin/Resources/Font/BigFont.spritefont"));
+	m_pGameInstance->Add_Font(TEXT("SmallFont"), TEXT("../Bin/Resources/Font/SmallFont.spritefont"));
 
 	return S_OK;
 }
@@ -163,8 +164,6 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Render_Begin(&vClearColor);
 	m_pGameInstance->Draw();
-	//TEST
-	m_pGameInstance->DrawFont(TEXT("MainFont"), TEXT("¹è°íÆÄ"), _float2(640.f, 320.f), XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, _float2(0.f, 0.f), _float2(1.f, 1.f));
 	m_pGameInstance->Render_End();
 
 	return S_OK;
@@ -337,6 +336,10 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Trail"),
 		CVIBuffer_Trail::Create(m_pDevice, m_pDeviceContext, 48))))
 		return E_FAIL;
+
+	if(FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Dynamic"),
+		CVIBuffer_Dynamic::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
 #pragma endregion
 
 	/* Prototype_GameObject_Camera_Target */
@@ -367,6 +370,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	/* Prototype_GameObject_SkyBox */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkyBox"),
 		CSkyBox::Create(m_pDevice, m_pDeviceContext))))
+		return E_FAIL;
+
+	/* Prototype_GameObject_DamageFont */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_DamageFont"),
+		CDamageFont::Create(m_pDevice, m_pDeviceContext, "../Bin/Resources/Font/DamageFont_Data.json"))))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_ForStatic_UI()))
@@ -412,8 +420,8 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 
 #pragma region LOGO_UI
 	/* Prototype_Component_Texture_SkyBox */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SkyBox"),
-		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Logo/Sky_Box.png"), 1))))
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Logo"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/Logo/Logo.png"), 1))))
 		return E_FAIL;
 
 	/* Prototype_Component_Texture_Logo_WaterMark */
@@ -546,6 +554,16 @@ HRESULT CMainApp::Ready_Prototype_ForStatic_Texture()
 	/* Prototype_Component_Texture_GamePlay_QueenMap */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_GamePlay_QueenMap"),
 		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/UI/GamePlay/wharf_battleCombat_V2_Icon.png"), 1))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_Dissolve */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Textures/Dissolve/Dissolve%d.png"), 5))))
+		return E_FAIL;
+
+	/* Prototype_Component_Texture_DamageFont */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_DamageFont"),
+		CTexture::Create(m_pDevice, m_pDeviceContext, TEXT("../Bin/Resources/Font/damage.png"), 1))))
 		return E_FAIL;
 
 #pragma endregion

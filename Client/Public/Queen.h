@@ -30,7 +30,9 @@ public:
 	virtual HRESULT Render() override;
 
 public:
+	void			End_CutScene();
 	virtual HRESULT	Spawn(MONSTER_SPAWN_DATA SpawnData) override;
+	virtual void	Dead() override;
 
 public:
 	virtual BT_STATE		Attack() override;
@@ -43,7 +45,6 @@ public:
 	BT_STATE				CanNearAttack();
 	BT_STATE				NearAttack();
 
-
 	BT_STATE				IsLook();
 	BT_STATE				Turn();
 
@@ -55,6 +56,7 @@ private:
 	_float					m_fBurrowTime = {};
 	_float					m_fBurrowCoolTime = {};
 	_bool					m_IsBurrow = {};
+	_bool					m_IsEyeLight = {};
 
 	_matrix					m_AnimRotationMatrix = {};
 
@@ -76,7 +78,6 @@ private:
 	HRESULT			Ready_Collider_Bounding();
 	HRESULT			Ready_Collider_Body_Hit();
 	HRESULT			Ready_Collider_Attack();
-	HRESULT			Ready_AttackMapping();
 
 	void			Compute_WorldMatrix();
 
@@ -84,6 +85,11 @@ private:
 	void			DecreaseDurabillity(_uint HitColliderIndex, _float fDamage);
 
 	void			Check_Near(_float fTimeDelta);
+	HRESULT			Change_Camera();
+	HRESULT			Request_SpawnEyeTrail();
+	
+	void			Dying();
+
 
 public:
 	static CQueen*			Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

@@ -229,12 +229,12 @@ PS_OUT PS_DAMAGE(PS_DEFAULT_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    
-    
     Out.vColor = g_Texture.Sample(DefaultSampler, In.vTexcoord);
-    
+        
     if (Out.vColor.a <= 0.3f)
         discard;
+    
+    Out.vColor.a = g_Alpha;
     
     return Out;
 }

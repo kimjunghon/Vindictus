@@ -94,6 +94,21 @@ HRESULT CPool_Instance::Request_SpawnEffect(const _wstring& strEffect, void* pSp
 	return m_pPooling_Manager->Request_SpawnEffect(strEffect, pSpawnData);
 }
 
+HRESULT CPool_Instance::Add_DamageFont(_uint iPrototypeLevelIndex, const _wstring& strFontTag, const _wstring& strFontName, void* pArg)
+{
+	return m_pPooling_Manager->Add_DamageFont(iPrototypeLevelIndex, strFontTag, strFontName, pArg);
+}
+
+void CPool_Instance::ReturnPool(const _wstring& strFont, CDamageFont* pFont)
+{
+	m_pPooling_Manager->ReturnPool(strFont, pFont);
+}
+
+HRESULT CPool_Instance::Request_SpawnFont(const _wstring& strFont, void* pSpawnData)
+{
+	return m_pPooling_Manager->Request_SpawnFont(strFont, pSpawnData);
+}
+
 
 #ifdef _DEBUG
 HRESULT CPool_Instance::SpawnRoom(_uint iRoomIndex, _uint iMonsterIndex)

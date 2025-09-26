@@ -42,7 +42,6 @@ HRESULT CVIBuffer_Trail::Initialize_Prototype(_uint iNumMaxNode)
 	m_pVertices = new VTXTRAIL[m_iNumVertices];
 	ZeroMemory(m_pVertices, m_VBDesc.ByteWidth);
 
-
 	m_IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
 	m_IBDesc.Usage = D3D11_USAGE_DEFAULT;
 	m_IBDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;

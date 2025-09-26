@@ -29,7 +29,7 @@ public:
 	void					WingBreak();
 	void					Change_BrokenModel();
 	void					End_Cutscene();
-
+	virtual	void			Dead() override;
 public:
 	virtual HRESULT Initialize_Prototype() override;
 	virtual HRESULT Initialize(void* pArg) override;
@@ -62,7 +62,8 @@ private:
 	_bool						m_IsGrap = {};
 	_bool						m_IsSwing_R = {};
 	_bool						m_IsSwing_L = {};
-
+	_bool						m_IsEyeLight = {};
+	_bool						m_IsBrokenEyeLight = {};
 	GAVELEN_STATUS				m_GavelenStatus = {};
 	GRAP_DATA					m_GrapData = {};
 
@@ -75,6 +76,7 @@ private:
 
 private:
 	virtual HRESULT		Add_Bone_Collider(COLLIDER_CHANNEL eChannel, CBoundingOBB::BOUNDING_OBB_DESC* pDesc, const string& strSocketName);
+	virtual HRESULT		Ready_Status(const string& strFilePath) override;
 
 	HRESULT				Ready_PawnObjects();
 	HRESULT				Ready_AI();
@@ -107,6 +109,8 @@ private:
 
 	void				Event_Cutscene(const EVENT_GAVELEN_CUTSCENE& Event);
 	HRESULT				Change_Camera();
+	HRESULT				Request_SpawnEyeTrail(_bool* pIsEyeLight);
+	void				Dying();
 
 public:
 	static CGlasgavelen*	Create(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);

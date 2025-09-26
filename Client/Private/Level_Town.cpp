@@ -44,7 +44,7 @@ HRESULT CLevel_Town::Initialize()
 	if (FAILED(Ready_Effect()))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Play_Sound(TEXT("Town_Bgm"), ENUM_CLASS(SOUND_CHANNEL::BGM), 0.5f, true)))
+	if (FAILED(m_pGameInstance->Play_Sound(TEXT("Town_Bgm"), ENUM_CLASS(SOUND_CHANNEL::BGM), 0.4f, true)))
 		return E_FAIL;
 
 	return S_OK;
@@ -403,7 +403,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Upper");
 	ArmorDesc.eArmorType = ARMOR_TYPE::UPPER;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Upper"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Upper"), 10.f, 5.f, 150.f, 150.f };
 	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
 	ArmorDesc.Materials[1] = DYEING_MATERIAL::LEATHER;
 	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
@@ -414,7 +414,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Lower");
 	ArmorDesc.eArmorType = ARMOR_TYPE::LOWER;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Lower"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Lower"), 10.f, 5.f, 150.f, 150.f };
 	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
 	ArmorDesc.Materials[1] = DYEING_MATERIAL::LEATHER;
 	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
@@ -425,7 +425,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Head");
 	ArmorDesc.eArmorType = ARMOR_TYPE::HEAD;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Head"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Head"), 10.f, 5.f, 150.f, 150.f };
 	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
 	ArmorDesc.Materials[1] = DYEING_MATERIAL::ARMOR_METAL;
 	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
@@ -436,7 +436,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Hand");
 	ArmorDesc.eArmorType = ARMOR_TYPE::HAND;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Hand"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Hand"), 10.f, 5.f, 150.f, 150.f };
 	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
 	ArmorDesc.Materials[1] = DYEING_MATERIAL::LEATHER;
 	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;
@@ -447,7 +447,7 @@ HRESULT CLevel_Town::Ready_DefaultArmor()
 	ArmorDesc.strArmorModelPrototypeTag = TEXT("Prototype_Component_Model_LightMale_Foot");
 	ArmorDesc.eArmorType = ARMOR_TYPE::FOOT;
 	ArmorDesc.pPawnMatrix = nullptr;
-	ArmorDesc.ArmorInfo = { TEXT("LightMale_Foot"), 10.f, 5.f, 30.f, 30.f };
+	ArmorDesc.ArmorInfo = { TEXT("LightMale_Foot"), 10.f, 5.f, 150.f, 150.f };
 	ArmorDesc.Materials[0] = DYEING_MATERIAL::ARMOR_METAL;
 	ArmorDesc.Materials[1] = DYEING_MATERIAL::LEATHER;
 	ArmorDesc.Materials[2] = DYEING_MATERIAL::ARMOR_METAL;

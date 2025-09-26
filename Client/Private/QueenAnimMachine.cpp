@@ -15,6 +15,7 @@ void CQueenAnimMachine::Initialize()
 	Initialize_ATTACK();
 	Initialize_BURROW();
 	Initialize_HIT();
+	Initialize_Dead();
 }
 
 void CQueenAnimMachine::Initialize_CUTSEAN()

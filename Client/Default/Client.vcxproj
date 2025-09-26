@@ -180,6 +180,7 @@
     <ClInclude Include="..\public\GavelenRock.h" />
     <ClInclude Include="..\public\GlasgavelenAI.h" />
     <ClInclude Include="..\public\GS_Cutscene.h" />
+    <ClInclude Include="..\public\GS_Dead.h" />
     <ClInclude Include="..\public\GS_Idle.h" />
     <ClInclude Include="..\Public\Client_Struct.h" />
     <ClInclude Include="..\public\Controller_Mouse.h" />
@@ -231,6 +232,7 @@
     <ClInclude Include="..\public\QS_NearAttack.h" />
     <ClInclude Include="..\Public\QS_Spawn.h" />
     <ClInclude Include="..\public\QS_Turn.h" />
+    <ClInclude Include="..\public\QueenDoor.h" />
     <ClInclude Include="..\public\SkyBox.h" />
     <ClInclude Include="..\public\State_Grap.h" />
     <ClInclude Include="..\public\Effect_Trail.h" />
@@ -360,6 +362,7 @@
     <ClCompile Include="..\private\GlasgavelenSword.cpp" />
     <ClCompile Include="..\private\GS_Attack.cpp" />
     <ClCompile Include="..\private\GS_Cutscene.cpp" />
+    <ClCompile Include="..\private\GS_Dead.cpp" />
     <ClCompile Include="..\private\GS_Desend.cpp" />
     <ClCompile Include="..\private\GS_Down.cpp" />
     <ClCompile Include="..\private\GS_Grap.cpp" />
@@ -401,6 +404,7 @@
     <ClCompile Include="..\private\QS_NearAttack.cpp" />
     <ClCompile Include="..\Private\QS_Spawn.cpp" />
     <ClCompile Include="..\private\QS_Turn.cpp" />
+    <ClCompile Include="..\private\QueenDoor.cpp" />
     <ClCompile Include="..\private\SkyBox.cpp" />
     <ClCompile Include="..\private\State_Grap.cpp" />
     <ClCompile Include="..\private\Effect_Trail.cpp" />

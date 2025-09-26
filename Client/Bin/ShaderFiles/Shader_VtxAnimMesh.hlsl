@@ -5,6 +5,9 @@ float4x4    g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_DiffuseTexture;
 texture2D g_NormalTexture;
 
+texture2D g_DissolveTexture;
+float g_fDissolveRatio;
+
 vector g_vMatrlAmbient = vector(1.0f, 1.0f, 1.0f, 1.0f);
 vector g_vMatrlSpecular = vector(0.4f, 0.4f, 0.4f, 0.4f);
 
@@ -156,6 +159,39 @@ PS_OUT PS_COLOR_MASKING(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_DISSOLVE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    vector vDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    float fDissolveRatio = 1.f - g_fDissolveRatio;
+    
+    if (vDissolve.r >= fDissolveRatio)
+        discard;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+   
+    float3 vNormal;
+    if (g_HasNormal)
+    {
+        vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
+        vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    
+        float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
+        vNormal = mul(vNormal, WorldMatrix);
+    }
+    else
+        vNormal = In.vNormal.xyz;
+    
+    Out.vDiffuse = vDiffuse;
+    Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector((In.vProjPos.z / In.vProjPos.w), In.vProjPos.w, 0.f, 0.f);
+    Out.vSpecular = g_vMatrlSpecular;
+    Out.vAmbient = g_vMatrlAmbient;
+    
+    return Out;
+}
 /////////////////////////////////////////SHADOW/////////////////////////////////////////
 struct VS_OUT_SHADOW
 {
@@ -263,5 +299,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_SHADOW();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_SHADOW();
+    }
+
+    pass DissolvePass
+    {
+        SetRasterizerState(RS_DEFAULT);
+        SetDepthStencilState(DSS_DEFAULT, 0);
+        SetBlendState(BS_DEFAULT, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_DISSOLVE();
     }
 }

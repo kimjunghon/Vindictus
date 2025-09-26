@@ -52,11 +52,17 @@ void CBossHP::Late_Update(_float fTimeDelta)
 	{
 		Update_BarData(fTimeDelta);
 		__super::Children_Late_Update(fTimeDelta);
+
+
+		if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::FONT, this)))
+			return;
 	}
 }
 
 HRESULT CBossHP::Render()
 {
+	m_pGameInstance->DrawFont(TEXT("MainFont"), m_strBossName.c_str(), _float2(m_fX + m_vFontOffset.x, m_fY + m_vFontOffset.y));
+
 	return S_OK;
 }
 
@@ -75,6 +81,8 @@ HRESULT CBossHP::Ready_Children()
 	Children_Desc.IsBlend = false;
 	Children_Desc.fAlpha = 1.f;
 
+	m_vFontOffset.y = -357.5f;
+
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_BossHPBar"), &Children_Desc, reinterpret_cast<CUIObject**>(&m_pHpBar))))
 		return E_FAIL;
 
@@ -91,20 +99,28 @@ HRESULT CBossHP::Ready_Children()
 
 void CBossHP::Event_BindBossHP(const EVENT_BIND_BOSSHP& Event)
 {
-	m_fLineHP = Event.m_fLineHP;
-	m_fMaxBossHP = Event.m_fMaxBossHP;
-	m_pCurrentBossHP = Event.m_pCurrentBossHP;
+	m_fLineHP = Event.fLineHP;
+	m_fMaxBossHP = Event.fMaxBossHP;
+	m_pCurrentBossHP = Event.pCurrentBossHP;
+	m_strBossName = Event.strBossName;
 
 	m_iNumMaxLine = static_cast<_uint>(m_fMaxBossHP / m_fLineHP);
 	m_iNumLine = m_iNumMaxLine;
-	
 
 	_float fCurrentLineHp = fmod(*m_pCurrentBossHP, m_fLineHP);
-
-	m_fLineRatio = fCurrentLineHp / m_fLineHP;
+	if (*m_pCurrentBossHP == m_fMaxBossHP)
+		m_fLineRatio = 1.f;
+	else
+		m_fLineRatio = fCurrentLineHp / m_fLineHP;
+	
 	m_fBarRatio = m_fLineRatio;
 
 	m_IsChangeLine = false;
+
+	m_vFontOffset.x = (static_cast<_float>(m_strBossName.length()) * -10.f);
+
+	m_pHpBar->Change_PassIndex(ENUM_CLASS(SHADER_VTXPOSTEX::BLEND_BAR));
+	m_pHpBar->Change_TextureIndex(2);
 }
 
 void CBossHP::Update_BarData(_float fTimeDelta)
@@ -117,7 +133,10 @@ void CBossHP::Update_BarData(_float fTimeDelta)
 
 	_float fCurrentLineHp = fmod(*m_pCurrentBossHP, m_fLineHP);
 
-	m_fLineRatio = fCurrentLineHp / m_fLineHP;
+	if (*m_pCurrentBossHP == m_fMaxBossHP)
+		m_fLineRatio = 1.f;
+	else
+		m_fLineRatio = fCurrentLineHp / m_fLineHP;
 
 	if (m_fBarRatio < m_fLineRatio)
 	{

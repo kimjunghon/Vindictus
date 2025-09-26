@@ -49,6 +49,8 @@ private:
 	HRESULT Render_Blend();
 	HRESULT Render_Distortion();
 	HRESULT Render_UI();
+	HRESULT Render_FONT();
+
 
 private:
 	HRESULT Ready_Shadow_Depth_Stencil_View();

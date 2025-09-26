@@ -73,7 +73,8 @@ HRESULT COptionMain::Ready_Children()
 	Button_Desc.Callback = [this]() {
 		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY);
 		};
-
+	Button_Desc.IsButtonText = true;
+	Button_Desc.strButtonText = TEXT("돌아가기");
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
 
@@ -82,6 +83,9 @@ HRESULT COptionMain::Ready_Children()
 	Button_Desc.Callback = [this]() {
 		*m_pUIState = ENUM_CLASS(STATE_FLAG::GAMEPLAY) | ENUM_CLASS(GAMEPLAY_FLAG::CONTROLLER);
 		};
+
+	Button_Desc.IsButtonText = true;
+	Button_Desc.strButtonText = TEXT("설정");
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
@@ -94,6 +98,9 @@ HRESULT COptionMain::Ready_Children()
 		Event.bIsLoading = false;
 		m_pGameInstance->Publish(ENUM_CLASS(EVENT_TYPE::STATIC), Event);
 		};
+
+	Button_Desc.IsButtonText = true;
+	Button_Desc.strButtonText = TEXT("게임종료");
 
 	if (FAILED(__super::Add_Child(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_UIObject_Button"), &Button_Desc)))
 		return E_FAIL;
