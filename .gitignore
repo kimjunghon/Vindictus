@@ -14,3 +14,5 @@ Engine/Public/RapidJson
 x64
 Client/Bin/Debug
 Client/Bin/Release
+*.sqlite
+.vs/VSWorkspaceState.json
