@@ -32,6 +32,6 @@
 | 캐릭터 커스터마이징 | 장착 장비에 따른 캐릭터 외형 변경 <br> 장비 파츠 별 염색  |
 | NPC | 대화 NPC / 전투 입장 NPC <br> 플레이어를 따라다니는 NPC |
 | 충돌 | AABB / OBB <br> Collision Channel 기반 충돌 필터링 <br> Broad Phase 충돌 검사 <br> NavMesh 기반 이동 가능 영역 구축 |
-| 이펙트 | Sprite 기반 2D 이펙트 / Billboard 이펙트 <br> Catmull-Rom Spline 기반 Trail 이펙트 <br> 파티클 이펙트 |
+| 이펙트 | Sprite 기반 2D 이펙트 <br> Catmull-Rom Spline 기반 Trail 이펙트 <br> 파티클 이펙트 / Billboard 이펙트 |
 | 렌더링 & 그래픽스 | 렌더 타겟 기반 렌더링 파이프라인 <br> 조명 및 그림자 표현 <br><br> **Post Processing** <br> Bloom / Emissive / 화면 왜곡 |
 | 툴 | 맵 오브젝트 배치 툴 <br> NavMesh 생성 및 편집 툴  <br> 애니메이션 데이터 생성 및 편집 툴 <br> 몬스터 배치 툴 <br> 컷씬 카메라 데이터 편집 툴 <br> 이펙트 생성 및 편집 |
