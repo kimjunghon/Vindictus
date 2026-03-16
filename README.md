@@ -2,7 +2,7 @@
 
 - 플레이 영상
 
-[https://youtu.be/J-mNhm9mx3k](https://youtu.be/J-mNhm9mx3k)
+https://youtu.be/J-dvhn1jpx0
 
 - 프로젝트 개요
     - C++과 DirectX11 기반으로 액션 중심 게임 시스템 구현을 목표로 제작한
