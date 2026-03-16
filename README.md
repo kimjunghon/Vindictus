@@ -29,7 +29,7 @@ https://youtu.be/J-dvhn1jpx0
 | 전투 상호작용 | 플레이어 장비 파괴 / 몬스터 부위 파괴 <br> 공격 강도(약 / 중 / 강)에 따른 경직 및 넉백  |
 | 카메라 | 타겟 카메라 / 컷씬 카메라 |
 | UI | 플레이어 HP / 스태미너 / 보스 HP <br> 인벤토리 / 장비 슬롯 <br> NPC 대화 / 염색 <br> 전투 입장 / 로딩 |
-| 캐릭터 커스터마이징 | 장착 장비에 따른 캐릭터 외형 변경 <br> 장비 파츠 별 염색  |
+| 캐릭터 커스터마이징 | 장착 장비에 따른 캐릭터 외형 변경 <br> 장비 파츠별 염색  |
 | NPC | 대화 NPC / 전투 입장 NPC <br> 플레이어를 따라다니는 NPC |
 | 충돌 | AABB / OBB <br> Collision Channel 기반 충돌 필터링 <br> Broad Phase 충돌 검사 <br> NavMesh 기반 이동 가능 영역 구축 |
 | 이펙트 | Sprite 기반 2D 이펙트 <br> Catmull-Rom Spline 기반 Trail 이펙트 <br> 파티클 이펙트 / Billboard 이펙트 |
