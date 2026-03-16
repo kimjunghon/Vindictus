@@ -15,7 +15,7 @@ https://youtu.be/J-dvhn1jpx0
     - 행동 트리를 이용한 몬스터 AI 시스템 구현
     - 선형 보간 및 Catmull-Rom Spline 보간을 적용한 컷씬 카메라 시스템 구현
     - NavMesh 기반 이동 영역 제한과 
-    Collider Channel + Broad Phase를 활용한 충돌 처리 구조 구현
+    Collision Channel + Broad Phase 충돌 검사를 활용한 충돌 처리 구조 구현
     - 몬스터, NavMesh, 이펙트, 카메라, Animation 데이터 입출력을 위한 ImGui 기반 툴 구현
     
 - 구현 목록
