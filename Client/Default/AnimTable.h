@@ -89,6 +89,7 @@ namespace Client
 
 			MIDDLE_FRONT = 1 <<12,
 			MIDDLE_FRONT_UP = 1 << 13,
+
 			MIDDLE_BACK = 1<<14,
 			MIDDLE_BACK_UP = 1 << 15,
 

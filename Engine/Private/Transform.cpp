@@ -10,16 +10,13 @@ CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContex
 
 _vector CTransform::Get_RotateQuat()
 {
-	_vector vRight = XMVector3Normalize(Get_State(STATE::RIGHT));
-	_vector vUp = XMVector3Normalize(Get_State(STATE::UP));
-	_vector vLook = XMVector3Normalize(Get_State(STATE::LOOK));
+	_vector vScale = {};
+	_vector vRotation = {};
+	_vector vPosition = {};
 
-	_matrix RotationMatrix = XMMatrixIdentity();
-	RotationMatrix.r[0] = vRight;
-	RotationMatrix.r[1] = vUp;
-	RotationMatrix.r[2] = vLook;
+	XMMatrixDecompose(&vScale, &vRotation, &vPosition, XMLoadFloat4x4(&m_WorldMatrix));
 
-	return XMQuaternionRotationMatrix(RotationMatrix);
+	return vRotation;
 }
 
 _vector CTransform::Get_LookQuaternion()

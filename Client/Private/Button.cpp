@@ -98,6 +98,9 @@ HRESULT CButton::Render()
         m_pGameInstance->DrawFont(TEXT("MainFont"), m_strButtonText.c_str(), _float2(m_fX + m_vTextOffset.x, m_fY + m_vTextOffset.y), 
             XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, _float2(0.f, 0.f), m_vTextScale);
     }
+
+    //_float2(m_fX + m_vTextOffset.x - 40.f, m_fY + m_vTextOffset.y - 10.f),//
+
     return S_OK;
 }
 

@@ -155,26 +155,26 @@ _vector CNavigation::Compute_OnCell(_fvector vPosition)
 #ifdef _DEBUG
 HRESULT CNavigation::Render()
 {
-	m_pGameInstance->RSSetState(ENUM_CLASS(D3DRS::WIRE));
+	//m_pGameInstance->RSSetState(ENUM_CLASS(D3DRS::WIRE));
 
-	_float4x4	WorldMatrix = m_WorldMatrix;
+	//_float4x4	WorldMatrix = m_WorldMatrix;
 
-	WorldMatrix._42 += 0.1f;
+	//WorldMatrix._42 += 0.1f;
 
-	if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
-		return E_FAIL;
+	//if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &WorldMatrix)))
+	//	return E_FAIL;
 
-	if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
-		return E_FAIL;
-	if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
-		return E_FAIL;
+	//if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+	//	return E_FAIL;
+	//if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+	//	return E_FAIL;
 
-	m_pShader->Begin(0);
+	//m_pShader->Begin(0);
 
-	for (auto& pCell : m_Cells)
-		pCell->Render();
+	//for (auto& pCell : m_Cells)
+	//	pCell->Render();
 
-	m_pGameInstance->RSSetState(ENUM_CLASS(D3DRS::DEFAULT));
+	//m_pGameInstance->RSSetState(ENUM_CLASS(D3DRS::DEFAULT));
 
 	return S_OK;
 }

@@ -9,19 +9,6 @@ CLevel_Manager::CLevel_Manager()
 	Safe_AddRef(m_pGameInstance);
 }
 
-HRESULT CLevel_Manager::Open_Level(_uint iLevelID, CLevel* pOpenLevel)
-{
-	if (nullptr == pOpenLevel)
-		return E_FAIL;
-
-	Safe_Release(m_pCurrentLevel);
-
-	m_iCurrentLevelID = iLevelID;
-
-	m_pCurrentLevel = pOpenLevel;
-
-	return S_OK;
-}
 
 void CLevel_Manager::Update(_float fTimeDelta)
 {
@@ -37,6 +24,20 @@ HRESULT CLevel_Manager::Render()
 		return E_FAIL;
 
 	return m_pCurrentLevel->Render();
+}
+
+HRESULT CLevel_Manager::Open_Level(_uint iLevelID, CLevel* pOpenLevel)
+{
+	if (nullptr == pOpenLevel)
+		return E_FAIL;
+
+	Safe_Release(m_pCurrentLevel);
+
+	m_iCurrentLevelID = iLevelID;
+
+	m_pCurrentLevel = pOpenLevel;
+
+	return S_OK;
 }
 
 HRESULT CLevel_Manager::Clear_Resources()

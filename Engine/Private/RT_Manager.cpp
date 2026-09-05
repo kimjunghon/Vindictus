@@ -142,7 +142,7 @@ HRESULT CRT_Manager::Ready_Debug(const _wstring& strRTTag, _float fX, _float fY,
 	return pRT->Ready_Debug(fX, fY, fSizeX, fSizeY);
 }
 
-HRESULT CRT_Manager::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+HRESULT CRT_Manager::Debug_Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 {
 	for (auto& Pair : m_MRTs)
 	{

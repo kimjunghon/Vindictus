@@ -23,6 +23,7 @@ public:
 	HRESULT Bind_SPV(const _char* pConstantName, ID3D11ShaderResourceView* pSPV);
 	HRESULT Bind_RawValue(const _char* pConstantName, const void* pData, _uint iLength);
 	HRESULT Bind_RawValueArray(const _char* pConstantName, const void* pData, _uint iLength);
+
 private:
 	ID3DX11Effect*				m_pEffect = { nullptr };
 	vector<ID3D11InputLayout*>	m_InputLayouts;

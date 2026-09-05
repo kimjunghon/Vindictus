@@ -402,9 +402,6 @@
     <ClInclude Include="..\public\SocketObject.h">
       <Filter>01.Utility\03.GameObject\Pawn\PawnObject\SocketObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\public\Model.h">
-      <Filter>01.Utility\04.Component\Models\Model</Filter>
-    </ClInclude>
     <ClInclude Include="..\public\BT_Node.h">
       <Filter>01.Utility\07.BehaviorTree\Node</Filter>
     </ClInclude>
@@ -500,6 +497,9 @@
     </ClInclude>
     <ClInclude Include="..\public\VIBuffer_Dynamic.h">
       <Filter>01.Utility\04.Component\VIBuffer\Dynamic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Model.h">
+      <Filter>01.Utility\04.Component\Models\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

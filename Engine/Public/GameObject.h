@@ -19,9 +19,10 @@ protected:
 	virtual ~CGameObject() = default;
 
 public:
-	_float				Get_Depth();
-	class CComponent*	Get_Component(const _wstring& strComponentTag);
-	_bool				Is_Active() { return m_IsActive; }
+	_float			Get_Depth();
+	_bool			Is_Active() { return m_IsActive; }
+	CComponent*		Get_Component(const _wstring& strComponentTag);
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize(void* pArg);

@@ -134,7 +134,6 @@ PS_OUT PS_COLOR_MASKING(PS_IN In)
     
     vDiffuse = float4((vDiffuseR * g_vColor_R) + (vDiffuseG * g_vColor_G) + (vDiffuseB * g_vColor_B), 1.f);
     
-    
     Out.vDiffuse = vDiffuse;
     
     float3 vNormal;

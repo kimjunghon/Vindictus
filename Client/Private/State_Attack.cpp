@@ -122,7 +122,6 @@ namespace {
 		StateAttackRegister() {
 			CStateFactory::GetInstance()->Register(ENUM_CLASS(PLAYER_STATE::ATTACK), []()->CPlayerState* { return CState_Attack::Create(); });
 		};
-
 	};
 	static StateAttackRegister Register;
 }

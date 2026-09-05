@@ -37,7 +37,6 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pGraphic_Device)
         return E_FAIL;
     
-
     m_pInput_Device = CInput_Device::Create(EngineDesc.hInst, EngineDesc.hWnd);
     if (nullptr == m_pInput_Device)
         return E_FAIL;
@@ -46,7 +45,6 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
     if (nullptr == m_pTimer_Manager)
         return E_FAIL;
     
-
     m_pRenderState = CRenderState::Create(*ppDevice, *ppDeviceContext);
     if (nullptr == m_pRenderState)
         return E_FAIL;
@@ -354,7 +352,7 @@ HRESULT CGameInstance::Ready_Debug(const _wstring& strRTTag, _float fX, _float f
 
 HRESULT CGameInstance::Render_RT_Debug(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 {
-    return m_pRT_Manager->Render(pShader, pVIBuffer);
+    return m_pRT_Manager->Debug_Render(pShader, pVIBuffer);
 }
 #endif
 

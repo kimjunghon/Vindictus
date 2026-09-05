@@ -54,7 +54,6 @@ protected:
 	CColliderContainer*		m_pColliderContainer = { nullptr };
 	CTransform*				m_pTargetTransformCom = { nullptr };
 	
-
 	ATTACK_DATA				m_CurrentAttackData = {};
 	
 	vector<BEZIER_POINT>	m_Points;

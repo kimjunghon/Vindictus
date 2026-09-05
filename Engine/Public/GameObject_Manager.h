@@ -19,7 +19,8 @@ public:
 
 public:
 	HRESULT Initialize();
-	HRESULT Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, _uint iPrototypeLevel, const _wstring& strPrototypeTag, void* pArg);
+	HRESULT Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, _uint iPrototypeLevel, 
+		const _wstring& strPrototypeTag, void* pArg);
 	//Pooling
 	HRESULT Add_GameObject_ToLayer(_uint iLayerIndex, const _wstring& strLayerTag, CGameObject* pGameObject);
 

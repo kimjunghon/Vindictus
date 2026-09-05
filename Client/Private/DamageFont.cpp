@@ -95,10 +95,10 @@ HRESULT CDamageFont::Spawn(void* pArg)
     vPosition = XMVector4Transform(vPosition, ProjMatrix);
     
     vPosition = XMVectorScale(vPosition, 1 / XMVectorGetW(vPosition));
-
-    m_fX = (XMVectorGetX(vPosition) * 0.5f + 0.5f) * g_iWinSizeX;
-    m_fY = (XMVectorGetY(vPosition) * -0.5f + 0.5f) * g_iWinSizeY;
     
+    m_fX = (XMVectorGetX(vPosition) * 0.5f + 0.5f) * g_iWinSizeX; 
+    m_fY = (XMVectorGetY(vPosition) * -0.5f + 0.5f) * g_iWinSizeY;
+
     m_iDamage = pDesc->iDamage;
 
     Update_Buffer(pDesc->eOwner);
@@ -283,7 +283,6 @@ void CDamageFont::Update_Buffer(COLLIDER_OWNER eOwner)
 
         _float fLeftX = static_cast<_float>(iIndex) / (fLength) - 0.5f;
         _float fRightX = static_cast<_float>(iIndex + 1) / (fLength) -0.5f;
-
 
         Vertex.vPosition = _float3(fLeftX, 0.5f, 0.f);
         Vertex.vTexcoord = _float2(Data.vUV.x, Data.vUV.y);

@@ -3,6 +3,8 @@
 
 NS_BEGIN(Engine)
 
+class CShader;
+
 class CMeshMaterial final : public CBase
 {
 private:
@@ -14,7 +16,7 @@ public:
 	HRESULT Initialize_Json(const _char* pModelFilePath, Json& Data);
 	HRESULT Initialize_Binary(const _char* pModelFilePath, ifstream& File);
 
-	_bool	Bind_Material(class CShader* pShader, const _char* pConstantName, _uint iSRVIndex, _uint iTextureType);
+	_bool	Bind_Material(CShader* pShader, const _char* pConstantName, _uint iSRVIndex, _uint iTextureType);
 
 private:
 	ID3D11Device*						m_pDevice = { nullptr };

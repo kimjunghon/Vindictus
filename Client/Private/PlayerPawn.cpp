@@ -1235,7 +1235,7 @@ void CPlayerPawn::Compute_WorldMatrix()
 
 		vRotation = XMQuaternionSlerp(XMQuaternionIdentity(), vRotation, 0.125f);
 
-		m_vPrevPlayerRotationQuat = XMQuaternionMultiply(vRotation, m_vPrevPlayerRotationQuat);
+		m_vPrevPlayerRotationQuat = XMQuaternionMultiply(vRotation, m_vPrevPlayerRotationQuat);	
 
 		vRotation = m_vPrevPlayerRotationQuat;
 	}

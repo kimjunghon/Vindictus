@@ -37,7 +37,7 @@ private:
 #ifdef _DEBUG
 public:
 	HRESULT Ready_Debug(const _wstring& strRTTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
-	HRESULT Render(CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+	HRESULT Debug_Render(CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #endif
 
 public:

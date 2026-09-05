@@ -284,7 +284,6 @@ void CVIBuffer_Trail::Update_TrailBuffer_Billboard(_float fTimeDelta)
 			if (XMVectorGetX(vLeftPosition) == 0.f || XMVectorGetX(vRightPosition) == 0.f)
 				int a = 10;
 
-
 			_float fU = (static_cast<_float>(i) + fRatio) / static_cast<_float>(m_iNumCurrentNode - 3);
 
 			XMStoreFloat3(&pVertices[iIndex].vPosition, vLeftPosition);

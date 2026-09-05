@@ -137,7 +137,7 @@ _bool CCollider_Manager::Intersect_Bounding(CCollider* pSrcCollider, CCollider* 
 	iDstChannel = pDstCollider->Get_ColliderChannel();
 
 	if (Check_Type(iSrcChannel, iDstChannel) == COLLIDER_TYPE::NONE)
-		false;
+		return false;
 
 	return pSrcCollider->Intersect_BoundingChannel(pDstCollider);
 }

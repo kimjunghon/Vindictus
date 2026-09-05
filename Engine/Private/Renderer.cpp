@@ -129,26 +129,26 @@ HRESULT CRenderer::Initialize()
 		return E_FAIL;
 
 #ifdef _DEBUG
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Diffuse"), 150.0f, 100.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Normal"), 150.0f, 350.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Depth"), 150.0f, 600.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Shade"), 400.0f, 100.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Specular"), 650.0f, 100.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_LightDepth"), 900.0f, 100.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_MapLightDepth"), 1150.0f, 100.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Blur"), 1400.0f, 100.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_BlurEnd"), 1400.0f, 350.0f, 200.f, 200.f)))
-		return E_FAIL;
-	if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Distortion"), 1400.0f, 600.0f, 200.f, 200.f)))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Diffuse"), 150.0f, 100.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Normal"), 150.0f, 350.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Depth"), 150.0f, 600.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Shade"), 400.0f, 100.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Specular"), 650.0f, 100.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_LightDepth"), 900.0f, 100.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_MapLightDepth"), 1150.0f, 100.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Blur"), 1400.0f, 100.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_BlurEnd"), 1400.0f, 350.0f, 200.f, 200.f)))
+	//	return E_FAIL;
+	//if (FAILED(m_pGameInstance->Ready_Debug(TEXT("RT_Distortion"), 1400.0f, 600.0f, 200.f, 200.f)))
+	//	return E_FAIL;
 #endif
 
 	return S_OK;
@@ -654,7 +654,7 @@ HRESULT CRenderer::Add_DebugComponent(CComponent* pComponent)
 
 HRESULT CRenderer::Render_Debug()
 {
-	if (m_pGameInstance->Get_KeyDown(DIK_END))
+	if (m_pGameInstance->Get_KeyDown(DIK_F1))
 		m_IsDebugDraw = !m_IsDebugDraw;
 
 	if (false == m_IsDebugDraw)

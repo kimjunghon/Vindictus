@@ -65,9 +65,6 @@ HRESULT CColliderContainer::Add_Collider(_uint iPrototypeLevelIndex, const _wstr
 	if (FAILED(Add_BoneMatrix(iChannel, pBoneMatrix)))
 		return E_FAIL;
 
-	if (FAILED(Add_CombineMatrix(iChannel)))
-		return E_FAIL;
-
 	m_ColliderChannels.insert(iChannel);
 
 	return S_OK;
@@ -138,7 +135,23 @@ void CColliderContainer::Update_Collider(_uint iChannel, _uint iIndex, CCollider
 	m_pGameInstance->Add_Collider(iChannel, pOwner, pCollider);
 
 #ifdef _DEBUG
-	m_pGameInstance->Add_DebugComponent(pCollider);
+	if (m_pGameInstance->Get_KeyDown(DIK_1))
+		iRenderIndex = 0;
+
+	if (m_pGameInstance->Get_KeyDown(DIK_2))
+		iRenderIndex = 1;
+
+	if (m_pGameInstance->Get_KeyDown(DIK_3))
+		iRenderIndex = 2;
+
+	if (m_pGameInstance->Get_KeyDown(DIK_4))
+		iRenderIndex = 3;
+
+	if (m_pGameInstance->Get_KeyDown(DIK_5))
+		iRenderIndex = 5;
+
+	if(iRenderIndex == pCollider->Get_ColliderChannel())
+		m_pGameInstance->Add_DebugComponent(pCollider);
 #endif
 }
 
@@ -159,23 +172,6 @@ HRESULT CColliderContainer::Add_BoneMatrix(_uint iChannel, const _float4x4* pBon
 	return S_OK;
 }
 
-HRESULT CColliderContainer::Add_CombineMatrix(_uint iChannel)
-{
-	vector<_matrix>* pCombinedMatrices = Find_CombineMatrices(iChannel);
-	if (pCombinedMatrices == nullptr)
-	{
-		vector<_matrix> CombinedMatrices;
-
-		CombinedMatrices.push_back(XMMatrixIdentity());
-
-		m_ColliderCombinedMatrices.emplace(iChannel, CombinedMatrices);
-	}
-	else
-		pCombinedMatrices->push_back(XMMatrixIdentity());
-
-	return S_OK;
-}
-
 vector<CCollider*>* CColliderContainer::Find_Colliders(_uint iChannel)
 {
 	auto iter = m_Colliders.find(iChannel);
@@ -191,16 +187,6 @@ vector<const _float4x4*>* CColliderContainer::Find_BoneMatrices(_uint iChannel)
 	auto iter = m_ColliderBoneMatrices.find(iChannel);
 
 	if (iter == m_ColliderBoneMatrices.end())
-		return nullptr;
-
-	return &(iter->second);
-}
-
-vector<_matrix>* CColliderContainer::Find_CombineMatrices(_uint iChannel)
-{
-	auto iter = m_ColliderCombinedMatrices.find(iChannel);
-
-	if (iter == m_ColliderCombinedMatrices.end())
 		return nullptr;
 
 	return &(iter->second);

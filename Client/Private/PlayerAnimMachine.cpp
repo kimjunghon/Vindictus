@@ -49,7 +49,7 @@ void CPlayerAnimMachine::Initialize_ATTACK()
 void CPlayerAnimMachine::Initialize_SMASH()
 {
 	_uint iFlag = ENUM_CLASS(STATE_FLAG::SMASH);
-
+	
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH0)]	=			{ "Smash_00", false, _float2{0.6f, 1.f} , 2.f };
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE)] =		{ "Smash_00_Charge", false, _float2{0.f, 1.f} , 2.f };
 	m_AnimDatas[iFlag| ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END)] =	{ "Smash_00_ChargeEnd", false, _float2{0.8f, 1.f} , 2.f };

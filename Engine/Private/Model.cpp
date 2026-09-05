@@ -107,7 +107,6 @@ HRESULT CModel::Initialize_Prototype(MODEL_TYPE eModelType, const _char* pModelF
         m_iNumMeshes = tModelInfo.iNumMeshes;
         m_iNumMaterials = tModelInfo.iNumMaterials;
 
-        
         m_Bounding.vMinPosition = _float3(FLT_MAX, FLT_MAX, FLT_MAX);
         m_Bounding.vMaxPosition = _float3(FLT_MAX * -1.f, FLT_MAX * -1.f, FLT_MAX * -1.f);
 
@@ -290,7 +289,6 @@ void CModel::Bind_ParentBone(vector<CBone*>& ParentBones)
     {
         pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, ParentBones);
     }
-
 }
 
 HRESULT CModel::Save_Binary(const _wstring& strSaveFilePath)
@@ -376,10 +374,6 @@ HRESULT CModel::MeshesToBinary(ofstream& File)
                 memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
                 memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
             }
-
-//            for (_uint i = 0; i < pAIMesh->mNumVertices; i++)
-//                File.write(reinterpret_cast<_char*>(&pVertices[i]), sizeof(VTXMESH));
-
             File.write(reinterpret_cast<_char*>(pVertices), sizeof(VTXMESH) * pAIMesh->mNumVertices);
 
             Safe_Delete_Array(pVertices);
@@ -666,10 +660,10 @@ void CModel::RootMotion()
     }
     if (m_RootMotionOption.Rotation)
     {
-        m_vAnimRotation = XMQuaternionMultiply(vRotation, XMQuaternionInverse(vTempPrevRotation));
+        m_vAnimRotation = XMQuaternionMultiply(vRotation, XMQuaternionInverse(vTempPrevRotation)); // 정석
         //m_vAnimRotation = vRotation;
-
-        if(m_RootMotionOption.RotationOnlyZ)
+           
+        if(m_RootMotionOption.RotationOnlyZ)        // 야매
         {
             _matrix RotationMatrix = XMMatrixRotationQuaternion(vRotation);
             _vector vLook = XMVector3Normalize(XMVectorSetY(RotationMatrix.r[2], 0.f));
@@ -817,7 +811,6 @@ HRESULT CModel::Ready_Animation(ifstream& File)
 {
     File.read(reinterpret_cast<_char*>(&m_iNumAnimation), sizeof(_uint));
 
-    
     for (_uint i = 0; i < m_iNumAnimation; i++)
     {
         size_t iAnimNameLength;

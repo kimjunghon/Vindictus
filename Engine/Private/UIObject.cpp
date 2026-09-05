@@ -85,10 +85,9 @@ HRESULT CUIObject::Begin()
 {
 	m_pTransformCom->Scale(_float3(m_fSizeX, m_fSizeY, 1.f));
 	m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX - (m_iWinSizeX * 0.5f), -m_fY + (m_iWinSizeY * 0.5f), (UI_FAR / (_float)m_iDepth), 1.f));
-
+	
 	return S_OK;
 }
-
 
 void CUIObject::Set_Position(_float fX, _float fY)
 {

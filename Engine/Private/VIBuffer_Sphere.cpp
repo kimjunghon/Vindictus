@@ -16,7 +16,6 @@ HRESULT CVIBuffer_Sphere::Initialize_Prototype(_uint iSphereX, _uint iSphereY)
 	m_iSphereX = iSphereX;
 	m_iSphereY = iSphereY;
 
-
 	m_iNumVertices = (m_iSphereX + 1) * (m_iSphereY + 1);
 	m_iVertexStride = sizeof(VTXPOSTEX);
 	m_iNumIndices = m_iSphereX * m_iSphereY * 2 * 3;

@@ -75,5 +75,4 @@ void CLayer::Free()
 		Safe_Release(pGameObject);
 
 	m_GameObjects.clear();
-
 }
