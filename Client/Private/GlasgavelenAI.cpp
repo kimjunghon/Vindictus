@@ -75,7 +75,11 @@ HRESULT CGlasgavelenAI::Ready_Nodes()
 CGlasgavelenAI* CGlasgavelenAI::Create(CGlasgavelen* pControlledGlasgavelen)
 {
 	CGlasgavelenAI* pInstance = new CGlasgavelenAI();
-	pInstance->Initialize(pControlledGlasgavelen);
+	if (FAILED(pInstance->Initialize(pControlledGlasgavelen)))
+	{
+		MSG_BOX(TEXT("Failed Created : CGlasgavelenAI"));
+		Safe_Release(pInstance);
+	}
 
 	return pInstance;
 }

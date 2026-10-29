@@ -13,6 +13,9 @@ HRESULT CBehaviorTree::Initialize()
 
 void CBehaviorTree::Update()
 {
+	if (nullptr == m_pRootNode)
+		return;
+
 	m_pRootNode->Evaluate();
 }
 

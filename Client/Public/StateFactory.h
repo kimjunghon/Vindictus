@@ -19,10 +19,14 @@ private:
 	
 public:
 	void			Register(const _uint iState, STATECREATE Func) { m_CreateMap[iState] = Func; }
-	CPlayerState*	Create(const _uint iState) { return m_CreateMap[iState](); }
+	CPlayerState*	Create(const _uint iState) {
+		auto iter = m_CreateMap.find(iState);
+		if (iter == m_CreateMap.end())
+			return nullptr;
+		return iter->second();
+	}
 
 private:
-	STATECREATE							m_CreateFunc;
 	unordered_map<_uint, STATECREATE>	m_CreateMap;
 
 public:

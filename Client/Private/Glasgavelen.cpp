@@ -301,7 +301,7 @@ BT_STATE CGlasgavelen::CanRageAttack()
 	{
 		if (m_RageAttackTime[i] >= m_RageAttackCoolTime[i])
 		{
-			if (m_IsBroken && m_iCurrentAttack == ENUM_CLASS(RAGE_ATTACK::DESEND) || m_iCurrentAttack == ENUM_CLASS(RAGE_ATTACK::HANG))
+			if (m_IsBroken && (i == ENUM_CLASS(RAGE_ATTACK::DESEND) || i == ENUM_CLASS(RAGE_ATTACK::HANG)))
 				continue;
 
 			m_iCurrentAttack = i;

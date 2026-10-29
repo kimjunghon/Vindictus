@@ -15,7 +15,7 @@ CPalette::CPalette(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
 CPalette::CPalette(const CPalette& Prototype)
     : CUIObject { Prototype }
     , m_iPaletteWidth { Prototype.m_iPaletteWidth }
-    , m_iPaletteHeight { Prototype.m_iPaletteWidth }
+    , m_iPaletteHeight { Prototype.m_iPaletteHeight }
     ,m_pPlayerInstance { Prototype.m_pPlayerInstance }
 {
     Safe_AddRef(m_pPlayerInstance);
@@ -279,8 +279,8 @@ _bool CPalette::IsPick(HWND hWnd)
 
     if (PtInRect(&rcRect, ptMouse))
     {
-        _uint iX = ptMouse.x - rcRect.left;
-        _uint iY = ptMouse.y - rcRect.top;
+        _uint iX = static_cast<_uint>((ptMouse.x - rcRect.left) / m_fSizeX * m_iPaletteWidth);
+        _uint iY = static_cast<_uint>((ptMouse.y - rcRect.top) / m_fSizeY * m_iPaletteHeight);
 
         _float3 vColor = PaletteColor(iX, iY);
 
@@ -306,15 +306,22 @@ void CPalette::Save_PaletteData()
 {
     D3D11_MAPPED_SUBRESOURCE	SubResource{};
 
-    m_pDeviceContext->Map(m_pPaletteSample, 0, D3D11_MAP_READ, 0, &SubResource);
+    if (FAILED(m_pDeviceContext->Map(m_pPaletteSample, 0, D3D11_MAP_READ, 0, &SubResource)))
+        return;
 
-    memcpy(m_pPixels, SubResource.pData, sizeof(_uint) * (m_iPaletteHeight * m_iPaletteWidth));
+    const _byte* pSrc = static_cast<const _byte*>(SubResource.pData);
+
+    for (_uint iY = 0; iY < m_iPaletteHeight; iY++)
+        memcpy(m_pPixels + (iY * m_iPaletteWidth), pSrc + (iY * SubResource.RowPitch), sizeof(_uint) * m_iPaletteWidth);
 
     m_pDeviceContext->Unmap(m_pPaletteSample, 0);
 }
 
 _float3 CPalette::PaletteColor(_uint iX, _uint iY)
 {
+    iX = min(iX, m_iPaletteWidth - 1);
+    iY = min(iY, m_iPaletteHeight - 1);
+
     _uint iIndex = iX + (iY * m_iPaletteWidth);
 
     _uint iPixelData = m_pPixels[iIndex];

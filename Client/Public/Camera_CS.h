@@ -70,6 +70,7 @@ private:
 	void	Update_LINEAR();
 	void	Update_SPLINE();
 	void	Find_Points(_vector* pPoints);
+	_float	Compute_NodeRatio();
 
 	void	Update_Shake(_float fTimeDelta);
 	void	Update_RotateNoise(_float fTimeDelta);

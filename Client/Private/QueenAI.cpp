@@ -94,7 +94,11 @@ HRESULT CQueenAI::Ready_Nodes()
 CQueenAI* CQueenAI::Create(CQueen* pControlledQueen)
 {
 	CQueenAI* pInstance = new CQueenAI();
-	pInstance->Initialize(pControlledQueen);
+	if (FAILED(pInstance->Initialize(pControlledQueen)))
+	{
+		MSG_BOX(TEXT("Failed Created : CQueenAI"));
+		Safe_Release(pInstance);
+	}
 
 	return pInstance;
 }

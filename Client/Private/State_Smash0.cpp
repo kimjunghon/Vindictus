@@ -51,7 +51,7 @@ void CState_Smash0::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInpu
 	}
 	else if (~ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::SMASH))
 	{
-		if(m_fChargeTime >= 0.7f)
+		if(m_fChargeTime >= m_fFullChargeTime)
 			ChangeActionFlag(ENUM_CLASS(SMASH_FLAG::SMASH0_CHARGE_END));	
 		else
 			ChangeActionFlag(ENUM_CLASS(SMASH_FLAG::SMASH0));

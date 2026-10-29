@@ -24,6 +24,7 @@ CPlayerPawn::CPlayerPawn(const CPlayerPawn& Prototype)
 	, m_pPlayerInstance { Prototype.m_pPlayerInstance}
 	, m_pPool_Instance{ Prototype.m_pPool_Instance }
 	, m_fStaminaDelay { Prototype.m_fStaminaDelay }
+	, m_fStaminaRecoveryPerSec { Prototype.m_fStaminaRecoveryPerSec }
 	, m_fSpeed { Prototype.m_fSpeed }
 {
 	Safe_AddRef(m_pPlayerInstance);
@@ -44,6 +45,7 @@ _bool CPlayerPawn::AnimCanChange()
 HRESULT CPlayerPawn::Initialize_Prototype()
 {
 	m_fStaminaDelay = 2.f;
+	m_fStaminaRecoveryPerSec = 60.f;
 	m_fSpeed = 50.f;
 
 	return S_OK;
@@ -153,7 +155,7 @@ HRESULT CPlayerPawn::Render()
 
 void CPlayerPawn::Change_State(_uint iStateIndex)
 {
-	if (iStateIndex >= ENUM_CLASS(PLAYER_STATE::END))
+	if (iStateIndex >= ENUM_CLASS(PLAYER_STATE::END) || nullptr == m_States[iStateIndex])
 		return;
 	
 	if(m_pCurrentState)
@@ -722,8 +724,13 @@ void CPlayerPawn::IncreaseStamina(_float fTimeDelta)
 {
 	m_fCurrentStaminaDelay += fTimeDelta;
 
-	if (m_fCurrentStaminaDelay >= m_fStaminaDelay && m_pStatus->fStamina < m_pStatus->fFullStamina)
-		m_pStatus->fStamina += 1.f;
+	if (m_fCurrentStaminaDelay < m_fStaminaDelay || m_pStatus->fStamina >= m_pStatus->fFullStamina)
+		return;
+
+	m_pStatus->fStamina += m_fStaminaRecoveryPerSec * fTimeDelta;
+
+	if (m_pStatus->fStamina > m_pStatus->fFullStamina)
+		m_pStatus->fStamina = m_pStatus->fFullStamina;
 }
 
 

@@ -18,7 +18,7 @@ public:
 	void			Update();
 
 protected:
-	CBT_Node* m_pRootNode;
+	CBT_Node* m_pRootNode = { nullptr };
 	
 public:
 	virtual void Free() override;

@@ -53,7 +53,7 @@ CGS_Turn* CGS_Turn::Create()
 	CGS_Turn* pInstance = new CGS_Turn();
 	if (FAILED(pInstance->Initialize()))
 	{
-		MSG_BOX(TEXT("Failed Created : CGS_Spawn"));
+		MSG_BOX(TEXT("Failed Created : CGS_Turn"));
 		Safe_Release(pInstance);
 	}
 	return pInstance;

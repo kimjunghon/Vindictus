@@ -56,23 +56,24 @@ void CCamera_CS::Priority_Update(_float fTimeDelta)
 
 void CCamera_CS::Update(_float fTimeDelta)
 {
+	if (0 == m_iNumNodes || nullptr == m_pOwnerWorldMatrix)
+	{
+		m_pGameInstance->Change_Camera(TEXT("Player_Camera"));
+		return;
+	}
+
 	m_fCurrentTime += fTimeDelta;
 
-	if (m_iCurrentIndex + 1 >= m_iNumNodes)
+	while (m_iCurrentIndex + 1 < m_iNumNodes && m_fCurrentTime >= m_CS_Datas[m_iCurrentIndex + 1].fTime)
 	{
-		if (m_fCurrentTime >= m_CS_Datas[m_iCurrentIndex].fTime)
-		{
-			m_pGameInstance->Change_Camera(TEXT("Player_Camera"));
-			return;
-		}
+		m_iCurrentIndex++;
+		m_fCurrentEffectTime = 0.f;
 	}
-	else
+
+	if (m_iCurrentIndex + 1 >= m_iNumNodes && m_fCurrentTime >= m_CS_Datas[m_iCurrentIndex].fTime)
 	{
-		if (m_fCurrentTime >= m_CS_Datas[m_iCurrentIndex + 1].fTime)
-		{
-			m_iCurrentIndex++;
-			m_fCurrentEffectTime = 0.f;
-		}
+		m_pGameInstance->Change_Camera(TEXT("Player_Camera"));
+		return;
 	}
 
 	switch (m_CS_Datas[m_iCurrentIndex].eType)
@@ -112,13 +113,17 @@ HRESULT CCamera_CS::Render()
 
 void CCamera_CS::Reset(void* pArg)
 {
+	if (nullptr == pArg)
+		return;
+
 	CAMERA_CS_RESET_DESC* pDesc = static_cast<CAMERA_CS_RESET_DESC*>(pArg);
 
 	m_pOwnerWorldMatrix = pDesc->pOwnerWorldMatrix;
 	m_OffsetMatrix = pDesc->OffsetMatrix;
 
 	m_fCurrentTime = 0.f;
-	m_iCurrentIndex = 0.f;
+	m_iCurrentIndex = 0;
+	m_fCurrentEffectTime = 0.f;
 }
 
 HRESULT CCamera_CS::Ready_Datas(const _char* pFilePath)
@@ -169,9 +174,7 @@ void CCamera_CS::Update_LINEAR()
 		return;
 	}
 
-	_float fTime = m_fCurrentTime - m_CS_Datas[m_iCurrentIndex].fTime;
-	_float fTimeDiff = m_CS_Datas[m_iCurrentIndex + 1].fTime - m_CS_Datas[m_iCurrentIndex].fTime;
-	_float fRatio = fTime / fTimeDiff;
+	_float fRatio = Compute_NodeRatio();
 
 	_vector vLerpPosition = XMVectorLerp(m_CS_Datas[m_iCurrentIndex].vPosition, m_CS_Datas[m_iCurrentIndex + 1].vPosition, fRatio);
 	_vector vLerpRotation = XMQuaternionSlerp(m_CS_Datas[m_iCurrentIndex].vRotation, m_CS_Datas[m_iCurrentIndex + 1].vRotation, fRatio);
@@ -198,16 +201,14 @@ void CCamera_CS::Update_SPLINE()
 		return;
 	}
 
-	_float fTime = m_fCurrentTime - m_CS_Datas[m_iCurrentIndex].fTime;
-	_float fTimeDiff = m_CS_Datas[m_iCurrentIndex + 1].fTime - m_CS_Datas[m_iCurrentIndex].fTime;
-	_float fRatio = fTime / fTimeDiff;
+	_float fRatio = Compute_NodeRatio();
 
 	_vector vPoints[4] = {};
 
 	Find_Points(vPoints);
 
-	_float fRatio2 = static_cast<_float>(pow(fRatio, 2.f));
-	_float fRatio3 = static_cast<_float>(pow(fRatio, 3.f));
+	_float fRatio2 = fRatio * fRatio;
+	_float fRatio3 = fRatio2 * fRatio;
 
 	_vector vSplinePosition = 0.5f * ((2.f * vPoints[1]) + (vPoints[2] - vPoints[0]) * fRatio + (vPoints[0] * 2.f - vPoints[1] * 5.f + vPoints[2] * 4.f - vPoints[3]) * fRatio2 +
 		(vPoints[1] * 3.f - vPoints[0] - vPoints[2] * 3.f + vPoints[3]) * fRatio3);
@@ -220,6 +221,17 @@ void CCamera_CS::Update_SPLINE()
 //	_matrix CombinedMatrix = XMMatrixMultiply(OffsetMatrix, XMLoadFloat4x4(m_pOwnerWorldMatrix));
 
 	m_pTransformCom->Set_WorldMatrix(CombinedMatrix);
+}
+
+_float CCamera_CS::Compute_NodeRatio()
+{
+	_float fTime = m_fCurrentTime - m_CS_Datas[m_iCurrentIndex].fTime;
+	_float fTimeDiff = m_CS_Datas[m_iCurrentIndex + 1].fTime - m_CS_Datas[m_iCurrentIndex].fTime;
+
+	if (fTimeDiff <= 0.f)
+		return 1.f;
+
+	return min(max(fTime / fTimeDiff, 0.f), 1.f);
 }
 
 void CCamera_CS::Find_Points(_vector* pPoints)

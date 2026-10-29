@@ -40,13 +40,15 @@ HRESULT CController_KeyBoard::MoveInput(INPUT_MOVE_DESC* pOut)
     if (m_pGameInstance->Get_KeyDown(DIK_LSHIFT) || m_pGameInstance->Get_KeyPressing(DIK_LSHIFT))
         bSprint = true;
 
-    if (XMVectorGetX((XMVector4Length(XMLoadFloat4(&vMoveDir)))) > 0.f)
+    _vector vDir = XMLoadFloat4(&vMoveDir);
+
+    if (XMVectorGetX(XMVector4Length(vDir)) > 0.f)
     {
         bMove = true;
-        XMVector4Normalize(XMLoadFloat4(&vMoveDir));
+        vDir = XMVector4Normalize(vDir);
     }
 
-    pOut->vDir = XMLoadFloat4(&vMoveDir);
+    pOut->vDir = vDir;
     pOut->bMove = bMove;
     pOut->bSprint = bSprint;
 

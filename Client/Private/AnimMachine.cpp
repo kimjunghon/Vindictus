@@ -15,7 +15,11 @@ HRESULT CAnimMachine::Set_Animation(CModel* pModelCom, _uint iState)
 	if (nullptr == pModelCom)
 		return E_FAIL;
 
-	return 	pModelCom->Set_Animation(m_AnimDatas[iState]);
+	auto iter = m_AnimDatas.find(iState);
+	if (iter == m_AnimDatas.end())
+		return E_FAIL;
+
+	return pModelCom->Set_Animation(iter->second);
 }
 
 HRESULT CAnimMachine::Forcing_Set_Animation(CModel* pModelCom, _uint iState)
@@ -23,15 +27,20 @@ HRESULT CAnimMachine::Forcing_Set_Animation(CModel* pModelCom, _uint iState)
 	if (nullptr == pModelCom)
 		return E_FAIL;
 
-	return 	pModelCom->Forcing_Set_Animation(m_AnimDatas[iState]);
+	auto iter = m_AnimDatas.find(iState);
+	if (iter == m_AnimDatas.end())
+		return E_FAIL;
+
+	return pModelCom->Forcing_Set_Animation(iter->second);
 }
 
 const ANIM_DATA* CAnimMachine::Get_AnimationData(_uint iState)
 {
-	if (m_AnimDatas.end() == m_AnimDatas.find(iState))
+	auto iter = m_AnimDatas.find(iState);
+	if (m_AnimDatas.end() == iter)
 		return nullptr;
 
-	return &m_AnimDatas[iState];
+	return &iter->second;
 }
 
 void CAnimMachine::Free()

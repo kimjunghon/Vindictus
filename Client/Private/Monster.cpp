@@ -442,6 +442,9 @@ void CMonster::TurnToTarget(_float fRatio)
 
 void CMonster::MoveToTarget(_float fRatio)
 {
+	if (nullptr == m_pTargetTransform)
+		return;
+
 	_vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
 	_vector vDir = XMVectorSetY(XMVectorSubtract(vTargetPos, m_pTransformCom->Get_State(STATE::POSITION)), 0.f);
 
@@ -538,7 +541,7 @@ _bool CMonster::CanChangeState()
 
 HRESULT CMonster::ChangeState(_uint iStateIndex)
 {
-	if (nullptr == m_States[iStateIndex])
+	if (iStateIndex >= m_States.size() || nullptr == m_States[iStateIndex])
 		return E_FAIL;
 
 	if (m_pCurrentState)

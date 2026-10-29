@@ -48,13 +48,8 @@ void CState_Guard::InputData(CPlayerPawn* pPlayerPawn, INPUT_MOVE_DESC MoveInput
 	}
 	else if (ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::GUARD) && pPlayerPawn->AnimCanChange())
 	{
-		if (m_bGuardBegin)
-		{
-			m_bGuardBegin = false;
-			ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_DURING));
-		}
-		else
-			ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_DURING));
+		m_bGuardBegin = false;
+		ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_DURING));
 		
 		if(ActionInput.byAction & ENUM_CLASS(ACTION_INPUT::ATTACK) && m_iStateFlag & ENUM_CLASS(GUARD_FLAG::GUARD_DURING))
 			ChangeActionFlag(ENUM_CLASS(GUARD_FLAG::GUARD_ATTACK));

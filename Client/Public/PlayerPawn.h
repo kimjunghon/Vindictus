@@ -78,6 +78,7 @@ private:
 	
 	PLAYER_STATUS*				m_pStatus = {};
 	_float						m_fStaminaDelay = {};
+	_float						m_fStaminaRecoveryPerSec = {};
 	_float						m_fCurrentStaminaDelay = {};
 
 	INPUT_MOVE_DESC				m_MoveInput = {};
